@@ -396,11 +396,15 @@ void CLevelDesign_Starblock::SetUp_Collider_Callback()
 			{
 				if (nullptr == pOther)
 					return;
-				if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
-					return;
+
+				PLAYER_QUERY PlayerQuery{};
+				m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &PlayerQuery);
 
 				ATTACK_INFO AttackInfo{};
-				AttackInfo.pAttacker = pOther->Get_Owner();
+				if (!Try_ResolveContactHit(pOther->Get_RegisteredGroup(), pOther->Get_Owner(),
+					PlayerQuery.pPlayer, &AttackInfo))
+					return;
+
 				Damaged(AttackInfo);
 			});
 	}
