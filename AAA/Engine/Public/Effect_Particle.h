@@ -24,9 +24,12 @@ PROPERTY(_float, m_fParticleSpawnEndRatio, L"Spawn End Ratio_P", L"Particle Spaw
 PROPERTY(_float, m_fParticleLifeRatio, L"Life Ratio_P", L"Particle Spawn");
 
 // Particle Shape
-PROPERTY(_int, m_iParticleShapeType, L"Shape Type_P", L"Particle Shape"); // 0 Point, 1 Sphere, 2 Circle, 3 Box
-PROPERTY(_float, m_fParticleShapeRadius, L"Radius_P", L"Particle Shape - Sphere Circle");
-PROPERTY(_bool, m_bParticleShapeRandomRadius, L"Random Radius_P", L"Particle Shape - Sphere Circle");
+PROPERTY(_int, m_iParticleShapeType, L"Shape Type_P", L"Particle Shape"); // 0 Point, 1 Sphere, 2 Circle, 3 Box, 4 Fan
+PROPERTY(_float, m_fParticleShapeRadius, L"Radius_P", L"Particle Shape - Sphere Circle Fan");
+PROPERTY(_bool, m_bParticleShapeRandomRadius, L"Random Radius_P", L"Particle Shape - Sphere Circle Fan");
+
+PROPERTY(_float, m_fParticleFanAngle, L"Angle_P", L"Particle Shape - Fan");
+PROPERTY(_float, m_fParticleFanDirectionDegree, L"Direction Degree_P", L"Particle Shape - Fan"); // 0 degrees = +X, positive toward +Z
 
 PROPERTY(_float3, m_vParticleBoxSize, L"Box Size_P", L"Particle Shape - Box");
 PROPERTY(_int, m_iParticleBoxSpawnMode, L"Box Spawn Mode_P", L"Particle Shape - Box"); // 0 Volume, 1 Top
