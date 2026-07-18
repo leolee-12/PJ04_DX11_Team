@@ -343,7 +343,7 @@ HRESULT CMapGimmickSection::Ready_Trigger()
 
 void CMapGimmickSection::On_TriggerEnter(CCollider* pOther)
 {
-	if (ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE) != pOther->Get_RegisteredGroup())
+	if (ETOUI(m_pEntry->eTriggerLayer) != pOther->Get_RegisteredGroup())
 		return;
 
 	Start_Break();
