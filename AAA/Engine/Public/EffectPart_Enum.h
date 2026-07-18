@@ -30,6 +30,7 @@ namespace Engine
 			{ 0, L"Default" },
 			{ 1, L"AlphaBlend" },
 			{ 2, L"Additive" },
+			{ 3, L"Max" },
 		};
 
 		return Items;
