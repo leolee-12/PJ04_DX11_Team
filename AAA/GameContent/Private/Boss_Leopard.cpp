@@ -9,6 +9,8 @@
 
 #include "Monster_Movement.h"
 
+#include "Spotlight_Rig.h"
+
 const vector<_float> CBoss_Leopard::s_Thresholds = {};
 
 const _float3 CBoss_Leopard::s_vPillarPos[CBoss_Leopard::PILLAR_COUNT] = {
@@ -50,6 +52,15 @@ void CBoss_Leopard::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
     Update_Afterimage(fTimeDelta);
+
+    if (nullptr == m_pSpotRig)
+        Ready_TestSpotlight();          
+
+    if (m_pSpotRig)
+    {
+        m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION));
+        m_pSpotRig->Update(fTimeDelta);
+    }
 }
 
 CAnimator* CBoss_Leopard::Get_BodyAnimator() const
@@ -340,6 +351,27 @@ void CBoss_Leopard::Spawn_Afterimage()
         m_strAfterimageId, Get_LevelIndex(), vPos, vLook);
 }
 
+HRESULT CBoss_Leopard::Ready_TestSpotlight()
+{
+    LIGHT_DESC tInit{};
+    tInit.eType = LIGHT::SPOT;
+    tInit.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+    tInit.vAmbient = _float4(0.f, 0.f, 0.f, 1.f);
+    tInit.fRange = 50.f;
+
+    m_pSpotRig = CSpotlight_Rig::Create(m_pGameInstance_Proxy, tInit);
+    if (nullptr == m_pSpotRig)
+        return E_FAIL;
+
+    m_pSpotRig->Set_Color(_float3(1.f, 0.95f, 0.8f), 15.f); // 따뜻한 흰색, 강도 8
+    m_pSpotRig->Set_Cone(18.f, 32.f);                      // 안쪽 18도 풀, 32도까지 감쇠
+    m_pSpotRig->Set_FollowSpeed(6.f);
+    m_pSpotRig->Set_OverheadOffset(XMVectorSet(0.f, 30.f, 0.f, 0.f)); // 머리 위 30에서 아래로
+
+    m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION)); // 첫 타겟=레오파드(스냅)
+    return S_OK;
+}
+
 #ifdef _DEBUG
 void CBoss_Leopard::Debug_KeyInput()
 {
@@ -389,4 +421,10 @@ CBoss_Leopard* CBoss_Leopard::Clone(void* pArg)
     if (FAILED(p->Initialize(pArg))) { MSG_BOX("Failed to Cloned : CBoss_Leopard"); Safe_Release(p); }
     return p;
 }
-void CBoss_Leopard::Free() { __super::Free(); }
+void CBoss_Leopard::Free()
+{ 
+    if (m_pSpotRig) { m_pSpotRig->Set_Enabled(false); m_pSpotRig->Push(); }
+    Safe_Release(m_pSpotRig);
+
+    __super::Free(); 
+}

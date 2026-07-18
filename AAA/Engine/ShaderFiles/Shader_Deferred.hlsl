@@ -57,6 +57,8 @@ Texture2D g_BlobShadowTexture;
 float4x4 g_BlobShadowView, g_BlobShadowProj;
 float g_fBlobShadowDarkness = 0.15f;
 
+float4 g_vSpotParams; // x = innerCos, y = outerCos
+
   //============================ Common VS ============================
 struct VS_IN
 {
@@ -199,7 +201,40 @@ float4 PS_MAIN_POINT(PS_IN In) : SV_TARGET0
     return float4(Lo, 1.f);
 }
 
-  //============================ Combined (pass 3) ============================
+  //============================ Spot (pass 3) ============================
+float4 PS_MAIN_SPOT(PS_IN In) : SV_TARGET0
+{
+    float4 nd = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 albedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+
+    albedo *= min(mra.b + float3(0.64f, 0.62f, 0.51f), 1.f);
+
+    float3 N = normalize(nd.xyz * 2.f - 1.f);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
+    float3 V = normalize(g_vCamPosition.xyz - wp);
+
+    float3 Lvec = g_vLightPos.xyz - wp;
+    float dist = length(Lvec);
+    float3 L = Lvec / max(dist, 1e-4);
+
+    // 거리 감쇠 (Point 와 동일)
+    float att = saturate((g_fLightRange - dist) / g_fLightRange);
+    att *= att;
+
+    // 콘 감쇠: 광원에서 픽셀로 향하는 방향(-L) 과 스포트 축의 각도
+    float3 spotDir = normalize(g_vLightDir.xyz);
+    float cosA = dot(-L, spotDir);
+    float cone = saturate((cosA - g_vSpotParams.y) / max(g_vSpotParams.x - g_vSpotParams.y, 1e-4));
+    cone *= cone; // 가장자리 부드럽게
+    att *= cone;
+
+    float3 Lo = CookTorrance(N, V, L, albedo, mra.r, mra.g, g_vLightDiffuse.rgb) * att;
+    return float4(Lo, 1.f);
+}
+
+  //============================ Combined (pass 4) ============================
 float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
 {
     float4 albedoA = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
@@ -323,7 +358,16 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_POINT();
     }
-    pass Combined // 3
+    pass Spot // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_SPOT();
+    }
+    pass Combined // 4
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Z_Disable, 0);

@@ -61,6 +61,7 @@
     <ClInclude Include="..\Public\PickUpEffect.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
+    <ClInclude Include="..\public\Spotlight_Rig.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
@@ -480,6 +481,7 @@
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
+    <ClCompile Include="..\private\Spotlight_Rig.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />

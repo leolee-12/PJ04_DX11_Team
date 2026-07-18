@@ -1,6 +1,7 @@
 #pragma once
 #include "GameContent_Defines.h"
 #include "Camera_Shakeable.h"
+#include "Spotlight_Rig.h"
 
 NS_BEGIN(Client)
 

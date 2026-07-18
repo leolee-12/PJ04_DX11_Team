@@ -13,6 +13,11 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_vLightAmbient",  "Sun Ambient",   GVAL::FLOAT4, { 0.f, 0.f, 0.f, 1.f },            { 0.f, 2.f } });
     Register({ "g_vLightSpecular", "Sun Specular",  GVAL::FLOAT4, { 1.f, 1.f, 1.f, 1.f },            { 0.f, 4.f } });
 
+    Register({ "g_vGodRaySpotPos",   "GodRay Spot Pos",   GVAL::FLOAT4, { 0.f, 0.f, 0.f, 0.f },  { -500.f, 500.f } }); 
+    Register({ "g_vGodRaySpotDir",   "GodRay Spot Dir",   GVAL::FLOAT4, { 0.f, -1.f, 0.f, 0.f }, { -1.f, 1.f } });     
+    Register({ "g_vGodRaySpotColor", "GodRay Spot Color", GVAL::FLOAT4, { 0.f, 0.f, 0.f, 0.f },  { 0.f, 20.f } });     
+    Register({ "g_vGodRaySpotCone",  "GodRay Spot Cone",  GVAL::FLOAT4, { 0.9f, 0.8f, 0.f, 0.f },{ -1.f, 1.f } });     
+
     Register({ "g_fSSAORadius",     "SSAO Radius",     GVAL::FLOAT, { 5.f,   0.f, 0.f, 0.f }, { 0.f,  5.f } });
     Register({ "g_fSSAOBias",       "SSAO Bias",       GVAL::FLOAT, { 0.1f, 0.f, 0.f, 0.f }, { 0.f,  0.1f } });
     Register({ "g_fSSAOPower",      "SSAO Power",      GVAL::FLOAT, { 2.4f,   0.f, 0.f, 0.f }, { 0.5f, 4.f } });

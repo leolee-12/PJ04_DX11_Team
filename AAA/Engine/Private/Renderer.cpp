@@ -892,6 +892,10 @@ HRESULT CRenderer::Render_VolumetricFog()
         Fog("g_fFogShadowStrength").x);
     cb->vGridParams = _float4((_float)FROXEL_W, (_float)FROXEL_H, (_float)FROXEL_D, 0.f);
     cb->vFogParams3 = _float4(Fog("g_fFogStart").x, Fog("g_fFogStartRange").x, 0.f, 0.f);
+    cb->vSpotPos = Fog("g_vGodRaySpotPos");
+    cb->vSpotDir = Fog("g_vGodRaySpotDir");
+    cb->vSpotColor = Fog("g_vGodRaySpotColor");
+    cb->vSpotCone = Fog("g_vGodRaySpotCone");
 
     m_pContext->Unmap(m_pFroxelCB, 0);
 

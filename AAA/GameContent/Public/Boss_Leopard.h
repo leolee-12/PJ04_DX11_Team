@@ -5,6 +5,7 @@ NS_BEGIN(Client)
 
 class CBoss_Leopard_Body;
 class CProjectile_Nail;
+class CSpotlight_Rig;
 
 class CBoss_Leopard final : public CBoss
 {
@@ -103,10 +104,13 @@ private:
     _float m_fAfterimageAccum = { 0.f };
     _wstring m_strAfterimageId;
 
+    CSpotlight_Rig* m_pSpotRig = { nullptr };
+
 private:
     void Tick_DeathSequence(_float fTimeDelta);
     void  Update_Afterimage(_float fTimeDelta);
     void  Spawn_Afterimage();
+    HRESULT Ready_TestSpotlight();
 #ifdef _DEBUG
     void Debug_KeyInput();
 #endif

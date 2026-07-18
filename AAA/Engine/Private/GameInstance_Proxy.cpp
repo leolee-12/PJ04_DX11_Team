@@ -508,12 +508,19 @@ const LIGHT_DESC* CGameInstance_Proxy::Get_LightDesc(_uint iIndex)
 	return m_pOwner->Get_LightDesc(iIndex);
 }
 
-HRESULT CGameInstance_Proxy::Add_Light(const LIGHT_DESC& LightDesc)
+_int CGameInstance_Proxy::Add_Light(const LIGHT_DESC& LightDesc)
+{
+	if (!IsConnected())
+		return -1;
+
+	return m_pOwner->Add_Light(LightDesc);
+}
+HRESULT CGameInstance_Proxy::Set_LightDesc(_uint iIndex, const LIGHT_DESC& LightDesc)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
-	return m_pOwner->Add_Light(LightDesc);
+	return m_pOwner->m_pLight_Manager->Set_LightDesc(iIndex, LightDesc);
 }
 HRESULT CGameInstance_Proxy::Render_Light(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 {

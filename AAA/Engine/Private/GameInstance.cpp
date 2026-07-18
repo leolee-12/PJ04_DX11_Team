@@ -426,7 +426,7 @@ const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex)
     return m_pLight_Manager->Get_LightDesc(iIndex);
 }
 
-HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
+_int CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
 {
     return m_pLight_Manager->Add_Light(LightDesc);
 }

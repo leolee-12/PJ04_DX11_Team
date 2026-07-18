@@ -20,6 +20,8 @@ namespace Engine
 		XMFLOAT4		vDirection;
 		XMFLOAT4		vPosition;
 		float			fRange;
+		float			fInnerCos;
+		float			fOuterCos;
 	}LIGHT_DESC;
 
 	typedef struct tagEnvironmentDesc
@@ -80,6 +82,10 @@ namespace Engine
 		XMFLOAT4 vFogParams2;   
 		XMFLOAT4 vGridParams;   
 		XMFLOAT4 vFogParams3;
+		XMFLOAT4 vSpotPos;  
+		XMFLOAT4 vSpotDir;  
+		XMFLOAT4 vSpotColor;
+		XMFLOAT4 vSpotCone;
 	}FROXEL_CB;
 
 	static constexpr unsigned int MESH_LAYER_EX_GROUP_COUNT = 5;

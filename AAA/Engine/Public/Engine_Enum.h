@@ -17,7 +17,7 @@ namespace Engine
 
 	enum class PROJ_TYPE { PERSPEC, ORTHO, END };
 
-	enum class LIGHT { DIRECTIONAL, POINT, END };
+	enum class LIGHT { DIRECTIONAL, POINT, SPOT, END };
 
 	enum class MODEL { NONANIM, ANIM, MAP, ENVIRONMENT, END };
 
@@ -31,7 +31,7 @@ namespace Engine
 
 	enum class DIMM { X, Y, WHEEL, END };
 
-	enum class DEFERRED { DEBUG, DIRECTIONAL, POINT, COMBINED, END };
+	enum class DEFERRED { DEBUG, DIRECTIONAL, POINT, SPOT, COMBINED, END };
 
 	enum class POSTPROSESS {
 		BRIGHT, BLUR, COMPSITE, SSAO, SSAO_BLUR, SSR,

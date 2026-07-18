@@ -934,6 +934,9 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Projectile">
       <UniqueIdentifier>{ccfbab45-1092-4a5d-853b-db52dd4420ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Spot">
+      <UniqueIdentifier>{5b5a61aa-7a1c-4825-b04a-0f34417aca22}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
     </Filter>
@@ -2430,6 +2433,9 @@
     <ClInclude Include="..\Public\Split_Stone.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Spotlight_Rig.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
     </ClInclude>
@@ -3598,6 +3604,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Split_Stone.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Spotlight_Rig.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
