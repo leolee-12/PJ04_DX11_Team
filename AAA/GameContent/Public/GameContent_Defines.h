@@ -41,6 +41,7 @@ namespace Client
 		DROPPED_BUBBLE,
 		DEFORM_OBJECT,
 		DROP_STAR,
+		LD_ITEM,
 		ENV_TRIGGER = 100
 	};
 
