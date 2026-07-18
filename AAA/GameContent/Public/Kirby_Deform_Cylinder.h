@@ -13,6 +13,7 @@ class CLIENT_DLL CKirby_Deform_Cylinder final : public CKirby_Deform
 {
 private:
 	static constexpr _float s_fCylinderMaxHorizontalSpeed = 35.f;
+	static constexpr _float s_fCylinderCarFallVelocity = -30.f;
 
 	// Controller
 	static constexpr _float s_fCylinder_CCT_Radius = 1.4f;

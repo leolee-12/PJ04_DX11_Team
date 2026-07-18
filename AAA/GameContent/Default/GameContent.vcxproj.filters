@@ -172,6 +172,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect">
       <UniqueIdentifier>{6ae61bed-b980-4de6-ba9b-8c5c5c37d3c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\23. OnLadderEffect">
+      <UniqueIdentifier>{4b622f74-20a8-4a20-bef5-f729f8d7191f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\96. SmokeSphereOriginalEmitter">
       <UniqueIdentifier>{9d0fc513-6eee-432b-8b54-b472bfb1fc04}</UniqueIdentifier>
     </Filter>
@@ -1560,6 +1563,9 @@
     <ClInclude Include="..\Public\DropStarEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\OnLadderEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\23. OnLadderEffect</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
@@ -2746,6 +2752,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\DropStarEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OnLadderEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\23. OnLadderEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>

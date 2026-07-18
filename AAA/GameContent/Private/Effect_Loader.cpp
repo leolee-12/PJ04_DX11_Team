@@ -24,7 +24,7 @@ namespace
         { TEXT("BombAimDot"),             TEXT("../../Resources/YSE/EffectContainer/BombAimDot.JSON") },
         { TEXT("SlideSmoke"),             TEXT("../../Resources/YSE/EffectContainer/SlideSmoke.JSON") },
         { TEXT("InhaleContainer"),        TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
-
+        { TEXT("OnLadderEffect"),         TEXT("../../Resources/YSE/EffectContainer/OnLadderEffect.JSON") },
         { TEXT("SwordSlash1"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },
         { TEXT("SwordSlash3"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash3.json") },
         { TEXT("JumpSlash_1"),            TEXT("../../Resources/YSE/EffectContainer/JumpSlash_1.json") },

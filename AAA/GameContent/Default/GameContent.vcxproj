@@ -35,6 +35,7 @@
     <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
+    <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
@@ -439,6 +440,7 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\OnLadderEffect.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />

@@ -90,6 +90,7 @@
 #include "CarLanding.h"
 #include "PickUpEffect.h"
 #include "DropStarEffect.h"
+#include "OnLadderEffect.h"
 #include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
@@ -1016,6 +1017,17 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
+    Register(COnLadderEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(COnLadderEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag,
+                    Texture_Star2D.iNumTex));
+        ));
     // CKirby_SwordTrail
     Register(CKirby_SwordTrail::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CKirby_SwordTrail),

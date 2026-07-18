@@ -131,6 +131,7 @@ void CKirby_Deform_Cylinder::Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_
     CMovement_Child* pMovement = pKirby->Get_Movement();
     _float fMaxHorizontalSpeed = 30.f;
     pMovement->Set_MaxHorizontalSpeed(fMaxHorizontalSpeed);
+    pMovement->Set_MaxFallVelocity(s_fCylinderCarFallVelocity);
 
     m_fMoveDir = DeformContext.vStartLook;
 }
@@ -172,6 +173,7 @@ void CKirby_Deform_Cylinder::Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_C
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+    pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
 }
 
 void CKirby_Deform_Cylinder::On_DumpSpitDeform(CKirby* pKirby)
@@ -274,7 +276,7 @@ void CKirby_Deform_Cylinder::Update_DeformCylinderState(CKirby* pKirby, _float f
                 Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH);
                 return;
             }
-            //Roll(pKirby, fTimeDelta);
+            Roll(pKirby, fTimeDelta);
             Update_RollState(pKirby, fTimeDelta);
             break;
         }
@@ -394,7 +396,7 @@ void CKirby_Deform_Cylinder::Roll(CKirby* pKirby, _float fTimeDelta)
 
     vLook = XMVector3Normalize(vLook);
 
-    constexpr _float fRollAcceleration = 70.f;
+    constexpr _float fRollAcceleration = 60.f;
     pKirby->Get_Movement()->Add_Acceleration(vLook * fRollAcceleration);
 }
 
@@ -443,7 +445,7 @@ void CKirby_Deform_Cylinder::Update_RollState(CKirby* pKirby, _float fTimeDelta)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
 
-    constexpr _float fJumpSpeed = 28.f;
+    constexpr _float fJumpSpeed = 22.f;
 
     switch (m_eRollState)
     {

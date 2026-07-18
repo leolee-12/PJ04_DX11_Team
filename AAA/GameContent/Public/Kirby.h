@@ -56,7 +56,7 @@ public:
 
 	// Movement_Child
 	static constexpr _float s_fGroundFriction = 40.f;
-	static constexpr _float s_fMaxHorizontalSpeed = 8.5f;
+	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
 
 	static constexpr _float s_fLinearDrag = 0.9f;
 	static constexpr _float s_fFallTransitionVelocityY = -7.f;
