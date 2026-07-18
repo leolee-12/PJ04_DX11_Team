@@ -718,6 +718,18 @@ void CMonster::Start_LaunchSmokeFx()
 		m_pTransformCom->Get_WorldMatrixPtr(), nullptr, &hSlot);
 }
 
+void CMonster::Play_LandingSmokeFx()
+{
+	if (!m_bActive || nullptr == m_pTransformCom)
+		return;
+
+	_float3 vPos{};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(
+		TEXT("MonsterLandingSmoke"), Get_LevelIndex(), vPos);
+}
+
 void CMonster::Stop_LaunchSmokeFx(_bool bImmediate)
 {
 	auto it = m_Effects.find(L"LaunchSmoke");

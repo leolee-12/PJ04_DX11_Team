@@ -160,11 +160,38 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK">
       <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu">
+      <UniqueIdentifier>{d0d182b5-faf2-4937-a252-3cbfefbaf77e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\MoveSmoke">
+      <UniqueIdentifier>{94d8ccce-348f-455a-8fd6-f31fb63bb339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\WarpIn">
+      <UniqueIdentifier>{db35b461-d7c5-4499-9550-c02163de7a05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\WarpOut">
+      <UniqueIdentifier>{2de7be80-f2e2-4b8e-b8a9-b3f8685376d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\02. Cappy">
+      <UniqueIdentifier>{ef83fc79-86ca-4d01-a53e-3135ff41ea5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\02. Cappy\KasaCatch">
+      <UniqueIdentifier>{44c03455-7491-4b5e-b3a1-6de697292c0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\02. Cappy\KasaUp">
+      <UniqueIdentifier>{e36ed791-3012-49fb-afa0-1a6ef8cd6ff9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared">
       <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke">
       <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\01. LandingSmoke">
+      <UniqueIdentifier>{42c52aba-75bf-4cab-ae2f-1a2323e51718}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\02. SwordHitEffect">
+      <UniqueIdentifier>{15a3e125-edcf-4742-96e1-d40ff661c54f}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect">
       <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
@@ -1716,6 +1743,12 @@
     <ClInclude Include="..\Public\Kabu_State_WarpOut.h">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KasaCatchEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\02. Cappy\KasaCatch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KasaUpEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\02. Cappy\KasaUp</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>00. GameObject\05. Kirby</Filter>
     </ClInclude>
@@ -1880,6 +1913,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\KoKabu.h">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LandingSmoke.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\01. LandingSmoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LaunchSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
@@ -2142,6 +2178,9 @@
     <ClInclude Include="..\Public\Movement_Child.h">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MoveSmoke.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\MoveSmoke</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\MultiHitBoxPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClInclude>
@@ -2349,6 +2388,9 @@
     <ClInclude Include="..\Public\SwordChargeEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SwordHitEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\SwordSlash1.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClInclude>
@@ -2483,6 +2525,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WarpInEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\WarpIn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WarpOutEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2876,6 +2924,12 @@
     <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\KasaCatchEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\02. Cappy\KasaCatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KasaUpEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\02. Cappy\KasaUp</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>00. GameObject\05. Kirby</Filter>
     </ClCompile>
@@ -3034,6 +3088,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\KoKabu.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LandingSmoke.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\01. LandingSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LaunchSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
@@ -3278,6 +3335,9 @@
     <ClCompile Include="..\Private\Movement_Child.cpp">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\MoveSmoke.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\MoveSmoke</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\MultiHitBoxPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClCompile>
@@ -3473,6 +3533,9 @@
     <ClCompile Include="..\Private\SwordChargeEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SwordHitEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\SwordSlash1.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
@@ -3595,6 +3658,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\WalkSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WarpInEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\WarpIn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WarpOutEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
