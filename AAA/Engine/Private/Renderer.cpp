@@ -831,7 +831,7 @@ HRESULT CRenderer::Render_Effect_HDR()
     if (m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)].empty())
         return S_OK;
 
-    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_DoF"), nullptr, false, false)))
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_DoF"), nullptr, true, false)))
         return E_FAIL;
 
     for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)])

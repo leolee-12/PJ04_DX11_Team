@@ -1677,6 +1677,22 @@ void CGameObject_Factory::Leopard_Effect()
                 CTexture::Create(pDevice, pContext, Texture_NailTrail.szFileTag, Texture_NailTrail.iNumTex));
         )
     );
+    Register(CLeopard_Afterimage_Assault::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Afterimage_Assault),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Afterimage_Assault::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Afterimage/BossLeopard_00_AssaultSlashEffectModel.ysh"
+            , XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_Afterimage_Jump::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Afterimage_Jump),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Afterimage_Jump::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Afterimage/BossLeopard_00_JumpAttackLeopardModel.ysh"
+            , XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
 }
 
 void CGameObject_Factory::Free()

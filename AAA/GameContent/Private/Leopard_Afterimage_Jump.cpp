@@ -54,7 +54,7 @@ HRESULT CLeopard_Afterimage_Jump::Ready_EffectPartObjects()
 	CMeshCommon::MESH_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
 	tDesc.wstrModelTag = MODEL_PROTO_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Meteo", &tDesc)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Afterimage", &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
