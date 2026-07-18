@@ -204,7 +204,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage1-2/Section/GsDefault_4.ysh",
 		L"MapGimmickSection_Stage1-2_GsDefault_4",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -226,7 +226,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_7.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_7",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -248,7 +248,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_8.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_8",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -270,7 +270,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_9.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_9",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -292,7 +292,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_10.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_10",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -314,7 +314,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-2/Section/Land_GsAllBuilding_9.ysh",
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_9",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -336,7 +336,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-2/Section/Land_GsAllBuilding_10.ysh",
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_10",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -358,7 +358,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-2/Section/Land_GsAllBuilding_11.ysh",
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_11",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -380,7 +380,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-2/Section/Land_GsAllBuilding_12.ysh",
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_12",
 
-		COLLISION_LAYER::CAR_BOOST,
+		COLLISION_LAYER::PLAYER_BREAKERABLE,
 
 		L"Split_Stone_Ultra",
 		1.f,

@@ -38,6 +38,7 @@
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
+    <ClInclude Include="..\Public\Kirby_DeformContext.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
     <ClInclude Include="..\Public\LD_LensFlare.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardB.h" />
@@ -130,7 +131,6 @@
     <ClInclude Include="..\Public\Kirby_Clear.h" />
     <ClInclude Include="..\Public\Kirby_Dialogue.h" />
     <ClInclude Include="..\Public\Kirby_Dodge.h" />
-    <ClInclude Include="..\Public\Kirby_HitBox_Model.h" />
     <ClInclude Include="..\Public\Kirby_SequenceLock.h" />
     <ClInclude Include="..\Public\Kirby_Slide.h" />
     <ClInclude Include="..\Public\LD_ArrowBoard.h" />
@@ -537,7 +537,6 @@
     <ClCompile Include="..\Private\Kirby_Clear.cpp" />
     <ClCompile Include="..\Private\Kirby_Dialogue.cpp" />
     <ClCompile Include="..\Private\Kirby_Dodge.cpp" />
-    <ClCompile Include="..\Private\Kirby_HitBox_Model.cpp" />
     <ClCompile Include="..\Private\Kirby_SequenceLock.cpp" />
     <ClCompile Include="..\Private\Kirby_Slide.cpp" />
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp" />

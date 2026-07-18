@@ -1,6 +1,17 @@
 #include "Kirby_Deform_Cylinder.h"
 
-#include "GameInstance.h"
+#include "Kirby.h"
+#include "Kirby_Body.h"
+#include "Kirby_Ability.h"
+
+#include "Kirby_State.h"
+
+#include "LD_DeformObject.h"
+#include "Kirby_Deform.h"
+
+#include "Movement_Child.h"
+
+#include "Deformable.h"
 
 CKirby_Deform_Cylinder::CKirby_Deform_Cylinder()
 {
@@ -10,6 +21,10 @@ HRESULT CKirby_Deform_Cylinder::Initialize()
 {
     if (FAILED(__super::Initialize()))
         return E_FAIL;
+
+    m_wstrAttackModeName = L"토관 머금기";
+
+    Set_FullBodyAni(DEFORM_ANI::SPIT_START, "SpitStart", false, false, 0.1f, 1.5f);
 
     return S_OK;
 }
@@ -21,18 +36,49 @@ DEFORM_TYPE CKirby_Deform_Cylinder::Get_DeformType()
 
 void CKirby_Deform_Cylinder::Enter_Deform(CKirby* pKirby)
 {
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_MaxHorizontalSpeed(s_fCylinderMaxHorizontalSpeed);
+    pMovement->Set_GravityScale(1.6f);
+
+    // CCT
+    pKirby->Set_CollisionSize(s_fCylinder_CCT_Radius, s_fCylinder_CCT_Height);
+
+    // Hit Box
+    CCollider::COLLIDER_DESC tBreakerableHitDesc{};
+    tBreakerableHitDesc.pOwner = pKirby;
+    tBreakerableHitDesc.fRadius = 2.3f;
+    tBreakerableHitDesc.fHeight = 4.7f;
+    constexpr _float fRadiusPadding = 0.5f;
+    tBreakerableHitDesc.vCenter =
+    {
+        tBreakerableHitDesc.fHeight / 2.f + tBreakerableHitDesc.fRadius,
+        tBreakerableHitDesc.fRadius / 2.f + fRadiusPadding,
+        0.f
+    };
+    tBreakerableHitDesc.vRadians = _float3(0.f, 0.f, XMConvertToRadians(90.f));
+    pKirby->Set_ColliderDesc(CKirby::BREAKERABLE_HITBOX, tBreakerableHitDesc);
 }
 
 void CKirby_Deform_Cylinder::Exit_Deform(CKirby* pKirby)
 {
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+    pMovement->Set_GravityScale(1.f);
+
+    pKirby->Set_CollisionSize(CKirby::s_fCCT_Radius, CKirby::s_fCCT_Height);
 }
 
 void CKirby_Deform_Cylinder::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
+    m_bReqEndAttackState = false;
+
+    m_eCylinderState = DEFORM_CYLINDER_STATE::CYLINDER_STATE_END;
+    Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::ROT_MOVEDIR);
 }
 
 void CKirby_Deform_Cylinder::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 {
+    Update_DeformCylinderState(pKirby, fTimeDelta);
 }
 
 void CKirby_Deform_Cylinder::Exit_AttackState(CKirby* pKirby)
@@ -41,22 +87,424 @@ void CKirby_Deform_Cylinder::Exit_AttackState(CKirby* pKirby)
 
 _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
+    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
+    //m_vRotDir
+    switch (eCommandType)
+    {
+        // Dump
+    case KIRBY_COMMAND_TYPE::DUMP:
+    {
+        if (!pCommand->IsPress())
+            return false;
+
+        if(m_eCylinderState == DEFORM_CYLINDER_STATE::CLASHED_WAIT)
+        {
+            if (pKirby->Can_Dump() == true)
+            {
+                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CYLINDER_STATE_END);
+                pKirby->Reset_DumpCool();
+                return true;
+            }
+
+            pKirby->Req_AbilityDumpCoolDecrease();
+        }
+
+        return true;
+    }
+        // Jump Down
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            m_bTryJump = true;
+
+            return true;
+        }
+    }
+
     return false;
 }
 
-_bool CKirby_Deform_Cylinder::Enter_Attack_KeyDown(CKirby* pKirby)
+void CKirby_Deform_Cylinder::Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
-    return true;
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    _float fMaxHorizontalSpeed = 30.f;
+    pMovement->Set_MaxHorizontalSpeed(fMaxHorizontalSpeed);
+
+    m_fMoveDir = DeformContext.vStartLook;
 }
 
-_bool CKirby_Deform_Cylinder::Enter_Attack_KeyPress(CKirby* pKirby)
+_bool CKirby_Deform_Cylinder::Update_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
 {
-    return true;
+    CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+    _float fRatio = pDeformModel->Get_Animator()->Get_Progress();
+
+    if (fRatio < 0.55f)
+        return false;
+
+    _vector vTargetPos = XMLoadFloat3(&DeformContext.vStartPos);
+
+    CTransform* pTransform = pKirby->Get_Transform();
+    _vector vCurPos = pTransform->Get_State(STATE::POSITION);
+    _vector vMoveDir = XMVectorSetY(vTargetPos - vCurPos, 0.f);
+
+    constexpr _float fSpeed = 40.f;
+    _float fEstimatedFrameMoveDist = fSpeed * fTimeDelta;
+    const _float fArrivalDistanceThreshold = fEstimatedFrameMoveDist > 0.1f ? fEstimatedFrameMoveDist : 0.1f;
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    if (XMVectorGetX(XMVector3LengthSq(vMoveDir)) < fArrivalDistanceThreshold * fArrivalDistanceThreshold)
+    {
+        pTransform->Set_State(STATE::POSITION, vTargetPos);
+        pMovement->Sync_To_Controller();
+        return true;
+    }
+
+    vMoveDir = XMVector3Normalize(vMoveDir);
+
+    pMovement->Set_Velocity(vMoveDir * fSpeed);
+
+    return false;
 }
 
-_bool CKirby_Deform_Cylinder::Enter_Attack_KeyUp(CKirby* pKirby)
+void CKirby_Deform_Cylinder::Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
-    return true;
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+}
+
+void CKirby_Deform_Cylinder::On_DumpSpitDeform(CKirby* pKirby)
+{
+    pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 20.f, 0.f, 0.f));
+}
+
+void CKirby_Deform_Cylinder::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+
+}
+
+void CKirby_Deform_Cylinder::Change_DeformCylinderState(CKirby* pKirby, DEFORM_CYLINDER_STATE eNext)
+{
+    if (m_eCylinderState == eNext)
+        return;
+
+    Exit_DeformCylinderState(pKirby, m_eCylinderState);
+
+    m_eCylinderState = eNext;
+
+    Enter_DeformCylinderState(pKirby, m_eCylinderState);
+}
+
+void CKirby_Deform_Cylinder::Enter_DeformCylinderState(CKirby* pKirby, DEFORM_CYLINDER_STATE eState)
+{
+    CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER);
+    CAnimator* pAnimator = pModel->Get_Animator();
+
+    switch (eState)
+    {
+        case DEFORM_CYLINDER_STATE::ROT_MOVEDIR:
+        {
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::ROLL:
+        {
+            m_bTryJump = false;
+            m_eRollState = ROLL_STATE::ROLL_STATE_END;
+            Change_RollState(pKirby, ROLL_STATE::MOVE);
+            pKirby->Set_ColliderEnabled(CKirby::BREAKERABLE_HITBOX, true);
+            break;
+        }
+
+        case DEFORM_CYLINDER_STATE::CLASH:
+        {
+            pAnimator->Play("Clash", false, false, 0.1f, 1.5f);
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Stop();
+            pMovement->Set_GravityScale(0.f);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CLASH_SLIP_WALL:
+        {
+            pAnimator->Play("ClashedSlipWall", true, false, 0.1f, 1.5f);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CLASHED_REMOVE_WALL:
+        {
+            pAnimator->Play("ClashedRemoveWall", false, false, 0.1f, 1.5f);
+            break;
+        }
+
+        case DEFORM_CYLINDER_STATE::CLASHED_LANDING:
+        {
+            pAnimator->Play("ClashedLanding", false, false, 0.1f, 1.5f);
+            break;
+        }
+
+        case DEFORM_CYLINDER_STATE::CLASHED_WAIT:
+        {
+            pAnimator->Play("ClashedWait", true, false, 0.1f, 1.5f);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CYLINDER_STATE_END:
+        {
+            m_bReqEndAttackState = true;
+            pKirby->Change_State(KIRBY_STATE_TYPE::DEFORM_DUMP);
+            break;
+        }
+    }
+}
+
+void CKirby_Deform_Cylinder::Update_DeformCylinderState(CKirby* pKirby, _float fTimeDelta)
+{
+    CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER);
+    CAnimator* pCylinderAnimator = pModel->Get_Animator();
+
+    switch (m_eCylinderState)
+    {
+        case DEFORM_CYLINDER_STATE::ROT_MOVEDIR:
+        {
+            Rot_MoveDir(pKirby, fTimeDelta);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::ROLL:
+        {
+            if (m_pGameInstance_Proxy->Key_Down(DIK_F))
+            {
+                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH);
+                return;
+            }
+            //Roll(pKirby, fTimeDelta);
+            Update_RollState(pKirby, fTimeDelta);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CLASH:
+        {
+            if (pCylinderAnimator->Is_Finished())
+            {
+                CMovement_Child* pMovement = pKirby->Get_Movement();
+
+                if (pMovement->Is_Grounded())
+                    Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASHED_REMOVE_WALL);
+                else
+                    Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH_SLIP_WALL);
+            }
+            break;
+        }
+
+        case DEFORM_CYLINDER_STATE::CLASH_SLIP_WALL:
+        {           
+            if (pKirby->Get_Movement()->Is_Grounded())
+                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASHED_REMOVE_WALL);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CLASHED_REMOVE_WALL:
+        {
+            if (pCylinderAnimator->Is_Finished())
+                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASHED_LANDING);
+            break;
+        }
+
+        case DEFORM_CYLINDER_STATE::CLASHED_LANDING:
+        {
+            if (pCylinderAnimator->Is_Finished())
+                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASHED_WAIT);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CLASHED_WAIT:
+        {
+            break;
+        }
+    }
+}
+
+void CKirby_Deform_Cylinder::Exit_DeformCylinderState(CKirby* pKirby, DEFORM_CYLINDER_STATE eState)
+{
+    switch (eState)
+    {
+        case DEFORM_CYLINDER_STATE::ROT_MOVEDIR:
+        {
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::ROLL:
+        {
+            pKirby->Set_ColliderEnabled(CKirby::BREAKERABLE_HITBOX, false);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CYLINDER_STATE_END:
+        {
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CLASH:
+        {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_GravityScale(1.f);
+            break;
+        }
+        case DEFORM_CYLINDER_STATE::CLASH_SLIP_WALL:
+            break;
+        case DEFORM_CYLINDER_STATE::CLASHED_REMOVE_WALL:
+            break;
+        case DEFORM_CYLINDER_STATE::CLASHED_LANDING:
+            break;
+        case DEFORM_CYLINDER_STATE::CLASHED_WAIT:
+            break;
+    }
+}
+
+void CKirby_Deform_Cylinder::Rot_MoveDir(CKirby* pKirby, _float fTimeDelta)
+{
+    _vector vTargetDir = XMLoadFloat3(&m_fMoveDir);
+    vTargetDir = XMVectorSetY(vTargetDir, 0.f);
+
+    if (XMVectorGetX(XMVector3LengthSq(vTargetDir)) <= Helper::fEpsilon)
+    {
+        assert(false);
+        return;
+    }
+
+    vTargetDir = XMVector3Normalize(vTargetDir);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Rotate_To_Direction(vTargetDir, fTimeDelta);
+
+    CTransform* pTransform = pKirby->Get_Transform();
+    _vector vCurrentLook =XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
+
+    constexpr _float fFinishDegree = 1.f;
+    const _float fFinishDot = cosf(XMConvertToRadians(fFinishDegree));
+
+    if (XMVectorGetX(XMVector3Dot(vCurrentLook, vTargetDir)) >= fFinishDot)
+    {
+        pTransform->LookTo(vTargetDir);
+        Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::ROLL);
+    }
+}
+
+void CKirby_Deform_Cylinder::Roll(CKirby* pKirby, _float fTimeDelta)
+{
+    _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
+    vLook = XMVectorSetY(vLook, 0.f);
+
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) <= Helper::fEpsilon)
+    {
+        assert(false);
+        return;
+    }
+
+    vLook = XMVector3Normalize(vLook);
+
+    constexpr _float fRollAcceleration = 70.f;
+    pKirby->Get_Movement()->Add_Acceleration(vLook * fRollAcceleration);
+}
+
+void CKirby_Deform_Cylinder::Change_RollState(CKirby* pKirby, ROLL_STATE eNext)
+{
+    if (m_eRollState == eNext)
+        return;
+
+    Exit_RollState(pKirby, m_eRollState);
+
+    m_eRollState = eNext;
+
+    Enter_RollState(pKirby, m_eRollState);
+}
+
+void CKirby_Deform_Cylinder::Enter_RollState(CKirby* pKirby, ROLL_STATE eState)
+{
+    CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER);
+
+    CAnimator* pAnimator = pModel->Get_Animator();
+
+    switch (eState)
+    {
+        case ROLL_STATE::MOVE:
+            pAnimator->Play("Rolling", true, false, 0.1f, 1.5f);
+            break;
+
+        case ROLL_STATE::JUMP:
+            pAnimator->Play("Rolling", true, false, 0.1f, 1.5f);            
+            break;
+
+        case ROLL_STATE::FALL:
+            pAnimator->Play("Fall", true, false, 0.1f, 1.5f);
+            break;
+
+        case ROLL_STATE::LANDING:
+            pAnimator->Play("Landing", false, false, 0.1f, 2.f);
+            break;
+
+        case ROLL_STATE::ROLL_STATE_END:
+            break;
+    }
+}
+
+void CKirby_Deform_Cylinder::Update_RollState(CKirby* pKirby, _float fTimeDelta)
+{
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+
+    constexpr _float fJumpSpeed = 28.f;
+
+    switch (m_eRollState)
+    {
+        case ROLL_STATE::MOVE:
+        {
+            if(m_bTryJump && pMovement->Try_Jump(fJumpSpeed))
+                Change_RollState(pKirby, ROLL_STATE::JUMP);
+            else if(!pMovement->Is_Grounded())
+                Change_RollState(pKirby, ROLL_STATE::FALL);
+
+            break;
+        }
+
+        case ROLL_STATE::JUMP:
+        {
+            if (pMovement->Get_VerticalVelocity() <= 0.f)
+                Change_RollState(pKirby, ROLL_STATE::FALL);
+            break;
+        }
+
+        case ROLL_STATE::FALL:
+        {
+            if (pMovement->Is_Grounded())
+                Change_RollState(pKirby, ROLL_STATE::LANDING);
+            break;
+        }
+        case ROLL_STATE::LANDING:
+        {
+            CAnimator* pAnimator = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER)->Get_Animator();
+            _bool bIsGround = pMovement->Is_Grounded();
+
+            if (m_bTryJump && pMovement->Try_Jump(fJumpSpeed))
+                Change_RollState(pKirby, ROLL_STATE::JUMP);
+            else if (!bIsGround)
+                Change_RollState(pKirby, ROLL_STATE::FALL);
+            else if (pAnimator->Is_Finished())
+                Change_RollState(pKirby, ROLL_STATE::MOVE);
+
+            break;
+        }
+    }
+
+    m_bTryJump = false;
+}
+
+void CKirby_Deform_Cylinder::Exit_RollState(CKirby* pKirby, ROLL_STATE eState)
+{
+    switch (eState)
+    {
+        case ROLL_STATE::MOVE:
+            break;
+
+        case ROLL_STATE::JUMP:
+            break;
+
+        case ROLL_STATE::FALL:
+            break;
+
+        case ROLL_STATE::LANDING:
+            break;
+    }
 }
 
 CKirby_Deform_Cylinder* CKirby_Deform_Cylinder::Create()

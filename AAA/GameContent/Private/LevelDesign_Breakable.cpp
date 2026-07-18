@@ -18,7 +18,7 @@ namespace
 
 	static constexpr _uint		BREAK_MASK_LV1 = 0xFFFFFFFFu;
 	constexpr _uint Hit_Bit(HIT_TYPE eType) { return 1u << static_cast<_uint>(eType); }
-	static constexpr _uint		BREAK_MASK_LV2 = Hit_Bit(HIT_TYPE::CAR_BOOSTER_HIT);
+	static constexpr _uint		BREAK_MASK_LV2 = Hit_Bit(HIT_TYPE::BREAKERABLE_HIT);
 
 	struct LD_BREAKABLE_CATALOG
 	{
@@ -525,6 +525,8 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 	m_pHurtBox->Set_OnEnter([this](CCollider* pOther)
 		{
 			if (nullptr == pOther)
+				return;
+			if (ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE) != pOther->Get_RegisteredGroup())
 				return;
 
 			PLAYER_QUERY PlayerQuery{};

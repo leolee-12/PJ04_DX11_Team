@@ -274,7 +274,7 @@ void CCappy::Apply_AIVariation(const _wstring& strVariation)
 
 void CCappy::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+	if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT)
 	{
 		if (m_pHat && (m_pHat->Is_Detached() || m_pHat->Is_Thrown()))
 			m_pHat->Despawn();

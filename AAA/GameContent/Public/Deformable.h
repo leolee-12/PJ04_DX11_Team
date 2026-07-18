@@ -1,6 +1,10 @@
 #pragma once
 #include "GameContent_Defines.h"
 
+NS_BEGIN(Engine)
+class CGameObject;
+NS_END
+
 NS_BEGIN(Client)
 class IDeformable;
 
@@ -34,6 +38,7 @@ protected:
 public:
     virtual DEFORM_TYPE         Get_DeformType() const = 0;
     virtual DEFORM_OBJECT_KIND  Get_DeformKind() const = 0;
+    virtual CGameObject*        Get_GameObject() = 0;
 
     virtual _bool   Request_Deform(const _float4x4* AnchorWorld) = 0;
 };
