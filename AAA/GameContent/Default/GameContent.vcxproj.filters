@@ -148,30 +148,6 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot">
       <UniqueIdentifier>{4d6324c8-1634-4bd9-9325-d8d4db88a743}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect">
-      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight">
-      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail">
-      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK">
-      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared">
-      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke">
-      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect">
-      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect">
-      <UniqueIdentifier>{6ae61bed-b980-4de6-ba9b-8c5c5c37d3c2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect">
       <UniqueIdentifier>{5ed7fbfe-ccc7-4a10-9bab-44a1c7666254}</UniqueIdentifier>
     </Filter>
@@ -196,6 +172,24 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect\Wind\Spin">
       <UniqueIdentifier>{239bf811-cb64-4bcd-8ea8-da24cb62af3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect">
+      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight">
+      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail">
+      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK">
+      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared">
+      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke">
+      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect">
       <UniqueIdentifier>{5ee074db-6e75-423d-87ff-db88afb2ded6}</UniqueIdentifier>
     </Filter>
@@ -208,17 +202,38 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Afterimage\Jump">
       <UniqueIdentifier>{95d8b69b-d1af-4c61-96d9-d9ca27e1c0f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw">
+      <UniqueIdentifier>{66ee8828-f0c0-4fc0-8858-f41b221bccf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Assault">
+      <UniqueIdentifier>{a8c040f7-a997-41f5-b769-768b6feeca98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Jump">
+      <UniqueIdentifier>{12f2a11e-7e1d-4b72-ba9d-449fc8b4b895}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Floor">
+      <UniqueIdentifier>{2386c389-46cd-4c86-9e4b-f5a80ff1bd5c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Meteo">
       <UniqueIdentifier>{ca2591ce-8750-4816-92bb-777fdfd2995e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring">
       <UniqueIdentifier>{897818e6-fb43-42f6-9d05-f28a29d18981}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Flash">
+      <UniqueIdentifier>{d72c8012-66e8-4d5b-977f-e13a24b7560d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Slash">
       <UniqueIdentifier>{8a197ee5-df94-4e70-aa6e-01a2453fc168}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Trail">
       <UniqueIdentifier>{ea4e84dd-eb3c-4eab-a2b8-6e97abf320fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect">
+      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect">
+      <UniqueIdentifier>{6ae61bed-b980-4de6-ba9b-8c5c5c37d3c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\96. SmokeSphereOriginalEmitter">
       <UniqueIdentifier>{9d0fc513-6eee-432b-8b54-b472bfb1fc04}</UniqueIdentifier>
@@ -1330,21 +1345,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw">
-      <UniqueIdentifier>{66ee8828-f0c0-4fc0-8858-f41b221bccf2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Assault">
-      <UniqueIdentifier>{a8c040f7-a997-41f5-b769-768b6feeca98}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Jump">
-      <UniqueIdentifier>{12f2a11e-7e1d-4b72-ba9d-449fc8b4b895}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Floor">
-      <UniqueIdentifier>{2386c389-46cd-4c86-9e4b-f5a80ff1bd5c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Flash">
-      <UniqueIdentifier>{d72c8012-66e8-4d5b-977f-e13a24b7560d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2004,20 +2004,29 @@
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LensFlare.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Leopard_Afterimage_Assault.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Afterimage\Assault</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Leopard_Afterimage_Jump.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Afterimage\Jump</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Leopard_ClawAssault.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Assault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_ClawJump.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Jump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Flash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Flash</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Leopard_Meteo.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Meteo</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Leopard_Slash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Slash</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LensFlare.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelData.h">
       <Filter>97. DataSystem\Header</Filter>
@@ -2579,15 +2588,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Leopard_ClawAssault.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Assault</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Leopard_ClawJump.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Jump</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Leopard_Flash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Flash</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3200,20 +3200,29 @@
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LensFlare.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Afterimage\Assault</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Afterimage\Jump</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Leopard_ClawAssault.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Assault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_ClawJump.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Jump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Flash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Flash</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Leopard_Meteo.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Meteo</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Leopard_Slash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Slash</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LensFlare.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
@@ -3736,15 +3745,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Leopard_ClawAssault.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Assault</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Leopard_ClawJump.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Claw\Jump</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Leopard_Flash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. Leopard_Effect\Ring\Flash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
