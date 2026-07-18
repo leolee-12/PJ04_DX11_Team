@@ -3856,10 +3856,8 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Leopard.hlsl">
+    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>
