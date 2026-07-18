@@ -1,15 +1,10 @@
 #include "MapStage.h"
-#include "MapEvent_BreakWall.h"
+#include "MapGimmick_Defines.h"
 
 #include "GameInstance_Proxy.h"
 #include "Math_Utils.h"
 
 NS_BEGIN(Client)
-
-namespace
-{
-	constexpr const _tchar* STAGE12_BREAK_WALL_BASE_SECTION_NAME = L"GsDefault_2";
-}
 
 CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject { pDevice, pContext }
@@ -53,18 +48,33 @@ HRESULT CMapStage::Validate_Initialized()
 	if (!m_bSnapshotValid)
 		return E_FAIL;
 
-	_bool bHasStage12BreakWallBaseSection = false;
-
 	for (CMapSection* pSection : m_Sections)
 	{
 		if (nullptr == pSection)
 			return E_FAIL;
-
-		if (STAGE12_BREAK_WALL_BASE_SECTION_NAME == pSection->Get_SectionName())
-			bHasStage12BreakWallBaseSection = true;
 	}
 
-	if (CMapEvent_BreakWall::STAGE12_STAGE_NAME == m_strStageName && !bHasStage12BreakWallBaseSection)
+	_bool bHasAllGimmickShellSections = true;
+
+	For_Each_MapGimmickEntry(m_strStageName,
+		[&](const MAP_GIMMICK_SECTION_ENTRY& Entry)
+		{
+			_bool bHasShellSection = false;
+
+			for (CMapSection* pSection : m_Sections)
+			{
+				if (pSection->Get_SectionName() != Entry.pShellSectionName)
+					continue;
+
+				bHasShellSection = true;
+				break;
+			}
+
+			if (!bHasShellSection)
+				bHasAllGimmickShellSections = false;
+		});
+
+	if (!bHasAllGimmickShellSections)
 		return E_FAIL;
 
 	return S_OK;
@@ -171,16 +181,17 @@ void CMapStage::Deserialize_Internal(const json& j)
 
 HRESULT CMapStage::Ready_Events()
 {
-	if (CMapEvent_BreakWall::STAGE12_STAGE_NAME == m_strStageName)
-	{
-		Subscribe_Event(EventTag::Stage1_Step2_CarBreakMap,
-			[this](void* pData)
-			{
-				UNREFERENCED_PARAMETER(pData);
-				m_pGameInstance_Proxy->Play_SFX(L"GimmickWallStake_Strike.wav", 0.6f, ESoundBus::SFX);
-				On_Stage12CarBreakWall();
-			});
-	}
+	Subscribe_Event(EventTag::MapGimmick_SectionBreak,
+		[this](void* pData)
+		{
+			const MAP_GIMMICK_BREAK_EVENT* pEvent = static_cast<const MAP_GIMMICK_BREAK_EVENT*>(pData);
+			if (nullptr == pEvent || nullptr == pEvent->pEntry)
+				return;
+			if (m_strStageName != pEvent->pEntry->pStageName)
+				return;
+
+			On_GimmickSectionBreak(pEvent->pEntry->pShellSectionName);
+		});
 
 	return S_OK;
 }
@@ -245,11 +256,14 @@ void CMapStage::Submit_VisibleSections()
 	}
 }
 
-void CMapStage::On_Stage12CarBreakWall()
+void CMapStage::On_GimmickSectionBreak(const _tchar* pShellSectionName)
 {
+	if (nullptr == pShellSectionName)
+		return;
+
 	for (CMapSection* pSection : m_Sections)
 	{
-		if (STAGE12_BREAK_WALL_BASE_SECTION_NAME != pSection->Get_SectionName())
+		if (pSection->Get_SectionName() != pShellSectionName)
 			continue;
 
 		pSection->Set_Renderable(false);

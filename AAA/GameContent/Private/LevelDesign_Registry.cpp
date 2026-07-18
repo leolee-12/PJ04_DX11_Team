@@ -7,6 +7,7 @@
 #include "LevelDesign_Rail.h"
 #include "LevelDesign_FallBorder.h"
 #include "LD_AudioArea.h"
+#include "LD_LensFlare.h"
 
 #include "LevelDesign_Breakable.h"
 #include "LD_PopFlower.h"
@@ -271,10 +272,10 @@ void CLevelDesign_Registry::Register_GuideAudio()
 {
 	Register_Unsupported(L"GuideMovieArea", LD_CATEGORY::GUIDE_AREA, L"Layer_LevelDesign_Guide");
 	Register_Unsupported(L"SlideInfoArea", LD_CATEGORY::GUIDE_AREA, L"Layer_LevelDesign_Guide");
-	Register_Unsupported(L"LensFlare", LD_CATEGORY::GUIDE_AREA, L"Layer_LevelDesign_Guide");
 	Register_Unsupported(L"IntroductionDemo", LD_CATEGORY::GUIDE_AREA, L"Layer_LevelDesign_Guide");
 
 	CLD_AudioArea::Register_LevelDesignSpecs();
+	CLD_LensFlare::Register_LevelDesignSpecs();
 }
 
 void CLevelDesign_Registry::Register_NPCs()

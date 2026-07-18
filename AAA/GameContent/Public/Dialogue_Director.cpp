@@ -1,6 +1,6 @@
 #include "Dialogue_Director.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 CDialogue_Director::CDialogue_Director(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }

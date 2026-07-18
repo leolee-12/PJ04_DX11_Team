@@ -5,14 +5,14 @@
 #include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
-#include "MapEvent_BreakWall.h"
+#include "MapGimmickSection.h"
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "LevelDesign_Bush.h"
 #include "Editable.h"
 #include "EffectPart_Enum.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 #include "GameInstance.h"
 #include "ContainerObject.h"
@@ -380,7 +380,8 @@ void CPanel_Inspector::Render()
 		Draw_EnvObjectEditPanel(pLevel, pSelected);
 	}
 
-	if (dynamic_cast<CMapEvent_BreakWall*>(pSelected))
+	CMapGimmickSection* pMapGimmickSection = dynamic_cast<CMapGimmickSection*>(pSelected);
+	if (nullptr != pMapGimmickSection)
 	{
 		ImGui::Separator();
 		Draw_MapSectionEditPanel(pLevel, nullptr, pSelected);
@@ -476,8 +477,9 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 	const _bool bSkipEnvObjectCategory =
 		nullptr != dynamic_cast<CEnvObject*>(pHolder);
 	const _bool bSkipMapSectionCategory =
-		nullptr != dynamic_cast<CMapSection*>(pHolder)
-		|| nullptr != dynamic_cast<CMapEvent_BreakWall*>(pHolder);
+		nullptr != dynamic_cast<CMapSection*>(pHolder);
+	const _bool bSkipMapGimmickSectionCategory =
+		nullptr != dynamic_cast<CMapGimmickSection*>(pHolder);
 	const _bool bSkipTriggerAreaRotation =
 		nullptr != dynamic_cast<CEnvObject_Trigger*>(pHolder);
 
@@ -487,6 +489,9 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 			continue;
 
 		if (bSkipMapSectionCategory && prop.strCategory == L"MapSection")
+			continue;
+
+		if (bSkipMapGimmickSectionCategory && prop.strCategory == L"MapGimmickSection")
 			continue;
 
 		if (bSkipTriggerAreaRotation && prop.strCategory == L"Trigger" && prop.strName == L"Area Rotation")
@@ -864,16 +869,16 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		return;
 
 	CMapSection* pMapSection = dynamic_cast<CMapSection*>(pObject);
-	CMapEvent_BreakWall* pBreakWall = dynamic_cast<CMapEvent_BreakWall*>(pObject);
+	CMapGimmickSection* pGimmickSection = dynamic_cast<CMapGimmickSection*>(pObject);
 
-	if (nullptr == pMapSection && nullptr == pBreakWall)
+	if (nullptr == pMapSection && nullptr == pGimmickSection)
 		return;
 	if (nullptr != pMapSection && nullptr == pMapStage)
 		return;
 
 	_bool* pbRenderable = nullptr;
-	if (nullptr != pBreakWall)
-		pbRenderable = FindBoolProperty(pBreakWall, L"Renderable", L"MapEvent_BreakWall");
+	if (nullptr != pGimmickSection)
+		pbRenderable = FindBoolProperty(pGimmickSection, L"Renderable", L"MapGimmickSection");
 
 	_wstring strStageName;
 	_wstring strSectionName;
@@ -888,21 +893,21 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		const CMap_EditSession* pSession = pLevel->Get_MapPreviewSession();
 		strStageName = (nullptr != pSession && !pSession->Get_LoadedStageName().empty())
 			? pSession->Get_LoadedStageName()
-			: CMapEvent_BreakWall::STAGE12_STAGE_NAME;
-		strSectionName = pBreakWall->Get_SectionName();
+			: pGimmickSection->Get_Entry()->pStageName;
+		strSectionName = pGimmickSection->Get_SectionName();
 	}
 
 	const string strStageNameText = WstrToStr(strStageName);
 	const string strSectionNameText = WstrToStr(strSectionName);
 
-	ImGui::TextUnformatted(nullptr != pBreakWall ? "MapEvent_BreakWall Edit" : "MapSection Edit");
-	if (nullptr != pBreakWall)
-		ImGui::TextDisabled("Type: MapEvent_BreakWall");
+	ImGui::TextUnformatted(nullptr != pGimmickSection ? "MapGimmickSection Edit" : "MapSection Edit");
+	if (nullptr != pGimmickSection)
+		ImGui::TextDisabled("Type: MapGimmickSection");
 	ImGui::TextDisabled("Stage: %s", strStageNameText.empty() ? "<Unnamed Stage>" : strStageNameText.c_str());
 	ImGui::TextDisabled("Section: %s", strSectionNameText.empty() ? "<Unnamed Section>" : strSectionNameText.c_str());
 
-	const _char* pFlagsHeader = nullptr != pBreakWall ? "MapEvent_BreakWall Flags" : "Section Flags";
-	const _char* pRenderableLabel = nullptr != pBreakWall ? "Renderable##MapEventBreakWallEdit" : "Renderable##SectionEdit";
+	const _char* pFlagsHeader = nullptr != pGimmickSection ? "MapGimmickSection Flags" : "Section Flags";
+	const _char* pRenderableLabel = nullptr != pGimmickSection ? "Renderable##MapGimmickSectionEdit" : "Renderable##SectionEdit";
 
 	if (ImGui::CollapsingHeader(pFlagsHeader, ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -922,12 +927,12 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 				ImGui::Checkbox(pRenderableLabel, (bool*)pbRenderable);
 
 			ImGui::TextDisabled("Transform and Renderable affect the current preview.");
-			ImGui::TextDisabled("Culling and section collision actor are not used by MapEvent_BreakWall.");
+			ImGui::TextDisabled("Culling and section collision actor are not used by MapGimmickSection.");
 			ImGui::TextDisabled("Shadow follows Renderable and break state.");
 		}
 	}
 
-	if (nullptr != pBreakWall)
+	if (nullptr != pGimmickSection)
 		return;
 
 	const _wstring strSectionKey = CMap_EditFile::Make_SectionKey(strStageName, strSectionName);
@@ -1929,8 +1934,6 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 				bChanged = true;
 
 			ImGui::Spacing();
-			DrawMapUVCompactGrid();
-			ImGui::Spacing();
 			DrawMapTextureCompactGrid();
 		}
 	}
@@ -1986,6 +1989,20 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		ImGui::SetNextItemWidth(160.f);
 		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
 			bChanged = true;
+
+		if (Ui.bWorldPassMeshUi)
+		{
+			if (ImGui::Checkbox("Use UV Scroll", (bool*)&Layer.bUseUVScroll))
+				bChanged = true;
+
+			ImGui::BeginDisabled(!Layer.bUseUVScroll);
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Scroll Speed", (float*)&Layer.vUVScrollSpeed, 0.001f))
+				bChanged = true;
+
+			ImGui::EndDisabled();
+		}
 
 		ImGui::EndDisabled();
 
@@ -2046,7 +2063,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	DrawSaveMeshLayerButton();
 }
 
-void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
+void CPanel_Inspector::Draw_MapStageSections(CMapStage* pMapStage)
 {
 	if (nullptr == pMapStage)
 		return;
@@ -2168,15 +2185,16 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 			Draw_EditableObjectPolicyPanel(m_pFocusedMapSection);
 
 			ImGui::Separator();
-			Draw_MeshLayerPanel(m_pFocusedMapSection);
-
-			ImGui::Separator();
-			Draw_MapSectionEditPanel(pLevel, pMapStage, m_pFocusedMapSection);
-			ImGui::Separator();
 #ifdef _DEBUG
 			Draw_MapSectionViewFilter(pMapStage, m_pFocusedMapSection, -1);
 			ImGui::Separator();
 #endif
+			Draw_MeshLayerPanel(m_pFocusedMapSection);
+
+			ImGui::Separator();
+			Draw_MapSectionEditPanel(pLevel, pMapStage, m_pFocusedMapSection);
+
+			ImGui::Separator();
 			Draw_Properties(m_pFocusedMapSection);
 			ImGui::Separator();
 			Draw_MapSectionRenderOptions(m_pFocusedMapSection);
@@ -2187,7 +2205,7 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 	ImGui::EndChild();
 }
 
-void CPanel_Inspector::Draw_MapSectionRenderOptions(Client::CMapSection* pSection)
+void CPanel_Inspector::Draw_MapSectionRenderOptions(CMapSection* pSection)
 {
 	if (nullptr == pSection)
 		return;

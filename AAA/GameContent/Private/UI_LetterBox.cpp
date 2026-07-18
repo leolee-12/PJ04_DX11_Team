@@ -1,6 +1,6 @@
 #include "UI_LetterBox.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 CUI_LetterBox::CUI_LetterBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUI_GenericContainer{ pDevice, pContext }

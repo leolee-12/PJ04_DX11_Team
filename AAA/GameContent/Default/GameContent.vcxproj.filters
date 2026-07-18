@@ -457,8 +457,14 @@
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo">
       <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main">
+      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo">
       <UniqueIdentifier>{61353b47-0911-422f-a94e-3454f21909a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\03. DeformCylinder_Main">
+      <UniqueIdentifier>{ee54d883-8d4f-4a92-9b53-3c45a377fe02}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts">
       <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
@@ -982,6 +988,9 @@
     <Filter Include="00. GameObject\96. LevelDesign\Visible\02. Ladder">
       <UniqueIdentifier>{a67d90e6-109a-4bab-91c3-7b56e9af8c93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\03. LD_Effects">
+      <UniqueIdentifier>{4325730a-feac-454a-9dd2-81eb632d9b7d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\04. ArrowBoard">
       <UniqueIdentifier>{5f8d9b4f-ea69-40d6-a6bd-0ded9461d520}</UniqueIdentifier>
     </Filter>
@@ -1272,12 +1281,6 @@
     </Filter>
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main">
-      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\03. DeformCylinder_Main">
-      <UniqueIdentifier>{ee54d883-8d4f-4a92-9b53-3c45a377fe02}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1638,14 +1641,14 @@
     <ClInclude Include="..\Public\GameContent_enum.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\GameContent_Events.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\GameContent_Log.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GameContent_pch.h">
       <Filter>99. Defines\pch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\GameContrnt_Events.h">
-      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameObject_Factory.h">
       <Filter>00. GameObject\99. Factory</Filter>
@@ -1788,6 +1791,9 @@
     <ClInclude Include="..\Public\Kirby_DeformCarBridge.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformContext.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCylinder_Demo.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo</Filter>
     </ClInclude>
@@ -1902,6 +1908,9 @@
     <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LD_LensFlare.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_PopFlower.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClInclude>
@@ -1933,7 +1942,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\06. Bush</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Defines.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
@@ -2019,7 +2028,10 @@
     <ClInclude Include="..\Public\Map_Spawner.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MapEvent_BreakWall.h">
+    <ClInclude Include="..\Public\MapGimmick_Defines.h">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapGimmickSection.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MapObject.h">
@@ -2477,9 +2489,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_DeformContext.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3056,6 +3065,9 @@
     <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LD_LensFlare.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LD_PopFlower.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClCompile>
@@ -3158,7 +3170,7 @@
     <ClCompile Include="..\Private\Map_Spawner.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MapEvent_BreakWall.cpp">
+    <ClCompile Include="..\Private\MapGimmickSection.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MapObject.cpp">

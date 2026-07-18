@@ -1,6 +1,6 @@
 #include "LD_AudioArea.h"
 #include "LevelDesign_Registry.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 #include "GameInstance.h"
 #include "Parsing_Utils.h"

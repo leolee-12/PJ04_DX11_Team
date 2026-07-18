@@ -10,7 +10,7 @@
 #include "EnvVolume_Light.h"
 #include "Env_SpotLight.h"
 #include "MapSection.h"
-#include "MapEvent_BreakWall.h"
+#include "MapGimmickSection.h"
 #include "MapStage.h"
 #include "GameObject_Factory.h"
 
@@ -69,14 +69,11 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 			return E_FAIL;
 	}
 
-	if (Package.StageDesc.strStageName == CMapEvent_BreakWall::STAGE12_STAGE_NAME)
-	{
-		MAP_SECTION_DESC Desc{};
-		Desc.strSectionName = CMapEvent_BreakWall::STAGE12_SECTION_NAME;
-		Desc.wstrModelProtoTag = CMapEvent_BreakWall::STAGE12_MODEL_PROTO_TAG;
-		Desc.wstrModelPath = CMapEvent_BreakWall::STAGE12_MODEL_PATH;
-		Desc.iModelProtoLevel = Levels.iStageModelLevel;
+	vector<MAP_SECTION_DESC> GimmickSectionDescs;
+	Append_MapGimmickSectionDescs(Package.StageDesc.strStageName, Levels.iStageModelLevel, &GimmickSectionDescs);
 
+	for (const MAP_SECTION_DESC& Desc : GimmickSectionDescs)
+	{
 		if (FAILED(Ready_MapSectionModel(Levels.iStageModelLevel, Desc)))
 			return E_FAIL;
 	}
@@ -210,8 +207,8 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 		return E_FAIL;
 	}
 
-	if (FAILED(EnsurePrototype(CMapEvent_BreakWall::PROTOTYPE_TAG,
-		[&]() -> CGameObject* { return CMapEvent_BreakWall::Create(m_pDevice, m_pContext); })))
+	if (FAILED(EnsurePrototype(CMapGimmickSection::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CMapGimmickSection::Create(m_pDevice, m_pContext); })))
 	{
 		return E_FAIL;
 	}

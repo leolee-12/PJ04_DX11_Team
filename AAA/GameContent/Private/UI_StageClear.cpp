@@ -1,7 +1,7 @@
 #include "UI_StageClear.h"
 #include "UIPartObject.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 //юс╫ц
 #include "Mission_Manager.h"
