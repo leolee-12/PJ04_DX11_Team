@@ -39,6 +39,7 @@
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
+    <ClInclude Include="..\Public\LD_LensFlare.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardB.h" />
     <ClInclude Include="..\Public\LaunchSmoke.h" />
     <ClInclude Include="..\Public\MapGimmick_Defines.h" />
@@ -444,6 +445,7 @@
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
     <ClCompile Include="..\Private\KoKabu.cpp" />
+    <ClCompile Include="..\Private\LD_LensFlare.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardB.cpp" />
     <ClCompile Include="..\Private\LaunchSmoke.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />

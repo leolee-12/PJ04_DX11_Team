@@ -991,6 +991,9 @@
     <Filter Include="00. GameObject\96. LevelDesign\Visible\02. Ladder">
       <UniqueIdentifier>{a67d90e6-109a-4bab-91c3-7b56e9af8c93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\03. LD_Effects">
+      <UniqueIdentifier>{4325730a-feac-454a-9dd2-81eb632d9b7d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\04. ArrowBoard">
       <UniqueIdentifier>{5f8d9b4f-ea69-40d6-a6bd-0ded9461d520}</UniqueIdentifier>
     </Filter>
@@ -1907,6 +1910,9 @@
     </ClInclude>
     <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_LensFlare.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_PopFlower.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
@@ -3064,6 +3070,9 @@
     </ClCompile>
     <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_LensFlare.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_PopFlower.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
