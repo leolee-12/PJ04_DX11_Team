@@ -169,6 +169,12 @@ inline json Save_MeshLayer(const MESH_LAYER_IDX& Layer)
 		jMesh["UVScaleMaterial"] = { Layer.vUVScaleMaterial.x, Layer.vUVScaleMaterial.y };
 		jMesh["UVRotate"] = Layer.fUVRotate;
 		jMesh["UVOffset"] = { Layer.vUVOffset.x, Layer.vUVOffset.y };
+
+		if (Layer.bUseUVScroll)
+		{
+			jMesh["UseUVScroll"] = true;
+			jMesh["UVScrollSpeed"] = { Layer.vUVScrollSpeed.x, Layer.vUVScrollSpeed.y };
+		}
 	}
 
 	if (Layer.fNormalStrength != 1.f)	jMesh["NormalStrength"] = Layer.fNormalStrength;
@@ -294,6 +300,11 @@ inline HRESULT Load_MeshLayer(const json& jMesh, MESH_LAYER_IDX* pOutLayer)
 				Layer.fUVRotate = jMesh["UVRotate"].get<_float>();
 
 			JsonUtils::Try_ReadFloat2Array(jMesh, "UVOffset", &Layer.vUVOffset);
+
+			if (jMesh.contains("UseUVScroll") && jMesh["UseUVScroll"].is_boolean())
+				Layer.bUseUVScroll = jMesh["UseUVScroll"].get<bool>();
+
+			JsonUtils::Try_ReadFloat2Array(jMesh, "UVScrollSpeed", &Layer.vUVScrollSpeed);
 		}
 	}
 

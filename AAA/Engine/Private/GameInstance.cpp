@@ -143,6 +143,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 void CGameInstance::Update_Engine(_float fTimeDelta, _float fRawTimeDelta)
 {
     ++m_iFrameIndex;
+    m_dGameTime += static_cast<_double>(fTimeDelta);
 
     PROFILE_FRAME_BEGIN(fTimeDelta, m_iFrameIndex);
     PROFILE_CPU_SCOPE(EPROFILE_CPU_SECTION::UPDATE);
@@ -240,6 +241,10 @@ _int CGameInstance::RandomInt(_int iMin, _int iMax) const
 _uint64 CGameInstance::Get_FrameIndex()
 {
     return m_iFrameIndex;
+}
+_double CGameInstance::Get_GameTime()
+{
+    return m_dGameTime;
 }
 #pragma endregion
 

@@ -59,8 +59,10 @@
     <ClInclude Include="..\public\Leopard_Slash.h" />
     <ClInclude Include="..\public\Nail_Smoke.h" />
     <ClInclude Include="..\public\Nail_Trail.h" />
+    <ClInclude Include="..\Public\LD_LensFlare.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardB.h" />
     <ClInclude Include="..\Public\LaunchSmoke.h" />
+    <ClInclude Include="..\Public\MapGimmick_Defines.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
@@ -215,7 +217,7 @@
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LD_Inhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
-    <ClInclude Include="..\Public\MapEvent_BreakWall.h" />
+    <ClInclude Include="..\Public\MapGimmickSection.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h" />
     <ClInclude Include="..\public\RockBounce.h" />
     <ClInclude Include="..\public\RockBurst.h" />
@@ -329,7 +331,7 @@
     <ClInclude Include="..\Public\EnvObject_Trigger.h" />
     <ClInclude Include="..\Public\EnvObject_Interact.h" />
     <ClInclude Include="..\Public\EnvObject_Static.h" />
-    <ClInclude Include="..\Public\GameContrnt_Events.h" />
+    <ClInclude Include="..\Public\GameContent_Events.h" />
     <ClInclude Include="..\Public\GameObject_Factory.h" />
     <ClInclude Include="..\public\GigantEdge.h" />
     <ClInclude Include="..\public\GigantEdge_Body.h" />
@@ -482,6 +484,7 @@
     <ClCompile Include="..\private\Leopard_Slash.cpp" />
     <ClCompile Include="..\private\Nail_Smoke.cpp" />
     <ClCompile Include="..\private\Nail_Trail.cpp" />
+    <ClCompile Include="..\Private\LD_LensFlare.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardB.cpp" />
     <ClCompile Include="..\Private\LaunchSmoke.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
@@ -636,7 +639,7 @@
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LD_Inhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
-    <ClCompile Include="..\Private\MapEvent_BreakWall.cpp" />
+    <ClCompile Include="..\Private\MapGimmickSection.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp" />
     <ClCompile Include="..\private\RockBounce.cpp" />
     <ClCompile Include="..\private\RockBurst.cpp" />

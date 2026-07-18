@@ -86,6 +86,13 @@ _int64 CGameInstance_Proxy::Get_FrameIndex()
 
 	return m_pOwner->Get_FrameIndex();
 }
+_double CGameInstance_Proxy::Get_GameTime()
+{
+	if (!IsConnected())
+		return 0.0;
+
+	return m_pOwner->Get_GameTime();
+}
 #pragma endregion
 
 #pragma region GRAPHICDEVICE

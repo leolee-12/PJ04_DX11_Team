@@ -26,6 +26,7 @@ public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Breakable";
 	static constexpr const _tchar* WOODBOX_MODEL_PROTO_TAG = L"Prototype_Component_Model_BoxWood";
 	static constexpr const _tchar* PLASTICBOX_MODEL_PROTO_TAG = L"Prototype_Component_Model_BoxPlastic";
+	static constexpr const _tchar* BOXIRON_MODEL_PROTO_TAG = L"Prototype_Component_Model_BoxIron";
 	static constexpr const _tchar* BREAKABLE_ROCK_S_MODEL_PROTO_TAG = L"Prototype_Component_Model_BreakableRock_S";
 	static constexpr const _tchar* BREAKABLE_ROCK_M_MODEL_PROTO_TAG = L"Prototype_Component_Model_BreakableRock_M";
 

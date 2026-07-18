@@ -1,6 +1,6 @@
 #include "Dialogue_Arranger.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "SequencePlayer.h"
 
 // 위치 vPos에서 vDir 방향을 바라보는 액터 월드 행렬 (스케일 1, 수평 시선)

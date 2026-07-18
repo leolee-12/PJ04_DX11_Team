@@ -1,6 +1,6 @@
 #include "Cappy_Hat.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "Collider.h"
 #include "Transform.h"
 #include "Effect_Loader.h"

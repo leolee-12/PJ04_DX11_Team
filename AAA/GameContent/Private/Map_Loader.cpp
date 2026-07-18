@@ -5,7 +5,7 @@
 #include "Map_ModelResolver.h"
 #include "Map_ProtoRegister.h"
 #include "Map_Spawner.h"
-#include "MapEvent_BreakWall.h"
+#include "MapGimmickSection.h"
 #include "GameContent_Log.h"
 #include "LevelDesign_Loader.h"
 
@@ -89,14 +89,14 @@ namespace
 	_bool Is_MapLayerInternal(const _wstring& strLayerTag)
 	{
 		return strLayerTag == kLayerMapStage
-			|| strLayerTag == CMapEvent_BreakWall::LAYER_TAG
+			|| strLayerTag == CMapGimmickSection::LAYER_TAG
 			|| Is_EnvLayerInternal(strLayerTag);
 	}
 
 	_bool Is_MapStageLayerInternal(const _wstring& strLayerTag)
 	{
 		return strLayerTag == kLayerMapStage
-			|| strLayerTag == CMapEvent_BreakWall::LAYER_TAG;
+			|| strLayerTag == CMapGimmickSection::LAYER_TAG;
 	}
 
 	string To_LogPath(const path& FilePath)
@@ -1086,15 +1086,8 @@ HRESULT CMap_Loader::Collect_PreloadJobs(ID3D11Device* pDevice, ID3D11DeviceCont
 	}
 
 	vector<MAP_SECTION_DESC> SectionDescs = PreloadPackage.StageDesc.SectionDescs;
-	if (PreloadPackage.StageDesc.strStageName == CMapEvent_BreakWall::STAGE12_STAGE_NAME)
-	{
-		MAP_SECTION_DESC Desc{};
-		Desc.strSectionName = CMapEvent_BreakWall::STAGE12_SECTION_NAME;
-		Desc.wstrModelProtoTag = CMapEvent_BreakWall::STAGE12_MODEL_PROTO_TAG;
-		Desc.wstrModelPath = CMapEvent_BreakWall::STAGE12_MODEL_PATH;
-		Desc.iModelProtoLevel = Levels.iStageModelLevel;
-		SectionDescs.push_back(Desc);
-	}
+	Append_MapGimmickSectionDescs(PreloadPackage.StageDesc.strStageName, Levels.iStageModelLevel, &SectionDescs);
+
 	for (const MAP_SECTION_DESC& Desc : SectionDescs)
 		pOutJobs->push_back([pDevice, pContext, Desc, Levels]() -> HRESULT
 			{ return Preload_One_SectionModel(pDevice, pContext, Desc, Levels); });

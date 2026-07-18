@@ -2,7 +2,7 @@
 #include "LevelDesign_Registry.h"
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "MeshLayer_Binder.h"
 #include "Kirby.h"
 

@@ -1,6 +1,6 @@
 #include "Camera_Dialogue.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 CCamera_Dialogue::CCamera_Dialogue(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCamera_Shakeable(pDevice, pContext) {

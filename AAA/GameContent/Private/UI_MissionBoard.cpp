@@ -1,6 +1,6 @@
 #include "UI_MissionBoard.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "UI_MissionPanel.h"
 #include "Mission_Manager.h"
 
