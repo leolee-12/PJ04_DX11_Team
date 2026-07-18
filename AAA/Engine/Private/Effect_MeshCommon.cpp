@@ -9,7 +9,8 @@ namespace
     {
         if (FAILED(pShader->Bind_RawValue("g_bUseDiffuseTexture", &Values.Diffuse.bUse, sizeof(_bool))) ||
             FAILED(pShader->Bind_RawValue("g_vDiffuseTiling", &Values.Diffuse.vTiling, sizeof(_float2))) ||
-            FAILED(pShader->Bind_RawValue("g_vDiffuseOffset", &Values.Diffuse.vCurrentOffset, sizeof(_float2))))
+            FAILED(pShader->Bind_RawValue("g_vDiffuseOffset", &Values.Diffuse.vCurrentOffset, sizeof(_float2))) ||
+            FAILED(pShader->Bind_RawValue("g_fDiffuseUVRotationDegree", &Values.Diffuse.fUVRotationDegree, sizeof(_float))))
             return E_FAIL;
 
         return S_OK;
@@ -19,7 +20,8 @@ namespace
     {
         if (FAILED(pShader->Bind_RawValue("g_bUseUnknownTexture", &Values.Unknown.bUse, sizeof(_bool))) ||
             FAILED(pShader->Bind_RawValue("g_vUnknownTiling", &Values.Unknown.vTiling, sizeof(_float2))) ||
-            FAILED(pShader->Bind_RawValue("g_vUnknownOffset", &Values.Unknown.vCurrentOffset, sizeof(_float2))))
+            FAILED(pShader->Bind_RawValue("g_vUnknownOffset", &Values.Unknown.vCurrentOffset, sizeof(_float2))) ||
+            FAILED(pShader->Bind_RawValue("g_fUnknownUVRotationDegree", &Values.Unknown.fUVRotationDegree, sizeof(_float))))
             return E_FAIL;
 
         return S_OK;
@@ -65,6 +67,7 @@ namespace
         Values.bUse = false;
         Values.vTiling = { 1.f, 1.f };
         Values.vOffset = { 0.f, 0.f };
+        Values.fUVRotationDegree = 0.f;
         Values.bUVScroll = false;
         Values.vUVScrollCount = { 0.f, 0.f };
     }
@@ -119,7 +122,9 @@ HRESULT Engine::EffectMesh::Bind_ShaderValues(CShader* pShader, const VALUES& Va
         return E_FAIL;
 
     if (FAILED(pShader->Bind_RawValue("g_bUseNormalTexture", &Values.bUseNormalTexture, sizeof(_bool))) ||
-        FAILED(pShader->Bind_RawValue("g_bUseMRATexture", &Values.bUseMRATexture, sizeof(_bool))))
+        FAILED(pShader->Bind_RawValue("g_fNormalUVRotationDegree", &Values.fNormalUVRotationDegree, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseMRATexture", &Values.bUseMRATexture, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fMRAUVRotationDegree", &Values.fMRAUVRotationDegree, sizeof(_float))))
         return E_FAIL;
 
     if (bBindUnknownBeforePBR == false && FAILED(BindUnknownValues(pShader, Values)))
@@ -217,7 +222,9 @@ void Engine::EffectMesh::Initialize_DefaultValues(VALUES& Values)
     Values.DiffuseEdgeFade.fEndRange = 0.1f;
     Values.DiffuseEdgeFade.fPower = 1.f;
     Values.bUseNormalTexture = false;
+    Values.fNormalUVRotationDegree = 0.f;
     Values.bUseMRATexture = false;
+    Values.fMRAUVRotationDegree = 0.f;
     InitializeTexture(Values.Unknown);
     Values.bUnknownColorToAlpha = false;
     Values.UnknownEdgeFade.bUse = false;
