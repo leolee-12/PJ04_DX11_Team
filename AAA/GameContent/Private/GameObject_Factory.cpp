@@ -84,10 +84,12 @@
 #include "BombAimDot.h"
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
+#include "LaunchSmoke.h"
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
 #include "CarLanding.h"
 #include "PickUpEffect.h"
+#include "DropStarEffect.h"
 #include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
@@ -285,7 +287,7 @@ namespace
     {
         TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG, CAbility_Model::Create(pDevice, pContext));
         
-        // ï¿½É·ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
+        // ´É·Â Ãß°¡µÉ ¶§¸¶´Ù ¾Æ·¡¿¡ Ãß°¡
         
         // Sword
         TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Sword"),
@@ -444,7 +446,7 @@ void CGameObject_Factory::Register_Container()
         )
     ); 
 
-#pragma region ï¿½ï¿½ï¿½ï¿½
+#pragma region ¸ó½ºÅÍ
     
     // 1. BladeKnight(Sword)
     Register
@@ -793,7 +795,7 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
                 CSmokeParticle::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CStarParticle::PROTOTYPE_TAG,
                 CStarParticle::Create(pDevice, pContext));
@@ -810,7 +812,7 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
                 CSmokeParticle::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSphereParticle::PROTOTYPE_TAG,
                 CSphereParticle::Create(pDevice, pContext));
@@ -872,11 +874,11 @@ void CGameObject_Factory::Register_Effect()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
 
         ));
 
-    // 7 Bubble Aura (EssenceBubble / DorppedBubble ï¿½ï¿½ï¿½ï¿½)
+    // 7 Bubble Aura (EssenceBubble / DorppedBubble °ø¿ë)
     Register(CBubbleAura::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CBubbleAura),
         LOADER
@@ -898,6 +900,18 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
+    Register(CLaunchSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CLaunchSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG,
+                CMeshEmitterCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
+        ));
+
     Register(CPickUpEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CPickUpEffect),
         LOADER
@@ -911,6 +925,17 @@ void CGameObject_Factory::Register_Effect()
 
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
+
+        ));
+
+    Register(CDropStarEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CDropStarEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
 
         ));
 
@@ -1016,7 +1041,7 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-#pragma region ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
+#pragma region ¸ó½ºÅÍ ÀÌÆåÆ®
     
     // BladeKnight
     Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),

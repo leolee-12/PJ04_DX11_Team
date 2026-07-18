@@ -18,11 +18,11 @@ namespace
 {
     struct EFFECT_DB_ENTRY
     {
-        const _tchar* szEffectId;    // О©╫О©╫О©╫О©╫ е╟
-        const _tchar* szConfigPath;  // ф╘О©╫О©╫ json (О©╫О©╫О©╫О©╫О©╫м╥О©╫ О©╫О©╫О©╫О©╫)
+        const _tchar* szEffectId;    // ?╓М▐╟ ??
+        const _tchar* szConfigPath;  // ?°К▀² json (?╟Л²╢?╟К║° ?═Л?)
     };
 
-    // === О©╫О©╫О©╫О©╫ф╝ DB : О©╫О©╫ О©╫О©╫О©╫О©╫ф╝О©╫О©╫ О©╫О©╫О©╫Б©║ О©╫О©╫ О©╫О©╫ О©╫ъ╟О©╫ ===
+    // === ?╢М▌≥??DB : ???╢М▌≥?╦К┼■ ?╛Й╦╟????Л╓?Л╤■Й? ===
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
         { TEXT("WalkSmoke"),              TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
@@ -85,11 +85,13 @@ namespace
         { TEXT("BreakWallEffect"),        TEXT("../../Resources/Map/Effect/Proto_BreakWallEffect_0.JSON") },
         { TEXT("ItemEffect"),             TEXT("../../Resources/Map/Effect/Proto_ItemEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
+        { TEXT("LaunchSmoke"),            TEXT("../../Resources/CHJ/Effect/LaunchSmoke.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/CHJ/Effect/Tornado_BK.JSON") },
         { TEXT("EssenceAura"),            TEXT("../../Resources/CHJ/Effect/EssenceAura.JSON") },
         { TEXT("PickUpEffect"),           TEXT("../../Resources/CHJ/Effect/PickUpEffect.JSON") },
+        { TEXT("DropStarEffect"),         TEXT("../../Resources/CHJ/Effect/DropStarEffect.JSON") },
 
         // Armadillo
         { TEXT("RutA"),                   TEXT("../../Resources/YSH/Effects/RutA.JSON") },
@@ -128,7 +130,7 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
 
         const _wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
 
-        // М■└К║°М├═М┐─Л·┘ STATIC 1М ▄ К⌠╠К║²
+        // га╥неДе╦ют STATIC 1х╦ ╣Н╥о
         if (!pProxy->Has_Prototype(iLevel, strProtoTag))
         {
             auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);

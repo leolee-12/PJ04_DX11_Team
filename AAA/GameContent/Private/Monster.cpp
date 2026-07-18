@@ -701,6 +701,47 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	return true;
 }
 
+void CMonster::Start_LaunchSmokeFx()
+{
+	if (!m_bActive || nullptr == m_pTransformCom)
+		return;
+
+	auto pLoader = CEffect_Loader::GetInstance();
+	FX_HANDLE& hSlot = m_Effects[L"LaunchSmoke"];
+	if (pLoader->Is_Current(hSlot))
+		return;
+
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam, 
+		XMVectorNegate(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook())));
+
+	hSlot.Clear();
+	pLoader->Spawn(L"LaunchSmoke", Get_LevelIndex(),
+		_float3(0.f, 0.f, 0.f),
+		vFaceCam,
+		_float3(0.f, 0.f, 0.f),
+		m_pTransformCom->Get_WorldMatrixPtr(), nullptr, &hSlot);
+}
+
+void CMonster::Stop_LaunchSmokeFx(_bool bImmediate)
+{
+	auto it = m_Effects.find(L"LaunchSmoke");
+	if (it == m_Effects.end())
+		return;
+
+	auto pLoader = CEffect_Loader::GetInstance();
+	FX_HANDLE& hSlot = it->second;
+	if (pLoader->Is_Current(hSlot))
+	{
+		if (bImmediate)
+			hSlot.p->EffectContainer_Stop();
+		else
+			hSlot.p->EffectContainer_StopAfterEmission();
+	}
+
+	hSlot.Clear();
+}
+
 void CMonster::Stop_AllFx(_bool bImmediate)
 {
 	auto pLoader = CEffect_Loader::GetInstance();
@@ -823,6 +864,7 @@ void CMonster::Enable_Colliders(_bool bEnable)
 
 void CMonster::On_Swallowed()
 {
+	Stop_AllFx(true);
 	SWALLOW_EVENT payload{ this };
 	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 	m_pCaptor = nullptr;

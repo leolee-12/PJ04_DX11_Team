@@ -142,29 +142,35 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. CarLanding">
       <UniqueIdentifier>{b817f195-327b-4c7f-957f-56e368b950d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect">
-      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight">
-      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail">
-      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK">
-      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared">
-      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim">
       <UniqueIdentifier>{b8bb5558-323f-41ac-b336-122a065fc73b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. PickUpEffect">
-      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot">
       <UniqueIdentifier>{4d6324c8-1634-4bd9-9325-d8d4db88a743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect">
+      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight">
+      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail">
+      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK">
+      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared">
+      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke">
+      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect">
+      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect">
+      <UniqueIdentifier>{6ae61bed-b980-4de6-ba9b-8c5c5c37d3c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect">
       <UniqueIdentifier>{5ed7fbfe-ccc7-4a10-9bab-44a1c7666254}</UniqueIdentifier>
@@ -1620,6 +1626,9 @@
     <ClInclude Include="..\Public\DropStar_Manager.h">
       <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DropStarEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
@@ -1938,6 +1947,9 @@
     <ClInclude Include="..\Public\KoKabu.h">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LaunchSmoke.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_ArrowBoard.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
     </ClInclude>
@@ -2245,7 +2257,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PickUpEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. PickUpEffect</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PoppyBrosJr.h">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr</Filter>
@@ -2422,10 +2434,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordTrail_BK.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
@@ -2834,6 +2846,9 @@
     <ClCompile Include="..\Private\DropStar_Manager.cpp">
       <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\DropStarEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
     </ClCompile>
@@ -3118,6 +3133,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\KoKabu.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LaunchSmoke.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
@@ -3405,7 +3423,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PickUpEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. PickUpEffect</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PoppyBrosJr.cpp">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr</Filter>
@@ -3573,10 +3591,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordTrail_BK.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>

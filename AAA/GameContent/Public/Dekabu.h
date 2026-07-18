@@ -49,6 +49,10 @@ protected:
     virtual void            Apply_AIVariation(const _wstring& strVariation) override;
 
     virtual HRESULT         Ready_PartObjects() override;
+    virtual HRESULT         Ready_AnimEvents() override;
+
+private:
+    void                    Fire_KoKabu();
 
 private:
     CDekabu_Body*           m_pBody = { nullptr };
