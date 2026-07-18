@@ -473,14 +473,16 @@ HRESULT CKirbyBomb::Ready_HitBox()
 
 			if (iRenderGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
 			{
+				if (m_bCarried)
+					return;	
+
 				if (auto* pDamageable = dynamic_cast<IDamageable*>(pGameObject))
 				{
 					ATTACK_INFO tAttackInfo{};
 					tAttackInfo.eHitType = HIT_TYPE::BOMB;
 					tAttackInfo.fDamage = m_fDamage;
 					tAttackInfo.fKnockback = m_fKnockback;
-					XMStoreFloat3(&tAttackInfo.vAttackerPos,
-						m_pTransformCom->Get_State(STATE::POSITION));
+					XMStoreFloat3(&tAttackInfo.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
 					tAttackInfo.pAttacker = this;
 
 					pDamageable->Damaged(tAttackInfo);

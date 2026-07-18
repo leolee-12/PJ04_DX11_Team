@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Character.h"
+#include "Collider.h"
 
 #include "GameContent_const.h"
 #include "Kirby_Command.h"
 
 NS_BEGIN(Engine)
 class CMovement;
-class CCollider;
 class CController;
 NS_END
 
@@ -41,7 +41,7 @@ class CKirby final : public CCharacter
 	GENERATED_BODY(CKirby)
 
 public:
-	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, SLIDE_COLLIDER, COLLIDER_END };
+	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, SLIDE_COLLIDER, BREAKERABLE_HITBOX, COLLIDER_END };
 
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -145,8 +145,12 @@ public:
 	void Change_KirbyDeform(DEFORM_TYPE eDeformType);
 	void Reset_KirbyDeform();
 
+	CKirby_Deform* Find_KirbyDeform(DEFORM_TYPE eType);
+
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
+	void Set_ColliderDesc(KIRBY_COLLIDER eKirbyCollider, const CCollider::COLLIDER_DESC& Desc);
+	void Set_ColliderEnabled(KIRBY_COLLIDER eKirbyCollider, _bool bEnabled);
 
 	// CutScene Attach
 	void Update_CutsceneAttachTransform();

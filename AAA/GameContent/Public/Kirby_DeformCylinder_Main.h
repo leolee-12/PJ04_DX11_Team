@@ -1,18 +1,18 @@
 #pragma once
 
-#include "Kirby_HitBox_Model.h"
+#include "Kirby_Deform_Model.h"
 
 NS_BEGIN(Engine)
 NS_END
 
 NS_BEGIN(Client)
 
-class CKirby_DeformCylinder_Main final : public CKirby_HitBox_Model
+class CKirby_DeformCylinder_Main final : public CKirby_Deform_Model
 {
 	GENERATED_BODY(CKirby_DeformCylinder_Main)
 
 public:
-	struct KIRBY_DEFORMCYLINDER_MAIN_DESC : public CKirby_HitBox_Model::KIRBY_HITBOX_MODEL_DESC
+	struct KIRBY_DEFORMCYLINDER_MAIN_DESC : public CKirby_Deform_Model::KIRBY_DEFORM_MODEL_DESC
 	{
 	};
 

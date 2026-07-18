@@ -396,7 +396,7 @@ void CLevelDesign_Starblock::SetUp_Collider_Callback()
 			{
 				if (nullptr == pOther)
 					return;
-				if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
+				if (ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE) != pOther->Get_RegisteredGroup())
 					return;
 
 				ATTACK_INFO AttackInfo{};

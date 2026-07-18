@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Movement_Child.h"
+
 CKirby_Deform::CKirby_Deform()
 {
 }
@@ -18,6 +20,11 @@ HRESULT CKirby_Deform::Initialize()
     m_AniInfos.resize(ETOUI(DEFORM_ANI::END));
 
     return S_OK;
+}
+
+void CKirby_Deform::On_DumpSpitStart(CKirby* pKirby)
+{
+    pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 22.f, 0.f, 0.f));
 }
 
 void CKirby_Deform::Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni)

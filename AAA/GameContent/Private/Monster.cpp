@@ -432,7 +432,7 @@ HRESULT CMonster::Ready_State()
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+	if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT)
 	{
 		if (m_pMovement->Is_Grounded())
 			Change_State(MONSTER_STATE_TYPE::FLATTEN);

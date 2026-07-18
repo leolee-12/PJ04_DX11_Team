@@ -3,12 +3,12 @@
 #include "GameInstance.h"
 
 CKirby_DeformCylinder_Main::CKirby_DeformCylinder_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CKirby_HitBox_Model(pDevice, pContext)
+    : CKirby_Deform_Model(pDevice, pContext)
 {
 }
 
 CKirby_DeformCylinder_Main::CKirby_DeformCylinder_Main(const CKirby_DeformCylinder_Main& Prototype)
-    : CKirby_HitBox_Model(Prototype)
+    : CKirby_Deform_Model(Prototype)
 {
 }
 
@@ -138,20 +138,6 @@ HRESULT CKirby_DeformCylinder_Main::Ready_Components()
         CAnimator::Create(m_pDevice, m_pContext));
     if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
-
-    // юс╫ц
-    CCollider::COLLIDER_DESC WallBreakerDesc{};
-    WallBreakerDesc.pOwner = this;
-    WallBreakerDesc.vCenter = _float3(0.f, 1.5f, 1.5f);
-    WallBreakerDesc.fRadius = 2.5f;
-
-    m_pHitBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
-        TEXT("WallBreakerCollider_Com"), &WallBreakerDesc);
-    if (m_pHitBox == nullptr)
-        return E_FAIL;
-
-    m_pHitBox->Set_Enabled(false);
-    //m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::CAR_BOOST));
 
     return S_OK;
 }
