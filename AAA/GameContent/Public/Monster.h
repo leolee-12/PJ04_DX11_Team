@@ -115,6 +115,8 @@ public:
 	void						Play_ActionLoopSFX(const _tchar* pKey);
 	void						Stop_ActionLoopSFX();
 	void						Stop_AllFx(_bool bImmediate);
+	void						Start_LaunchSmokeFx();
+	void						Stop_LaunchSmokeFx(_bool bImmediate = false);
 	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
 	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 

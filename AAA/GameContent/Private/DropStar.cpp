@@ -6,6 +6,8 @@
 #include "DropStar_Body.h"
 #include "DropStar_Manager.h"
 #include "BubbleMovement.h"
+#include "Effect_Loader.h"
+#include "Effect_Container.h"
 
 CDropStar::CDropStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject { pDevice,  pContext }
@@ -40,44 +42,56 @@ HRESULT CDropStar::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_vBaseScale = m_pTransformCom->Get_Scaled();
+	XMStoreFloat4x4(&m_matHaloWorld, XMMatrixIdentity());
 
 	return S_OK;
 }
 
 void CDropStar::Update(_float fTimeDelta)
 {
-	if (!m_bActive)
-		return;
+    if (!m_bActive)
+        return;
 
-	if (m_eState == DROPSTAR_STATE::DELAY)
-	{
-		m_fDelay -= fTimeDelta;
-		if (m_fDelay <= 0.f)
-			Reveal();
-		return;
-	}
+    if (m_eState == DROPSTAR_STATE::DELAY)
+    {
+        m_fDelay -= fTimeDelta;
+        if (m_fDelay <= 0.f)
+            Reveal();
 
-	if (m_eState == DROPSTAR_STATE::LIVE)
-		Apply_Roll(fTimeDelta);
+        Update_HaloSocket();
+        return;
+    }
 
-	__super::Update(fTimeDelta);
+    if (m_eState == DROPSTAR_STATE::LIVE)
+        Apply_Roll(fTimeDelta);
 
-	if (m_eState == DROPSTAR_STATE::CAPTURED)
-	{
-		Update_Captured(fTimeDelta);
-		return;
-	}
+    __super::Update(fTimeDelta);
 
-	if (m_eState == DROPSTAR_STATE::SPAT)
-		return;								// Spit Projectile이 Transform 구동
+    if (m_eState == DROPSTAR_STATE::CAPTURED)
+    {
+        Update_Captured(fTimeDelta);
+        Update_HaloSocket();
+        return;
+    }
 
-	if (m_pMovement)
-		m_pMovement->Tick(fTimeDelta);
+    if (m_eState == DROPSTAR_STATE::SPAT)
+    {
+        Update_HaloSocket();
+        return;                             // Spit Projectile가 Transform 관리
+    }
 
-	m_fTimer += fTimeDelta;
+    if (m_pMovement)
+        m_pMovement->Tick(fTimeDelta);
 
-	if (m_fTimer >= s_fDeSpawnTime)
-		Despawn();
+    m_fTimer += fTimeDelta;
+
+    if (m_fTimer >= s_fDeSpawnTime)
+    {
+        Despawn();
+        return;
+    }
+
+    Update_HaloSocket();
 }
 
 void CDropStar::Late_Update(_float fTimeDelta)
@@ -105,36 +119,41 @@ void CDropStar::Set_Pool(CDropStar_Manager* pPool, _uint iLevel, const _wstring&
 
 void CDropStar::Activate(const _float3& vPos, const _float3& vLook, const _float3& vDir, _float fDelay)
 {
-	m_bActive = true;
-	m_bAvailable = true;
-	m_pCaptor = nullptr;
-	m_eState = DROPSTAR_STATE::DELAY;
+    Stop_HaloFx();
 
-	if (m_pBody && m_pBody->Get_Animator())
-		m_pBody->Get_Animator()->Play("NormalPosition", true, true);
+    m_bActive = true;
+    m_bAvailable = true;
+    m_pCaptor = nullptr;
+    m_eState = DROPSTAR_STATE::DELAY;
 
-	m_fDelay = fDelay;      
-	m_fTimer = 0.f;
-	m_fPullSpeed = 0.f;
-	m_fScaleRatio = 1.f;
-	m_fRollAngle = 0.f;
+    if (m_pBody && m_pBody->Get_Animator())
+        m_pBody->Get_Animator()->Play("NormalPosition", true, true);
 
-	m_pTransformCom->Set_State(STATE::POSITION,
-		XMVectorSetW(XMLoadFloat3(&vPos), 1.f));
+    m_fDelay = fDelay;
+    m_fTimer = 0.f;
+    m_fPullSpeed = 0.f;
+    m_fScaleRatio = 1.f;
+    m_fRollAngle = 0.f;
 
-	Set_Orientation(vLook);
+    m_pTransformCom->Set_State(STATE::POSITION,
+        XMVectorSetW(XMLoadFloat3(&vPos), 1.f));
 
-	m_vLaunchDir = vDir;
+    Set_Orientation(vLook);
 
-	m_pTransformCom->Set_Scale(m_vBaseScale.x,
-		m_vBaseScale.y, m_vBaseScale.z);
+    m_vLaunchDir = vDir;
 
-	if (m_pMovement)
-		m_pMovement->Stop();
-	if (m_pController)
-		m_pController->Set_Enabled(false);
-	if (m_pCollider)
-		m_pCollider->Set_Enabled(false);
+    m_pTransformCom->Set_Scale(m_vBaseScale.x,
+        m_vBaseScale.y, m_vBaseScale.z);
+
+    if (m_pMovement)
+        m_pMovement->Stop();
+    if (m_pController)
+        m_pController->Set_Enabled(false);
+    if (m_pCollider)
+        m_pCollider->Set_Enabled(false);
+
+    Update_HaloSocket();
+    Start_HaloFx();
 }
 
 _bool CDropStar::Can_BeInhaled(const INHALE_QUERY& q) const
@@ -163,37 +182,42 @@ void CDropStar::Be_Captured(CGameObject* pInhaler)
 
 void CDropStar::On_SpatBegin()
 {
-	m_pCaptor = nullptr;
-	m_eState = DROPSTAR_STATE::SPAT;
+    m_pCaptor = nullptr;
+    m_eState = DROPSTAR_STATE::SPAT;
 
-	Set_Active(true);
+    Set_Active(true);
 
-	Update_SpatPivot_FromBone();
+    Update_SpatPivot_FromBone();
 
-	if (m_pMovement)
-		m_pMovement->Stop();
-	if (m_pController)
-		m_pController->Set_Enabled(false);
-	if (m_pCollider)
-		m_pCollider->Set_Enabled(false);
+    if (m_pMovement)
+        m_pMovement->Stop();
+    if (m_pController)
+        m_pController->Set_Enabled(false);
+    if (m_pCollider)
+        m_pCollider->Set_Enabled(false);
 
-	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
+    m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
+
+    Update_HaloSocket();
+    Start_HaloFx();
 }
 
 void CDropStar::On_SpatEnd()
 {
-	m_pCaptor = nullptr;
-	m_bAvailable = false;
+    m_pCaptor = nullptr;
+    m_bAvailable = false;
 
-	if (m_pMovement)
-		m_pMovement->Stop();
-	if (m_pController)
-		m_pController->Set_Enabled(false);
-	if (m_pCollider)
-		m_pCollider->Set_Enabled(false);
+    if (m_pMovement)
+        m_pMovement->Stop();
+    if (m_pController)
+        m_pController->Set_Enabled(false);
+    if (m_pCollider)
+        m_pCollider->Set_Enabled(false);
 
-	Set_Active(false);
-	Return_ToPool();
+    Stop_HaloFx();
+
+    Set_Active(false);
+    Return_ToPool();
 }
 
 HRESULT CDropStar::Ready_Collider()
@@ -254,25 +278,84 @@ HRESULT CDropStar::Ready_PartObjects()
 	return S_OK;
 }
 
+void CDropStar::Start_HaloFx()
+{
+    if (m_pHaloFx)
+        return;
+
+    Update_HaloSocket();
+
+    FX_HANDLE h{};
+    if (SUCCEEDED(CEffect_Loader::GetInstance()->Spawn(
+        L"DropStarEffect", Get_LevelIndex(),
+        _float3(0.f, 0.f, 0.f),
+        _float3(0.f, 0.f, 0.f),
+        _float3(0.f, 0.f, 0.f),
+        &m_matHaloWorld,
+        nullptr,
+        &h)))
+    {
+        m_pHaloFx = h.p;
+        m_iHaloFxEpoch = h.iEpoch;
+    }
+}
+
+void CDropStar::Stop_HaloFx()
+{
+    if (nullptr == m_pHaloFx)
+        return;
+
+    FX_HANDLE h{ m_pHaloFx, m_iHaloFxEpoch };
+    if (CEffect_Loader::GetInstance()->Is_Current(h))
+        m_pHaloFx->EffectContainer_Stop();
+
+    m_pHaloFx = nullptr;
+    m_iHaloFxEpoch = 0;
+}
+
+void CDropStar::Update_HaloSocket()
+{
+    _matrix matSocket = XMMatrixIdentity();
+
+    if (m_pBody)
+    {
+        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("CenterL");
+        if (pBone)
+        {
+            _matrix matBoneWorld =
+                XMLoadFloat4x4(pBone) *
+                XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+            matSocket.r[3] = matBoneWorld.r[3];
+            XMStoreFloat4x4(&m_matHaloWorld, matSocket);
+            return;
+        }
+    }
+
+    matSocket.r[3] = m_pTransformCom->Get_State(STATE::POSITION);
+    XMStoreFloat4x4(&m_matHaloWorld, matSocket);
+}
+
 void CDropStar::Reveal()
 {
-	m_eState = DROPSTAR_STATE::LIVE;
-	m_fTimer = 0.f;
-	if (m_pBody && m_pBody->Get_Animator())
-		m_pBody->Get_Animator()->Play("BoundlPosition", true, true);
+    m_eState = DROPSTAR_STATE::LIVE;
+    m_fTimer = 0.f;
+    if (m_pBody && m_pBody->Get_Animator())
+        m_pBody->Get_Animator()->Play("BoundlPosition", true, true);
 
+    Start_HaloFx();
 
-	if (m_pController)
-	{
-		m_pController->Set_Enabled(true);
-		m_pController->Set_Solid(false);
-		m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
-	}
+    if (m_pController)
+    {
+        m_pController->Set_Enabled(true);
+        m_pController->Set_Solid(false);
+        m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
+    }
 
-	Launch();    
+    Launch();
 
-	if (m_pCollider)
-		m_pCollider->Set_Enabled(true);
+    if (m_pCollider)
+        m_pCollider->Set_Enabled(true);
 }
 
 void CDropStar::Update_Captured(_float fTimeDelta)
@@ -321,40 +404,46 @@ void CDropStar::Update_SpatPivot_FromBone()
 
 void CDropStar::On_Swallowed()
 {
-	SWALLOW_EVENT payload{ this };
-	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
+    SWALLOW_EVENT payload{ this };
+    m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 
-	m_pCaptor = nullptr;
+    m_pCaptor = nullptr;
 
-	if (m_pCollider)
-		m_pCollider->Set_Enabled(false);
+    if (m_pCollider)
+        m_pCollider->Set_Enabled(false);
 
-	Set_Active(false);
+    Stop_HaloFx();
+
+    Set_Active(false);
 }
 
 void CDropStar::Despawn()
 {
-	if (!m_bActive)
-		return;
+    if (!m_bActive)
+        return;
 
-	m_bAvailable = false;
+    m_bAvailable = false;
 
-	Set_Active(false);
+    Stop_HaloFx();
 
-	if (m_pMovement)
-		m_pMovement->Stop();
-	if (m_pController)
-		m_pController->Set_Enabled(false);
-	if (m_pCollider)
-		m_pCollider->Set_Enabled(false);
+    Set_Active(false);
 
-	Return_ToPool();
+    if (m_pMovement)
+        m_pMovement->Stop();
+    if (m_pController)
+        m_pController->Set_Enabled(false);
+    if (m_pCollider)
+        m_pCollider->Set_Enabled(false);
+
+    Return_ToPool();
 }
 
 void CDropStar::Return_ToPool()
 {
-	if (m_pPool)
-		m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
+    Stop_HaloFx();
+
+    if (m_pPool)
+        m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
 }
 
 void CDropStar::Set_Orientation(const _float3& vLook)
@@ -434,5 +523,12 @@ CGameObject* CDropStar::Clone(void* pArg)
 
 void CDropStar::Free()
 {
-	__super::Free();
+    if (m_pHaloFx)
+    {
+        m_pHaloFx->EffectContainer_Stop();
+        m_pHaloFx = nullptr;
+        m_iHaloFxEpoch = 0;
+    }
+
+    __super::Free();
 }

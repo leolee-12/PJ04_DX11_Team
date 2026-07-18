@@ -1,6 +1,7 @@
 #include "Dekabu.h"
 #include "GameInstance.h"
 #include "Monster_StateMachine.h"
+#include "GameContent_AnimEvents.h"
 
 #include "Dekabu_Body.h"
 #include "Dekabu_Brain.h"
@@ -15,6 +16,9 @@
 #include "Monster_State_Spat.h"
 #include "Dekabu_State_Alert.h"
 #include "Dekabu_State_Attack.h"
+
+#include "Projectile_Manager.h"
+#include "Kokabu.h"
 
 CDekabu::CDekabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -141,6 +145,45 @@ HRESULT CDekabu::Ready_PartObjects()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CDekabu::Ready_AnimEvents()
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (nullptr == pAnim)
+        return E_FAIL;
+
+    pAnim->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
+        {
+            if (Handle_SoundAnimEvent(e, phase))
+                return;
+
+            switch (static_cast<EANIM_EVENT>(e.iEventType))
+            {
+            case EANIM_EVENT::Projectile:
+                if (phase == ANIM_EVENT_PHASE::POINT)
+                    Fire_KoKabu();
+                break;
+            default:
+                break;
+            }
+        });
+    return S_OK;
+}
+
+void CDekabu::Fire_KoKabu()
+{
+    CProjectile* pProj = nullptr;
+    CProjectile_Manager::GetInstance()->Spawn(Get_PrototypeLevelIndex(), Get_LevelIndex(), L"KoKabu", CKokabu::PROTOTYPE_TAG, &pProj);
+    if (nullptr == pProj)
+        return;
+
+    _float3 vPos, vDir;
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    XMStoreFloat3(&vDir, XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK)));
+
+    pProj->Launch(vPos, vDir);
 }
 
 CDekabu* CDekabu::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

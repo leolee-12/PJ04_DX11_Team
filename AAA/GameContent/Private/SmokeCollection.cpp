@@ -9,7 +9,7 @@ CSmokeCollection::CSmokeCollection(ID3D11Device* pDevice, ID3D11DeviceContext* p
 }
 
 CSmokeCollection::CSmokeCollection(const CSmokeCollection& Prototype)
-	: CEffect_Container{ Prototype }
+	: CEffect_Container (Prototype )
 {
 }
 

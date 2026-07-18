@@ -78,7 +78,7 @@ HRESULT CDekabu_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_Monster;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_Dekabu_Body");
-    t.szAnimEventFile = TEXT("");   
+    t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/Dekabu/Body/Dekabu_AnimEvents.json");
 
     if (FAILED(Ready_MeshPart(t)))
         return E_FAIL;
