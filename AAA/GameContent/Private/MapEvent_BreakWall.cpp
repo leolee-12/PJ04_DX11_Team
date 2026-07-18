@@ -1,5 +1,5 @@
 #include "MapEvent_BreakWall.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "Shader_PassMeta.h"
 #include "Effect_Loader.h"
 

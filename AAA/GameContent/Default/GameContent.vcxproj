@@ -309,7 +309,7 @@
     <ClInclude Include="..\Public\EnvObject_Trigger.h" />
     <ClInclude Include="..\Public\EnvObject_Interact.h" />
     <ClInclude Include="..\Public\EnvObject_Static.h" />
-    <ClInclude Include="..\Public\GameContrnt_Events.h" />
+    <ClInclude Include="..\Public\GameContent_Events.h" />
     <ClInclude Include="..\Public\GameObject_Factory.h" />
     <ClInclude Include="..\public\GigantEdge.h" />
     <ClInclude Include="..\public\GigantEdge_Body.h" />

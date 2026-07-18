@@ -1,7 +1,7 @@
 #include "DropStar.h"
 #include "GameInstance.h"
 #include "GameContent_const.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "Controller.h"
 #include "DropStar_Body.h"
 #include "DropStar_Manager.h"

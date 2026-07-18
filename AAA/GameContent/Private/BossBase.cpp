@@ -1,7 +1,7 @@
 #include "BossBase.h"
 #include "GameInstance.h"
 #include "Monster_Movement.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 CBossBase::CBossBase(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext) {

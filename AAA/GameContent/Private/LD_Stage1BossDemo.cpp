@@ -1,7 +1,7 @@
 #include "LD_Stage1BossDemo.h"
 #include "LevelDesign_Registry.h"
 #include "Parsing_Utils.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "GameContent_AnimEvents.h"
 
 #include "Model.h"
