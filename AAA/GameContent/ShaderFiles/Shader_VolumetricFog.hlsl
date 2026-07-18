@@ -138,14 +138,17 @@ float SampleShadow(float3 worldPos)
 
         float cosA = dot(-Ls, normalize(g_vSpotDir.xyz));
         float cone = saturate((cosA - g_vSpotCone.y) / max(g_vSpotCone.x - g_vSpotCone.y, 1e-4f));
+        cone = smoothstep(0.f, 1.f, cone);
         cone *= cone;
 
         float phaseS = HenyeyGreenstein(dot(-rayDir, Ls), g_vFogParams2.x);
 
         float beamDensity = g_vSpotCone.z;
         float beam = beamDensity * cone;
-
         float3 spotBeam = g_vSpotColor.rgb * beam * phaseS * attS;
+
+        spotBeam *= smoothstep(0.f, max(g_vSpotCone.w, 1e-3f), dist);
+
         extinction += beam * 0.5f;
 
         g_Scatter[id] = float4(scattering * inScatter + spotBeam, extinction);

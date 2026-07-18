@@ -100,6 +100,9 @@ CBTNode* CBoss_Leopard_Brain::Make_Remount()
         Clip("PillarMoveStart", SPD),
         Make_Arc(false, { "PillarMove", "PillarJumpRoll" }, 1.6f, 12.f),
         Clip("PillarLanding", SPD),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            static_cast<CBoss_Leopard*>(m_pOwner)->Spotlight_On_Snap();
+            return BT_STATUS::SUCCESS; }),
         });
 }
 
@@ -113,7 +116,9 @@ CBTNode* CBoss_Leopard_Brain::Make_MountFirst()
         }),
         CBTSequence::Create({
             Make_Remount(),
-            CBTAction::Create([bMounted](CBlackboard*, _float) { *bMounted = true; return BT_STATUS::SUCCESS; }),
+            CBTAction::Create([bMounted](CBlackboard*, _float) {
+                *bMounted = true;
+                return BT_STATUS::SUCCESS; }),
         }),
         });
 }
@@ -150,6 +155,7 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
             if (!d->started) {
                 _vector vSelf = pTf->Get_State(STATE::POSITION);
                 _float3 vTgt = m_pOwner->Get_BlackBoard().vTargetPos; d->groundY = vTgt.y;
+                Leo->Spotlight_LockTarget(XMLoadFloat3(&vTgt));
                 _vector vTo = XMVectorSubtract(XMLoadFloat3(&vTgt), vSelf);
                 if (XMVectorGetX(XMVector3LengthSq(vTo)) < 1e-6f) vTo = pTf->Get_State(STATE::LOOK);
                 XMStoreFloat3(&d->vDir, XMVector3Normalize(vTo));
@@ -175,6 +181,7 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
             }
             return BT_STATUS::RUNNING;
         }, [this, d] {
+            if (!d->started) return;
             d->started = false;
             Enable_Hit(CBoss_Leopard_Body::LHB_LCLAW, false);
             Enable_Hit(CBoss_Leopard_Body::LHB_RCLAW, false);
@@ -194,7 +201,11 @@ CBTNode* CBoss_Leopard_Brain::Make_Groggy()
                 st->first = true; st->second = 0.f;
             }
             st->second += dt;
-            if (st->second >= fGroggy) { st->first = false; return BT_STATUS::SUCCESS; }
+            if (st->second >= fGroggy) { 
+                st->first = false; 
+                static_cast<CBoss_Leopard*>(m_pOwner)->Spotlight_Off();
+                return BT_STATUS::SUCCESS; 
+            }
             return BT_STATUS::RUNNING;
         }, [st] { st->first = false; st->second = 0.f; });
 }
@@ -202,6 +213,10 @@ CBTNode* CBoss_Leopard_Brain::Make_Groggy()
 CBTNode* CBoss_Leopard_Brain::Make_ChargeDash()
 {
     return CBTSequence::Create({
+        CBTAction::Create([this](CBlackboard*, _float) {
+            static_cast<CBoss_Leopard*>(m_pOwner)->Spotlight_TrackKirby();
+            return BT_STATUS::SUCCESS;
+        }),
         FaceWindup("JumpAttackMoveStart", TURN_DEG, SPD),
         Make_Dash(), Make_Groggy(), Clip("JumpAttackEnd", SPD),
         });
@@ -279,19 +294,30 @@ CBTNode* CBoss_Leopard_Brain::Make_AssaultSlash()
             if (s->t >= fDashTime) {
                 mv->Set_MoveSpeed(s->prevSpd);
                 Enable_Hit(CBoss_Leopard_Body::LHB_ASSAULT, false);
+                Leo->Spotlight_Off();
                 Leo->Set_AfterimageFx(false);
                 s->started = false; return BT_STATUS::SUCCESS;
             }
             return BT_STATUS::RUNNING;
         }, [this, s] {
+            if (!s->started)
+                return;
             s->started = false;
             auto* mv = m_pOwner->Get_Movement();
+            auto  Leo = static_cast<CBoss_Leopard*>(m_pOwner);
             if (mv && s->prevSpd > 0.f) mv->Set_MoveSpeed(s->prevSpd);
             Enable_Hit(CBoss_Leopard_Body::LHB_ASSAULT, false);
-            static_cast<CBoss_Leopard*>(m_pOwner)->Set_AfterimageFx(false);
+            Leo->Spotlight_Off();
+            Leo->Set_AfterimageFx(false);
             });
         return CBTSequence::Create({
+            CBTAction::Create([this](CBlackboard*, _float) {
+                static_cast<CBoss_Leopard*>(m_pOwner)->Spotlight_On_Snap();
+                return BT_STATUS::SUCCESS; }),
             FaceWindup("Ready", TURN_DEG, SPD),
+            CBTAction::Create([this](CBlackboard*, _float) {
+                static_cast<CBoss_Leopard*>(m_pOwner)->Spotlight_TrackKirby();
+                return BT_STATUS::SUCCESS; }),
             FaceWindup("AssaultSlashStart", TURN_DEG, SPD),
             pSlash, Clip("AssaultSlashEnd", SPD),
             });

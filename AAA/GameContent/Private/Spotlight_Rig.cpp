@@ -39,24 +39,21 @@ void CSpotlight_Rig::Set_Direction(_fvector vDir)
 
 void CSpotlight_Rig::Set_Color(const _float3& vColor, _float fIntensity)
 {
-    m_vColor = vColor;
+    m_vColor = vColor;          
     m_fIntensity = fIntensity;
-    Set_Enabled(m_bEnabled);           // diffuse 재계산
 }
 
 void CSpotlight_Rig::Set_Cone(_float fInnerDeg, _float fOuterDeg)
 {
-    m_tDesc.fInnerCos = cosf(XMConvertToRadians(fInnerDeg) * 0.5f);
-    m_tDesc.fOuterCos = cosf(XMConvertToRadians(fOuterDeg) * 0.5f);
+    m_fInnerDeg = fInnerDeg;
+    m_fOuterDeg = fOuterDeg;
 }
 
 void CSpotlight_Rig::Set_Range(_float fRange) { m_tDesc.fRange = fRange; }
 
 void CSpotlight_Rig::Set_Enabled(_bool bOn)
 {
-    m_bEnabled = bOn;
-    const _float f = bOn ? m_fIntensity : 0.f;
-    m_tDesc.vDiffuse = _float4(m_vColor.x * f, m_vColor.y * f, m_vColor.z * f, 1.f);
+    m_iFadeDir = bOn ? +1 : -1;
 }
 
 void CSpotlight_Rig::Push()
@@ -69,17 +66,17 @@ void CSpotlight_Rig::Push()
 
     m_pProxy->Set_LightDesc(static_cast<_uint>(m_iIndex), m_tDesc);
 
-    const _float fEnable = m_bEnabled ? 1.f : 0.f;
+    const _float fEnable = (m_fCurFade > 0.001f) ? 1.f : 0.f;
     m_pProxy->Set_ShaderGlobal("g_vGodRaySpotPos",
         _float4(m_tDesc.vPosition.x, m_tDesc.vPosition.y, m_tDesc.vPosition.z, m_tDesc.fRange));
     m_pProxy->Set_ShaderGlobal("g_vGodRaySpotDir",
         _float4(m_tDesc.vDirection.x, m_tDesc.vDirection.y, m_tDesc.vDirection.z, fEnable));
     m_pProxy->Set_ShaderGlobal("g_vGodRaySpotColor",
-        _float4(m_tDesc.vDiffuse.x * m_fGodRayStrength,   // vDiffuse 는 이미 색*강도
+        _float4(m_tDesc.vDiffuse.x * m_fGodRayStrength,
             m_tDesc.vDiffuse.y * m_fGodRayStrength,
             m_tDesc.vDiffuse.z * m_fGodRayStrength, 0.f));
     m_pProxy->Set_ShaderGlobal("g_vGodRaySpotCone",
-        _float4(m_tDesc.fInnerCos, m_tDesc.fOuterCos, m_fBeamDensity, 0.f));
+        _float4(m_tDesc.fInnerCos, m_tDesc.fOuterCos, m_fBeamDensity, m_fGodRayNear));
 }
 
 void CSpotlight_Rig::Set_Target(_fvector vFocusPos)
@@ -105,23 +102,47 @@ void CSpotlight_Rig::Snap()
     m_bFocusInit = true;
 }
 
+void CSpotlight_Rig::Snap_Fade(_bool bOn)
+{
+    m_fFadeT = bOn ? 1.f : 0.f;
+    m_iFadeDir = 0;
+    Apply_Fade(0.f);
+}
+
 void CSpotlight_Rig::Update(_float fTimeDelta)
 {
+    Apply_Fade(fTimeDelta);
+
     _vector vCur = XMLoadFloat3(&m_vFocusCurrent);
     _vector vTgt = XMLoadFloat3(&m_vFocusTarget);
     const _float fT = 1.f - expf(-m_fFollowSpeed * fTimeDelta);
     vCur = XMVectorLerp(vCur, vTgt, fT);
     XMStoreFloat3(&m_vFocusCurrent, vCur);
 
-    if (m_bOverhead)
+    Set_Direction(vCur - XMLoadFloat4(&m_tDesc.vPosition));
+    Push();
+}
+
+void CSpotlight_Rig::Apply_Fade(_float fTimeDelta)
+{
+    if (m_iFadeDir != 0)
     {
-        _vector vPos = vCur + XMLoadFloat3(&m_vOverheadOffset);
-        Set_Position(vPos);
+        const _float step = (m_fFadeDuration > 1e-4f) ? (fTimeDelta / m_fFadeDuration) : 1.f;
+        m_fFadeT += m_iFadeDir * step;
+        if (m_fFadeT <= 0.f) { m_fFadeT = 0.f; m_iFadeDir = 0; }
+        else if (m_fFadeT >= 1.f) { m_fFadeT = 1.f; m_iFadeDir = 0; }
     }
 
-    Set_Direction(vCur - XMLoadFloat4(&m_tDesc.vPosition));
+    const _float t = m_fFadeT * m_fFadeT * (3.f - 2.f * m_fFadeT);
+    m_fCurFade = t;
 
-    Push();
+    const _float fInner = m_fFadeStartInnerDeg + (m_fInnerDeg - m_fFadeStartInnerDeg) * t;
+    const _float fOuter = m_fFadeStartOuterDeg + (m_fOuterDeg - m_fFadeStartOuterDeg) * t;
+    m_tDesc.fInnerCos = cosf(XMConvertToRadians(fInner) * 0.5f);
+    m_tDesc.fOuterCos = cosf(XMConvertToRadians(fOuter) * 0.5f);
+
+    const _float f = m_fIntensity * t;
+    m_tDesc.vDiffuse = _float4(m_vColor.x * f, m_vColor.y * f, m_vColor.z * f, 1.f);
 }
 
 CSpotlight_Rig* CSpotlight_Rig::Create(CGameInstance_Proxy* pProxy, const LIGHT_DESC& tInit)

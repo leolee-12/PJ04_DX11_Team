@@ -65,7 +65,7 @@ namespace Engine
 
 	static const unsigned int FROXEL_W = 160;
 	static const unsigned int FROXEL_H = 90;
-	static const unsigned int FROXEL_D = 64;
+	static const unsigned int FROXEL_D = 128;
 
 	typedef struct tagFroxelCB
 	{

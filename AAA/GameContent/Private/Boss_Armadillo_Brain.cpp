@@ -95,6 +95,7 @@ CBTNode* CBoss_Armadillo_Brain::Make_TwinDance()
             return BT_STATUS::RUNNING;
         },
         [this, bOn]() {
+            if (!*bOn) return;
             *bOn = false;
             m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
             m_pOwner->Get_Movement()->Set_LockFacing(false);
@@ -174,9 +175,10 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
             }
             return BT_STATUS::RUNNING;
         },
-        [this, bOn]() { 
-            *bOn = false; 
-            m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED); 
+        [this, bOn]() {
+            if (!*bOn) return;
+            *bOn = false;
+            m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
             static_cast<CBoss_Armadillo*>(m_pOwner)->Set_RollFx(false);
         });
 
@@ -285,7 +287,11 @@ CBTNode* CBoss_Armadillo_Brain::Make_CatchOnce(shared_ptr<bool> pThrown)
             if (pArma->Is_QTEEscaped()) { *bWaitOn = false; pArma->End_QTE(); return BT_STATUS::SUCCESS; }
             if (pArma->Tick_QTETimer(dt)) { *bWaitOn = false; pArma->End_QTE(); return BT_STATUS::FAILURE; }
             return BT_STATUS::RUNNING;
-        }, [this, bWaitOn]() { *bWaitOn = false; static_cast<CBoss_Armadillo*>(m_pOwner)->End_QTE(); });
+        }, [this, bWaitOn]() {
+            if (!*bWaitOn) return;
+            *bWaitOn = false; 
+            static_cast<CBoss_Armadillo*>(m_pOwner)->End_QTE();
+            });
 
     auto* pReleaseEscape = CBTAction::Create([this](CBlackboard*, _float) {
         static_cast<CBoss_Armadillo*>(m_pOwner)->Fire_Release(KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE);

@@ -70,7 +70,11 @@ CBTNode* CBoss_Gorilla_Brain::Make_ArmSpin()
             if (*fSpinT >= fSpinDuration) { m_pOwner->Stop_ActionLoopSFX(); *fSpinT = 0.f; *bSpin = false; return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
-        [this, fSpinT, bSpin]() { *fSpinT = 0.f; *bSpin = false; m_pOwner->Stop_ActionLoopSFX(); });
+        [this, fSpinT, bSpin]() {
+            if (!*bSpin) return;
+            *fSpinT = 0.f; *bSpin = false;
+            m_pOwner->Stop_ActionLoopSFX();
+        });
 
     return CBTSequence::Create({
         Clip("ArmSpinChargeStart", SPD),
@@ -135,7 +139,10 @@ CBTNode* CBoss_Gorilla_Brain::Make_Catch()
                 pAnim->Play("CatchAttack", false, true, 0.1f, SPD);
                 pGorilla->Get_HitBoxPart()->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, true);
             }
-            if (pGorilla->Is_CatchHit()) { *bAtkOn = false; return BT_STATUS::SUCCESS; }
+            if (pGorilla->Is_CatchHit()) {
+                pGorilla->Get_HitBoxPart()->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, false);
+                *bAtkOn = false; return BT_STATUS::SUCCESS;
+            }
             if (pAnim->Is_Finished()) {
                 pGorilla->Get_HitBoxPart()->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, false);
                 *bAtkOn = false; return BT_STATUS::SUCCESS;

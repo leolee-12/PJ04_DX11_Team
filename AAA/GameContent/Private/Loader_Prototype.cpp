@@ -280,7 +280,7 @@ HRESULT CLIENT_DLL Load_LevelManifest(const _tchar* strManifestPath, LEVEL_MANIF
             pOut->strUIFile = StrToWstr(jManifest["UI"].get<string>());
 
         if (jManifest.contains("RenderGlobals"))
-            pOut->strRenderGlobalsFile = StrToWstr(jManifest["renderGlobals"].get<string>());
+            pOut->strRenderGlobalsFile = StrToWstr(jManifest["RenderGlobals"].get<string>());
     }
     catch (json::exception&)
     {

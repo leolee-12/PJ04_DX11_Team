@@ -55,6 +55,11 @@ public:
     void  Set_AfterimageFx(_bool bOn, const _wstring& strEffectId = L"");
     void  Spawn_FloorFx();
 
+    void  Spotlight_Off();
+    void  Spotlight_On_Snap();
+    void  Spotlight_TrackKirby();
+    void  Spotlight_LockTarget(_fvector vWorldPos);
+
 protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
@@ -105,6 +110,9 @@ private:
     _wstring m_strAfterimageId;
 
     CSpotlight_Rig* m_pSpotRig = { nullptr };
+
+    enum SPOT_TARGET { SPOT_LEOPARD, SPOT_KIRBY, SPOT_FIXED };
+    SPOT_TARGET m_eSpotTarget = { SPOT_LEOPARD };
 
 private:
     void Tick_DeathSequence(_float fTimeDelta);

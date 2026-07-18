@@ -119,6 +119,8 @@ namespace ProtoDesc
 	//Marb1e
 	inline constexpr TEXTURE_DESC Texture_LeoSlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LeoSlash"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Ring/spin01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_NailTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_NailTrail"), TEXT("../../Resources/YSH/Boss/Leopard/Nail/Trail.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_ImpactRing = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ImpactRing"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Ring/common_ringnofrip01.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_ImpactCircle = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ImpactCircle"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Circle/common_shinecircle01.png"), 1 };
 
 
 	//sky

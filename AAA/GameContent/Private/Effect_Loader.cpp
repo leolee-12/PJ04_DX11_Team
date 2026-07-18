@@ -116,6 +116,7 @@ namespace
         { TEXT("Leopard_Floor"),          TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Floor.JSON") },
         { TEXT("Leopard_Flash_R"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_R.JSON") },
         { TEXT("Leopard_Flash_L"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_L.JSON") },
+        { TEXT("Leopard_Impact"),         TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Impact.JSON") },
     };
 }
 

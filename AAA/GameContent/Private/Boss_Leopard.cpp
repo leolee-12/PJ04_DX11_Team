@@ -58,7 +58,17 @@ void CBoss_Leopard::Update(_float fTimeDelta)
 
     if (m_pSpotRig)
     {
-        m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION));
+        switch (m_eSpotTarget)
+        {
+            case SPOT_LEOPARD:
+                m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION));
+                break;
+            case SPOT_KIRBY:
+                m_pSpotRig->Set_Target(XMLoadFloat3(&Get_BlackBoard().vTargetPos));
+                break;
+            case SPOT_FIXED:
+                break;
+        }
         m_pSpotRig->Update(fTimeDelta);
     }
 }
@@ -171,14 +181,6 @@ void CBoss_Leopard::Enter_PillarMode()
     if (m_bPillarMode) return;
     m_bPillarMode = true;
 
-    //_float fBackDist = { 14.0f };        // 커비 뒤로 거리
-    //_float fHeight = { 4.f };            // 카메라 높이
-    //_float fShoulderOffset = { -1.8f };  // 양수=오른쪽 어깨
-    //_float fAimBias = { 0.65f };         // 0=커비 / 1=보스
-    //_float fAimHeight = { 6.f };         // 시선 높이(보스 크면 키움)
-    //_float fSmoothTime = { 0.18f };      // 따라오는 부드러움
-    //_float fFovDeg = { 50.f };           // FOV
-
     BOSSCAM_CONFIG_DESC cfg{};
     cfg.fAimHeight = -3.f;
     cfg.fShoulderOffset = 0.f;
@@ -237,6 +239,36 @@ void CBoss_Leopard::Spawn_FloorFx()
         L"Leopard_Floor", Get_LevelIndex(), vPos, vLook);
 }
 
+void CBoss_Leopard::Spotlight_Off()
+{
+    if (!m_pSpotRig) return;
+    m_eSpotTarget = SPOT_LEOPARD;
+    m_pSpotRig->Set_Enabled(false);
+    m_pSpotRig->Push();
+}
+
+void CBoss_Leopard::Spotlight_On_Snap()
+{
+    if (!m_pSpotRig) return;
+    m_eSpotTarget = SPOT_LEOPARD;
+    m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION));
+    m_pSpotRig->Snap();
+    m_pSpotRig->Set_Enabled(true);
+    m_pSpotRig->Push();
+}
+
+void CBoss_Leopard::Spotlight_TrackKirby()
+{
+    m_eSpotTarget = SPOT_KIRBY;
+}
+
+void CBoss_Leopard::Spotlight_LockTarget(_fvector vWorldPos)
+{
+    if (!m_pSpotRig) return;
+    m_eSpotTarget = SPOT_FIXED;
+    m_pSpotRig->Set_Target(vWorldPos);
+}
+
 CMonsterBrain* CBoss_Leopard::Create_Brain()
 {
     return CBoss_Leopard_Brain::Create(this);
@@ -244,6 +276,7 @@ CMonsterBrain* CBoss_Leopard::Create_Brain()
 
 void CBoss_Leopard::Play_Intro()
 {
+    Spotlight_Off();
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play("Anger", false, true, 0.f, BASE_ANIM_SPEED);
 
@@ -268,6 +301,8 @@ void CBoss_Leopard::Play_Death()
     Enable_Colliders(false);
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
+
+    Spotlight_Off();
 
     _vector vDir = XMVectorSetY(
         XMLoadFloat3(&Get_BlackBoard().vTargetPos) - m_pTransformCom->Get_State(STATE::POSITION), 0.f);
@@ -355,20 +390,24 @@ HRESULT CBoss_Leopard::Ready_TestSpotlight()
 {
     LIGHT_DESC tInit{};
     tInit.eType = LIGHT::SPOT;
-    tInit.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+    tInit.vSpecular = _float4(1.f, 1.f, 0.25f, 1.f);
     tInit.vAmbient = _float4(0.f, 0.f, 0.f, 1.f);
-    tInit.fRange = 50.f;
+    tInit.fRange = 90.f;
 
     m_pSpotRig = CSpotlight_Rig::Create(m_pGameInstance_Proxy, tInit);
     if (nullptr == m_pSpotRig)
         return E_FAIL;
 
-    m_pSpotRig->Set_Color(_float3(1.f, 0.95f, 0.8f), 15.f); // 따뜻한 흰색, 강도 8
-    m_pSpotRig->Set_Cone(18.f, 32.f);                      // 안쪽 18도 풀, 32도까지 감쇠
+    m_pSpotRig->Set_Color(_float3(1.f, 1.f, 0.25f), 15.f);
+    m_pSpotRig->Set_Cone(20.f, 25.f);
     m_pSpotRig->Set_FollowSpeed(6.f);
-    m_pSpotRig->Set_OverheadOffset(XMVectorSet(0.f, 30.f, 0.f, 0.f)); // 머리 위 30에서 아래로
 
-    m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION)); // 첫 타겟=레오파드(스냅)
+    _vector vSpawnPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vLightPos = vSpawnPos + XMVectorSet(0.f, 30.f, 0.f, 0.f);
+    m_pSpotRig->Set_Position(vLightPos);
+    m_pSpotRig->Set_Target(vSpawnPos);
+    m_pSpotRig->Snap_Fade(true);
+    m_pSpotRig->Push();
     return S_OK;
 }
 
