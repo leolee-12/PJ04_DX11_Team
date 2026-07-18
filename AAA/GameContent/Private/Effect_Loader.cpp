@@ -113,6 +113,9 @@ namespace
         { TEXT("Afterimage_Jump"),        TEXT("../../Resources/YSH/Effects/Leopard/Afterimage_Jump.JSON") },
         { TEXT("ClawAssault"),            TEXT("../../Resources/YSH/Effects/Leopard/ClawAssault.JSON") },
         { TEXT("ClawJump"),               TEXT("../../Resources/YSH/Effects/Leopard/ClawJump.JSON") },
+        { TEXT("Leopard_Floor"),          TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Floor.JSON") },
+        { TEXT("Leopard_Flash_R"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_R.JSON") },
+        { TEXT("Leopard_Flash_L"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_L.JSON") },
     };
 }
 

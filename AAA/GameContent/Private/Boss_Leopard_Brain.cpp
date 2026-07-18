@@ -170,6 +170,7 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
                 Enable_Hit(CBoss_Leopard_Body::LHB_LCLAW, false);
                 Enable_Hit(CBoss_Leopard_Body::LHB_RCLAW, false);
                 Leo->Set_AfterimageFx(false);
+                Leo->Spawn_FloorFx();
                 d->started = false; return BT_STATUS::SUCCESS;
             }
             return BT_STATUS::RUNNING;

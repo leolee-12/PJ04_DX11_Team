@@ -201,6 +201,8 @@
 #include "Leopard_Afterimage_Jump.h"
 #include "Leopard_ClawAssault.h"
 #include "Leopard_ClawJump.h"
+#include "Leopard_Flash.h"
+#include "Leopard_Floor.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1709,6 +1711,23 @@ void CGameObject_Factory::Leopard_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_ClawJump::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Claw/BossLeopard_00_JumpAttackClawModel.ysh"
                     , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_Flash::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Flash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Flash::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Ring/BossLeopard_00_Common_Ring02.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Flash::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Circle/BossLeopard_00_Common_Circle01.ysh"));
+        )
+    );
+    Register(CLeopard_Floor::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Floor),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Floor::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Floor/GroundRockEffectModel_TopL.ysh"));
         )
     );
 }

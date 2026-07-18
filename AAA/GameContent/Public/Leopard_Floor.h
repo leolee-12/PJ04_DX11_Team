@@ -4,19 +4,18 @@
 
 NS_BEGIN(Client)
 
-class CLeopard_Flash final : public CEffect_Container
+class CLeopard_Floor final : public CEffect_Container
 {
-	GENERATED_BODY(CLeopard_Flash)
+	GENERATED_BODY(CLeopard_Floor)
 
 public:
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Leopard_Flash";
-	static constexpr const _tchar* MODEL_PROTO_TAG_RING = L"Prototype_Component_Model_Leopard_FlashRing";
-	static constexpr const _tchar* MODEL_PROTO_TAG_CIRCLE = L"Prototype_Component_Model_Leopard_Circle";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Leopard_Floor";
+	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_Leopard_Floor";
 
 private:
-	CLeopard_Flash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CLeopard_Flash(const CLeopard_Flash& Prototype);
-	virtual ~CLeopard_Flash() = default;
+	CLeopard_Floor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLeopard_Floor(const CLeopard_Floor& Prototype);
+	virtual ~CLeopard_Floor() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;
@@ -36,7 +35,7 @@ private:
 	HRESULT Ready_EffectPartObjects();
 
 public:
-	static CLeopard_Flash* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CLeopard_Floor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:

@@ -215,6 +215,17 @@ void CBoss_Leopard::Set_AfterimageFx(_bool bOn, const _wstring& strEffectId)
     }
 }
 
+void CBoss_Leopard::Spawn_FloorFx()
+{
+    _float3 vPos{}, vLook{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(
+        L"Leopard_Floor", Get_LevelIndex(), vPos, vLook);
+}
+
 CMonsterBrain* CBoss_Leopard::Create_Brain()
 {
     return CBoss_Leopard_Brain::Create(this);

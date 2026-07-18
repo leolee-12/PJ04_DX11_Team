@@ -53,15 +53,11 @@ HRESULT CLeopard_Flash::Ready_EffectPartObjects()
 {
 	CMeshCommon::MESH_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
-	tDesc.bUseTextureCom = true;
-	tDesc.iTextureLevel = m_iPrototypeLevel;
 
-	tDesc.wstrTextureTag = Texture_LeoSlash.szProtoTag;
 	tDesc.wstrModelTag = MODEL_PROTO_TAG_RING;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Ring", &tDesc)))
 		return E_FAIL;
 
-	tDesc.wstrTextureTag = Texture_LeoSlash.szProtoTag;
 	tDesc.wstrModelTag = MODEL_PROTO_TAG_CIRCLE;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Flash", &tDesc)))
 		return E_FAIL;

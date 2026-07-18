@@ -52,6 +52,7 @@ public:
     _bool Is_PillarMode() const { return m_bPillarMode; }
 
     void  Set_AfterimageFx(_bool bOn, const _wstring& strEffectId = L"");
+    void  Spawn_FloorFx();
 
 protected:
     virtual CMonsterBrain* Create_Brain() override;
