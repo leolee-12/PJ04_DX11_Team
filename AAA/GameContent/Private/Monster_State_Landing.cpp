@@ -23,6 +23,7 @@ void CMonster_State_Landing::Enter(MONSTER_STATE_TYPE ePrevState)
 		m_pAnimator->Play(&m_PlayInfo);
 
 	m_pOwner->Play_OneShotSFX(L"CharaBasic_Landing.wav", 0.6f);
+	m_pOwner->Play_LandingSmokeFx();
 }
 
 void CMonster_State_Landing::Update(_float fTimeDelta)

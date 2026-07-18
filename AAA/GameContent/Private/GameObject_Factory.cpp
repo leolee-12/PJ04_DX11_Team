@@ -87,6 +87,7 @@
 #include "LaunchSmoke.h"
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
+#include "LandingSmoke.h"
 #include "CarLanding.h"
 #include "PickUpEffect.h"
 #include "DropStarEffect.h"
@@ -1041,6 +1042,21 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    // LandingSmoke
+    Register(CLandingSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CLandingSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeMesh"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPolyMesh"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
         ));
 
     // CarLanding
