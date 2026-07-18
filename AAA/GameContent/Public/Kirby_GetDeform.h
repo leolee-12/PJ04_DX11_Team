@@ -2,6 +2,8 @@
 
 #include "Kirby_State.h"
 
+#include "Kirby_DeformContext.h"
+
 NS_BEGIN(Engine)
 class CGameInstance_Proxy;
 class CAnimator;
@@ -13,6 +15,9 @@ NS_BEGIN(Client)
 
 class CKirby;
 class CKirby_Body;
+class CKirby_Deform;
+
+struct DEFORM_ACQUIRED_EVENT;
 
 class CLIENT_DLL CKirby_GetDeform final : public CKirby_State
 {
@@ -55,12 +60,14 @@ private:
 	// Event
 	void Subscribe_DeformEvent(CKirby* pKirby);
 	void Unsubscribe_DeformEvent();
-	void Handle_DeformEvent(CKirby* pKirby);
+	void Handle_DeformEvent(CKirby* pKirby, const DEFORM_ACQUIRED_EVENT* pDesc);
 
 private:
 	DEFORM_STATE m_eDeformState{};
 
 	// 변신할 타입
+	POST_DEFORM_END_CONTEXT m_tPostDeformEndContext{};
+	CKirby_Deform* pPendingDeform{};
 	DEFORM_TYPE m_eDeformType{};
 
 	// Effect
