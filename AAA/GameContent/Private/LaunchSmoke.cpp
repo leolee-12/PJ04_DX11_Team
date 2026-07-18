@@ -52,7 +52,7 @@ HRESULT CLaunchSmoke::Ready_EffectPartObjects()
 {
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
-	tDesc.wstrModelTag = L"Prototype_Component_Model_SmokeSphereOriginal";
+	tDesc.wstrModelTag = L"Prototype_Component_Model_SmokeMesh";
 	tDesc.bUseDiffuseTexture = false;
 	tDesc.bUseUnknownTexture = true;
 	tDesc.bUseNormalTexture = false;

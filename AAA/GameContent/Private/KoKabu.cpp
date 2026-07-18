@@ -177,7 +177,7 @@ HRESULT CKokabu::Render()
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
-	return S_OK; S_OK;
+	return S_OK;
 }
 
 HRESULT CKokabu::Ready_Visual()
