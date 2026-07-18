@@ -204,6 +204,9 @@
 #include "Leopard_Flash.h"
 #include "Leopard_Floor.h"
 #include "Leopard_Impact.h"
+#include "Nail_Smoke.h"
+#include "LeoJump_Smoke.h"
+#include "Assault_Smoke.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1743,6 +1746,28 @@ void CGameObject_Factory::Leopard_Effect()
                 CTexture::Create(pDevice, pContext, Texture_ImpactRing.szFileTag, Texture_ImpactRing.iNumTex));
             TRY_ADD_PROTO(pProxy, iLevelIndex, Texture_ImpactCircle.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_ImpactCircle.szFileTag, Texture_ImpactCircle.iNumTex));
+        )
+    );
+
+    Register(CNail_Smoke::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CNail_Smoke),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CNail_Smoke::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
+        )
+    );
+    Register(CLeoJump_Smoke::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeoJump_Smoke),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeoJump_Smoke::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
+        )
+    );
+    Register(CAssault_Smoke::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CAssault_Smoke),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAssault_Smoke::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
         )
     );
 }

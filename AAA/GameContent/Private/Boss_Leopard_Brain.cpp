@@ -175,6 +175,7 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
                 pTf->Set_State(STATE::POSITION, XMLoadFloat3(&p)); mv->Sync_To_Controller();
                 Enable_Hit(CBoss_Leopard_Body::LHB_LCLAW, false);
                 Enable_Hit(CBoss_Leopard_Body::LHB_RCLAW, false);
+                Leo->Spawn_JumpSmoke(p);
                 Leo->Set_AfterimageFx(false);
                 Leo->Spawn_FloorFx();
                 d->started = false; return BT_STATUS::SUCCESS;

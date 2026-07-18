@@ -49,6 +49,11 @@ HRESULT CProjectile_Nail::Ready_Visual()
 void CProjectile_Nail::Kill()
 {
     Stop_Meteo();
+
+    _float3 vPos{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
+    CEffect_Loader::GetInstance()->Spawn(TEXT("Nail_Smoke"), m_iLevelIndex, vPos);
+
     __super::Kill();
 }
 

@@ -54,6 +54,7 @@ public:
 
     void  Set_AfterimageFx(_bool bOn, const _wstring& strEffectId = L"");
     void  Spawn_FloorFx();
+    void  Spawn_JumpSmoke(const _float3& vPos);
 
     void  Spotlight_Off();
     void  Spotlight_On_Snap();

@@ -239,6 +239,16 @@ void CBoss_Leopard::Spawn_FloorFx()
         L"Leopard_Floor", Get_LevelIndex(), vPos, vLook);
 }
 
+void CBoss_Leopard::Spawn_JumpSmoke(const _float3& vPos)
+{
+    _float3 vLook{};
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(
+        L"LeoJump_Smoke", Get_LevelIndex(), vPos, vLook);
+}
+
 void CBoss_Leopard::Spotlight_Off()
 {
     if (!m_pSpotRig) return;

@@ -117,6 +117,10 @@ namespace
         { TEXT("Leopard_Flash_R"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_R.JSON") },
         { TEXT("Leopard_Flash_L"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_L.JSON") },
         { TEXT("Leopard_Impact"),         TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Impact.JSON") },
+        { TEXT("Assault_Smoke"),          TEXT("../../Resources/YSH/Effects/Leopard/Assault_Smoke.JSON") },
+        { TEXT("Nail_Smoke"),             TEXT("../../Resources/YSH/Effects/Leopard/Nail_Smoke.JSON") },
+        { TEXT("LeoJump_Smoke"),          TEXT("../../Resources/YSH/Effects/Leopard/LeoJump_Smoke.JSON") },
+
     };
 }
 

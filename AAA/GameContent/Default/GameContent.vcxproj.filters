@@ -1351,6 +1351,18 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Impact">
       <UniqueIdentifier>{702ef715-6e1a-434a-8d7f-98afbd09bcfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke">
+      <UniqueIdentifier>{27c3eaf6-7b12-42f3-9638-db0b01d7ef3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault">
+      <UniqueIdentifier>{2be1544d-23be-4d46-825b-53fefeb18cc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump">
+      <UniqueIdentifier>{0c567446-9d4a-4a45-af00-39abff17ff8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Nail">
+      <UniqueIdentifier>{f901b1c7-516a-4295-a415-0eaa7b26e8c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2604,6 +2616,15 @@
     <ClInclude Include="..\public\Leopard_Impact.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Impact</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Nail_Smoke.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Nail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LeoJump_Smoke.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Assault_Smoke.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3769,6 +3790,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Leopard_Impact.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Impact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Nail_Smoke.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Nail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LeoJump_Smoke.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Assault_Smoke.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
