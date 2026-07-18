@@ -17,6 +17,7 @@ Texture2D g_LightDepthTexture; // 그림자맵
 Texture2D g_EmissiveTexture; // 이미시브
 Texture2D<uint> g_MaterialIDTexture;
 Texture2D       g_ShadowRawTexture;
+Texture2D       g_SkyTexture;
 
 vector g_vCamPosition;
 
@@ -239,7 +240,20 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
 {
     float4 albedoA = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (0.f == albedoA.a)
-        discard;
+    {
+        float4 sky = g_SkyTexture.Sample(LinearSampler, In.vTexcoord);
+        
+        if (0.f == sky.a)
+            discard;
+
+        float3 skyCol = sky.rgb;
+        if (g_fFogEnable > 0.5f)
+        {
+            float4 fog = g_FogVolume.SampleLevel(ClampSampler, float3(In.vTexcoord, 1.f), 0);
+            skyCol = skyCol * fog.a + fog.rgb;
+        }
+        return float4(skyCol, 1.f);
+    }
 
     float3 light = g_LightTexture.Sample(LinearSampler, In.vTexcoord).rgb;
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;

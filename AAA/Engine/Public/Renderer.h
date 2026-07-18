@@ -88,6 +88,7 @@ private:
 
 private:
 	HRESULT Render_Priority();
+	HRESULT Render_Sky();
 	HRESULT Render_Shadow();
 	HRESULT Render_ShadowBlur();
 	HRESULT Render_NonBlend();

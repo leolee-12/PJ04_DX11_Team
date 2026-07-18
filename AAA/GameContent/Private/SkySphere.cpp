@@ -43,7 +43,7 @@ void CSkySphere::Update(_float fTimeDelta)
 void CSkySphere::Late_Update(_float fTimeDelta)
 {
 	m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition()));
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::PRIORITY, this);
+	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SKY, this);
 }
 
 HRESULT CSkySphere::Render()
