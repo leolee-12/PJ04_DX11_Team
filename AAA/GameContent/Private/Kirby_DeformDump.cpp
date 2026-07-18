@@ -74,38 +74,40 @@ void CKirby_DeformDump::Change_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE
 
 void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE eState)
 {
+    CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
+
     switch (eState)
     {
         case DEFORM_DUMP_STATE::SPIT_START:
         {
-            CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
+            pKirbyDeform->On_DumpSpitStart(pKirby);
+
             pKirbyDeform->Play_DeformAni(pKirby, DEFORM_ANI::SPIT_START);
-            pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 22.f, 0.f, 0.f));
             break;
         }
         case DEFORM_DUMP_STATE::SPIT_DEFORM:
         {
             m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_SpitStart.wav", 0.2f);
 
-            // Deform Model
-            CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
-            DEFORM_TYPE eDeformType = pKirbyDeform->Get_DeformType();
+            pKirbyDeform->On_DumpSpitDeform(pKirby);
 
+            // Deform Model
+            DEFORM_TYPE eDeformType = pKirbyDeform->Get_DeformType();
             CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(eDeformType);
             pDeformModel->Set_Active(false);
 
             // Body
             CKirby_Body* pBody = pKirby->Get_Body();
             pBody->Set_Active(true);
-            CAnimator* pBodyAnimator = pBody->Get_Animator();
-            pBodyAnimator->Play("SpitDeform", false, false, 0.1f, 2.f);
+
+            // Ani
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::SPIT_DEFORM);
 
             // Parts
-            COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
+            COPY_ABILITY_TYPE m_eAbilityType = pAbility->Get_AbilityType();
             pKirby->Change_HatSocketMatrix(m_eAbilityType, pBody->Get_HatBoneMatirx());
 
-            //eDeformType = DEFORM_TYPE::CYLINDER;  // Debug
-            // ptr
             CLD_DeformObject::Spawn_Released(m_pGameInstance_Proxy, eDeformType,
                 pKirby->Get_LevelIndex(), pKirby->Get_Transform()->Get_WorldMatrixPtr());
 

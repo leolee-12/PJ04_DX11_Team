@@ -39,15 +39,20 @@ protected:
 public:
 	virtual DEFORM_TYPE Get_DeformType() = 0;
 
+	// Deform 진입
 	virtual void Enter_Deform(CKirby* pKirby) = 0;
 	virtual void Exit_Deform(CKirby* pKirby) = 0;
 
-public:
-	void Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni);
-
+	// Get_Deform 변신 추가 로직
 	virtual void Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
 	virtual _bool Update_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) { return true; }
 	virtual void Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
+
+	// Deform Dump용 함수
+	virtual void On_DumpSpitStart(CKirby* pKirby);
+	virtual void On_DumpSpitDeform(CKirby* pKirby) {}
+
+	void Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni);
 
 protected:
 	void Set_FullBodyAni(DEFORM_ANI eAni, const _string& strAniName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.1f, _float fSpeed = 1.f);

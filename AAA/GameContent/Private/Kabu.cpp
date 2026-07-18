@@ -199,7 +199,7 @@ HRESULT CKabu::Ready_AnimEvents()
 
 void CKabu::On_Damaged(const ATTACK_INFO& tInfo)
 {
-    if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+    if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT)
     {
         if (!(static_cast<CMonster_RailMovement*>(m_pMovement)->Is_OffPath()))
             Change_State(MONSTER_STATE_TYPE::FLATTEN);

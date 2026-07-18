@@ -10,7 +10,7 @@
 
 #include "Movement_Child.h"
 
-#include "Kirby_DeformCar_Main.h"
+#include "Kirby_Deform_Model.h"
 
 CKirby_Deform_Car::CKirby_Deform_Car()
 {
@@ -53,11 +53,22 @@ void CKirby_Deform_Car::Enter_Deform(CKirby* pKirby)
     pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
     pMovement->Set_MaxFallVelocity(s_fMaxCarFallVelocity);
 
+    // CCT
     pKirby->Set_CollisionSize(s_fCar_CCT_Radius, s_fCar_CCT_Height);
+
+    // Hit Box
+    CCollider::COLLIDER_DESC BreakerableHitBoxDesc{};
+    BreakerableHitBoxDesc.pOwner = pKirby;
+    BreakerableHitBoxDesc.vCenter = _float3(0.f, -1.f, 1.5f);
+    BreakerableHitBoxDesc.fRadius = 2.5f;
+    BreakerableHitBoxDesc.fHeight = 0.f;
+    pKirby->Set_ColliderDesc(CKirby::BREAKERABLE_HITBOX, BreakerableHitBoxDesc);
 }
 
 void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
 {
+    pKirby->Set_ColliderEnabled(CKirby::BREAKERABLE_HITBOX, false);
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
@@ -90,8 +101,10 @@ void CKirby_Deform_Car::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 
 void CKirby_Deform_Car::Exit_AttackState(CKirby* pKirby)
 {
+    pKirby->Set_ColliderEnabled(CKirby::BREAKERABLE_HITBOX, false);
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
-    pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
+    pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
 
     Effect_Stop(m_pBoostGas);
     Effect_Stop(m_pBoostWind);
@@ -226,9 +239,7 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
 
             BoostEffectStart(pKirby, m_pBoostGas, L"BoostGas");
 
-            CKirby_HitBox_Model* pCarMainModel =
-                static_cast<CKirby_HitBox_Model*>(pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR));
-            pCarMainModel->Set_HitBoxEnabled(true);
+            pKirby->Set_ColliderEnabled(CKirby::BREAKERABLE_HITBOX, true);
 
             CEffect_Loader::GetInstance()->Spawn(L"CarMilkyWay", pKirby->Get_LevelIndex(),
                 _float3(0.f, 1.3f, 2.4f), _float3(0.f, 0.f, 0.f), _float3(0.f, 180.f, 0.f),
@@ -342,9 +353,7 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
         {
             pModel->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
-            CKirby_HitBox_Model* pCarMainModel =
-                static_cast<CKirby_HitBox_Model*>(pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR));
-            pCarMainModel->Set_HitBoxEnabled(false);
+            pKirby->Set_ColliderEnabled(CKirby::BREAKERABLE_HITBOX, false);
 
             Effect_Stop(m_pBoostGas);
             Effect_Stop(m_pBoostWind);

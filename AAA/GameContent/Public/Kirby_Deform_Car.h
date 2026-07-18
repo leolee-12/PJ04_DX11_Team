@@ -38,9 +38,11 @@ private:
 public:
 	virtual DEFORM_TYPE Get_DeformType() override;
 
+	// Deform 진입
 	virtual void Enter_Deform(CKirby* pKirby) override;
 	virtual void Exit_Deform(CKirby* pKirby) override;
 
+	// Attack 상태 진입
 	virtual void Enter_AttackState(CKirby* pKirby, _int iFlag) override;
 	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
 	virtual void Exit_AttackState(CKirby* pKirby) override;
