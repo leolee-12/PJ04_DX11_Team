@@ -22,6 +22,13 @@
     <ClInclude Include="..\Public\Ability_Bubble.h" />
     <ClInclude Include="..\Public\Ability_Model.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
+    <ClInclude Include="..\public\Armadillo_Dust.h" />
+    <ClInclude Include="..\public\Armadillo_RollWind.h" />
+    <ClInclude Include="..\public\Armadillo_RutA.h" />
+    <ClInclude Include="..\public\Armadillo_RutB.h" />
+    <ClInclude Include="..\public\Armadillo_SpinWind.h" />
+    <ClInclude Include="..\public\Armadillo_WallImpact.h" />
+    <ClInclude Include="..\public\Assault_Smoke.h" />
     <ClInclude Include="..\public\Boss_GorillaRush.h" />
     <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
@@ -41,6 +48,18 @@
     <ClInclude Include="..\Public\EssenceCrown.h" />
     <ClInclude Include="..\Public\Kirby_DeformContext.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
+    <ClInclude Include="..\public\LeoJump_Smoke.h" />
+    <ClInclude Include="..\public\Leopard_Afterimage_Assault.h" />
+    <ClInclude Include="..\public\Leopard_Afterimage_Jump.h" />
+    <ClInclude Include="..\public\Leopard_ClawAssault.h" />
+    <ClInclude Include="..\public\Leopard_ClawJump.h" />
+    <ClInclude Include="..\public\Leopard_Flash.h" />
+    <ClInclude Include="..\public\Leopard_Floor.h" />
+    <ClInclude Include="..\public\Leopard_Impact.h" />
+    <ClInclude Include="..\public\Leopard_Meteo.h" />
+    <ClInclude Include="..\public\Leopard_Slash.h" />
+    <ClInclude Include="..\public\Nail_Smoke.h" />
+    <ClInclude Include="..\public\Nail_Trail.h" />
     <ClInclude Include="..\Public\LD_LensFlare.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardB.h" />
     <ClInclude Include="..\Public\LaunchSmoke.h" />
@@ -50,6 +69,7 @@
     <ClInclude Include="..\Public\PickUpEffect.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
+    <ClInclude Include="..\public\Spotlight_Rig.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
@@ -429,6 +449,13 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
     <ClCompile Include="..\Private\Ability_Model.cpp" />
+    <ClCompile Include="..\private\Armadillo_Dust.cpp" />
+    <ClCompile Include="..\private\Armadillo_RollWind.cpp" />
+    <ClCompile Include="..\private\Armadillo_RutA.cpp" />
+    <ClCompile Include="..\private\Armadillo_RutB.cpp" />
+    <ClCompile Include="..\private\Armadillo_SpinWind.cpp" />
+    <ClCompile Include="..\private\Armadillo_WallImpact.cpp" />
+    <ClCompile Include="..\private\Assault_Smoke.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
@@ -447,6 +474,18 @@
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
     <ClCompile Include="..\Private\KoKabu.cpp" />
+    <ClCompile Include="..\private\LeoJump_Smoke.cpp" />
+    <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp" />
+    <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp" />
+    <ClCompile Include="..\private\Leopard_ClawAssault.cpp" />
+    <ClCompile Include="..\private\Leopard_ClawJump.cpp" />
+    <ClCompile Include="..\private\Leopard_Flash.cpp" />
+    <ClCompile Include="..\private\Leopard_Floor.cpp" />
+    <ClCompile Include="..\private\Leopard_Impact.cpp" />
+    <ClCompile Include="..\private\Leopard_Meteo.cpp" />
+    <ClCompile Include="..\private\Leopard_Slash.cpp" />
+    <ClCompile Include="..\private\Nail_Smoke.cpp" />
+    <ClCompile Include="..\private\Nail_Trail.cpp" />
     <ClCompile Include="..\Private\LD_LensFlare.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardB.cpp" />
     <ClCompile Include="..\Private\LaunchSmoke.cpp" />
@@ -455,6 +494,7 @@
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
+    <ClCompile Include="..\private\Spotlight_Rig.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />
@@ -879,7 +919,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Leopard.hlsl" />
+    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -17,6 +17,10 @@ cbuffer FroxelCB : register(b0)
     float4 g_vFogParams2; // x=g(�̹漺) y=ambient z=time w=shadowStrength
     float4 g_vGridParams; // x=W y=H z=D w=jitter
     float4 g_vFogParams3; // x=fogStart, y=startRange
+    float4 g_vSpotPos; // xyz=pos w=range
+    float4 g_vSpotDir; // xyz=dir w=enable
+    float4 g_vSpotColor; // rgb
+    float4 g_vSpotCone; // x=innerCos y=outerCos
 };
 
 Texture2D g_ShadowDepth : register(t0); // Target_LightDepth (.r)
@@ -121,6 +125,35 @@ float SampleShadow(float3 worldPos)
     float shadowT = lerp(1.f, shadow, g_vFogParams2.w);
 
     float3 inScatter = g_vLightColor.rgb * phase * shadowT + g_vFogParams2.y.xxx;
+    
+    if (g_vSpotDir.w > 0.5f)
+    {
+        float3 Lvec = g_vSpotPos.xyz - wp;
+        float dist = length(Lvec);
+        float3 Ls = Lvec / max(dist, 1e-4f);
+
+        float rng = max(g_vSpotPos.w, 1e-3f);
+        float attS = saturate((rng - dist) / rng);
+        attS *= attS;
+
+        float cosA = dot(-Ls, normalize(g_vSpotDir.xyz));
+        float cone = saturate((cosA - g_vSpotCone.y) / max(g_vSpotCone.x - g_vSpotCone.y, 1e-4f));
+        cone = smoothstep(0.f, 1.f, cone);
+        cone *= cone;
+
+        float phaseS = HenyeyGreenstein(dot(-rayDir, Ls), g_vFogParams2.x);
+
+        float beamDensity = g_vSpotCone.z;
+        float beam = beamDensity * cone;
+        float3 spotBeam = g_vSpotColor.rgb * beam * phaseS * attS;
+
+        spotBeam *= smoothstep(0.f, max(g_vSpotCone.w, 1e-3f), dist);
+
+        extinction += beam * 0.5f;
+
+        g_Scatter[id] = float4(scattering * inScatter + spotBeam, extinction);
+        return;
+    }
 
     g_Scatter[id] = float4(scattering * inScatter, extinction);
 }

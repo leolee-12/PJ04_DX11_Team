@@ -20,6 +20,9 @@ HRESULT CRenderer::Initialize()
     m_iRTHeight = static_cast<_uint>(m_pGameInstance_Proxy->Get_WindowHeight());
 
     /* 렌더타겟들을 만든다. */
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Sky"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Diffuse"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Normal"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
@@ -76,6 +79,9 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
 
     /* 만든 렌더타겟들을 장치에 동시에 바인딩되는 기준으로 모은다. */
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Sky"), TEXT("Target_Sky"))))
+        return E_FAIL;
+
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Normal"))))
@@ -246,6 +252,8 @@ HRESULT CRenderer::Draw()
 
     if (FAILED(Render_Priority()))
         return E_FAIL;
+    if (FAILED(Render_Sky()))
+        return E_FAIL;
     if (FAILED(Render_Shadow()))
         return E_FAIL;
     if (FAILED(Render_ShadowBlur()))
@@ -346,6 +354,18 @@ HRESULT CRenderer::Render_Priority()
     m_RenderObjects[ETOUI(RENDERID::PRIORITY)].clear();
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_Sky()
+{
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Sky"), nullptr, false, true)))
+        return E_FAIL;
+    for (auto& p : m_RenderObjects[ETOUI(RENDERID::SKY)]) {
+        if (p) p->Render();
+        Safe_Release(p);
+    }
+    m_RenderObjects[ETOUI(RENDERID::SKY)].clear();
+    return m_pGameInstance_Proxy->End_MRT();
 }
 
 HRESULT CRenderer::Render_Shadow()
@@ -601,6 +621,8 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pShaderDeferred, "g_ShadowRawTexture")))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Sky"), m_pShaderDeferred, "g_SkyTexture")))
+        return E_FAIL;
 
     if (FAILED(m_pShaderDeferred->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
         return E_FAIL;
@@ -831,7 +853,7 @@ HRESULT CRenderer::Render_Effect_HDR()
     if (m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)].empty())
         return S_OK;
 
-    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_DoF"), nullptr, false, false)))
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_DoF"), nullptr, true, false)))
         return E_FAIL;
 
     for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)])
@@ -892,6 +914,10 @@ HRESULT CRenderer::Render_VolumetricFog()
         Fog("g_fFogShadowStrength").x);
     cb->vGridParams = _float4((_float)FROXEL_W, (_float)FROXEL_H, (_float)FROXEL_D, 0.f);
     cb->vFogParams3 = _float4(Fog("g_fFogStart").x, Fog("g_fFogStartRange").x, 0.f, 0.f);
+    cb->vSpotPos = Fog("g_vGodRaySpotPos");
+    cb->vSpotDir = Fog("g_vGodRaySpotDir");
+    cb->vSpotColor = Fog("g_vGodRaySpotColor");
+    cb->vSpotCone = Fog("g_vGodRaySpotCone");
 
     m_pContext->Unmap(m_pFroxelCB, 0);
 

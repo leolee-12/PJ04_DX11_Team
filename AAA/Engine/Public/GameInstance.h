@@ -142,7 +142,7 @@ private:
 
 #pragma region LIGHT_MANAGER
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
-	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+	_int Add_Light(const LIGHT_DESC& LightDesc);
 #pragma endregion
 
 #pragma region PICKING

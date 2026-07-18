@@ -62,6 +62,7 @@ void CBoss_Armadillo::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
     Update_BodyOffset(fTimeDelta);
+    Update_RutTrail(fTimeDelta);
 }
 
 void CBoss_Armadillo::Late_Update(_float fTimeDelta)
@@ -78,6 +79,11 @@ void CBoss_Armadillo::Play_Intro()
 {
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play("Angry", false, true, 0.f, 1.5f);
+
+    m_pController->Set_Solid(false);
+
+    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 
     BOSSCAM_CONFIG_DESC cfg{};
     cfg.fAimHeight = 4.f;    
@@ -297,6 +303,43 @@ void CBoss_Armadillo::Hide_Cage()
         m_pCage->Set_Active(false);
 }
 
+void CBoss_Armadillo::Set_RollFx(_bool bOn)
+{
+    if (m_bRutTrail == bOn)
+        return;
+
+    m_bRutTrail = bOn;
+
+    if (bOn)
+    {
+        XMStoreFloat3(&m_vRutLastPos, m_pTransformCom->Get_State(STATE::POSITION));
+        m_iRutToggle = 0;
+
+        CEffect_Loader::GetInstance()->Spawn(
+            L"RollWind", Get_LevelIndex(),
+            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+            m_pTransformCom->Get_WorldMatrixPtr(), &m_pRollWind);
+    }
+    else
+    {
+        if (m_pRollWind)
+        {
+            m_pRollWind->Start_FadeOut(0.3f);
+            m_pRollWind = nullptr;      // 핸들은 즉시 놓는다. 아래 주석 참고
+        }
+    }
+}
+
+void CBoss_Armadillo::Play_WallImpact()
+{
+    _float3 vPos{}, vLook{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(L"WallImpact", Get_LevelIndex(), vPos, vLook);
+}
+
 HRESULT CBoss_Armadillo::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
@@ -304,6 +347,8 @@ HRESULT CBoss_Armadillo::Ready_AnimEvents()
 
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         if (Handle_SoundAnimEvent(e, phase))
+            return;
+        if (Handle_FxAnimEvent(e, phase))
             return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))
@@ -376,6 +421,11 @@ HRESULT CBoss_Armadillo::Ready_PartObjects()
     return S_OK;
 }
 
+const _float4x4* CBoss_Armadillo::Get_FxParentMatrix(const _wstring& strFx) const
+{
+    return m_pTransformCom->Get_WorldMatrixPtr();
+}
+
 void CBoss_Armadillo::Update_BodyOffset(_float fTimeDelta)
 {
     if (!m_pBody || m_fBodyOffsetT >= 1.f)
@@ -433,6 +483,47 @@ void CBoss_Armadillo::Tick_DeathSequence(_float fTimeDelta)
             break;
         default: break;
     }
+}
+
+void CBoss_Armadillo::Update_RutTrail(_float fTimeDelta)
+{
+    UNREFERENCED_PARAMETER(fTimeDelta);
+
+    if (!m_bRutTrail)
+        return;
+
+    _vector vNow = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vLast = XMLoadFloat3(&m_vRutLastPos);
+
+    _vector vDelta = XMVectorSetY(vNow - vLast, 0.f);
+    _float  fDist = XMVectorGetX(XMVector3Length(vDelta));
+
+    if (fDist < s_fRutInterval)
+        return;
+
+    _vector vDir = XMVector3Normalize(vDelta);
+
+    _float3 vLook{};
+    XMStoreFloat3(&vLook, vDir);
+
+    _int iCount = static_cast<_int>(fDist / s_fRutInterval);
+
+    for (_int i = 1; i <= iCount; ++i)
+    {
+        _vector vSpawn = vLast + vDir * (s_fRutInterval * i);
+        vSpawn = XMVectorSetY(vSpawn, XMVectorGetY(vNow));
+
+        _float3 vPos{};
+        XMStoreFloat3(&vPos, vSpawn);
+
+        CEffect_Loader::GetInstance()->Spawn(
+            (m_iRutToggle & 1) ? L"RutB" : L"RutA",
+            Get_LevelIndex(), vPos, vLook);
+
+        ++m_iRutToggle;
+    }
+
+    XMStoreFloat3(&m_vRutLastPos, vLast + vDir * (s_fRutInterval * iCount));
 }
 
 CBoss_Armadillo* CBoss_Armadillo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

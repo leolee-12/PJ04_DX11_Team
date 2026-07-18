@@ -823,6 +823,30 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Brain">
       <UniqueIdentifier>{2f3fa464-0dad-48e6-b461-172c792ca4de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect">
+      <UniqueIdentifier>{5ed7fbfe-ccc7-4a10-9bab-44a1c7666254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect\Dust">
+      <UniqueIdentifier>{05f7ee4c-c91c-4832-8609-33ac078ddd05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect\RutA">
+      <UniqueIdentifier>{d5d3be5e-92c7-4f16-933f-efdf0ccfb101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect\RutB">
+      <UniqueIdentifier>{504a16fb-319d-40f5-a173-90bc35906f47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect\WallImpact">
+      <UniqueIdentifier>{6a2bf876-d81c-4700-b80f-46d2e733fa61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect\Wind">
+      <UniqueIdentifier>{2a0808cb-85eb-40d4-97f6-f0f3bf4c9bcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect\Wind\Roll">
+      <UniqueIdentifier>{1d5e4795-5880-4250-ba67-58bc1a9da092}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Effect\Wind\Spin">
+      <UniqueIdentifier>{239bf811-cb64-4bcd-8ea8-da24cb62af3b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part">
       <UniqueIdentifier>{e1ae568f-b8db-489a-9fb4-3919421203c5}</UniqueIdentifier>
     </Filter>
@@ -865,11 +889,68 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Brain">
       <UniqueIdentifier>{e1c1248b-14dc-412a-a309-7824f9496b95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect">
+      <UniqueIdentifier>{5ee074db-6e75-423d-87ff-db88afb2ded6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Afterimage">
+      <UniqueIdentifier>{1bf372d8-61cc-4d72-848b-1ffeb0a7b122}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Afterimage\Assault">
+      <UniqueIdentifier>{e85463ad-3a47-4345-a6e7-f2cead9680ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Afterimage\Jump">
+      <UniqueIdentifier>{95d8b69b-d1af-4c61-96d9-d9ca27e1c0f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Claw">
+      <UniqueIdentifier>{66ee8828-f0c0-4fc0-8858-f41b221bccf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Claw\Assault">
+      <UniqueIdentifier>{a8c040f7-a997-41f5-b769-768b6feeca98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Claw\Jump">
+      <UniqueIdentifier>{12f2a11e-7e1d-4b72-ba9d-449fc8b4b895}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Floor">
+      <UniqueIdentifier>{2386c389-46cd-4c86-9e4b-f5a80ff1bd5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Impact">
+      <UniqueIdentifier>{702ef715-6e1a-434a-8d7f-98afbd09bcfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Meteo">
+      <UniqueIdentifier>{ca2591ce-8750-4816-92bb-777fdfd2995e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Ring">
+      <UniqueIdentifier>{897818e6-fb43-42f6-9d05-f28a29d18981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Ring\Flash">
+      <UniqueIdentifier>{d72c8012-66e8-4d5b-977f-e13a24b7560d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Ring\Slash">
+      <UniqueIdentifier>{8a197ee5-df94-4e70-aa6e-01a2453fc168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke">
+      <UniqueIdentifier>{27c3eaf6-7b12-42f3-9638-db0b01d7ef3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault">
+      <UniqueIdentifier>{2be1544d-23be-4d46-825b-53fefeb18cc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump">
+      <UniqueIdentifier>{0c567446-9d4a-4a45-af00-39abff17ff8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Nail">
+      <UniqueIdentifier>{f901b1c7-516a-4295-a415-0eaa7b26e8c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Effect\Trail">
+      <UniqueIdentifier>{ea4e84dd-eb3c-4eab-a2b8-6e97abf320fb}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Part">
       <UniqueIdentifier>{68c80ce0-dd15-457a-8fcf-a8858f37f553}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Projectile">
       <UniqueIdentifier>{ccfbab45-1092-4a5d-853b-db52dd4420ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Spot">
+      <UniqueIdentifier>{5b5a61aa-7a1c-4825-b04a-0f34417aca22}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
@@ -1295,6 +1376,27 @@
     </ClInclude>
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
       <Filter>97. DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armadillo_Dust.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\Dust</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armadillo_RollWind.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\Wind\Roll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armadillo_RutA.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\RutA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armadillo_RutB.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\RutB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armadillo_SpinWind.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\Wind\Spin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armadillo_WallImpact.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\WallImpact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Assault_Smoke.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29</Filter>
@@ -1935,6 +2037,36 @@
     <ClInclude Include="..\Public\LensFlare.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LeoJump_Smoke.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Afterimage_Assault.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Afterimage\Assault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Afterimage_Jump.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Afterimage\Jump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_ClawAssault.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Claw\Assault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_ClawJump.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Claw\Jump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Flash.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Ring\Flash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Floor.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Floor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Impact.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Impact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Meteo.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Meteo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Leopard_Slash.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Ring\Slash</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LevelData.h">
       <Filter>97. DataSystem\Header</Filter>
     </ClInclude>
@@ -2157,6 +2289,12 @@
     <ClInclude Include="..\public\MultiHitBoxPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Nail_Smoke.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Nail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Nail_Trail.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Trail</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\NormalEnemy.h">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy</Filter>
     </ClInclude>
@@ -2334,6 +2472,9 @@
     <ClInclude Include="..\Public\Split_Stone.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Spotlight_Rig.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
     </ClInclude>
@@ -2503,6 +2644,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\Ability_Model.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Parts\Ability_Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armadillo_Dust.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\Dust</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armadillo_RollWind.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\Wind\Roll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armadillo_RutA.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\RutA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armadillo_RutB.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\RutB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armadillo_SpinWind.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\Wind\Spin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armadillo_WallImpact.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Effect\WallImpact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Assault_Smoke.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight.cpp">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29</Filter>
@@ -3095,6 +3257,36 @@
     <ClCompile Include="..\Private\LensFlare.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\LeoJump_Smoke.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Afterimage\Assault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Afterimage\Jump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_ClawAssault.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Claw\Assault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_ClawJump.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Claw\Jump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Flash.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Ring\Flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Floor.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Floor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Impact.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Impact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Meteo.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Meteo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Leopard_Slash.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Ring\Slash</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
     </ClCompile>
@@ -3296,6 +3488,12 @@
     <ClCompile Include="..\private\MultiHitBoxPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Nail_Smoke.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Nail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Nail_Trail.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Trail</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\NormalEnemy.cpp">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy</Filter>
     </ClCompile>
@@ -3460,6 +3658,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Split_Stone.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Spotlight_Rig.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
@@ -3676,10 +3877,8 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Leopard.hlsl">
+    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>

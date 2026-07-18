@@ -36,7 +36,7 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         return E_FAIL;
 
     // 셰어드 리소스 준비 직후 1회
-    if (FAILED(CEffect_Loader::GetInstance()->Ready(pProxy, pDevice, pContext)))
+    if (FAILED(CEffect_Loader::GetInstance()->Ready(pProxy, pDevice, pContext, ETOUI(LEVEL::STATIC))))
         return E_FAIL;
 
     if (FAILED(CBubble_Manager::GetInstance()->Initialize(pDevice, pContext)))
@@ -278,6 +278,82 @@ HRESULT CLIENT_DLL Load_LevelManifest(const _tchar* strManifestPath, LEVEL_MANIF
 
         if (jManifest.contains("UI"))
             pOut->strUIFile = StrToWstr(jManifest["UI"].get<string>());
+
+        if (jManifest.contains("RenderGlobals"))
+            pOut->strRenderGlobalsFile = StrToWstr(jManifest["RenderGlobals"].get<string>());
+    }
+    catch (json::exception&)
+    {
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+HRESULT CLIENT_DLL Load_Level_FromManifest(const LEVEL_LOAD_CONTEXT& ctx, const _tchar* strManifestPath, _uint iLevelIndex, MAP_LOAD_RESULT* pOutReport, CMapStage** ppOutMapStage)
+{
+    LEVEL_MANIFEST Manifest{};
+    if (FAILED(Load_LevelManifest(strManifestPath, &Manifest)))
+        return E_FAIL;
+
+    MAP_LOAD_RESULT report{};
+    CMapStage* pMapStage = nullptr;
+    if (FAILED(CMap_Loader::Spawn_Map(ctx.pDevice, ctx.pContext,
+        Manifest.strMapManifest, Manifest.strObjectsFile,
+        iLevelIndex, &report, &pMapStage)))
+        return E_FAIL;
+
+    if (FAILED(Load_Level(ctx.pProxy, ctx.pDevice, ctx.pContext,
+        Manifest.strObjectsFile.c_str(), iLevelIndex)))
+        return E_FAIL;
+
+    if (!Manifest.strUIFile.empty())
+    {
+        if (FAILED(Load_Level_UI(ctx.pProxy, ctx.pDevice, ctx.pContext,
+            Manifest.strUIFile.c_str(), iLevelIndex)))
+            return E_FAIL;
+    }
+
+    if (!Manifest.strRenderGlobalsFile.empty())
+        Apply_RenderGlobals_FromFile(ctx.pProxy, Manifest.strRenderGlobalsFile.c_str());
+
+#ifdef _DEBUG
+    const _wstring msg =
+        L"[MapLoad][LevelDesign] json=" + to_wstring(report.iLevelDesignJsonLoadedCount) +
+        L", parsed=" + to_wstring(report.iLevelDesignParsedObjectCount) +
+        L", created=" + to_wstring(report.iLevelDesignCreatedCount) +
+        L", fallback=" + to_wstring(report.iLevelDesignFallbackSpecCount) +
+        L", failed=" + to_wstring(report.iLevelDesignSkippedCreateFailedCount) + L"\n";
+    OutputDebugStringW(msg.c_str());
+#endif
+
+    if (pOutReport)    *pOutReport = report;
+    if (ppOutMapStage) *ppOutMapStage = pMapStage;
+    return S_OK;
+}
+
+HRESULT CLIENT_DLL Apply_RenderGlobals_FromFile(CGameInstance_Proxy* pProxy, const _tchar* strPath)
+{
+    if (nullptr == pProxy || nullptr == strPath)
+        return E_FAIL;
+
+    string strContent = {};
+    if (FAILED(CDataLoader::Read_Json(strPath, &strContent)))
+        return E_FAIL;
+
+    try
+    {
+        json jGlobals = json::parse(strContent);
+        for (auto it = jGlobals.begin(); it != jGlobals.end(); ++it)
+        {
+            const auto& a = it.value();               // [x, y, z, w]
+            if (!a.is_array() || a.size() < 4)
+                continue;
+
+            pProxy->Set_ShaderGlobal(it.key(),
+                _float4(a[0].get<float>(), a[1].get<float>(),
+                    a[2].get<float>(), a[3].get<float>()));
+        }
     }
     catch (json::exception&)
     {

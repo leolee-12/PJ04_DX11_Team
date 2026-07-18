@@ -12,6 +12,7 @@ SamplerState ClampSampler
     filter = MIN_MAG_MIP_LINEAR;
     AddressU = CLAMP;
     AddressV = CLAMP;
+    AddressW = CLAMP;
 };
 
 SamplerState BorderSampler

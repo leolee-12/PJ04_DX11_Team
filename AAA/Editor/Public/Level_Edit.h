@@ -43,6 +43,7 @@ public:
 	void			Load_Level(const wstring& strFilePath);
 
 	void			Save_LiveObjects(const wstring& strFilePath, const wstring& strLevelTag);
+	void			Save_RenderGlobals(const wstring& strFilePath);
 	void			Load_LiveObjects(const wstring& strFilePath);
 
 public:

@@ -1390,7 +1390,7 @@ void CImGui_Manager::Draw_ShaderGlobals()
         _int iID = 0;
         for (auto& g : Globals)
         {
-            ImGui::PushID(iID++);   // 라벨 중복 대비 고유 ID
+            ImGui::PushID(iID++);
 
             switch (g.eType)
             {
@@ -1417,6 +1417,27 @@ void CImGui_Manager::Draw_ShaderGlobals()
 
             ImGui::PopID();
         }
+    }
+
+    ImGui::Separator();
+
+    static const int iBufferSize = 256;
+    static char s_GlobalSaveBuf[iBufferSize] = {};
+    if (ImGui::Button("Save Render Globals")) {
+        memset(s_GlobalSaveBuf, 0, sizeof(s_GlobalSaveBuf));
+        ImGui::OpenPopup("Save RenderGlobals Name");
+    }
+    if (ImGui::BeginPopupModal("Save RenderGlobals Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::InputText("##globalname", s_GlobalSaveBuf, iBufferSize);
+        if (ImGui::Button("Save") && strlen(s_GlobalSaveBuf) > 0) {
+            wstring strName(s_GlobalSaveBuf, s_GlobalSaveBuf + strlen(s_GlobalSaveBuf));
+            wstring strPath = L"../../Resources/YSH/RenderGlobals/" + strName + L"_RenderGlobals.json";
+            m_pLevel_Edit->Save_RenderGlobals(strPath);
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
     }
 
     ImGui::End();

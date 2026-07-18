@@ -187,6 +187,28 @@
 #include "Boss_Leopard_Body.h"
 #include "Projectile_Nail.h"
 
+//Boss Effect
+#include "Armadillo_RutA.h"
+#include "Armadillo_RutB.h"
+#include "Armadillo_Dust.h"
+#include "Armadillo_RollWind.h"
+#include "Armadillo_SpinWind.h"
+#include "Armadillo_WallImpact.h"
+
+#include "Leopard_Slash.h"
+#include "Leopard_Meteo.h"
+#include "Nail_Trail.h"
+#include "Leopard_Afterimage_Assault.h"
+#include "Leopard_Afterimage_Jump.h"
+#include "Leopard_ClawAssault.h"
+#include "Leopard_ClawJump.h"
+#include "Leopard_Flash.h"
+#include "Leopard_Floor.h"
+#include "Leopard_Impact.h"
+#include "Nail_Smoke.h"
+#include "LeoJump_Smoke.h"
+#include "Assault_Smoke.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
@@ -325,6 +347,7 @@ void CGameObject_Factory::RegisterAll()
     Register_NonAnimObject();
     Register_AnimObject();
     Register_Effect();
+    Register_BossEffect();
     Register_Bubble();
 
 
@@ -730,98 +753,6 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
-    // 0
-    Register(CRockBurst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBurst),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::PROTOTYPE_TAG,
-                CRockFloorEffect::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSH/Boss/Gorilla/RockFloorEffect/RockFloorEffectModel.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockEffect::PROTOTYPE_TAG,
-                CRockEffect::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockEffect::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSH/Boss/Gorilla/RockEffect/RockEffectModel.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
-                CSpinWind::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
-        )
-    );
-
-    Register(CDeathSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CDeathSmoke),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
-                CSmokeParticle::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-        )
-    );
-
-    Register(CRockBounce::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBounce),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
-                CSmokeParticle::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-        )
-    );
-
-    Register(CRockPull::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockPull),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
-                CSmokeParticle::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-        )
-    );
-
-    Register(CRockPush::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockPush),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
-                CSmokeParticle::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-        )
-    );
-
-    Register(CGorilla_Swing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGorilla_Swing),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwing_Smoke::PROTOTYPE_TAG,
-                CSwing_Smoke::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
-                CSpinWind::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
-        )
-    );
-
-    Register(CGorilla_Ring::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGorilla_Ring),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::PROTOTYPE_TAG,
-                CShockwave::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Gorilla/Shockwave/BossGorilla_00_Donut.ysh"
-                    , XMMatrixScaling(10.f, 10.f, 10.f)));
-        )
-    );
-
-
     // BoostGas
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
@@ -1385,6 +1316,13 @@ void CGameObject_Factory::Register_Effect()
     );
 }
 
+void CGameObject_Factory::Register_BossEffect()
+{
+    Gorilla_Effect();
+    Armadillo_Effect();
+    Leopard_Effect();
+}
+
 void CGameObject_Factory::Register_Bubble()
 {
     //Ability Bubble - DroppedBubble
@@ -1580,6 +1518,272 @@ void CGameObject_Factory::Register_SystemObject()
     Register(CDialogue_Director::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CDialogue_Director), LOADER());
     Register(CDialogue_Arranger::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CDialogue_Arranger), LOADER());
     Register(CSkySphere::PROTOTYPE_TAG, TEXT("TEST_OBJECT"), CREATOR(CSkySphere), LOADER());
+}
+
+void CGameObject_Factory::Gorilla_Effect()
+{
+    Register(CRockBurst::PROTOTYPE_TAG, TEXT("00.Gorilla_Effect"), CREATOR(CRockBurst),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::PROTOTYPE_TAG,
+                CRockFloorEffect::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/RockFloorEffect/RockFloorEffectModel.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockEffect::PROTOTYPE_TAG,
+                CRockEffect::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockEffect::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/RockEffect/RockEffectModel.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
+                CSpinWind::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
+        )
+    );
+
+    Register(CDeathSmoke::PROTOTYPE_TAG, TEXT("00.Gorilla_Effect"), CREATOR(CDeathSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockBounce::PROTOTYPE_TAG, TEXT("00.Gorilla_Effect"), CREATOR(CRockBounce),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockPull::PROTOTYPE_TAG, TEXT("00.Gorilla_Effect"), CREATOR(CRockPull),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockPush::PROTOTYPE_TAG, TEXT("00.Gorilla_Effect"), CREATOR(CRockPush),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CGorilla_Swing::PROTOTYPE_TAG, TEXT("00.Gorilla_Effect"), CREATOR(CGorilla_Swing),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwing_Smoke::PROTOTYPE_TAG,
+                CSwing_Smoke::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
+                CSpinWind::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
+        )
+    );
+
+    Register(CGorilla_Ring::PROTOTYPE_TAG, TEXT("00.Gorilla_Effect"), CREATOR(CGorilla_Ring),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::PROTOTYPE_TAG,
+                CShockwave::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Gorilla/Shockwave/BossGorilla_00_Donut.ysh"
+                    , XMMatrixScaling(10.f, 10.f, 10.f)));
+        )
+    );
+}
+
+void CGameObject_Factory::Armadillo_Effect()
+{
+    Register(CArmadillo_RutA::PROTOTYPE_TAG, TEXT("00.Armadillo_Effect"), CREATOR(CArmadillo_RutA),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RutA::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Floor/EffectModel_RollingRutA.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CArmadillo_RutB::PROTOTYPE_TAG, TEXT("00.Armadillo_Effect"), CREATOR(CArmadillo_RutB),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RutB::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Floor/EffectModel_RollingRutB.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CArmadillo_Dust::PROTOTYPE_TAG, TEXT("00.Armadillo_Effect"), CREATOR(CArmadillo_Dust),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_Dust::TEX_PROTOTAG,
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/Boss/Armadillo/Floor/smoke02.png", 1));
+        )
+    );
+    Register(CArmadillo_RollWind::PROTOTYPE_TAG, TEXT("00.Armadillo_Effect"), CREATOR(CArmadillo_RollWind),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RollWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Effect/Rolling/BossArmadillo_00_Common_SphereRolling.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CArmadillo_SpinWind::PROTOTYPE_TAG, TEXT("00.Armadillo_Effect"), CREATOR(CArmadillo_SpinWind),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
+                CSpinWind::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
+        )
+    );
+    Register(CArmadillo_WallImpact::PROTOTYPE_TAG, TEXT("00.Armadillo_Effect"), CREATOR(CArmadillo_WallImpact),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordCharge::PROTOTYPE_TAG, CSwordCharge::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordCharge"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/SwordCharge/Model_Common_Ring03.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_ChargeNoise.iLevelID, Texture_ChargeNoise.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ChargeNoise.szFileTag, Texture_ChargeNoise.iNumTex));
+        )
+    );
+}
+
+void CGameObject_Factory::Leopard_Effect()
+{
+    Register(CLeopard_Slash::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Slash),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Slash::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Ring/BossLeopard_00_Common_Ring02.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Texture_LeoSlash.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_LeoSlash.szFileTag, Texture_LeoSlash.iNumTex));
+        )
+    );
+    Register(CLeopard_Meteo::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Meteo),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Meteo::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Meteo/BossLeopard_00_Common_MeteoSpere.ysh"));
+        )
+    );
+    Register(CNail_Trail::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CNail_Trail), 
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_NailTrail.iLevelID, Texture_NailTrail.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_NailTrail.szFileTag, Texture_NailTrail.iNumTex));
+        )
+    );
+    Register(CLeopard_Afterimage_Assault::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Afterimage_Assault),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Afterimage_Assault::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Afterimage/BossLeopard_00_AssaultSlashEffectModel.ysh"
+            , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_Afterimage_Jump::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Afterimage_Jump),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Afterimage_Jump::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Afterimage/BossLeopard_00_JumpAttackLeopardModel.ysh"
+            , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_ClawAssault::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_ClawAssault),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_ClawAssault::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Claw/BossLeopard_00_AssultSlashClawModel.ysh"
+                    , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_ClawJump::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_ClawJump),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_ClawJump::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Claw/BossLeopard_00_JumpAttackClawModel.ysh"
+                    , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_Flash::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Flash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Flash::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Ring/BossLeopard_00_Common_Ring02.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Flash::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Circle/BossLeopard_00_Common_Circle01.ysh"));
+        )
+    );
+    Register(CLeopard_Floor::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Floor),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Floor::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Floor/GroundRockEffectModel_TopL.ysh"));
+        )
+    );
+    Register(CLeopard_Impact::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Impact),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Impact::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Ring/BossLeopard_00_Common_Ring02.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Impact::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Circle/BossLeopard_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Texture_ImpactRing.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ImpactRing.szFileTag, Texture_ImpactRing.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Texture_ImpactCircle.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ImpactCircle.szFileTag, Texture_ImpactCircle.iNumTex));
+        )
+    );
+
+    Register(CNail_Smoke::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CNail_Smoke),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CNail_Smoke::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
+        )
+    );
+    Register(CLeoJump_Smoke::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeoJump_Smoke),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeoJump_Smoke::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
+        )
+    );
+    Register(CAssault_Smoke::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CAssault_Smoke),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAssault_Smoke::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Free()
