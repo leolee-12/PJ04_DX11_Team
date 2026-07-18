@@ -1,6 +1,6 @@
 #include "EnemyBomb.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CProjectile_Bomb{ pDevice , pContext }

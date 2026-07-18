@@ -20,6 +20,8 @@ namespace Engine
 		XMFLOAT4		vDirection;
 		XMFLOAT4		vPosition;
 		float			fRange;
+		float			fInnerCos;
+		float			fOuterCos;
 	}LIGHT_DESC;
 
 	typedef struct tagEnvironmentDesc
@@ -63,7 +65,7 @@ namespace Engine
 
 	static const unsigned int FROXEL_W = 160;
 	static const unsigned int FROXEL_H = 90;
-	static const unsigned int FROXEL_D = 64;
+	static const unsigned int FROXEL_D = 128;
 
 	typedef struct tagFroxelCB
 	{
@@ -80,6 +82,10 @@ namespace Engine
 		XMFLOAT4 vFogParams2;   
 		XMFLOAT4 vGridParams;   
 		XMFLOAT4 vFogParams3;
+		XMFLOAT4 vSpotPos;  
+		XMFLOAT4 vSpotDir;  
+		XMFLOAT4 vSpotColor;
+		XMFLOAT4 vSpotCone;
 	}FROXEL_CB;
 
 	static constexpr unsigned int MESH_LAYER_EX_GROUP_COUNT = 5;
@@ -115,6 +121,8 @@ namespace Engine
 		XMFLOAT2		vUVScaleMaterial = { 0.075f, 0.075f };
 		float			fUVRotate = 0.f;
 		XMFLOAT2		vUVOffset = { 0.f, 0.f };
+		bool			bUseUVScroll = { false };
+		XMFLOAT2		vUVScrollSpeed = { 0.f, 0.f };  // UV/초. 전역 누적 시간과 곱해 오프셋에 가산
 
 		float			fNormalStrength = 1.f;
 		float			fMaskStrength = 1.f;

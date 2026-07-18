@@ -56,6 +56,8 @@ float g_fUVCutBottom = { 0.f };
 
 float g_fRoll = { 0.f };
 
+float g_fDissolve;
+
 struct VS_IN
 {
     float3 vPosition : POSITION;

@@ -1,6 +1,6 @@
 #include "CameraDirector.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "Camera_Cutscene.h"
 #include "Camera_Boss.h"
 #include "Camera_AreaCam.h"

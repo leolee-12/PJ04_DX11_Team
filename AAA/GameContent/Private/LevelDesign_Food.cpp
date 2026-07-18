@@ -14,6 +14,11 @@ namespace
 	constexpr _float s_fFoodPickupDuration = 0.75f;
 	constexpr _float s_fFoodPickupHeight = 3.f;
 	constexpr _float s_fFoodPickupTurnCount = 1.f;
+
+	constexpr _float s_fInhalePullAccel = 40.f;
+	constexpr _float s_fInhaleMouthFwd = 0.6f;
+	constexpr _float s_fInhaleMouthUp = 0.6f;
+
 	constexpr const _tchar* ITEM_EFFECT_ID = L"ItemEffect";
 
 	struct LD_FOOD_CATALOG
@@ -138,8 +143,15 @@ void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 		if (!m_bActive)
 			return;
 	}
+	else if (m_bInhalePullRequested)
+	{
+		Update_InhalePull(fTimeDelta);
+		m_bInhalePullRequested = false;
+	}
 	else
 	{
+		m_fInhalePullSpeed = 0.f;
+		m_pInhaler = nullptr;
 		m_pTransformCom->Turn(XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP)), fTimeDelta);
 	}
 
@@ -385,7 +397,7 @@ HRESULT CLevelDesign_Food::Ready_HurtBox()
 	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::LD_ITEM));
 
 	return S_OK;
 }
@@ -395,7 +407,8 @@ void CLevelDesign_Food::SetUp_Collider_Callback()
 	if (nullptr == m_pHurtBox)
 		return;
 
-	m_pHurtBox->Set_OnEnter([this](CCollider* pOther) { Handle_Pickup(pOther); });
+	m_pHurtBox->Set_OnEnter([this](CCollider* pOther) { Handle_Pickup(pOther); Handle_InhalePull(pOther); });
+	m_pHurtBox->Set_OnStay([this](CCollider* pOther) { Handle_InhalePull(pOther); });
 }
 
 void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
@@ -424,6 +437,10 @@ void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
 
 	if (m_pHurtBox)
 		m_pHurtBox->Set_Enabled(false);
+
+	m_bInhalePullRequested = false;
+	m_fInhalePullSpeed = 0.f;
+	m_pInhaler = nullptr;
 
 	Begin_Pickup(vStartPos);
 }
@@ -461,6 +478,56 @@ void CLevelDesign_Food::Update_Pickup(_float fTimeDelta)
 
 	if (fRatio >= 1.f)
 		Set_Active(false);
+}
+
+void CLevelDesign_Food::Handle_InhalePull(CCollider* pOther)
+{
+	if (nullptr == pOther)
+		return;
+	if (ETOUI(COLLISION_LAYER::PLAYER_INHALE) != pOther->Get_RegisteredGroup())
+		return;
+	if (Is_Dead() || m_bPickingUp)
+		return;
+
+	CGameObject* pInhaler = pOther->Get_Owner();
+	if (nullptr == pInhaler)
+		return;
+
+	m_pInhaler = pInhaler;
+	m_bInhalePullRequested = true;
+}
+
+void CLevelDesign_Food::Update_InhalePull(_float fTimeDelta)
+{
+	if (nullptr == m_pInhaler)
+		return;
+
+	CTransform* pInhalerTransform = m_pInhaler->Get_Transform();
+	const _vector vMouthPosition = pInhalerTransform->Get_State(STATE::POSITION)
+		+ pInhalerTransform->Get_State(STATE::LOOK) * s_fInhaleMouthFwd
+		+ pInhalerTransform->Get_State(STATE::UP) * s_fInhaleMouthUp;
+
+	const _vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	const _vector vDirection = vMouthPosition - vPosition;
+	const _float fDistance = XMVectorGetX(XMVector3Length(vDirection));
+	if (fDistance <= FLT_EPSILON)
+		return;
+
+	m_fInhalePullSpeed += s_fInhalePullAccel * fTimeDelta;
+	const _float fMoveDistance = min(m_fInhalePullSpeed * fTimeDelta, fDistance);
+	m_pTransformCom->Set_State(STATE::POSITION, vPosition + XMVector3Normalize(vDirection) * fMoveDistance);
+
+	if (nullptr != m_pItemEffect)
+	{
+		const _vector vEffectPosition = m_pTransformCom->Get_State(STATE::POSITION)
+			+ XMVectorSet(0.f, s_fFoodFloatHeight * 1.5f, 0.f, 0.f);
+		m_pItemEffect->Get_Transform()->Set_State(STATE::POSITION, XMVectorSetW(vEffectPosition, 1.f));
+	}
+
+	if (fMoveDistance > 0.f)
+		m_bInhaleDisplaced = true;
+
+	m_pTransformCom->Turn(XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP)), fTimeDelta);
 }
 
 CLevelDesign_Food* CLevelDesign_Food::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

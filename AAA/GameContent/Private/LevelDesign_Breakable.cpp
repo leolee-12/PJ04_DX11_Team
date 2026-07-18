@@ -14,8 +14,11 @@ namespace
 	constexpr const _tchar*		LARGE_ROCK_BREAK_SOUNDKEY		= L"GimmickBreakable_LargeRockBreak.wav";
 
 	static constexpr _float		DESTROY_EFFECT_HEIGHT_RATIO = 0.55f;
-
 	static constexpr _float		BREAKABLE_CULL_MARGIN = 1.f;
+
+	static constexpr _uint		BREAK_MASK_LV1 = 0xFFFFFFFFu;
+	constexpr _uint Hit_Bit(HIT_TYPE eType) { return 1u << static_cast<_uint>(eType); }
+	static constexpr _uint		BREAK_MASK_LV2 = Hit_Bit(HIT_TYPE::BREAKERABLE_HIT);
 
 	struct LD_BREAKABLE_CATALOG
 	{
@@ -31,15 +34,24 @@ namespace
 		// 사운드 관련 정보
 		const _tchar*	pBreakSoundKey;
 		_float			fVolume;
+
+		_uint	iBreakHitMask;
 	};
 
 	static const LD_BREAKABLE_CATALOG g_BreakableCatalog[] =
 	{
-		{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false, L"CommonHit", WOOD_BOX_BREAK_SOUNDKEY, 0.25f },
-		{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, L"CommonHit", PLASTIC_BOX_BREAK_SOUNDKEY, 0.25f },
-		{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f },
-		{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f  },
-		{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big",  LARGE_ROCK_BREAK_SOUNDKEY, 0.15f  }
+			{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh",
+			MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false, L"CommonHit", WOOD_BOX_BREAK_SOUNDKEY, 0.25f, BREAK_MASK_LV1 },
+			{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh",
+			MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, L"CommonHit", PLASTIC_BOX_BREAK_SOUNDKEY, 0.25f, BREAK_MASK_LV1 },
+			{ L"BoxIron", CLevelDesign_Breakable::BOXIRON_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxIron/BoxIron2.ysh",
+			MODEL::ANIM, 0u, "Model__BoxIronC", false, L"CommonHit", nullptr, 0.f, BREAK_MASK_LV2 },
+			{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh",
+			MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f, BREAK_MASK_LV2 },
+			{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh",
+			MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f, BREAK_MASK_LV2 },
+			{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh",
+			MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big", LARGE_ROCK_BREAK_SOUNDKEY, 0.15f, BREAK_MASK_LV2 }
 	};
 
 	static const LD_BREAKABLE_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
@@ -315,9 +327,14 @@ void CLevelDesign_Breakable::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
 {
-	UNREFERENCED_PARAMETER(tInfo);
-
 	if (BREAKABLE_STATE::INTACT != m_eState)
+		return;
+
+	const LD_BREAKABLE_CATALOG* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return;
+
+	if (0 == (pCatalog->iBreakHitMask & Hit_Bit(tInfo.eHitType)))
 		return;
 
 	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
@@ -329,12 +346,10 @@ void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
 	if (!Compute_EffectSpawnPosition(m_pModelCom, DESTROY_EFFECT_HEIGHT_RATIO, &vPos))
 		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
 
-	const LD_BREAKABLE_CATALOG* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
-
-	if (nullptr != pCatalog && nullptr != pCatalog->pBreakSoundKey)
+	if (nullptr != pCatalog->pBreakSoundKey)
 		m_pGameInstance_Proxy->Play_SFX(pCatalog->pBreakSoundKey, pCatalog->fVolume);
 
-	if (nullptr != pCatalog && nullptr != pCatalog->pDestroyEffectId)
+	if (nullptr != pCatalog->pDestroyEffectId)
 	{
 		if (MODEL::ANIM == pCatalog->eModelType)
 			CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
@@ -359,7 +374,6 @@ void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
 
 	m_eState = BREAKABLE_STATE::DESTROYED;
 }
-
 
 void CLevelDesign_Breakable::Register_LevelDesignSpecs()
 {
@@ -515,8 +529,14 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 			if (ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE) != pOther->Get_RegisteredGroup())
 				return;
 
+			PLAYER_QUERY PlayerQuery{};
+			m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &PlayerQuery);
+
 			ATTACK_INFO AttackInfo{};
-			AttackInfo.pAttacker = pOther->Get_Owner();
+			if (!Try_ResolveContactHit(pOther->Get_RegisteredGroup(), pOther->Get_Owner(),
+				PlayerQuery.pPlayer, &AttackInfo))
+				return;
+
 			Damaged(AttackInfo);
 		});
 

@@ -16,7 +16,7 @@ class CLevelDesign_Bush
 	: public CLevelDesignObject
 	, public IDamageable
 {
-	GENERATED_BODY(CLevelDesign_Bush);
+	GENERATED_BODY(CLevelDesign_Bush)
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Bush";

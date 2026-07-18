@@ -31,9 +31,7 @@ namespace
 	static const LD_BUSH_CATALOG g_EventObjectCatalog[] =
 	{
 		{ L"Bush2BasicS", CLevelDesign_Bush::BUSH_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushS.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutS.ysh", MODEL::NONANIM },
-
 		{ L"Bush2BasicM", CLevelDesign_Bush::BUSH_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushM.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutM.ysh", MODEL::NONANIM },
-
 		{ L"Bush2BasicL", CLevelDesign_Bush::BUSH_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushL.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutL.ysh", MODEL::NONANIM }
 	};
 
@@ -256,7 +254,7 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 	if (BUSH_STATE::CUT == m_eState)
 		return;
 
-	if (HIT_TYPE::SWORD_DEFAULT != tInfo.eHitType && HIT_TYPE::SWORD_SPIN != tInfo.eHitType)
+	if (!Is_CutHit(tInfo.eHitType))
 		return;
 
 	_float3 vPos{};

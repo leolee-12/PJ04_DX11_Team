@@ -4,6 +4,8 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
+float g_fDissolve;
+
 Texture2D g_DiffuseTexture;
 bool g_bUseDiffuseTexture = { false };
 bool g_bDiffuseColorToAlpha = { false };

@@ -445,6 +445,27 @@ PS_COLOR_OUT PS_MAIN_MIRROR(PS_IN In)
     return Out;
 }
 
+PS_COLOR_OUT PS_MAX(PS_IN In)
+{
+    PS_COLOR_OUT Out;
+
+    float4 vColor = ComposeEffectColor_Linear(In.vTexcoord);
+    vColor.rgb += g_vEmissiveColor.rgb * vColor.a;
+    
+    Out.vColor = float4(vColor.rgb * g_fAlpha, vColor.a);
+    return Out;
+}
+
+PS_COLOR_OUT PS_MAX_MIRROR(PS_IN In)
+{
+    PS_COLOR_OUT Out;
+    float4 vColor = ComposeEffectColor_Mirror(In.vTexcoord);
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
+    
+    Out.vColor = float4(vColor.rgb * g_fAlpha, vColor.a);
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass //0
@@ -488,7 +509,7 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+        SetPixelShader(CompileShader(ps_5_0, PS_MAX()));
     }
 
     pass DefaultPass_Mirror //4
@@ -532,7 +553,7 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+        SetPixelShader(CompileShader(ps_5_0, PS_MAX_MIRROR()));
     }
 
     pass DefaultPass_DepthIgnore //8
@@ -576,7 +597,7 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+        SetPixelShader(CompileShader(ps_5_0, PS_MAX()));
     }
 
     pass DefaultPass_Mirror_DepthIgnore //12
@@ -620,6 +641,6 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+        SetPixelShader(CompileShader(ps_5_0, PS_MAX_MIRROR()));
     }
 }

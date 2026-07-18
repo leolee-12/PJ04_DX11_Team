@@ -14,7 +14,8 @@ public:
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 
 public:
-	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+	_int    Add_Light(const LIGHT_DESC& LightDesc);
+	HRESULT Set_LightDesc(_uint iIndex, const LIGHT_DESC& LightDesc);
 	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 	HRESULT Clear_Lights();
 

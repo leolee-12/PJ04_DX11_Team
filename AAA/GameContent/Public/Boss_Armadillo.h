@@ -64,6 +64,9 @@ public:
     void Show_Cage();
     void Hide_Cage();
 
+    void Set_RollFx(_bool bOn);
+    void Play_WallImpact();
+
 protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
@@ -84,6 +87,7 @@ protected:
 
     virtual HRESULT Ready_AnimEvents() override;
     virtual HRESULT Ready_PartObjects() override;
+    virtual const _float4x4* Get_FxParentMatrix(const _wstring& strFx) const override;
 
 private:
     CBoss_Armadillo_Body* m_pBody = { nullptr };
@@ -107,6 +111,14 @@ private:
     _int    m_iDeathPoseDelay = { 0 };
     _float  m_fDeathPauseTimer = { 0.f };
 
+    _bool   m_bRutTrail = { false };
+    _float3 m_vRutLastPos = { 0.f, 0.f, 0.f };
+    _int    m_iRutToggle = { 0 };
+
+    static constexpr _float s_fRutInterval = 2.f;
+
+    CEffect_Container* m_pRollWind = { nullptr };
+
 #ifdef _DEBUG
     mutable _bool m_bDebugWallHit = { false };
 #endif
@@ -115,6 +127,7 @@ private:
     void Update_BodyOffset(_float fTimeDelta);
     void Fire_CatchCamera(const _tchar* szTrack);
     void Tick_DeathSequence(_float fTimeDelta);
+    void Update_RutTrail(_float fTimeDelta);
 
 public:
     static CBoss_Armadillo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

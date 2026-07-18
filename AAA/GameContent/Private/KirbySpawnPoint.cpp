@@ -1,6 +1,6 @@
 #include "KirbySpawnPoint.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "GameObject_Factory.h"
 #include "Kirby.h"
 

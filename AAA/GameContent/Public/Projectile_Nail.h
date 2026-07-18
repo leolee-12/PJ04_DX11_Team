@@ -1,7 +1,12 @@
 #pragma once
 #include "Projectile.h"
 
-NS_BEGIN(Engine) class CShader; class CModel; NS_END
+NS_BEGIN(Engine) 
+class CShader; 
+class CModel; 
+class CEffect_Container;
+NS_END
+
 NS_BEGIN(Client)
 
 // 네일(표창): 커비는 관통(데미지만), 정적 지형에 닿으면 꽂혀 잠시 유지 후 소멸. 풀 관리.
@@ -31,20 +36,27 @@ public:
 protected:
     virtual HRESULT Ready_Visual() override;
     virtual void    On_Impact() override {}
+    virtual void    Kill() override;
 
 private:
     void    Enter_Stuck(const _float3& vNormal);
     HRESULT Bind_ShaderResources();
+    void    Start_Meteo();
+    void    Stop_Meteo();
 
 private:
     CShader* m_pShaderCom = { nullptr };
     CModel* m_pModelCom = { nullptr };
+
+    CEffect_Container* m_pMeteo = { nullptr };
+    CEffect_Container* m_pTrail = { nullptr };
 
     STATE  m_eState = { STATE::FLYING };
     _float m_fStuckTimer = { 0.f };
 
     static constexpr _float SPIN_SPEED = 30.f;   // rad/s
     static constexpr _float STUCK_LINGER = 3.f;    // 꽂힌 채 유지(초)
+    static constexpr _float STUCK_PULLBACK = 0.5f;
 
 public:
     static CProjectile_Nail* Create(ID3D11Device*, ID3D11DeviceContext*);

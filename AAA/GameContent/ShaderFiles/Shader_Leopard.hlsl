@@ -20,6 +20,8 @@ float g_fShadowDepthBias = 0.001f;
 float g_fHitFlash = 0.f;
 float3 g_vHitFlashColor = float3(1.f, 1.f, 1.f);
 
+float g_fDissolve;
+
 // 눈 팔레트 (마스크 R=흰자, G=테두리, B=파란 눈동자)
 static const float3 EYE_WHITE = float3(1.f, 1.f, 1.f);
 static const float3 EYE_BLUE = float3(0.12f, 0.45f, 1.f);

@@ -1,6 +1,6 @@
 #include "Map_Spawner.h"
 #include "MapStage.h"
-#include "MapEvent_BreakWall.h"
+#include "MapGimmickSection.h"
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
 #include "EnvTrigger_Generic.h"
@@ -108,8 +108,19 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	vector<CGameObject*> CreatedObjects;
 	vector<PENDING_CREATED_CALLBACK_INFO> PendingCallbacks;
 
+	size_t iGimmickObjectCount = 0;
+
+	if (Options.bSpawnStage)
+	{
+		For_Each_MapGimmickEntry(Package.StageDesc.strStageName,
+			[&](const MAP_GIMMICK_SECTION_ENTRY&)
+			{
+				++iGimmickObjectCount;
+			});
+	}
+
 	const size_t iExpectedObjectCount =
-		(Options.bSpawnStage ? 2u : 0u)
+		(Options.bSpawnStage ? 1u + iGimmickObjectCount : 0u)
 		+ (Options.bSpawnEnv
 			? Package.EnvObjectDescs.size() + Package.AddedObjectDescs.size() + 1u
 			: 0u);
@@ -160,33 +171,37 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			Targets.pStageObjectTag
 			});
 
-		if (StageDesc.strStageName == CMapEvent_BreakWall::STAGE12_STAGE_NAME)
+		for (const MAP_GIMMICK_SECTION_ENTRY& Entry : g_MapGimmickSections)
 		{
-			CMapEvent_BreakWall::MAP_EVENT_BREAK_WALL_DESC Desc{};
+			if (StageDesc.strStageName != Entry.pStageName)
+				continue;
+
+			CMapGimmickSection::MAP_GIMMICK_SECTION_DESC Desc{};
+			Desc.pEntry = &Entry;
 			Desc.iModelProtoLevel = Levels.iStageModelLevel;
 			Desc.bRenderable = false;
 
-			CGameObject* pBreakWall = nullptr;
+			CGameObject* pGimmickSection = nullptr;
 			if (FAILED(m_pProxy->Add_GameObject_Return(
-				&pBreakWall,
+				&pGimmickSection,
 				Levels.iObjectLevel,
-				CMapEvent_BreakWall::PROTOTYPE_TAG,
+				CMapGimmickSection::PROTOTYPE_TAG,
 				Targets.Stage.iPlaceLevel,
-				CMapEvent_BreakWall::LAYER_TAG,
-				CMapEvent_BreakWall::STAGE12_OBJECT_TAG,
+				CMapGimmickSection::LAYER_TAG,
+				Entry.pObjectTag,
 				&Desc)))
 			{
 				Rollback(CreatedObjects);
 				return E_FAIL;
 			}
 
-			CreatedObjects.push_back(pBreakWall);
+			CreatedObjects.push_back(pGimmickSection);
 			PendingCallbacks.push_back({
-				pBreakWall,
-				CMapEvent_BreakWall::PROTOTYPE_TAG,
-				CMapEvent_BreakWall::LAYER_TAG,
-				CMapEvent_BreakWall::STAGE12_OBJECT_TAG
-			});
+					pGimmickSection,
+					CMapGimmickSection::PROTOTYPE_TAG,
+					CMapGimmickSection::LAYER_TAG,
+					Entry.pObjectTag
+				});
 		}
 	}
 
