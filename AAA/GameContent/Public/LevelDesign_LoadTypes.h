@@ -186,6 +186,19 @@ struct LD_GUIDE_AREA_DESC
 	_uint iRelationActorUid = 0;
 };
 
+struct LD_EFFECT_AREA_DESC
+{
+	_float3 vAreaCenter = {};
+	_float4 qAreaRot = { 0.f, 0.f, 0.f, 1.f };
+	_float3 vAreaSize = {};
+
+	_float3 vEffectPos = {};
+	_float4 qEffectRot = { 0.f, 0.f, 0.f, 1.f };
+
+	_bool bHasEffectPos = false;
+	_bool bHasEffectRot = false;
+};
+
 struct LD_STEP_LINK_INFO
 {
 	_bool bIgnoreWarningAtOneWay = false;
@@ -201,6 +214,7 @@ struct LD_PARSED_OBJECT : public LD_OBJECT_DESC
 	LD_VOLUME_DESC Volume;
 	LD_GUIDE_AREA_DESC GuideArea;
 	LD_AUDIO_AREA_DESC AudioArea;
+	LD_EFFECT_AREA_DESC EffectArea;
 };
 
 using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_DESC, LD_EVENTOBJECT_DESC, LD_FOOD_DESC, LD_POINT_DESC, LD_BUSH_DESC, LD_DEFORMOBJECT_DESC>;

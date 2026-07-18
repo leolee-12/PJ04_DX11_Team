@@ -1,4 +1,5 @@
 #include "LD_LensFlare.h"
+#include "LensFlare.h"
 #include "LevelDesign_Registry.h"
 
 #include "GameInstance.h"
@@ -250,11 +251,23 @@ void CLD_LensFlare::Start_LensFlare()
 {
 	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
 
-	if (pEffectLoader->Is_Current(m_LensFlareHandle))
-		return;
-
-	m_LensFlareHandle.Clear();
 	Update_RuntimeMatrices();
+
+	if (pEffectLoader->Is_Current(m_LensFlareHandle))
+	{
+		CLensFlare* pLensFlare = dynamic_cast<CLensFlare*>(m_LensFlareHandle.p);
+
+		if (nullptr != pLensFlare && pLensFlare->Is_Playing())
+		{
+			pLensFlare->EffectContainer_Start(_float3{}, _float3{}, &m_matEffectAnchorWorld);
+			return;
+		}
+
+		if (nullptr == pLensFlare)
+			m_LensFlareHandle.p->EffectContainer_Stop();
+
+		m_LensFlareHandle.Clear();
+	}
 
 	if (FAILED(pEffectLoader->Spawn(
 		L"LensFlare",
@@ -271,6 +284,19 @@ void CLD_LensFlare::Start_LensFlare()
 }
 
 void CLD_LensFlare::Stop_LensFlare()
+{
+	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
+
+	if (!pEffectLoader->Is_Current(m_LensFlareHandle))
+	{
+		m_LensFlareHandle.Clear();
+		return;
+	}
+
+	m_LensFlareHandle.p->Start_FadeOut();
+}
+
+void CLD_LensFlare::Release_LensFlare()
 {
 	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
 
@@ -326,7 +352,7 @@ CGameObject* CLD_LensFlare::Clone(void* pArg)
 
 void CLD_LensFlare::Free()
 {
-	Stop_LensFlare();
+	Release_LensFlare();
 
 	if (nullptr != m_pTrigger)
 		m_pTrigger->Clear_Callbacks();

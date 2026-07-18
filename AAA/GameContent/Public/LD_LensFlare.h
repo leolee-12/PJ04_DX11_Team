@@ -60,6 +60,7 @@ private:
 
 	void Start_LensFlare();
 	void Stop_LensFlare();
+	void Release_LensFlare();
 
 public:
 	static void Register_LevelDesignSpecs();
