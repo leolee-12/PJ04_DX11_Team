@@ -12,7 +12,7 @@
 #include "LevelDesign_Bush.h"
 #include "Editable.h"
 #include "EffectPart_Enum.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 #include "GameInstance.h"
 #include "ContainerObject.h"
@@ -1986,6 +1986,20 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		ImGui::SetNextItemWidth(160.f);
 		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
 			bChanged = true;
+
+		if (Ui.bWorldPassMeshUi)
+		{
+			if (ImGui::Checkbox("Use UV Scroll", (bool*)&Layer.bUseUVScroll))
+				bChanged = true;
+
+			ImGui::BeginDisabled(!Layer.bUseUVScroll);
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Scroll Speed", (float*)&Layer.vUVScrollSpeed, 0.001f))
+				bChanged = true;
+
+			ImGui::EndDisabled();
+		}
 
 		ImGui::EndDisabled();
 

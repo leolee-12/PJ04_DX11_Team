@@ -115,6 +115,8 @@ namespace Engine
 		XMFLOAT2		vUVScaleMaterial = { 0.075f, 0.075f };
 		float			fUVRotate = 0.f;
 		XMFLOAT2		vUVOffset = { 0.f, 0.f };
+		bool			bUseUVScroll = { false };
+		XMFLOAT2		vUVScrollSpeed = { 0.f, 0.f };  // UV/초. 전역 누적 시간과 곱해 오프셋에 가산
 
 		float			fNormalStrength = 1.f;
 		float			fMaskStrength = 1.f;

@@ -43,6 +43,7 @@ public: // Engine
     _int   RandomInt(_int iMin, _int iMax) const;
 
     _int64 Get_FrameIndex();
+    _double Get_GameTime();
 #pragma endregion
 
 #pragma region GRAPHICDEVICE
