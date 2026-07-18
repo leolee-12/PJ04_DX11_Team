@@ -68,7 +68,7 @@ namespace Client
         inline constexpr const _tchar* CutFade_InDone = L"CutFade.InDone";
         
         // 맵 
-        inline constexpr const _tchar* Stage1_Step2_CarBreakMap = L"Stage1-2.CarBreakMap";
+        inline constexpr const _tchar* MapGimmick_SectionBreak = L"MapGimmick.SectionBreak";
         inline constexpr const _tchar* Level_BossDefeated = L"Level.BossDefeated";
 
         // 포인터 질의

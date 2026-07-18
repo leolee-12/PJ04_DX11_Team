@@ -2025,7 +2025,10 @@
     <ClInclude Include="..\Public\Map_Spawner.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MapEvent_BreakWall.h">
+    <ClInclude Include="..\Public\MapGimmick_Defines.h">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapGimmickSection.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MapObject.h">
@@ -3164,7 +3167,7 @@
     <ClCompile Include="..\Private\Map_Spawner.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MapEvent_BreakWall.cpp">
+    <ClCompile Include="..\Private\MapGimmickSection.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MapObject.cpp">

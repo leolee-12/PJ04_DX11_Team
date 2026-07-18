@@ -53,7 +53,7 @@ private:
 	void			Refresh_SectionTransforms();
 	void			Submit_VisibleSections();
 
-	void			On_Stage12CarBreakWall();
+	void			On_GimmickSectionBreak(const _tchar* pShellSectionName);
 
 public:
 	static CMapStage*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
