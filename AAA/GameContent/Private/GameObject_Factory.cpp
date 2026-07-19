@@ -87,6 +87,8 @@
 #include "LaunchSmoke.h"
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
+#include "LandingSmoke.h"
+#include "MoveSmoke.h"
 #include "CarLanding.h"
 #include "PickUpEffect.h"
 #include "DropStarEffect.h"
@@ -148,6 +150,8 @@
 #include "Cappy.h"
 #include "NormalEnemyWild.h"
 #include "Dekabu.h"
+#include "Bouncy.h"
+#include "RabbitEnemy.h"
 
 // MonsterPart
 #include "BladeKnight_Body.h"
@@ -160,6 +164,8 @@
 #include "Cappy_Hat.h"
 #include "NormalEnemyWild_Body.h"
 #include "Dekabu_Body.h"
+#include "Bouncy_Body.h"
+#include "RabbitEnemy_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -610,6 +616,36 @@ void CGameObject_Factory::Register_Container()
         )
     );
 
+    // Bouncy
+    Register
+    (
+        CBouncy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CBouncy),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBouncy_Body::PROTOTYPE_TAG, CBouncy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Bouncy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Bouncy/Body/Bouncy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // RabbitEnemy
+    Register
+    (
+        CRabbitEnemy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CRabbitEnemy),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRabbitEnemy_Body::PROTOTYPE_TAG, CRabbitEnemy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_RabbitEnemy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM,  "../../Resources/CHJ/Monster/RabbitEnemy/Body/RabbitEnemy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
 #pragma endregion
 
     // NPC
@@ -884,7 +920,7 @@ void CGameObject_Factory::Register_Effect()
                     Texture_CommonSparkle02.iNumTex));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeMesh"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
 
         ));
@@ -918,7 +954,7 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG,
                 CMeshEmitterCommon::Create(pDevice, pContext));
 
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeMesh"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
         ));
@@ -986,6 +1022,32 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    // LandingSmoke
+    Register(CLandingSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CLandingSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeMesh"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPolyMesh"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    Register(CMoveSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CMoveSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG,
+                CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeMesh"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
         ));
 
     // CarLanding

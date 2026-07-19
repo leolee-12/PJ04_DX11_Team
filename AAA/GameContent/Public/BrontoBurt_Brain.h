@@ -16,6 +16,10 @@ protected:
 public:
     static CBrontoBurt_Brain*   Create(CMonster* pOwner);
 
+private:    
+    _float                      m_fTimer = { 0.f };
+    static constexpr _float     s_fFallRecoverTime = { 1.5f };
+
 protected:
     virtual void                Free() override;
 };

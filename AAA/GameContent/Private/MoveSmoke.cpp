@@ -1,23 +1,23 @@
-#include "LaunchSmoke.h"
+#include "MoveSmoke.h"
 
 #include "MeshEmitterCommon.h"
 
-CLaunchSmoke::CLaunchSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMoveSmoke::CMoveSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
 {
 }
 
-CLaunchSmoke::CLaunchSmoke(const CLaunchSmoke& Prototype)
+CMoveSmoke::CMoveSmoke(const CMoveSmoke& Prototype)
 	: CEffect_Container(Prototype)
 {
 }
 
-HRESULT CLaunchSmoke::Initialize_Prototype()
+HRESULT CMoveSmoke::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CLaunchSmoke::Initialize(void* pArg)
+HRESULT CMoveSmoke::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -28,27 +28,27 @@ HRESULT CLaunchSmoke::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CLaunchSmoke::Priority_Update(_float fTimeDelta)
+void CMoveSmoke::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 }
 
-void CLaunchSmoke::Update(_float fTimeDelta)
+void CMoveSmoke::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 }
 
-void CLaunchSmoke::Late_Update(_float fTimeDelta)
+void CMoveSmoke::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 }
 
-HRESULT CLaunchSmoke::Render()
+HRESULT CMoveSmoke::Render()
 {
 	return __super::Render();
 }
 
-HRESULT CLaunchSmoke::Ready_EffectPartObjects()
+HRESULT CMoveSmoke::Ready_EffectPartObjects()
 {
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
@@ -71,34 +71,34 @@ HRESULT CLaunchSmoke::Ready_EffectPartObjects()
 	return S_OK;
 }
 
-CLaunchSmoke* CLaunchSmoke::Create(ID3D11Device* pDevice,
+CMoveSmoke* CMoveSmoke::Create(ID3D11Device* pDevice,
 	ID3D11DeviceContext* pContext)
 {
-	CLaunchSmoke* pInstance = new CLaunchSmoke(pDevice, pContext);
+	CMoveSmoke* pInstance = new CMoveSmoke(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created: CLaunchSmoke");
+		MSG_BOX("Failed to Created: CMoveSmoke");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CLaunchSmoke::Clone(void* pArg)
+CGameObject* CMoveSmoke::Clone(void* pArg)
 {
-	CLaunchSmoke* pInstance = new CLaunchSmoke(*this);
+	CMoveSmoke* pInstance = new CMoveSmoke(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned: CLaunchSmoke");
+		MSG_BOX("Failed to Cloned: CMoveSmoke");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CLaunchSmoke::Free()
+void CMoveSmoke::Free()
 {
 	__super::Free();
 }

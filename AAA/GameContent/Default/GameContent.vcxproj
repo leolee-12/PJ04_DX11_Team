@@ -34,6 +34,12 @@
     <ClInclude Include="..\public\Boss_Leopard.h" />
     <ClInclude Include="..\public\Boss_Leopard_Body.h" />
     <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
+    <ClInclude Include="..\Public\Bouncy.h" />
+    <ClInclude Include="..\Public\Bouncy_Body.h" />
+    <ClInclude Include="..\Public\Bouncy_Brain.h" />
+    <ClInclude Include="..\Public\Bouncy_State_Fall.h" />
+    <ClInclude Include="..\Public\Bouncy_State_Idle.h" />
+    <ClInclude Include="..\Public\BrontoBurt_State_Chase.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
@@ -46,8 +52,11 @@
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
+    <ClInclude Include="..\Public\KasaCatchEffect.h" />
+    <ClInclude Include="..\Public\KasaUpEffect.h" />
     <ClInclude Include="..\Public\Kirby_DeformContext.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
+    <ClInclude Include="..\Public\LandingSmoke.h" />
     <ClInclude Include="..\public\LeoJump_Smoke.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Assault.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Jump.h" />
@@ -63,12 +72,18 @@
     <ClInclude Include="..\Public\LD_LensFlare.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardB.h" />
     <ClInclude Include="..\Public\LaunchSmoke.h" />
+    <ClInclude Include="..\Public\MoveSmoke.h" />
     <ClInclude Include="..\Public\MapGimmick_Defines.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
+    <ClInclude Include="..\Public\RabbitEnemy.h" />
+    <ClInclude Include="..\Public\RabbitEnemy_Body.h" />
+    <ClInclude Include="..\Public\RabbitEnemy_Brain.h" />
+    <ClInclude Include="..\Public\RabbitEnemy_State_Jump.h" />
+    <ClInclude Include="..\Public\SwordHitEffect.h" />
     <ClInclude Include="..\public\Spotlight_Rig.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
@@ -445,6 +460,8 @@
     <ClInclude Include="..\Public\WaddleDee.h" />
     <ClInclude Include="..\Public\WaddleDee_Body.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
+    <ClInclude Include="..\Public\WarpInEffect.h" />
+    <ClInclude Include="..\Public\WarpOutEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
@@ -461,7 +478,14 @@
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
+    <ClCompile Include="..\Private\Bouncy.cpp" />
+    <ClCompile Include="..\Private\Bouncy_Body.cpp" />
+    <ClCompile Include="..\Private\Bouncy_Brain.cpp" />
+    <ClCompile Include="..\Private\Bouncy_State_Fall.cpp" />
+    <ClCompile Include="..\Private\Bouncy_State_Idle.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt_State_Chase.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />
     <ClCompile Include="..\Private\Dekabu_Brain.cpp" />
@@ -473,7 +497,9 @@
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
+    <ClCompile Include="..\Private\KasaUpEffect.cpp" />
     <ClCompile Include="..\Private\KoKabu.cpp" />
+    <ClCompile Include="..\Private\LandingSmoke.cpp" />
     <ClCompile Include="..\private\LeoJump_Smoke.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp" />
@@ -489,11 +515,17 @@
     <ClCompile Include="..\Private\LD_LensFlare.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardB.cpp" />
     <ClCompile Include="..\Private\LaunchSmoke.cpp" />
+    <ClCompile Include="..\Private\MoveSmoke.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
+    <ClCompile Include="..\Private\RabbitEnemy.cpp" />
+    <ClCompile Include="..\Private\RabbitEnemy_Body.cpp" />
+    <ClCompile Include="..\Private\RabbitEnemy_Brain.cpp" />
+    <ClCompile Include="..\Private\RabbitEnemy_State_Jump.cpp" />
+    <ClCompile Include="..\Private\SwordHitEffect.cpp" />
     <ClCompile Include="..\private\Spotlight_Rig.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
@@ -844,6 +876,8 @@
     <ClCompile Include="..\Private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WaddleDee_Body.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
+    <ClCompile Include="..\Private\WarpInEffect.cpp" />
+    <ClCompile Include="..\Private\WarpOutEffect.cpp" />
     <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>
   <ItemGroup>
