@@ -3,6 +3,8 @@
 #include "Monster_RailMovement.h"
 #include "Animator.h"
 #include "Monster_StateMachine.h"
+#include "Effect_Loader.h"
+#include "Effect_Container.h"
 
 #include "Kabu_Body.h"
 #include "Kabu_Brain.h"
@@ -44,7 +46,17 @@ HRESULT CKabu::Initialize(void* pArg)
     m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
     m_fCullDist = 95.f;
 
+    Update_MoveSmokeSocket();
+
     return S_OK;
+}
+
+void CKabu::Update(_float fTimeDelta)
+{
+    __super::Update(fTimeDelta);
+
+    Update_MoveSmokeSocket();
+    Update_MoveSmokeFx();
 }
 
 _bool CKabu::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
@@ -197,10 +209,81 @@ HRESULT CKabu::Ready_AnimEvents()
     return S_OK;
 }
 
+void CKabu::Update_MoveSmokeSocket()
+{
+    _matrix matSocket = XMMatrixIdentity();
+
+    if (nullptr != m_pBody && nullptr != m_pTransformCom)
+    {
+        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("TopL");
+        if (nullptr != pBone)
+        {
+            _matrix matBoneWorld =
+                XMLoadFloat4x4(pBone) *
+                XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+            matSocket.r[3] = matBoneWorld.r[3];
+        }
+    }
+
+    XMStoreFloat4x4(&m_matMoveSmokeSocket, matSocket);
+}
+
+void CKabu::Update_MoveSmokeFx()
+{
+    auto pLoader = CEffect_Loader::GetInstance();
+    auto pRailMovement = static_cast<CMonster_RailMovement*>(m_pMovement);
+
+    const _bool bHasRail = nullptr != pRailMovement && pRailMovement->Has_Rail();
+    const _bool bOffPath = bHasRail && pRailMovement->Is_OffPath();
+    const _bool bRailRiding =
+        m_bActive && m_bVisible && !m_CullState.bRenderCull && bHasRail && !bOffPath &&
+        nullptr != m_pStateMachine &&
+        MONSTER_STATE_TYPE::IDLE == m_pStateMachine->Get_StateType();
+
+    if (!bRailRiding)
+    {
+        Stop_MoveSmokeFx(!m_bActive || !bOffPath);
+        return;
+    }
+
+    FX_HANDLE& hSlot = m_Effects[TEXT("MoveSmoke")];
+    if (pLoader->Is_Current(hSlot))
+        return;
+
+    hSlot.Clear();
+    pLoader->Spawn(TEXT("MoveSmoke"), Get_LevelIndex(),
+        _float3(0.f, 0.f, 0.f),
+        _float3(0.f, 0.f, 0.f),
+        _float3(0.f, 0.f, 0.f),
+        &m_matMoveSmokeSocket, nullptr, &hSlot);
+}
+
+void CKabu::Stop_MoveSmokeFx(_bool bImmediate)
+{
+    auto it = m_Effects.find(TEXT("MoveSmoke"));
+    if (it == m_Effects.end())
+        return;
+
+    auto pLoader = CEffect_Loader::GetInstance();
+    FX_HANDLE& hSlot = it->second;
+    if (pLoader->Is_Current(hSlot))
+    {
+        if (bImmediate)
+            hSlot.p->EffectContainer_Stop();
+        else
+            hSlot.p->EffectContainer_StopAfterEmission();
+    }
+
+    hSlot.Clear();
+}
+
 void CKabu::On_Damaged(const ATTACK_INFO& tInfo)
 {
     if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
     {
+        Stop_MoveSmokeFx(true);
+
         if (!(static_cast<CMonster_RailMovement*>(m_pMovement)->Is_OffPath()))
             Change_State(MONSTER_STATE_TYPE::FLATTEN);
         else
@@ -218,6 +301,9 @@ HRESULT  CKabu::Ready_PartObjects()
         CKabu_Body::PROTOTYPE_TAG, TEXT("Body"));
 
     if (nullptr == m_pBody)
+        return E_FAIL;
+
+    if (nullptr == m_pBody->Get_BoneMatrixPtr("TopL"))
         return E_FAIL;
 
     return S_OK;
