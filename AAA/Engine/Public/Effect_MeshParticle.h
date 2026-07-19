@@ -29,15 +29,18 @@ PROPERTY(_float, m_fDiffuseUVEdgeFadePower,      L"Edge Fade Power_D",        L"
 PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue_D",     L"Diffuse");
 PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling_D",                  L"Diffuse");
 PROPERTY(_float2, m_vDiffuseOffset,             L"Offset_D",                  L"Diffuse");
+PROPERTY(_float, m_fDiffuseUVRotationDegree,    L"UV Rotation Degree_D",      L"Diffuse");
 
 PROPERTY(_bool, m_vDiffuseUVScroll,             L"UV Scroll     _D",          L"Diffuse");
 PROPERTY(_float2, m_vDiffuseUVScrollCount,      L"UV Scroll Count_D",         L"Diffuse");
 
 // Normal
 PROPERTY(_bool, m_bUseNormalTexture,            L"Use Normal Textrue_N",      L"Normal");
+PROPERTY(_float, m_fNormalUVRotationDegree,     L"UV Rotation Degree_N",      L"Normal");
 
 // MRA
 PROPERTY(_bool, m_bUseMRATexture,               L"Use Material Textrue_M",    L"Material");
+PROPERTY(_float, m_fMRAUVRotationDegree,        L"UV Rotation Degree_MRA",    L"Material");
 
 // Unknown
 PROPERTY(_bool, m_bUnknownColorToAlpha,         L"Color To Alpha_U",          L"Unknown");
@@ -49,6 +52,7 @@ PROPERTY(_float, m_fUnknownUVEdgeFadePower,      L"Edge Fade Power_U",        L"
 PROPERTY(_bool, m_bUseUnknownTexture,           L"Use Unknown Textrue_U",     L"Unknown");
 PROPERTY(_float2, m_vUnknownTiling,             L"Tiling_U",                  L"Unknown");
 PROPERTY(_float2, m_vUnknownOffset,             L"Offset_U",                  L"Unknown");
+PROPERTY(_float, m_fUnknownUVRotationDegree,    L"UV Rotation Degree_U",      L"Unknown");
 
 PROPERTY(_bool, m_vUnknownUVScroll,             L"UV Scroll     _U",          L"Unknown");
 PROPERTY(_float2, m_vUnknownUVScrollCount,      L"UV Scroll Count_U",         L"Unknown");

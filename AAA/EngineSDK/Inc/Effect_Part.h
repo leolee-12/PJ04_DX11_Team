@@ -24,6 +24,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_bool, m_bUseTextureCom,           L"Use TextureCom_T",          L"Texture Com");
     PROPERTY(_float2, m_vTextureTiling,         L"Tiling_T",                  L"Texture Com");
     PROPERTY(_float2, m_vTextureOffset,         L"Offset_T",                  L"Texture Com");
+    PROPERTY(_float, m_fTextureUVRotationDegree, L"UV Rotation Degree_T",     L"Texture Com");
 
     PROPERTY(_bool, m_bTextureUVScroll,         L"UV Scroll     _T",          L"Texture Com");
     PROPERTY(_float2, m_vTextureUVScrollCount,  L"UV Scroll Count_T",         L"Texture Com");
@@ -32,6 +33,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_bool, m_bUseMaskCom,          L"Use MaskCom_M",             L"Mask Com");
     PROPERTY(_float2, m_vMaskTiling,        L"Tiling_M",                  L"Mask Com");
     PROPERTY(_float2, m_vMaskOffset,        L"Offset_M",                  L"Mask Com");
+    PROPERTY(_float, m_fMaskUVRotationDegree, L"UV Rotation Degree_M",     L"Mask Com");
 
     PROPERTY(_bool, m_bMaskUVScroll,        L"UV Scroll     _M",          L"Mask Com");
     PROPERTY(_float2, m_vMaskUVScrollCount, L"UV Scroll Count_M",         L"Mask Com");
