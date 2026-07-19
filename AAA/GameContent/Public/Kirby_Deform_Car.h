@@ -38,9 +38,11 @@ private:
 public:
 	virtual DEFORM_TYPE Get_DeformType() override;
 
+	// Deform 진입
 	virtual void Enter_Deform(CKirby* pKirby) override;
 	virtual void Exit_Deform(CKirby* pKirby) override;
 
+	// Attack 상태 진입
 	virtual void Enter_AttackState(CKirby* pKirby, _int iFlag) override;
 	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
 	virtual void Exit_AttackState(CKirby* pKirby) override;
@@ -65,8 +67,7 @@ private:
 
 	_float3 m_vRotDir{};
 
-	CEffect_Container* m_pBoostGas1{};
-	CEffect_Container* m_pBoostGas2{};
+	CEffect_Container* m_pBoostGas{};
 	CEffect_Container* m_pBoostWind{};
 
 private:
@@ -80,7 +81,7 @@ private:
 	void Update_BoostJumpState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eStaten);
 
-	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag);
+	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer, const _tchar* EffectTag);
 
 	_bool Check_FrontCollision(CKirby* pKirby);
 

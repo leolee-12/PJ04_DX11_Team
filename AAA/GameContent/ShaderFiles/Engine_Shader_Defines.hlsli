@@ -12,6 +12,7 @@ SamplerState ClampSampler
     filter = MIN_MAG_MIP_LINEAR;
     AddressU = CLAMP;
     AddressV = CLAMP;
+    AddressW = CLAMP;
 };
 
 SamplerState BorderSampler
@@ -202,6 +203,20 @@ BlendState BS_Additive
     SrcBlendAlpha = Src_Alpha; // 스타 커버리지를 알파에 더함
     DestBlendAlpha = One; // 기존 씬 알파(지형=1)를 절대 깎지 않음
     BlendOpAlpha = Add; // dstA = srcA + dstA
+};
+
+BlendState BS_Max
+{
+    BlendEnable[0] = true;
+    BlendEnable[1] = true;
+
+    SrcBlend = One;
+    DestBlend = One;
+    BlendOp = Max;
+
+    SrcBlendAlpha = One;
+    DestBlendAlpha = One;
+    BlendOpAlpha = Max;
 };
 
 // 커튼 RT 용

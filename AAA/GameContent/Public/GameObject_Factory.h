@@ -74,12 +74,18 @@ private:
 	void Register_NonAnimObject();
     void Register_AnimObject();
 	void Register_Effect();
+    void Register_BossEffect();
     void Register_Bubble();
 
     void Register_MiniBoss();
     void Register_MainBoss();
     void Register_Cutscene();
     void Register_SystemObject();
+
+private:
+    void Gorilla_Effect();
+    void Armadillo_Effect();
+    void Leopard_Effect();
 
 public:
     virtual void Free() override;

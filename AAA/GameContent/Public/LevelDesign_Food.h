@@ -12,7 +12,7 @@ struct LD_SPAWN_SPEC;
 
 class CLevelDesign_Food : public CLevelDesignObject
 {
-	GENERATED_BODY(CLevelDesign_Food);
+	GENERATED_BODY(CLevelDesign_Food)
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Food";
@@ -38,7 +38,7 @@ public:
 	virtual HRESULT Render_Shadow() override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
-	virtual _bool   Is_CullTransformDynamic() const override { return m_bPickingUp; }
+	virtual _bool   Is_CullTransformDynamic() const override { return m_bPickingUp || m_bInhaleDisplaced; }
 
 	static void Register_LevelDesignSpecs();
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
@@ -56,6 +56,12 @@ private:
 	_float3				m_vPickupStartPos = {};
 	_float3				m_vPickupTargetPos = {};
 
+	// »Ì¿‘ ¿Œ∑¬
+	_bool				m_bInhalePullRequested = { false };
+	_bool				m_bInhaleDisplaced = { false };
+	_float				m_fInhalePullSpeed = {};
+	CGameObject*		m_pInhaler = { nullptr };
+
 private:
 	virtual void  On_LDEventReceived(const _wstring& strEventTag) override;
 
@@ -71,6 +77,9 @@ private:
 	void			Handle_Pickup(CCollider* pOther);
 	void			Begin_Pickup(const _float3& vStartPos);
 	void			Update_Pickup(_float fTimeDelta);
+
+	void			Handle_InhalePull(CCollider* pOther);
+	void			Update_InhalePull(_float fTimeDelta);
 
 public:
 	static CLevelDesign_Food* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

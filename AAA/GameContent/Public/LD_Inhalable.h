@@ -10,7 +10,7 @@ NS_BEGIN(Client)
 
 class CLD_Inhalable abstract : public CLevelDesignObject, public IInhalable
 {
-	GENERATED_BODY_ABSTRACT(CLD_Inhalable);
+	GENERATED_BODY_ABSTRACT(CLD_Inhalable)
 
 protected:
 	CLD_Inhalable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -4,17 +4,25 @@
 #include "Effect_Container.h"
 #include "DataLoader.h"
 
+#include "RectCommon.h"
+#include "MeshCommon.h"
+#include "RectParticleCommon.h"
+#include "MeshParticleCommon.h"
+#include "RectEmitterCommon.h"
+#include "MeshEmitterCommon.h"
+#include "TrailCommon.h"
+
 IMPLEMENT_SINGLETON(CEffect_Loader)
 
 namespace
 {
     struct EFFECT_DB_ENTRY
     {
-        const _tchar* szEffectId;    // Ω∫∆˘ ≈∞
-        const _tchar* szConfigPath;  // ∆©¥◊ json (µ•¿Ã≈Õ∑Œ ¿Ø¡ˆ)
+        const _tchar* szEffectId;    // ?§Ìè∞ ??
+        const _tchar* szConfigPath;  // ?úÎãù json (?∞Ïù¥?∞Î°ú ?†Ï?)
     };
 
-    // === ¿Ã∆Â∆Æ DB : ªı ¿Ã∆Â∆Æ¥¬ ø©±‚ø° «— ¡Ÿ √ﬂ∞° ===
+    // === ?¥Ìéô??DB : ???¥Ìéô?∏Îäî ?¨Í∏∞????Ï§?Ï∂îÍ? ===
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
         { TEXT("WalkSmoke"),              TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
@@ -22,7 +30,7 @@ namespace
         { TEXT("CarLanding"),             TEXT("../../Resources/YSE/EffectContainer/CarLanding.JSON") },
         { TEXT("BombHitAim"),             TEXT("../../Resources/YSE/EffectContainer/BombHitAim.JSON") },
         { TEXT("BombAimDot"),             TEXT("../../Resources/YSE/EffectContainer/BombAimDot.JSON") },
-        { TEXT("SlideSmoke"),             TEXT("../../Resources/LevelData/SlideSmoke.JSON") },
+        { TEXT("SlideSmoke"),             TEXT("../../Resources/YSE/EffectContainer/SlideSmoke.JSON") },
         { TEXT("InhaleContainer"),        TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
 
         { TEXT("SwordSlash1"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },
@@ -37,6 +45,7 @@ namespace
 
         { TEXT("RockFloor"),              TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
+        { TEXT("MoveGas"),               TEXT("../../Resources/YSE/EffectContainer/MoveGas.json") },
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/YSE/EffectContainer/CarMilkyWay_Final2.json") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/YSH/Effects/GetAbilityEffect.json") },
@@ -66,6 +75,7 @@ namespace
 
         { TEXT("FlowerPetals"),           TEXT("../../Resources/Map/Effect/Proto_FlowerPetals_0.JSON") },
         { TEXT("FlowerWing"),             TEXT("../../Resources/Map/Effect/Proto_FlowerWing.JSON") },
+        { TEXT("LensFlare"),              TEXT("../../Resources/Map/Effect/Proto_LensFlare_0.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/Map/Effect/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/Map/Effect/Proto_Split_Starblock_Big.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/Map/Effect/Proto_Split_Stone_0.JSON") },
@@ -86,10 +96,39 @@ namespace
         { TEXT("EssenceAura"),            TEXT("../../Resources/CHJ/Effect/EssenceAura.JSON") },
         { TEXT("PickUpEffect"),           TEXT("../../Resources/CHJ/Effect/PickUpEffect.JSON") },
         { TEXT("DropStarEffect"),         TEXT("../../Resources/CHJ/Effect/DropStarEffect.JSON") },
+
+        // Armadillo
+        { TEXT("RutA"),                   TEXT("../../Resources/YSH/Effects/RutA.JSON") },
+        { TEXT("RutB"),                   TEXT("../../Resources/YSH/Effects/RutB.JSON") },
+        { TEXT("Dust"),                   TEXT("../../Resources/YSH/Effects/Dust.JSON") },
+        { TEXT("Dust_Landing"),           TEXT("../../Resources/YSH/Effects/Dust_Landing.JSON") },
+        { TEXT("TwinDust"),               TEXT("../../Resources/YSH/Effects/TwinDust.JSON") },
+        { TEXT("RollWind"),               TEXT("../../Resources/YSH/Effects/RollWind.JSON") },
+        { TEXT("TwinSpinWind"),           TEXT("../../Resources/YSH/Effects/TwinSpinWind.JSON") },
+        { TEXT("PartnerWind"),            TEXT("../../Resources/YSH/Effects/PartnerWind.JSON") },
+        { TEXT("WallImpact"),             TEXT("../../Resources/YSH/Effects/WallImpact.JSON") },
+
+        //Leopard
+        { TEXT("LeoSlash_L"),             TEXT("../../Resources/YSH/Effects/Leopard/LeoSlash_L.JSON") },
+        { TEXT("LeoSlash_R"),             TEXT("../../Resources/YSH/Effects/Leopard/LeoSlash_R.JSON") },
+        { TEXT("Leopard_Meteo"),          TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Meteo.JSON") },
+        { TEXT("Nail_Trail"),             TEXT("../../Resources/YSH/Effects/Leopard/Nail_Trail.JSON") },
+        { TEXT("Afterimage_Assault"),     TEXT("../../Resources/YSH/Effects/Leopard/Afterimage_Assault.JSON") },
+        { TEXT("Afterimage_Jump"),        TEXT("../../Resources/YSH/Effects/Leopard/Afterimage_Jump.JSON") },
+        { TEXT("ClawAssault"),            TEXT("../../Resources/YSH/Effects/Leopard/ClawAssault.JSON") },
+        { TEXT("ClawJump"),               TEXT("../../Resources/YSH/Effects/Leopard/ClawJump.JSON") },
+        { TEXT("Leopard_Floor"),          TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Floor.JSON") },
+        { TEXT("Leopard_Flash_R"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_R.JSON") },
+        { TEXT("Leopard_Flash_L"),        TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Flash_L.JSON") },
+        { TEXT("Leopard_Impact"),         TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Impact.JSON") },
+        { TEXT("Assault_Smoke"),          TEXT("../../Resources/YSH/Effects/Leopard/Assault_Smoke.JSON") },
+        { TEXT("Nail_Smoke"),             TEXT("../../Resources/YSH/Effects/Leopard/Nail_Smoke.JSON") },
+        { TEXT("LeoJump_Smoke"),          TEXT("../../Resources/YSH/Effects/Leopard/LeoJump_Smoke.JSON") },
+
     };
 }
 
-HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iLevel)
 {
     m_pProxy = pProxy;
 
@@ -108,18 +147,33 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
         const _wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
 
         // «¡∑Œ≈‰≈∏¿‘ STATIC 1»∏ µÓ∑œ
-        if (!pProxy->Has_Prototype(ETOUI(LEVEL::STATIC), strProtoTag))
+        if (!pProxy->Has_Prototype(iLevel, strProtoTag))
         {
             auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
             if (!pReg)
                 continue;
-            pReg->ResourceLoader(pProxy, pDevice, pContext, ETOUI(LEVEL::STATIC));
-            pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), strProtoTag.c_str(),
+            pReg->ResourceLoader(pProxy, pDevice, pContext, iLevel);
+            pProxy->Add_Prototype(iLevel, strProtoTag.c_str(),
                 pReg->CreatorFunc(pDevice, pContext));
         }
 
         m_Assets[strEffectId] = EFFECT_ASSET{ strProtoTag, std::move(jEffect) };
     }
+
+    if (FAILED(pProxy->Add_Prototype(iLevel, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext))))
+        return E_FAIL;
 
     return S_OK;
 }

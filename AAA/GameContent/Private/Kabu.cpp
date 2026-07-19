@@ -280,7 +280,7 @@ void CKabu::Stop_MoveSmokeFx(_bool bImmediate)
 
 void CKabu::On_Damaged(const ATTACK_INFO& tInfo)
 {
-    if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+    if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT)
     {
         Stop_MoveSmokeFx(true);
 

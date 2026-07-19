@@ -9,6 +9,8 @@
 
 #include "Monster_Movement.h"
 
+#include "Spotlight_Rig.h"
+
 const vector<_float> CBoss_Leopard::s_Thresholds = {};
 
 const _float3 CBoss_Leopard::s_vPillarPos[CBoss_Leopard::PILLAR_COUNT] = {
@@ -49,6 +51,26 @@ void CBoss_Leopard::Update(_float fTimeDelta)
 
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
+    Update_Afterimage(fTimeDelta);
+
+    if (nullptr == m_pSpotRig)
+        Ready_TestSpotlight();          
+
+    if (m_pSpotRig)
+    {
+        switch (m_eSpotTarget)
+        {
+            case SPOT_LEOPARD:
+                m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION));
+                break;
+            case SPOT_KIRBY:
+                m_pSpotRig->Set_Target(XMLoadFloat3(&Get_BlackBoard().vTargetPos));
+                break;
+            case SPOT_FIXED:
+                break;
+        }
+        m_pSpotRig->Update(fTimeDelta);
+    }
 }
 
 CAnimator* CBoss_Leopard::Get_BodyAnimator() const
@@ -73,6 +95,9 @@ HRESULT CBoss_Leopard::Ready_AnimEvents()
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         if (Handle_SoundAnimEvent(e, phase))
             return;
+        if (Handle_FxAnimEvent(e, phase))
+            return;
+
         if (phase != ANIM_EVENT_PHASE::POINT)
             return;
         if (!m_pBody)
@@ -156,14 +181,6 @@ void CBoss_Leopard::Enter_PillarMode()
     if (m_bPillarMode) return;
     m_bPillarMode = true;
 
-    //_float fBackDist = { 14.0f };        // 커비 뒤로 거리
-    //_float fHeight = { 4.f };            // 카메라 높이
-    //_float fShoulderOffset = { -1.8f };  // 양수=오른쪽 어깨
-    //_float fAimBias = { 0.65f };         // 0=커비 / 1=보스
-    //_float fAimHeight = { 6.f };         // 시선 높이(보스 크면 키움)
-    //_float fSmoothTime = { 0.18f };      // 따라오는 부드러움
-    //_float fFovDeg = { 50.f };           // FOV
-
     BOSSCAM_CONFIG_DESC cfg{};
     cfg.fAimHeight = -3.f;
     cfg.fShoulderOffset = 0.f;
@@ -197,6 +214,71 @@ void CBoss_Leopard::Exit_PillarMode()
     }
 }
 
+void CBoss_Leopard::Set_AfterimageFx(_bool bOn, const _wstring& strEffectId)
+{
+    if (m_bAfterimageFx == bOn)
+        return;
+    m_bAfterimageFx = bOn;
+
+    if (bOn)
+    {
+        m_strAfterimageId = strEffectId;   
+        m_fAfterimageAccum = 0.f;
+        Spawn_Afterimage();                 
+    }
+}
+
+void CBoss_Leopard::Spawn_FloorFx()
+{
+    _float3 vPos{}, vLook{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(
+        L"Leopard_Floor", Get_LevelIndex(), vPos, vLook);
+}
+
+void CBoss_Leopard::Spawn_JumpSmoke(const _float3& vPos)
+{
+    _float3 vLook{};
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(
+        L"LeoJump_Smoke", Get_LevelIndex(), vPos, vLook);
+}
+
+void CBoss_Leopard::Spotlight_Off()
+{
+    if (!m_pSpotRig) return;
+    m_eSpotTarget = SPOT_LEOPARD;
+    m_pSpotRig->Set_Enabled(false);
+    m_pSpotRig->Push();
+}
+
+void CBoss_Leopard::Spotlight_On_Snap()
+{
+    if (!m_pSpotRig) return;
+    m_eSpotTarget = SPOT_LEOPARD;
+    m_pSpotRig->Set_Target(m_pTransformCom->Get_State(STATE::POSITION));
+    m_pSpotRig->Snap();
+    m_pSpotRig->Set_Enabled(true);
+    m_pSpotRig->Push();
+}
+
+void CBoss_Leopard::Spotlight_TrackKirby()
+{
+    m_eSpotTarget = SPOT_KIRBY;
+}
+
+void CBoss_Leopard::Spotlight_LockTarget(_fvector vWorldPos)
+{
+    if (!m_pSpotRig) return;
+    m_eSpotTarget = SPOT_FIXED;
+    m_pSpotRig->Set_Target(vWorldPos);
+}
+
 CMonsterBrain* CBoss_Leopard::Create_Brain()
 {
     return CBoss_Leopard_Brain::Create(this);
@@ -204,6 +286,7 @@ CMonsterBrain* CBoss_Leopard::Create_Brain()
 
 void CBoss_Leopard::Play_Intro()
 {
+    Spotlight_Off();
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play("Anger", false, true, 0.f, BASE_ANIM_SPEED);
 
@@ -228,6 +311,8 @@ void CBoss_Leopard::Play_Death()
     Enable_Colliders(false);
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
+
+    Spotlight_Off();
 
     _vector vDir = XMVectorSetY(
         XMLoadFloat3(&Get_BlackBoard().vTargetPos) - m_pTransformCom->Get_State(STATE::POSITION), 0.f);
@@ -284,6 +369,58 @@ void CBoss_Leopard::Tick_DeathSequence(_float fTimeDelta)
     }
 }
 
+void CBoss_Leopard::Update_Afterimage(_float fTimeDelta)
+{
+    if (!m_bAfterimageFx)
+        return;
+
+    m_fAfterimageAccum += fTimeDelta;
+    while (m_fAfterimageAccum >= s_fAfterimageInterval)
+    {
+        m_fAfterimageAccum -= s_fAfterimageInterval;
+        Spawn_Afterimage();
+    }
+}
+
+void CBoss_Leopard::Spawn_Afterimage()
+{
+    if (m_strAfterimageId.empty())
+        return;
+
+    _float3 vPos{}, vLook{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(
+        m_strAfterimageId, Get_LevelIndex(), vPos, vLook);
+}
+
+HRESULT CBoss_Leopard::Ready_TestSpotlight()
+{
+    LIGHT_DESC tInit{};
+    tInit.eType = LIGHT::SPOT;
+    tInit.vSpecular = _float4(1.f, 1.f, 0.25f, 1.f);
+    tInit.vAmbient = _float4(0.f, 0.f, 0.f, 1.f);
+    tInit.fRange = 90.f;
+
+    m_pSpotRig = CSpotlight_Rig::Create(m_pGameInstance_Proxy, tInit);
+    if (nullptr == m_pSpotRig)
+        return E_FAIL;
+
+    m_pSpotRig->Set_Color(_float3(1.f, 1.f, 0.25f), 15.f);
+    m_pSpotRig->Set_Cone(20.f, 25.f);
+    m_pSpotRig->Set_FollowSpeed(6.f);
+
+    _vector vSpawnPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vLightPos = vSpawnPos + XMVectorSet(0.f, 30.f, 0.f, 0.f);
+    m_pSpotRig->Set_Position(vLightPos);
+    m_pSpotRig->Set_Target(vSpawnPos);
+    m_pSpotRig->Snap_Fade(true);
+    m_pSpotRig->Push();
+    return S_OK;
+}
+
 #ifdef _DEBUG
 void CBoss_Leopard::Debug_KeyInput()
 {
@@ -333,4 +470,10 @@ CBoss_Leopard* CBoss_Leopard::Clone(void* pArg)
     if (FAILED(p->Initialize(pArg))) { MSG_BOX("Failed to Cloned : CBoss_Leopard"); Safe_Release(p); }
     return p;
 }
-void CBoss_Leopard::Free() { __super::Free(); }
+void CBoss_Leopard::Free()
+{ 
+    if (m_pSpotRig) { m_pSpotRig->Set_Enabled(false); m_pSpotRig->Push(); }
+    Safe_Release(m_pSpotRig);
+
+    __super::Free(); 
+}

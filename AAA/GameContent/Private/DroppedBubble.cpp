@@ -1,6 +1,6 @@
 #include "DroppedBubble.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "Controller.h"
 #include "PhysX/characterkinematic/PxController.h"
 

@@ -25,14 +25,24 @@ const LIGHT_DESC* CLight_Manager::Get_LightDesc(_uint iIndex)
     return (*iter)->Get_LightDesc();    
 }
 
-HRESULT CLight_Manager::Add_Light(const LIGHT_DESC& LightDesc)
+_int CLight_Manager::Add_Light(const LIGHT_DESC& LightDesc)
 {
     CLight* pLight = CLight::Create(m_pDevice, m_pContext, LightDesc);
     if (nullptr == pLight)
-        return E_FAIL;
+        return -1;
 
     m_Lights.push_back(pLight);
+    return static_cast<_int>(m_Lights.size()) - 1;
+}
 
+HRESULT CLight_Manager::Set_LightDesc(_uint iIndex, const LIGHT_DESC& LightDesc)
+{
+    if (iIndex >= m_Lights.size())
+        return E_FAIL;
+
+    auto iter = m_Lights.begin();
+    std::advance(iter, iIndex);
+    (*iter)->Set_LightDesc(LightDesc);
     return S_OK;
 }
 

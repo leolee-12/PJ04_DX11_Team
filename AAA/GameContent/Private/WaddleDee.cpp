@@ -1,7 +1,7 @@
 #include "WaddleDee.h"
 #include "WaddleDee_Body.h"
 #include "LevelDesign_LoadTypes.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "GameContent_const.h"
 
 #include "GameInstance.h"

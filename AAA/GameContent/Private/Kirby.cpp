@@ -558,6 +558,22 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::SLIDE_COLLIDER], ETOUI(COLLISION_LAYER::PLAYER_HIT));
 
 
+    // Collider Breakerable HitBox
+    CCollider::COLLIDER_DESC BreakerableHitDesc{};
+    BreakerableHitDesc.pOwner = this;
+    BreakerableHitDesc.vSize = _float3(1.f, 1.f, 1.f);
+    BreakerableHitDesc.fRadius = 1.f;
+    BreakerableHitDesc.fHeight = 1.f;
+
+    m_KirbyColliders[KIRBY_COLLIDER::BREAKERABLE_HITBOX] = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
+        TEXT("BreakerableHitBox_Com"), &BreakerableHitDesc);
+    if (m_KirbyColliders[KIRBY_COLLIDER::BREAKERABLE_HITBOX] == nullptr)
+        return E_FAIL;
+
+    m_KirbyColliders[KIRBY_COLLIDER::BREAKERABLE_HITBOX]->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::BREAKERABLE_HITBOX], ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE));
+
+
     //юс╫ц
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
@@ -565,6 +581,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROPPED_BUBBLE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROP_STAR));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::LD_ITEM));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
@@ -575,6 +592,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::LD_ITEM));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_HURT));
@@ -591,10 +609,10 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::PLAYER_BOMB));
 
     // Kirby_DeformCar_Main
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::MONSTER_HURT));
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_HURT));
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::ENV_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 
     return S_OK;
 }
@@ -925,8 +943,7 @@ HRESULT CKirby::SetUp_Collider_Callback()
                 ATTACK_INFO tAttackDesc{};
                 tAttackDesc.eHitType = HIT_TYPE::BODY_CONTACT;
                 tAttackDesc.pAttacker = pMonster;
-                XMStoreFloat3(&tAttackDesc.vAttackerPos,
-                    pMonster->Get_Transform()->Get_State(STATE::POSITION));
+                XMStoreFloat3(&tAttackDesc.vAttackerPos, pMonster->Get_Transform()->Get_State(STATE::POSITION));
                 tAttackDesc.fDamage = 10.f;
                 tAttackDesc.fKnockback = 2.f;
                 Damaged(tAttackDesc);
@@ -984,6 +1001,26 @@ HRESULT CKirby::SetUp_Collider_Callback()
             {
                 Set_TriggerDeformObj(nullptr);
             }
+        }
+    );
+
+    m_KirbyColliders[BREAKERABLE_HITBOX]->Set_OnEnter(
+        [this](CCollider* pOther)
+        {
+            if (pOther->Get_RegisteredGroup() != ETOUI(COLLISION_LAYER::MONSTER_HURT))
+                return;
+
+            CMonster* pMonster = dynamic_cast<CMonster*>(pOther->Get_Owner());
+            if (pMonster == nullptr)
+                return;
+
+            ATTACK_INFO tAttackInfo{};
+            tAttackInfo.eHitType = HIT_TYPE::BREAKERABLE_HIT;
+            tAttackInfo.pAttacker = this;
+            XMStoreFloat3(&tAttackInfo.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+            tAttackInfo.fDamage = 0.f;
+            tAttackInfo.fKnockback = 0.f;
+            pMonster->Damaged(tAttackInfo);
         }
     );
 
@@ -1251,9 +1288,35 @@ void CKirby::Reset_KirbyDeform()
     m_pKirby_Deform = nullptr;
 }
 
+CKirby_Deform* CKirby::Find_KirbyDeform(DEFORM_TYPE eType)
+{
+    auto iter = m_Deformations.find(eType);
+
+    if (iter == m_Deformations.end())
+        return nullptr;
+
+    return iter->second;
+}
+
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
 {
     return m_KirbyColliders[eKirbyCollider];
+}
+
+void CKirby::Set_ColliderDesc(KIRBY_COLLIDER eKirbyCollider, const CCollider::COLLIDER_DESC& Desc)
+{
+    CCollider* pCollider = m_KirbyColliders[eKirbyCollider];
+    if (pCollider == nullptr)
+        return;
+
+    pCollider->Reset_Bounding(Desc);
+}
+
+void CKirby::Set_ColliderEnabled(KIRBY_COLLIDER eKirbyCollider, _bool bEnabled)
+{
+    CCollider* pCollider = m_KirbyColliders[eKirbyCollider];
+    if (pCollider)
+        pCollider->Set_Enabled(bEnabled);
 }
 
 void CKirby::Update_CutsceneAttachTransform()

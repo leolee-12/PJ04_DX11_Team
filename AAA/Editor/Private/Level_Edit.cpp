@@ -209,6 +209,22 @@ void CLevel_Edit::Save_LiveObjects(const wstring& strFilePath, const wstring& st
     CDataExporter::Write_JsonFile(strFilePath.c_str(), jLevel);
 }
 
+void CLevel_Edit::Save_RenderGlobals(const wstring& strFilePath)
+{
+    json jGlobals;
+
+    const auto& globals = m_pGameInstance_Proxy->Get_ShaderGlobals();
+    for (const auto& g : globals)
+    {
+        if (g.strShaderName.rfind("g_vGodRaySpot", 0) == 0)
+            continue;
+
+        jGlobals[g.strShaderName] = { g.vValue.x, g.vValue.y, g.vValue.z, g.vValue.w };
+    }
+
+    CDataExporter::Write_JsonFile(strFilePath.c_str(), jGlobals);
+}
+
 void CLevel_Edit::Load_LiveObjects(const wstring& strFilePath)
 {
     string strContent = {};

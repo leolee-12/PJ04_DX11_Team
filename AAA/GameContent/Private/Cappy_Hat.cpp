@@ -1,6 +1,6 @@
 #include "Cappy_Hat.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "Collider.h"
 #include "Transform.h"
 #include "Effect_Loader.h"
@@ -178,7 +178,7 @@ void CCappy_Hat::SetUp_Collider_CallBack()
 	if (m_pHurtBox)
 	{
 		m_pHurtBox->Set_OnEnter([this](CCollider* pOther) {
-			if (ETOUI(COLLISION_LAYER::CAR_BOOST) == pOther->Get_RegisteredGroup() && m_bThrown)
+			if (ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE) == pOther->Get_RegisteredGroup() && m_bThrown)
 				Despawn();
 		});
 	}

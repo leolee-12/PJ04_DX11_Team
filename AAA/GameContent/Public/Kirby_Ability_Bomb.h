@@ -14,6 +14,11 @@ class CKirbyBomb;
 class CLIENT_DLL CKirby_Ability_Bomb final : public CKirby_Ability
 {
 private:
+	static constexpr _float s_fBombMaxHorizontalSpeed = 4.5f;
+	static constexpr _float s_fBombMaxFallVelocity = -4.f;
+	static constexpr _float s_fBombRot_Speed_Degree = 360.f;
+
+private:
 	enum BOMB_STATE
 	{ 
 		MOVE_THROW,
@@ -63,11 +68,12 @@ private:
 	void Reset_Aim(CKirby* pKirby);
 	void Acc_AimInput(const _float3& vInputDir);
 	void Cal_Aim(_float fTimeDelta);
+	void Update_AimFacing(CKirby* pKirby, _float fTimeDelta);
 
 	void Update_AimPrediction();
 
-	void Update_BombHitAim();
-	void Despawn_BombHitAim();
+	void Update_BombHitAimEffect();
+	void Despawn_BombHitAimEffect();
 
 private:
 	BOMB_STATE m_eBombState{};
@@ -84,6 +90,8 @@ private:
 
 	_float3 m_vAimLaunchVelocity{};
 
+	_bool m_bAimRotating{};
+	_bool m_bPlayingRotAni{};
 
 	// Effect
 	vector<_float3> m_PredictedPathPoints;

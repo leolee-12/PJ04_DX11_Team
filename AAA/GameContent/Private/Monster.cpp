@@ -432,7 +432,7 @@ HRESULT CMonster::Ready_State()
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+	if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT)
 	{
 		if (m_pMovement->Is_Grounded())
 			Change_State(MONSTER_STATE_TYPE::FLATTEN);
@@ -642,7 +642,7 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	if (strFx.empty())
 		return true;
 
-	_float3 vPos{}, vLook{ 0.f, 0.f, 1.f }, vRotDeg{};
+	_float3 vPos{}, vLook{}, vRotDeg{};
 	const _float4x4* vAncorMat = { nullptr };
 	switch (e.iIntParam)
 	{
@@ -672,7 +672,12 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 		return true;
 	}
 
-	if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+	if (ePhase == ANIM_EVENT_PHASE::POINT)
+	{
+		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
+			vPos, vLook, vRotDeg, vAncorMat, nullptr);
+	}
+	else if (ePhase == ANIM_EVENT_PHASE::BEGIN)
 	{
 		FX_HANDLE& hSlot = m_Effects[strFx];
 		if (pLoader->Is_Current(hSlot))

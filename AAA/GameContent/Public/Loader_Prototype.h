@@ -8,6 +8,9 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CMapStage;
+struct MAP_LOAD_RESULT;
+
 struct ENV_ENTRY 
 { 
     const _tchar* tag; 
@@ -22,6 +25,14 @@ struct LEVEL_MANIFEST
     wstring strMapManifest;
     wstring strObjectsFile;
     wstring strUIFile;
+    wstring strRenderGlobalsFile;
+};
+
+struct LEVEL_LOAD_CONTEXT
+{
+    CGameInstance_Proxy* pProxy;
+    ID3D11Device* pDevice;
+    ID3D11DeviceContext* pContext;
 };
 
 HRESULT CLIENT_DLL Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy,
@@ -40,6 +51,16 @@ HRESULT CLIENT_DLL Load_Level(
 HRESULT CLIENT_DLL Load_LevelManifest(
     const _tchar* strManifestPath,
     LEVEL_MANIFEST* pOut);
+
+HRESULT CLIENT_DLL Load_Level_FromManifest(
+    const LEVEL_LOAD_CONTEXT& ctx,
+    const _tchar* strManifestPath,
+    _uint iLevelIndex,
+    MAP_LOAD_RESULT* pOutReport = nullptr,
+    CMapStage** ppOutMapStage = nullptr);
+
+HRESULT CLIENT_DLL Apply_RenderGlobals_FromFile(
+    CGameInstance_Proxy* pProxy, const _tchar* strPath);
 
 HRESULT CLIENT_DLL Load_Fonts(CGameInstance_Proxy* pProxy);
 

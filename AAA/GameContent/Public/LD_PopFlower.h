@@ -14,7 +14,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_PopFlower final : public CLevelDesignObject
 {
-	GENERATED_BODY(CLD_PopFlower);
+	GENERATED_BODY(CLD_PopFlower)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"PopFlower";

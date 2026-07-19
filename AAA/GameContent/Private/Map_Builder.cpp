@@ -1,6 +1,7 @@
 #include "Map_Builder.h"
 #include "GameContent_Log.h"
 #include "Map_ModelResolver.h"
+#include "MapGimmick_Defines.h"
 #include "Map_Parser.h"
 #include "Map_EditFile.h"
 #include "Env_CollisionCatalog.h"
@@ -149,6 +150,9 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 	for (const MAP_MANIFEST_SECTION& Section : Manifest.Sections)
 	{
 		const _wstring& strSectionName = Section.strName;
+
+		if (Is_MapGimmickSection(Manifest.strStageName, strSectionName))
+			continue;
 
 		_wstring wstrModelPath;
 		_wstring wstrModelProtoTag;

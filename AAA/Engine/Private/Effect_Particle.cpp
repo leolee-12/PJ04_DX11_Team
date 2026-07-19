@@ -66,6 +66,9 @@ void CEffect_Particle::Init_PropertyValue()
     m_fParticleShapeRadius = 1.f;
     m_bParticleShapeRandomRadius = false;
 
+    m_fParticleFanAngle = 90.f;
+    m_fParticleFanDirectionDegree = 0.f;
+
     m_vParticleBoxSize = { 5.f, 3.f, 5.f };
     m_iParticleBoxSpawnMode = PARTICLE_BOX_TOP;
 
@@ -389,6 +392,32 @@ _float3 CEffect_Particle::Make_ParticleSpawnLocalPos() const
             fRadius = m_pGameInstance_Proxy->RandomFloat(0.f, fRadius);
 
         const _float fTheta = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
+
+        return {
+            m_fPivot.x + cosf(fTheta) * fRadius,
+            m_fPivot.y,
+            m_fPivot.z + sinf(fTheta) * fRadius
+        };
+    }
+
+    case PARTICLE_SHAPE_FAN:
+    {
+        _float fRadius = m_fParticleShapeRadius;
+
+        if (fRadius < 0.f)
+            fRadius = 0.f;
+
+        if (m_bParticleShapeRandomRadius == true)
+            fRadius = m_pGameInstance_Proxy->RandomFloat(0.f, fRadius);
+
+        _float fFanAngle = fabsf(m_fParticleFanAngle);
+        Helper::FloatClamp(fFanAngle, 0.f, 360.f);
+
+        const _float fCenterRadian = XMConvertToRadians(m_fParticleFanDirectionDegree);
+        const _float fHalfRadian = XMConvertToRadians(fFanAngle * 0.5f);
+        const _float fTheta = m_pGameInstance_Proxy->RandomFloat(
+            fCenterRadian - fHalfRadian,
+            fCenterRadian + fHalfRadian);
 
         return {
             m_fPivot.x + cosf(fTheta) * fRadius,

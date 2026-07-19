@@ -43,6 +43,7 @@ public: // Engine
     _int   RandomInt(_int iMin, _int iMax) const;
 
     _int64 Get_FrameIndex();
+    _double Get_GameTime();
 #pragma endregion
 
 #pragma region GRAPHICDEVICE
@@ -145,7 +146,8 @@ public: // CameraManager
 #pragma region LIGHTMANAGER
 public: // LightManager
     const LIGHT_DESC* Get_LightDesc(_uint iIndex);
-    HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+    _int    Add_Light(const LIGHT_DESC& LightDesc);
+    HRESULT Set_LightDesc(_uint iIndex, const LIGHT_DESC& LightDesc);
     HRESULT Render_Light(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
     HRESULT Clear_Lights();
 #pragma endregion

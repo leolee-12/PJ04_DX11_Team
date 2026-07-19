@@ -1,6 +1,6 @@
 #include "Camera_Shakeable.h"
 #include "GameInstance.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 void CCamera_Shakeable::Tick_Shake(_float fTimeDelta)
 {

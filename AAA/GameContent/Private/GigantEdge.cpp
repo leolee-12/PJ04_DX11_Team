@@ -7,7 +7,7 @@
 #include "GigantEdge_Brain.h"
 #include "Animator.h"
 #include "Monster_Movement.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 
 CGigantEdge::CGigantEdge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMiniBoss(pDevice, pContext) {

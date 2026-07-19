@@ -46,6 +46,7 @@ protected:
 private:
     void    Enter_Break();
     HRESULT Bind_ShaderResources();
+    void    Tick_LaunchFx(_float fTimeDelta);
 
 private:
     CShader* m_pShaderCom = { nullptr };
@@ -53,6 +54,9 @@ private:
     CAnimator* m_pAnimatorCom = { nullptr };
 
     STATE  m_eState = { STATE::CARRIED };
+
+    _float m_fFxTimer = { 0.f };
+    static constexpr _float FX_INTERVAL = 1.f;
 
 public:
     static CProjectile_Partner* Create(ID3D11Device*, ID3D11DeviceContext*);

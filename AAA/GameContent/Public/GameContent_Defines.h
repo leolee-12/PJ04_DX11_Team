@@ -1,6 +1,6 @@
 #pragma once
 #include "GameContent_enum.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "GameContent_AnimEvents.h"
 
 #ifdef GAMECONTENT_EXPORTS
@@ -33,7 +33,7 @@ namespace Client
 		MONSTER_HIT,
 		MONSTER_PROJECTILE,
 		MONSTER_D_RANGE,
-		CAR_BOOST,
+		PLAYER_BREAKERABLE,
 		ENV_HURT,
 		ENV_FOLIAGE,
 		ENV_LADDER,
@@ -41,6 +41,7 @@ namespace Client
 		DROPPED_BUBBLE,
 		DEFORM_OBJECT,
 		DROP_STAR,
+		LD_ITEM,
 		ENV_TRIGGER = 100
 	};
 

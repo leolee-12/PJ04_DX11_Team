@@ -1,7 +1,7 @@
 #include "KoKabu.h"
 #include "GameInstance.h"
 #include "GameContent_Const.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_Events.h"
 #include "Projectile_Movement.h"
 #include "Collider.h"
 #include "Effect_Loader.h"
