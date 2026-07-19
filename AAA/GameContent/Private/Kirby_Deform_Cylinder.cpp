@@ -81,6 +81,14 @@ void CKirby_Deform_Cylinder::Exit_Deform(CKirby* pKirby)
     pMovement->Set_GravityScale(1.f);
 
     pKirby->Set_CCTSize(CKirby::s_fCCT_Radius, CKirby::s_fCCT_Height);
+
+    // Hurt Box
+    CCollider::COLLIDER_DESC tHurtDesc{};
+    tHurtDesc.pOwner = pKirby;
+    tHurtDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    tHurtDesc.fRadius = CKirby::s_fCCT_Radius + CKirby::s_fHurtBoxRadiusPadding;
+    tHurtDesc.fHeight = CKirby::s_fCCT_Height;
+    pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
 }
 
 void CKirby_Deform_Cylinder::Enter_AttackState(CKirby* pKirby, _int iFlag)
@@ -291,11 +299,17 @@ void CKirby_Deform_Cylinder::Update_DeformCylinderState(CKirby* pKirby, _float f
         }
         case DEFORM_CYLINDER_STATE::ROLL:
         {
-            if (m_pGameInstance_Proxy->Key_Down(DIK_F))
+            //if (m_pGameInstance_Proxy->Key_Down(DIK_F))
+            //{
+            //    Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH);
+            //    return;
+            //}
+            if (pKirby->Get_DeformEndTrigger() && Check_FrontCollision(pKirby))
             {
                 Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH);
                 return;
             }
+
             Roll(pKirby, fTimeDelta);
             Roll_RotL(pKirby, fTimeDelta);
             Update_RollState(pKirby, fTimeDelta);
@@ -439,6 +453,27 @@ void CKirby_Deform_Cylinder::Roll_RotL(CKirby* pKirby, _float fTimeDelta)
 
     CAnimator* pAnimator = pKirby->Get_CurrentDeformModel()->Get_Animator();
     pAnimator->SetBoneRotation("RotL", m_fRotL_Degree, XMVectorSet(-1.f, 0.f, 0.f, 0.f));
+}
+
+_bool CKirby_Deform_Cylinder::Check_FrontCollision(CKirby* pKirby)
+{
+    CTransform* pTransform = pKirby->Get_Transform();
+
+    _float3 vCenter{};
+    XMStoreFloat3(&vCenter, pTransform->Get_State(STATE::POSITION));
+    vCenter.y += s_fCylinder_CCT_Radius;
+
+    _float3 vDir{};
+    XMStoreFloat3(&vDir, XMVector3Normalize(pTransform->Get_State(STATE::LOOK)));
+
+    _float fRadius = 0.1f;
+    _float3 vDumpNormal{};
+    _float  fDumpDistance{};
+    _float fCollisionRadiusPadding = 0.2f;
+    return m_pGameInstance_Proxy->Sweep_Sphere(
+        vCenter, fRadius, vDir,
+        s_fCylinder_CCT_Radius + fCollisionRadiusPadding,
+        &vDumpNormal, &fDumpDistance, true, false);
 }
 
 void CKirby_Deform_Cylinder::Change_RollState(CKirby* pKirby, ROLL_STATE eNext)

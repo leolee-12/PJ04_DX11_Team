@@ -75,6 +75,8 @@ private:
 	void Roll(CKirby* pKirby, _float fTimeDelta);
 	void Roll_RotL(CKirby* pKirby, _float fTimeDelta);
 
+	_bool Check_FrontCollision(CKirby* pKirby);
+
 private:
 	void Change_RollState(CKirby* pKirby, ROLL_STATE eNext);
 	void Enter_RollState(CKirby* pKirby, ROLL_STATE eState);

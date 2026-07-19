@@ -506,14 +506,14 @@ HRESULT CKirby::Ready_Components()
     m_KirbyColliders.resize(COLLIDER_END);
 
     // Collider HurtBox
-    CCollider::COLLIDER_DESC ColliderDesc{};
-    ColliderDesc.pOwner = this;
-    ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f); // 발 위치임
-    ColliderDesc.fRadius = s_fCCT_Radius + s_fHurtBoxRadiusPadding;
-    ColliderDesc.fHeight = s_fCCT_Height;
+    CCollider::COLLIDER_DESC tColliderDesc{};
+    tColliderDesc.pOwner = this;
+    tColliderDesc.vCenter = _float3(0.f, 0.f, 0.f); // 발 위치임
+    tColliderDesc.fRadius = s_fCCT_Radius + s_fHurtBoxRadiusPadding;
+    tColliderDesc.fHeight = s_fCCT_Height;
 
     m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
-        TEXT("HurtBox_Com"), &ColliderDesc);
+        TEXT("HurtBox_Com"), &tColliderDesc);
     if (m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] == nullptr)
         return E_FAIL;
 
@@ -968,6 +968,10 @@ HRESULT CKirby::SetUp_Collider_Callback()
             {
                 Set_TriggerDeformObj(static_cast<CLD_DeformObject*>(pGameObject));
             }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA))
+            {
+                Set_DeformEndTrigger(true);
+            }
         }
     );
 
@@ -1002,6 +1006,10 @@ HRESULT CKirby::SetUp_Collider_Callback()
             else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
             {
                 Set_TriggerDeformObj(nullptr);
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA))
+            {
+                Set_DeformEndTrigger(false);
             }
         }
     );
