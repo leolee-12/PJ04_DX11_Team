@@ -125,6 +125,9 @@ void CCamera_Cutscene::Apply_Pose()
     atL.x = -atL.x;
 
     _matrix W = XMLoadFloat4x4(m_pAnchor);
+    W.r[0] = XMVector3Normalize(W.r[0]);
+    W.r[1] = XMVector3Normalize(W.r[1]);
+    W.r[2] = XMVector3Normalize(W.r[2]);
     _vector eyeW = XMVector3TransformCoord(XMLoadFloat3(&eyeL), W);
     _vector atW = XMVector3TransformCoord(XMLoadFloat3(&atL), W);
 

@@ -24,8 +24,15 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int)
         Make_Rest(),
         Make_StepApproach(),
         Make_DashIn(),
+        CBTSelector::Create({
+            CBTSequence::Create({
+                CBTCondition::Create([](CBlackboard* pBB) {
+                    return pBB->Get<_float>("DistToTarget", FLT_MAX) <= COMBO_RANGE; }),
+                Make_SwordCombo(),
+            }),
+            Make_Rest(),
+        }),
         Make_Rest(),
-        // TODO: 붙은 뒤 근접 공격(Attack1~3 콤보) 이어붙일 자리
         });
 }
 
@@ -128,6 +135,27 @@ CBTNode* CBoss_Metaknight_Brain::Make_DashIn()
         {
             *bOn = false;
             *fElapsed = 0.f;
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_SwordHit(_bool bOn)
+{
+    return CBTAction::Create([this, bOn](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Enable_SwordHit(bOn);
+        return BT_STATUS::SUCCESS;
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_SwordCombo()
+{
+    return CBTSequence::Create({
+        FaceWindup("Attack1Start", 540.f, SPD),
+        Make_SwordHit(true),
+        Clip("Attack1", SPD, 0.05f),
+        Clip("Attack2", SPD, 0.05f),
+        Clip("Attack3", SPD, 0.05f),
+        Make_SwordHit(false),
+        Clip("Attack3End", SPD),
         });
 }
 

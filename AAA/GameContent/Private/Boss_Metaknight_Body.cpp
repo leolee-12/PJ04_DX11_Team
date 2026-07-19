@@ -62,7 +62,7 @@ HRESULT CBoss_Metaknight_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_Metaknight;
     t.szModelProtoTag = MODEL_PROTO_TAG;
-    // TODO: 애님 이벤트 json 만들면 경로 연결
+    t.szAnimEventFile = TEXT("../../Resources/YSH/Boss/Metaknight/Body/Metaknight_anim_events.json");
     return Ready_MeshPart(t);
 }
 

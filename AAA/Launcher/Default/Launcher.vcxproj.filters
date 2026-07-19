@@ -64,6 +64,9 @@
     <Filter Include="99. Defines">
       <UniqueIdentifier>{dd6aa0aa-c4c2-46b8-b52c-7511d9ad0e05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\02. Stage\Arena">
+      <UniqueIdentifier>{fa533b06-17d1-41b4-9f5e-60bb438e6cd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Boss_Stage1.h">
@@ -126,6 +129,9 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Arena.h">
+      <Filter>01. Levels\02. Stage\Arena</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Launcher.ico">
@@ -182,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="Launcher.cpp">
       <Filter>98. Default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Arena.cpp">
+      <Filter>01. Levels\02. Stage\Arena</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

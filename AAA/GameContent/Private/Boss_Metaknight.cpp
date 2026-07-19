@@ -121,6 +121,9 @@ _bool CBoss_Metaknight::Is_Intro_Finished() const
 void CBoss_Metaknight::On_Intro_End()
 {
     Show_Mant(false);
+
+    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 void CBoss_Metaknight::Play_Death()
@@ -144,10 +147,6 @@ void CBoss_Metaknight::On_Enter_Corpse()
     __super::On_Enter_Corpse();
 
     m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
-
-    CUTSCENE_CAMERA_DESC cam{};
-    cam.eCam = ECutsceneCam::Area;
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 _bool CBoss_Metaknight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
@@ -177,6 +176,27 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
             return;
         if (Handle_FxAnimEvent(e, phase))
             return;
+
+        switch (static_cast<EANIM_EVENT>(e.iEventType))
+        {
+            case EANIM_EVENT::CamTrack:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                if (!e.strParam.empty())
+                {
+                    wstring w = StrToWstr(e.strParam);
+                    Fire_CutsceneCamera(w.c_str());
+                }
+                else
+                {
+                    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+                    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                }
+                break;
+            }
+        }
+
         });
     return S_OK;
 }
@@ -244,6 +264,16 @@ void CBoss_Metaknight::Play_MantSync(const _char* szClip, _bool bLoop, _float fB
 {
     if (m_pMant && m_pMant->Is_Active())
         m_pMant->Get_Animator()->Play(szClip, bLoop, true, fBland, fSpeed);
+}
+
+void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)
+{
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Cutscene;
+    cam.szTrack = szTrack;
+    cam.pProgress = Get_BodyAnimator();
+    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 CBoss_Metaknight* CBoss_Metaknight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

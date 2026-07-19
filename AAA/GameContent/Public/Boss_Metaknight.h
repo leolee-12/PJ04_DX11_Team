@@ -82,6 +82,9 @@ private:
     // µð¹ö±×
     static constexpr _bool s_bSkipIntro = true;
 
+private:
+    void Fire_CutsceneCamera(const _tchar* szTrack);
+
 public:
     static CBoss_Metaknight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CBoss_Metaknight* Clone(void* pArg) override;

@@ -28,11 +28,18 @@ private:
     static constexpr _float DASH_ARRIVE_DIST = 0.5f; // 도착 판정 반경
     static constexpr _float DASH_TIMEOUT = 2.5f;
 
+    static constexpr _float COMBO_RANGE = 6.f;
+
 private:
+    // 움직임
     CBTNode* Make_Rest();
     CBTNode* Make_Step();        
     CBTNode* Make_StepApproach();
     CBTNode* Make_DashIn();
+
+    // 기본공격
+    CBTNode* Make_SwordHit(_bool bOn);
+    CBTNode* Make_SwordCombo();
 
 public:
     static CBoss_Metaknight_Brain* Create(CMonster* pOwner);
