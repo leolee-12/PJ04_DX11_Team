@@ -56,6 +56,8 @@
     <ClInclude Include="..\Public\Kirby_DeformContext.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
     <ClInclude Include="..\Public\LandingSmoke.h" />
+    <ClInclude Include="..\Public\LD_LavaArea.h" />
+    <ClInclude Include="..\Public\LD_WaterArea.h" />
     <ClInclude Include="..\public\LeoJump_Smoke.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Assault.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Jump.h" />
@@ -498,6 +500,8 @@
     <ClCompile Include="..\Private\KasaUpEffect.cpp" />
     <ClCompile Include="..\Private\KoKabu.cpp" />
     <ClCompile Include="..\Private\LandingSmoke.cpp" />
+    <ClCompile Include="..\Private\LD_LavaArea.cpp" />
+    <ClCompile Include="..\Private\LD_WaterArea.cpp" />
     <ClCompile Include="..\private\LeoJump_Smoke.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp" />

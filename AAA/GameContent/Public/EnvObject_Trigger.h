@@ -15,6 +15,7 @@ class CLIENT_DLL CEnvObject_Trigger abstract : public CEnvObject
 	PROPERTY(_float3, m_vAreaCenter, L"Area Center", L"Trigger")
 	PROPERTY(_float3, m_vAreaSize, L"Area Size", L"Trigger")
 	PROPERTY(_float4, m_vAreaRot, L"Area Rotation", L"Trigger")
+	PROPERTY(_int, m_iCollisionLayer, L"Collision Layer", L"Trigger")
 
 	PROPERTY(_bool, m_bDebugDrawTrigger, L"Debug Draw", L"Trigger")
 	PROPERTY(_wstring, m_strDebugTextFontTag, L"Debug Text Font", L"Trigger")
@@ -45,6 +46,7 @@ public:
 
 protected:
 	CCollider* m_pCollider = { nullptr };
+	_uint m_iRegisteredCollisionLayer = { UINT_MAX };
 
 	_bool m_bTriggerShapeDirty = { true };
 	_bool m_bTriggerTransformDirty = { true };
@@ -59,6 +61,7 @@ protected:
 	_bool Is_PlayerActivator(const CCollider* pOther) const;
 
 	HRESULT Ready_TriggerCollider();
+	void    Refresh_TriggerCollisionLayer();
 	void	SetUp_Collider_Callback();
 	void    Refresh_TriggerCollider();
 

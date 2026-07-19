@@ -10,6 +10,7 @@ CEnvObject_Trigger::CEnvObject_Trigger(ID3D11Device* pDevice, ID3D11DeviceContex
 	, m_vAreaCenter{ 0.f, 0.f, 0.f }
 	, m_vAreaSize{ 1.f, 1.f, 1.f }
 	, m_vAreaRot{ 0.f, 0.f, 0.f, 1.f }
+	, m_iCollisionLayer{ static_cast<_int>(COLLISION_LAYER::ENV_TRIGGER) }
 	, m_bDebugDrawTrigger{ true }
 	, m_strDebugTextFontTag{ L"KOR-FOT-ComicReggaeStd-B" }
 	, m_vDebugTextColor{ 1.f, 1.f, 0.2f, 1.f }
@@ -25,6 +26,7 @@ CEnvObject_Trigger::CEnvObject_Trigger(const CEnvObject_Trigger& Prototype)
 	, m_vAreaCenter{ Prototype.m_vAreaCenter }
 	, m_vAreaSize{ Prototype.m_vAreaSize }
 	, m_vAreaRot{ Prototype.m_vAreaRot }
+	, m_iCollisionLayer{ Prototype.m_iCollisionLayer }
 	, m_bDebugDrawTrigger{ Prototype.m_bDebugDrawTrigger }
 	, m_strDebugTextFontTag{ Prototype.m_strDebugTextFontTag }
 	, m_vDebugTextColor{ Prototype.m_vDebugTextColor }
@@ -77,6 +79,8 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
+	Refresh_TriggerCollisionLayer();
+
 	if (m_bTriggerShapeDirty || m_bTriggerTransformDirty)
 		Refresh_TriggerCollider();
 
@@ -107,6 +111,7 @@ HRESULT CEnvObject_Trigger::On_EditTransformChanged()
 
 void CEnvObject_Trigger::Mark_TriggerDirty()
 {
+	Refresh_TriggerCollisionLayer();
 	m_bTriggerShapeDirty = true;
 	m_bTriggerDebugStyleDirty = true;
 }
@@ -148,9 +153,30 @@ HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 	if (FAILED(m_pCollider->Initialize(&ColliderDesc)))
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-
+	Refresh_TriggerCollisionLayer();
 	return S_OK;
+}
+
+void CEnvObject_Trigger::Refresh_TriggerCollisionLayer()
+{
+	if (nullptr == m_pCollider)
+		return;
+
+	const _uint iEnvTriggerLayer = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
+	const _uint iDeformReleaseLayer = ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA);
+	const _uint iCollisionLayer = static_cast<_int>(iDeformReleaseLayer) == m_iCollisionLayer ? iDeformReleaseLayer : iEnvTriggerLayer;
+
+	if (m_iCollisionLayer != static_cast<_int>(iCollisionLayer))
+		m_iCollisionLayer = static_cast<_int>(iCollisionLayer);
+
+	if (m_iRegisteredCollisionLayer == iCollisionLayer)
+		return;
+
+	if (UINT_MAX != m_iRegisteredCollisionLayer)
+		m_pGameInstance_Proxy->Immediate_Unregister(m_pCollider, m_iRegisteredCollisionLayer);
+
+	m_pGameInstance_Proxy->Register_Collider(m_pCollider, iCollisionLayer);
+	m_iRegisteredCollisionLayer = iCollisionLayer;
 }
 
 void CEnvObject_Trigger::SetUp_Collider_Callback()
