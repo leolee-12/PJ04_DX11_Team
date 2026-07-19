@@ -22,7 +22,10 @@ void CMonster_State_Landing::Enter(MONSTER_STATE_TYPE ePrevState)
 	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
 		m_pAnimator->Play(&m_PlayInfo);
 
-	m_pOwner->Play_OneShotSFX(L"CharaBasic_Landing.wav", 0.6f);
+	_vector vPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+
+	m_pOwner->Play_OneShotSFX3D(L"CharaBasic_Landing.wav", vPos,  0.3f);
+	m_pOwner->Play_LandingSmokeFx();
 }
 
 void CMonster_State_Landing::Update(_float fTimeDelta)

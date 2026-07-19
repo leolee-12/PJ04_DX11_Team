@@ -14,6 +14,7 @@ namespace EffectMesh
         _bool& bUse;
         _float2& vTiling;
         _float2& vOffset;
+        _float& fUVRotationDegree;
         _bool& bUVScroll;
         _float2& vUVScrollCount;
         _float2& vCurrentOffset;
@@ -56,7 +57,9 @@ namespace EffectMesh
         _bool& bDiffuseColorToAlpha;
         UV_EDGE_FADE_VALUES DiffuseEdgeFade;
         _bool& bUseNormalTexture;
+        _float& fNormalUVRotationDegree;
         _bool& bUseMRATexture;
+        _float& fMRAUVRotationDegree;
         TEXTURE_VALUES Unknown;
         _bool& bUnknownColorToAlpha;
         UV_EDGE_FADE_VALUES UnknownEdgeFade;
