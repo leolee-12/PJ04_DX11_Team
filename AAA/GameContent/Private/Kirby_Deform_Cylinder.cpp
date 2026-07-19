@@ -299,11 +299,11 @@ void CKirby_Deform_Cylinder::Update_DeformCylinderState(CKirby* pKirby, _float f
         }
         case DEFORM_CYLINDER_STATE::ROLL:
         {
-            //if (m_pGameInstance_Proxy->Key_Down(DIK_F))
-            //{
-            //    Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH);
-            //    return;
-            //}
+            if (m_pGameInstance_Proxy->Key_Down(DIK_F))
+            {
+                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH);
+                return;
+            }
             if (pKirby->Get_DeformEndTrigger() && Check_FrontCollision(pKirby))
             {
                 Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CLASH);
