@@ -1,6 +1,7 @@
 #include "LevelDesign_MonsterCatalog.h"
 #include "LevelDesign_Registry.h"
 
+#include "Parsing_Utils.h"
 #include "BladeKnight.h"
 #include "NormalEnemy.h"
 #include "Kabu.h"
@@ -9,7 +10,8 @@
 #include "Cappy.h"
 #include "NormalEnemyWild.h"
 #include "Dekabu.h"
-#include "Parsing_Utils.h"
+#include "Bouncy.h"
+#include "RabbitEnemy.h"
 
 NS_BEGIN(Client)
 
@@ -63,6 +65,16 @@ namespace
 		return CDekabu::Create(pDevice, pContext);
 	}
 
+	CGameObject* Create_BouncyPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CBouncy::Create(pDevice, pContext);
+	}
+
+	CGameObject* Create_RabbitEnemyPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CRabbitEnemy::Create(pDevice, pContext);
+	}
+
 	static const LD_MONSTER_CATALOG g_MonsterCatalog[] =
 	{
 			{ L"BladeKnight",		CBladeKnight::PROTOTYPE_TAG,		&Create_BladeKnightPrototype },
@@ -73,6 +85,10 @@ namespace
 			{ L"Cappy",				CCappy::PROTOTYPE_TAG,				&Create_CappyPrototype },
 			{ L"NormalEnemyWild",	CNormalEnemyWild::PROTOTYPE_TAG,	&Create_NormalEnemyWildPrototype, L"NormalEnemy"},
 			{ L"Dekabu",			CDekabu::PROTOTYPE_TAG,				&Create_DekabuPrototype},
+			{ L"Bouncy",			CBouncy::PROTOTYPE_TAG,				&Create_BouncyPrototype},
+			{ L"Scarfy",			CBrontoBurt::PROTOTYPE_TAG,			&Create_BrontoBurtPrototype },
+			{ L"RabbitEnemy",		CRabbitEnemy::PROTOTYPE_TAG,		&Create_RabbitEnemyPrototype },
+			//{ L"NormalEnemy",		CNormalEnemy::PROTOTYPE_TAG,		&Create_NormalEnemyPrototype },
 	};
 }
 

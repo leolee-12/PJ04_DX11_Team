@@ -100,77 +100,29 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring">
       <UniqueIdentifier>{c9f6dfc2-48b9-4927-8563-c108eb1ab4de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect">
-      <UniqueIdentifier>{e4898539-8c43-4e25-9225-88d7fe38505a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. BoostGas">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\07. BoostGas">
       <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
-      <UniqueIdentifier>{485a73df-26e0-4a27-a49d-295d417d941b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\10. CommonHit">
-      <UniqueIdentifier>{5724edbd-da90-41e3-8da0-0abb4bf70071}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\11. SpitObject">
-      <UniqueIdentifier>{67c8b5ca-3d52-4622-a89d-948c3a95df05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect">
-      <UniqueIdentifier>{a77db0a5-c085-47bb-ae9c-91fba3cf6b27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
-      <UniqueIdentifier>{9a60cf97-d070-41ab-b46a-36ea78ff4834}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura">
-      <UniqueIdentifier>{34e8c8a7-dd40-4972-a48a-81234410bfab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\EssenceAura">
-      <UniqueIdentifier>{97a43dad-cc91-46a7-82f3-88e81c2782ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. Env">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. Env">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. Env\Split">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. Env\Split">
       <UniqueIdentifier>{6fc60edd-b034-4d2e-b974-b555d698dd72}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. SmokeCollection">
       <UniqueIdentifier>{b61bc410-72bb-4bf3-a7d8-705301a4aee9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail">
       <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. CarLanding">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\11. CarLanding">
       <UniqueIdentifier>{b817f195-327b-4c7f-957f-56e368b950d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\12. BombHitAim">
       <UniqueIdentifier>{b8bb5558-323f-41ac-b336-122a065fc73b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. BombAimDot">
       <UniqueIdentifier>{4d6324c8-1634-4bd9-9325-d8d4db88a743}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect">
-      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight">
-      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail">
-      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK">
-      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared">
-      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke">
-      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect">
-      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect">
-      <UniqueIdentifier>{6ae61bed-b980-4de6-ba9b-8c5c5c37d3c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\96. SmokeSphereOriginalEmitter">
       <UniqueIdentifier>{9d0fc513-6eee-432b-8b54-b472bfb1fc04}</UniqueIdentifier>
@@ -315,6 +267,93 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter">
       <UniqueIdentifier>{ceb4bc6d-b69e-4301-84d7-c4155c360871}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect">
+      <UniqueIdentifier>{784f4915-c24f-4690-b478-5ff7c46d6089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container">
+      <UniqueIdentifier>{0fbbd97b-95d2-4719-9e61-0cce3d5e3101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\00. SpitObject">
+      <UniqueIdentifier>{67c8b5ca-3d52-4622-a89d-948c3a95df05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit">
+      <UniqueIdentifier>{5724edbd-da90-41e3-8da0-0abb4bf70071}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\02. BombExplosion">
+      <UniqueIdentifier>{485a73df-26e0-4a27-a49d-295d417d941b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\03. DespawnEffect">
+      <UniqueIdentifier>{e4898539-8c43-4e25-9225-88d7fe38505a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\04. BombFuseEffect">
+      <UniqueIdentifier>{a77db0a5-c085-47bb-ae9c-91fba3cf6b27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\05. AbilityBubbleEffect">
+      <UniqueIdentifier>{9a60cf97-d070-41ab-b46a-36ea78ff4834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\05. AbilityBubbleEffect\BubbleAura">
+      <UniqueIdentifier>{34e8c8a7-dd40-4972-a48a-81234410bfab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\05. AbilityBubbleEffect\EssenceAura">
+      <UniqueIdentifier>{97a43dad-cc91-46a7-82f3-88e81c2782ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect">
+      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight">
+      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail">
+      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK">
+      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu">
+      <UniqueIdentifier>{d0d182b5-faf2-4937-a252-3cbfefbaf77e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\MoveSmoke">
+      <UniqueIdentifier>{94d8ccce-348f-455a-8fd6-f31fb63bb339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpIn">
+      <UniqueIdentifier>{db35b461-d7c5-4499-9550-c02163de7a05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut">
+      <UniqueIdentifier>{2de7be80-f2e2-4b8e-b8a9-b3f8685376d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy">
+      <UniqueIdentifier>{ef83fc79-86ca-4d01-a53e-3135ff41ea5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaCatch">
+      <UniqueIdentifier>{44c03455-7491-4b5e-b3a1-6de697292c0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaUp">
+      <UniqueIdentifier>{e36ed791-3012-49fb-afa0-1a6ef8cd6ff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared">
+      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\00. LaunchSmoke">
+      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\01. LandingSmoke">
+      <UniqueIdentifier>{42c52aba-75bf-4cab-ae2f-1a2323e51718}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\02. SwordHitEffect">
+      <UniqueIdentifier>{15a3e125-edcf-4742-96e1-d40ff661c54f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\07. PickUpEffect">
+      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\08. DropStarEffect">
+      <UniqueIdentifier>{6ae61bed-b980-4de6-ba9b-8c5c5c37d3c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect">
+      <UniqueIdentifier>{1c50b743-da4b-4840-be0b-ed12450b89df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect\CageGlowEffect">
+      <UniqueIdentifier>{732f78e3-2105-4db3-b1a1-b91ef2c7f0a4}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
@@ -697,6 +736,9 @@
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State">
       <UniqueIdentifier>{b14e5d4b-e541-461c-bc37-5e4e4711bb0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Chase">
+      <UniqueIdentifier>{1954345d-e00a-4689-af87-ee213970f404}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Idle">
       <UniqueIdentifier>{7d169597-3af1-47c4-8cec-1155bc9970ce}</UniqueIdentifier>
     </Filter>
@@ -742,8 +784,17 @@
     <Filter Include="00. GameObject\06. Monster\10. Bouncy\Parts">
       <UniqueIdentifier>{50db9364-75dc-4714-98b3-42178479ba94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\Parts\Body">
+      <UniqueIdentifier>{94640ab5-874e-4a13-b319-4cca217ad783}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\10. Bouncy\State">
       <UniqueIdentifier>{412fdb9c-38a7-4181-ba8a-c181f1feaddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\State\Fall">
+      <UniqueIdentifier>{4ad27578-dd52-4213-a6e3-54b8efe4095f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\State\Idle">
+      <UniqueIdentifier>{ee79ffa2-fc91-4e18-8fce-349a467ebc8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\11. Scarfy">
       <UniqueIdentifier>{94e610fe-842e-4cb8-8ab7-8cfc18f75c05}</UniqueIdentifier>
@@ -780,6 +831,9 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy\State">
       <UniqueIdentifier>{1e642da8-508c-4050-a06e-0488b1efa3c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy\State\Jump">
+      <UniqueIdentifier>{f7b5b92a-afae-4cf4-b695-600eeed4b1f2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29">
       <UniqueIdentifier>{718a3379-8dbd-482d-bfdf-c467b909a130}</UniqueIdentifier>
@@ -1258,6 +1312,9 @@
     <Filter Include="01. Projectile\00. PhysicsProjectile\02. KoKabu">
       <UniqueIdentifier>{bd02d882-8d9d-4bb9-acde-f8024bf59fc0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\03.">
+      <UniqueIdentifier>{da473f75-77ec-480a-b2ed-18e3035027aa}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
     </Filter>
@@ -1417,19 +1474,19 @@
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BombAimDot.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. BombAimDot</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BombExplosion.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\02. BombExplosion</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BombFuseEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\04. BombFuseEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BombHitAim.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombHitAim</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BoostGas.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Boss.h">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -1488,8 +1545,23 @@
     <ClInclude Include="..\public\BossNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Bouncy.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_Body.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_Brain.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_State_Fall.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Fall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_State_Idle.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Idle</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BreakWallEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
@@ -1499,6 +1571,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt_Brain.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_State_Chase.h">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Chase</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt_State_Idle.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Idle</Filter>
@@ -1513,7 +1588,7 @@
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BubbleAura.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\05. AbilityBubbleEffect\BubbleAura</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BubbleMovement.h">
       <Filter>02. Component\02. BubbleMovement</Filter>
@@ -1573,7 +1648,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\98. Car_00_MilkyWay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CarLanding.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. CarLanding</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\11. CarLanding</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -1606,7 +1681,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CommonHit.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. CommonHit</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CutsceneActor.h">
       <Filter>00. GameObject\08. CutsceneActor</Filter>
@@ -1639,7 +1714,7 @@
       <Filter>00. GameObject\06. Monster\09. Dekabu\State\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DespawnEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\03. DespawnEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Dialogue_Arranger.h">
       <Filter>03. SystemObject\Dialogue Arranger</Filter>
@@ -1663,7 +1738,7 @@
       <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DropStarEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\08. DropStarEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
@@ -1720,7 +1795,7 @@
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EssenceAura.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\EssenceAura</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\05. AbilityBubbleEffect\EssenceAura</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EssenceBubble.h">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
@@ -1729,7 +1804,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\18. EssenceCrown</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FlowerPetals.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameContent_AnimEvents.h">
       <Filter>99. Defines</Filter>
@@ -1798,7 +1873,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ItemEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kabu.h">
       <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
@@ -1817,6 +1892,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kabu_State_WarpOut.h">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KasaCatchEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaCatch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KasaUpEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaUp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>00. GameObject\05. Kirby</Filter>
@@ -1969,7 +2050,7 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordTrail.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -1983,8 +2064,11 @@
     <ClInclude Include="..\Public\KoKabu.h">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LandingSmoke.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\01. LandingSmoke</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LaunchSmoke.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_ArrowBoard.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
@@ -2029,7 +2113,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LensFlare.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LeoJump_Smoke.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump</Filter>
@@ -2280,6 +2364,9 @@
     <ClInclude Include="..\Public\Movement_Child.h">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MoveSmoke.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\MoveSmoke</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\MultiHitBoxPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClInclude>
@@ -2320,7 +2407,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PickUpEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\07. PickUpEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PoppyBrosJr.h">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr</Filter>
@@ -2360,6 +2447,18 @@
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Partner.h">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy_Body.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy_Brain.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy_State_Jump.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\State\Jump</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RailRideable.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
@@ -2413,7 +2512,7 @@
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeCollection.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\09. SmokeCollection</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeEmitter.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter</Filter>
@@ -2449,22 +2548,22 @@
       <Filter>01. Projectile\01. Kirby_Spit</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SpitObject.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\00. SpitObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Bush.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Coaster.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Cylinder.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Starblock.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Stone.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Spotlight_Rig.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
@@ -2496,14 +2595,17 @@
     <ClInclude Include="..\Public\SwordChargeEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SwordHitEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\SwordSlash1.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordTrail_BK.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
@@ -2631,6 +2733,12 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\WarpInEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpIn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WarpOutEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2682,19 +2790,19 @@
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombAimDot.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. BombAimDot</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombExplosion.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\02. BombExplosion</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombFuseEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\04. BombFuseEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombHitAim.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombHitAim</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Boss.cpp">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -2753,8 +2861,23 @@
     <ClCompile Include="..\private\BossNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Bouncy.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_State_Fall.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Fall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_State_Idle.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Idle</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\BreakWallEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
@@ -2764,6 +2887,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt_Brain.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_State_Chase.cpp">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Chase</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Idle</Filter>
@@ -2778,7 +2904,7 @@
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BubbleAura.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\05. AbilityBubbleEffect\BubbleAura</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BubbleMovement.cpp">
       <Filter>02. Component\02. BubbleMovement</Filter>
@@ -2838,7 +2964,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\98. Car_00_MilkyWay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CarLanding.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. CarLanding</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\11. CarLanding</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -2868,7 +2994,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CommonHit.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. CommonHit</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CutsceneActor.cpp">
       <Filter>00. GameObject\08. CutsceneActor</Filter>
@@ -2895,7 +3021,7 @@
       <Filter>00. GameObject\06. Monster\09. Dekabu\State\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DespawnEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\03. DespawnEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Dialogue_Arranger.cpp">
       <Filter>03. SystemObject\Dialogue Arranger</Filter>
@@ -2916,7 +3042,7 @@
       <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DropStarEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\08. DropStarEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
@@ -2967,7 +3093,7 @@
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EssenceAura.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\EssenceAura</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\05. AbilityBubbleEffect\EssenceAura</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EssenceBubble.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
@@ -2976,7 +3102,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\18. EssenceCrown</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FlowerPetals.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\GameContent_Log.cpp">
       <Filter>99. Defines</Filter>
@@ -3024,7 +3150,7 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ItemEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kabu.cpp">
       <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
@@ -3043,6 +3169,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KasaCatchEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaCatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KasaUpEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaUp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>00. GameObject\05. Kirby</Filter>
@@ -3186,7 +3318,7 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -3200,8 +3332,11 @@
     <ClCompile Include="..\Private\KoKabu.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LandingSmoke.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\01. LandingSmoke</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LaunchSmoke.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
@@ -3246,7 +3381,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LensFlare.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LeoJump_Smoke.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Jump</Filter>
@@ -3476,6 +3611,9 @@
     <ClCompile Include="..\Private\Movement_Child.cpp">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\MoveSmoke.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\MoveSmoke</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\MultiHitBoxPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClCompile>
@@ -3513,7 +3651,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PickUpEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\07. PickUpEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PoppyBrosJr.cpp">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr</Filter>
@@ -3553,6 +3691,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Partner.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy_State_Jump.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\State\Jump</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
@@ -3597,7 +3747,7 @@
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeCollection.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\09. SmokeCollection</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeEmitter.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter</Filter>
@@ -3633,22 +3783,22 @@
       <Filter>01. Projectile\01. Kirby_Spit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SpitObject.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\00. SpitObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Bush.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Coaster.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Cylinder.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Starblock.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Stone.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Spotlight_Rig.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
@@ -3680,14 +3830,17 @@
     <ClCompile Include="..\Private\SwordChargeEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SwordHitEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\SwordSlash1.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordTrail_BK.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
@@ -3803,6 +3956,12 @@
     <ClCompile Include="..\Private\WalkSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\WarpInEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpIn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WarpOutEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
+    </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
@@ -3828,6 +3987,9 @@
     </None>
     <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
@@ -3867,9 +4029,6 @@
     </None>
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
-      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
   </ItemGroup>
 </Project>

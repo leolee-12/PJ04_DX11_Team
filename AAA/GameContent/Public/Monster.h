@@ -116,6 +116,7 @@ public:
 	void						Stop_ActionLoopSFX();
 	void						Stop_AllFx(_bool bImmediate);
 	void						Start_LaunchSmokeFx();
+	void						Play_LandingSmokeFx();
 	void						Stop_LaunchSmokeFx(_bool bImmediate = false);
 	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
 	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
@@ -204,7 +205,10 @@ protected:
 	_bool						Handle_SoundAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 	_bool						Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
-	virtual const _float4x4*	Get_FxParentMatrix(const _wstring& strFx) const { return nullptr; }
+	virtual const _float4x4*	Get_FxParentMatrix(const _wstring& strFx) const
+	{
+		return m_pTransformCom->Get_WorldMatrixPtr();
+	}
 
 	void						Play_DeathFX();
 	void						Compute_SpatPivot();

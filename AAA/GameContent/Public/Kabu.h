@@ -32,6 +32,7 @@ protected:
     virtual HRESULT         Initialize(void* pArg) override;
 
 public:
+    virtual void            Update(_float fTimeDelta) override;
     virtual void            Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
     {
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
@@ -63,9 +64,13 @@ protected:
 private:
     HRESULT                 Ready_PartObjects();
     virtual void            On_Deserialized() override;
+    void                    Update_MoveSmokeSocket();
+    void                    Update_MoveSmokeFx();
+    void                    Stop_MoveSmokeFx(_bool bImmediate);
 
 private:
     CKabu_Body*             m_pBody = { nullptr };
+    _float4x4               m_matMoveSmokeSocket = {};
 
     _bool                   m_bVisible = { false };         // 워프 중일 때 안보이게 하기 위함
 

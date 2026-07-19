@@ -144,6 +144,34 @@ _bool CMonster_Movement::Update_JumpArc(_float fTimeDelta)
 	return false;
 }
 
+_bool CMonster_Movement::Fly_Toward(_fvector vTarget, _float fSpeed, _float fTimeDelta, _float fArriveDist)
+{
+	if (nullptr == m_pController || nullptr == m_pTransform)
+		return true;
+
+	_vector vSelf = m_pTransform->Get_State(STATE::POSITION);
+	_vector vTo = XMVectorSubtract(vTarget, vSelf);
+	_float fDist = XMVectorGetX(XMVector3Length(vTo));
+	if (fDist <= fArriveDist)
+		return true;
+
+	_float fStep = min(fSpeed * fTimeDelta, fDist);
+	_vector vDisp = XMVector3Normalize(vTo) * fStep;
+
+	physx::PxControllerFilters filters;
+	filters.mFilterFlags = physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
+	filters.mCCTFilterCallback = &Engine::Get_CCTFilter();
+	m_pController->move(
+		physx::PxVec3(XMVectorGetX(vDisp), XMVectorGetY(vDisp), XMVectorGetZ(vDisp)),
+		0.001f, fTimeDelta, filters);
+
+	const physx::PxExtendedVec3& foot = m_pController->getFootPosition();
+	m_pTransform->Set_State(STATE::POSITION,
+		XMVectorSet((_float)foot.x, (_float)foot.y, (_float)foot.z, 1.f));
+
+	return false;
+}
+
 _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 {
 	if (nullptr == m_pTransform || nullptr == m_pController)
@@ -252,7 +280,7 @@ void CMonster_Movement::Apply_Facing(_fvector vFaceDir, _float fTimeDelta)
 
 void CMonster_Movement::Calc_Vertical(_float fTimeDelta)
 {
-	if (!m_bGravityEnabled)
+	if (!m_bGravityEnabled && !m_bLaunched)
 	{
 		m_fVerticalVelocity = 0.f;
 		return;
