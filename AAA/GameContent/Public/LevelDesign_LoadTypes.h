@@ -165,6 +165,15 @@ struct LD_AUDIO_AREA_DESC
 };
 #pragma endregion
 
+#pragma region SurfaceArea
+struct LD_SURFACE_AREA_DESC : public LD_OBJECT_DESC
+{
+	_uint           iModelProtoLevel = {};
+	MODEL           eModelType = MODEL::NONANIM;
+	_wstring        wstrModelProtoTag;
+};
+#pragma endregion
+
 struct LD_VOLUME_DESC
 {
 	_float3 vAreaCenter = {};
@@ -217,7 +226,17 @@ struct LD_PARSED_OBJECT : public LD_OBJECT_DESC
 	LD_EFFECT_AREA_DESC EffectArea;
 };
 
-using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_DESC, LD_EVENTOBJECT_DESC, LD_FOOD_DESC, LD_POINT_DESC, LD_BUSH_DESC, LD_DEFORMOBJECT_DESC>;
+using LD_OBJECT_ENTRY = variant<
+	LD_PARSED_OBJECT
+	, LD_BREAKABLE_DESC
+	, LD_LADDER_DESC
+	, LD_EVENTOBJECT_DESC
+	, LD_FOOD_DESC
+	, LD_POINT_DESC
+	, LD_BUSH_DESC
+	, LD_DEFORMOBJECT_DESC
+	, LD_SURFACE_AREA_DESC
+>;
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)
 {

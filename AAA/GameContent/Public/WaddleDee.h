@@ -83,7 +83,7 @@ private:
 	CGameObject* m_pPlayer = { nullptr };
 
 public:
-	static _wstring Resolve_FixedAnim(const _wstring& strVariation);
+	static _wstring Resolve_FixedAnim(const _wstring& strVariation, _uint iSeed = 0u);
 	static CWaddleDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
