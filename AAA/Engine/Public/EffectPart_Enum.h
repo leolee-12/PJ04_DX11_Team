@@ -53,6 +53,7 @@ namespace Engine
 		{
 			{ 0, L"Default" },
 			{ 1, L"Ignore" },
+			{ 2, L"Ignore + Stencil Mask" },
 		};
 
 		return Items;

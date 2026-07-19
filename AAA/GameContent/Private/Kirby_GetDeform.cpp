@@ -161,6 +161,12 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         {
             m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_GetAbility.wav", 0.2f);
 
+            CTransform* pTransform = pKirby->Get_Transform();
+            _float3 vKirbyPos{};
+            XMStoreFloat3(&vKirbyPos, pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 4.f, 0.f, 0.f));
+            CEffect_Loader::GetInstance()->Spawn(L"GetDeformEffect", pKirby->Get_LevelIndex(),
+                vKirbyPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), nullptr);
+
             CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
             pDeformModel_Demo->Set_Active(false);
 
