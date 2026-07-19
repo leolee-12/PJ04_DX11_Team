@@ -34,7 +34,6 @@ void CKirby_GetAbility::Enter(CKirby* pKirby, _int iFlag)
     pKirby->Set_AbilityPartsActive(pPreAbility->Get_AbilityType(), false);
     pKirby->Apply_ChangeKirbyAbility();
 
-
     CKirby_Ability* pNewAbility = pKirby->Get_KirbyAbility();
     pNewAbility->Clear_Overlay(pKirby, 1, 0.1f);
     if (iFlag == GETABILITY_STATE_FLAG::ESSENCE)
@@ -82,7 +81,12 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
     Parts_On(pKirby, fRatio);
 
     if(pAnimator->Is_Finished() == true)
-        Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
+    {
+        if(pKirby->Get_ActiveAttackMode()->Should_ForceEnterAttackState())
+            pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+        else
+            Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
+    }
 }
 
 void CKirby_GetAbility::Exit(CKirby* pKirby)
