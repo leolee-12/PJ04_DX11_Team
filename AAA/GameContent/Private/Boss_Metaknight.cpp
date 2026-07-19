@@ -1,0 +1,274 @@
+#include "Boss_Metaknight.h"
+#include "GameInstance.h"
+#include "Monster_Movement.h"
+#include "Boss_Metaknight_Brain.h"
+#include "Boss_Metaknight_Body.h"
+#include "Boss_Metaknight_ReplicaSword.h"
+#include "Boss_Metaknight_Sword.h"
+#include "Boss_Metaknight_Mant.h"
+
+const vector<_float> CBoss_Metaknight::s_Thresholds = {};
+
+CBoss_Metaknight::CBoss_Metaknight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CBoss(pDevice, pContext) {
+}
+CBoss_Metaknight::CBoss_Metaknight(const CBoss_Metaknight& Prototype)
+    : CBoss(Prototype) {
+}
+
+HRESULT CBoss_Metaknight::Initialize_Prototype()
+{
+    return S_OK;
+}
+
+HRESULT CBoss_Metaknight::Initialize(void* pArg)
+{
+    if (FAILED(__super::Initialize(pArg)))
+        return E_FAIL;
+
+    m_strBossName = L"메타나이트";
+    m_fMaxHP = 100.f;
+    m_fCurHP = m_fMaxHP;
+
+    m_pTransformCom->Set_Scale(1.3f, 1.3f, 1.3f);
+
+    m_pMovement->Set_MoveSpeed(6.f);
+    m_pMovement->Set_RotSpeed(240.f);
+    m_pMovement->Set_Acceleration(10000.f, 10000.f);
+
+    m_pBody->Get_Animator()->Play("Wait", true, false, 0.f, 1.f);
+
+    return S_OK;
+}
+
+void CBoss_Metaknight::Update(_float fTimeDelta)
+{
+#ifdef _DEBUG
+    if (m_pGameInstance_Proxy->Is_EditMode())
+    {
+        if (m_pMovement) m_pMovement->Sync_To_Controller();
+        return;
+    }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_0))
+        Appear();
+#endif
+    __super::Update(fTimeDelta);
+}
+
+void CBoss_Metaknight::Late_Update(_float fTimeDelta)
+{
+    __super::Late_Update(fTimeDelta);
+}
+
+CMonsterBrain* CBoss_Metaknight::Create_Brain()
+{
+    return CBoss_Metaknight_Brain::Create(this);
+}
+
+void CBoss_Metaknight::Play_Intro()
+{
+    if (s_bSkipIntro)
+    {
+        if (CAnimator* pAnim = Get_BodyAnimator())
+            pAnim->Play("Wait", true, true, 0.f, s_fDefaultAnimSpeed);
+        return;
+    }
+
+    static constexpr const _char* INTRO_CUTS[] = {
+        "DemoAppearCut1", "DemoAppearCut2", "DemoAppearCut3", "DemoAppearCut4", "DemoAppearCut5",
+    };
+
+    CAnimator* pBodyAnim = Get_BodyAnimator();
+    CAnimator* pMantAnim = (m_pMant && m_pMant->Is_Active()) ? m_pMant->Get_Animator() : nullptr;
+    if (!pBodyAnim) return;
+
+    pBodyAnim->Play(INTRO_CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
+    if (pMantAnim) pMantAnim->Play(INTRO_CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
+
+    for (_uint i = 1; i < _countof(INTRO_CUTS); ++i)
+    {
+        CAnimator::ANI_PLAY_INFO tInfo{};
+        tInfo.strAniName = INTRO_CUTS[i];
+        tInfo.bLoop = false;
+        tInfo.bRestart = true;
+        tInfo.fBlend = 0.f;
+        tInfo.fSpeed = s_fDefaultAnimSpeed;
+
+        pBodyAnim->Enqueue(tInfo);
+        if (pMantAnim) pMantAnim->Enqueue(tInfo);
+    }
+
+    m_pController->Set_Solid(false);
+
+    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+
+    BOSSCAM_CONFIG_DESC cfg{};
+    cfg.fAimHeight = 2.6f;
+    cfg.fShoulderOffset = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::BossCam_Config, &cfg);
+}
+
+_bool CBoss_Metaknight::Is_Intro_Finished() const
+{
+    if (s_bSkipIntro)
+        return true;
+
+    CAnimator* pAnim = Get_BodyAnimator();
+    return pAnim ? pAnim->Is_Finished() : true;
+}
+
+void CBoss_Metaknight::On_Intro_End()
+{
+    Show_Mant(false);
+}
+
+void CBoss_Metaknight::Play_Death()
+{
+    Enable_Colliders(false);
+    if (auto* p = Get_HitBoxPart())
+        p->Enable_AllHitBoxes(false);
+
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Play("DeathLanding", false, true, 0.f, 1.f);
+}
+
+_bool CBoss_Metaknight::Is_Death_Finished() const
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    return pAnim ? pAnim->Is_Finished() : true;
+}
+
+void CBoss_Metaknight::On_Enter_Corpse()
+{
+    __super::On_Enter_Corpse();
+
+    m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
+
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Area;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+_bool CBoss_Metaknight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
+{
+    Out.fRadius = s_fCCT_Radius + 0.1f;
+    Out.fHeight = s_fCCT_Height + 0.1f;
+    return true;
+}
+
+CAnimator* CBoss_Metaknight::Get_BodyAnimator() const
+{
+    return m_pBody ? m_pBody->Get_Animator() : nullptr;
+}
+
+CMultiHitBoxPart* CBoss_Metaknight::Get_HitBoxPart() const
+{
+    return m_pBody;
+}
+
+HRESULT CBoss_Metaknight::Ready_AnimEvents()
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) return E_FAIL;
+
+    pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
+        if (Handle_SoundAnimEvent(e, phase))
+            return;
+        if (Handle_FxAnimEvent(e, phase))
+            return;
+        });
+    return S_OK;
+}
+
+HRESULT CBoss_Metaknight::Ready_PartObjects()
+{
+    m_pBody = Add_MonsterPart<CBoss_Metaknight_Body>(
+        CBoss_Metaknight_Body::PROTOTYPE_TAG, CBoss_Metaknight_Body::PART_TAG);
+    if (!m_pBody) return E_FAIL;
+
+    m_pSword = Add_MonsterPart<CBoss_Metaknight_Sword>(
+        CBoss_Metaknight_Sword::PROTOTYPE_TAG, CBoss_Metaknight_Sword::PART_TAG,
+        m_pBody->Get_BoneMatrixPtr("RHaveL"));
+    if (!m_pSword) return E_FAIL;
+
+    m_pReplica = Add_MonsterPart<CBoss_Metaknight_ReplicaSword>(
+        CBoss_Metaknight_ReplicaSword::PROTOTYPE_TAG, CBoss_Metaknight_ReplicaSword::PART_TAG,
+        m_pBody->Get_BoneMatrixPtr("RHaveL"));
+    if (!m_pReplica) return E_FAIL;
+
+    m_pMant = Add_MonsterPart<CBoss_Metaknight_Mant>(
+        CBoss_Metaknight_Mant::PROTOTYPE_TAG, CBoss_Metaknight_Mant::PART_TAG);
+    if (!m_pMant) return E_FAIL;
+
+    constexpr _float fMantBakedScale = 1.f / 1.3f;
+    m_pMant->Get_Transform()->Set_Scale(fMantBakedScale, fMantBakedScale, fMantBakedScale);
+
+    Set_ActiveSword(EMK_SWORD::GALAXIA);
+
+    return S_OK;
+}
+
+const _float4x4* CBoss_Metaknight::Get_FxParentMatrix(const _wstring& strFx) const
+{
+    return m_pTransformCom->Get_WorldMatrixPtr();
+}
+
+void CBoss_Metaknight::Set_ActiveSword(EMK_SWORD eSword)
+{
+    m_eActiveSword = eSword;
+
+    if (m_pSword)
+        m_pSword->Set_Drawn(eSword == EMK_SWORD::GALAXIA);
+    if (m_pReplica)
+        m_pReplica->Set_Drawn(eSword == EMK_SWORD::REPLICA);
+}
+
+void CBoss_Metaknight::Enable_SwordHit(_bool bOn)
+{
+    switch (m_eActiveSword)
+    {
+        case EMK_SWORD::GALAXIA: if (m_pSword)   m_pSword->Set_HitBox(bOn);   break;
+        case EMK_SWORD::REPLICA: if (m_pReplica) m_pReplica->Set_HitBox(bOn); break;
+        default: break;
+    }
+}
+
+void CBoss_Metaknight::Show_Mant(_bool bOn)
+{
+    if (m_pMant)
+        m_pMant->Set_Active(bOn);
+}
+
+void CBoss_Metaknight::Play_MantSync(const _char* szClip, _bool bLoop, _float fBland, _float fSpeed)
+{
+    if (m_pMant && m_pMant->Is_Active())
+        m_pMant->Get_Animator()->Play(szClip, bLoop, true, fBland, fSpeed);
+}
+
+CBoss_Metaknight* CBoss_Metaknight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+    CBoss_Metaknight* pInstance = new CBoss_Metaknight(pDevice, pContext);
+    if (FAILED(pInstance->Initialize_Prototype()))
+    {
+        MSG_BOX("Failed to Created : CBoss_Metaknight");
+        Safe_Release(pInstance);
+    }
+    return pInstance;
+}
+
+CBoss_Metaknight* CBoss_Metaknight::Clone(void* pArg)
+{
+    CBoss_Metaknight* pInstance = new CBoss_Metaknight(*this);
+    if (FAILED(pInstance->Initialize(pArg)))
+    {
+        MSG_BOX("Failed to Cloned : CBoss_Metaknight");
+        Safe_Release(pInstance);
+    }
+    return pInstance;
+}
+
+void CBoss_Metaknight::Free()
+{
+    __super::Free();
+}

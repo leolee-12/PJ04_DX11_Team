@@ -186,6 +186,12 @@
 #include "Boss_Leopard_Body.h"
 #include "Projectile_Nail.h"
 
+#include "Boss_Metaknight.h"
+#include "Boss_Metaknight_Body.h"
+#include "Boss_Metaknight_Sword.h"
+#include "Boss_Metaknight_ReplicaSword.h"
+#include "Boss_Metaknight_Mant.h"
+
 //Boss Effect
 #include "Armadillo_RutA.h"
 #include "Armadillo_RutB.h"
@@ -1473,6 +1479,33 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
                 CBoss_Gorilla_Body::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Metaknight::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Metaknight),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Body/Model_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Body::PROTOTYPE_TAG, CBoss_Metaknight_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Sword::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Sword/Sword.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Sword::PROTOTYPE_TAG,
+                CBoss_Metaknight_Sword::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_ReplicaSword::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/ReplicaSword/ReplicaSword.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_ReplicaSword::PROTOTYPE_TAG,
+                CBoss_Metaknight_ReplicaSword::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Mant/Mant_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::PROTOTYPE_TAG,
+                CBoss_Metaknight_Mant::Create(pDevice, pContext));
         )
     );
 }

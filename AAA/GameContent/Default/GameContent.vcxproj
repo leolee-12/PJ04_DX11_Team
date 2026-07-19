@@ -34,6 +34,11 @@
     <ClInclude Include="..\public\Boss_Leopard.h" />
     <ClInclude Include="..\public\Boss_Leopard_Body.h" />
     <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
+    <ClInclude Include="..\public\Boss_Metaknight.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Brain.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Mant.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
@@ -57,6 +62,7 @@
     <ClInclude Include="..\public\Leopard_Impact.h" />
     <ClInclude Include="..\public\Leopard_Meteo.h" />
     <ClInclude Include="..\public\Leopard_Slash.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Body.h" />
     <ClInclude Include="..\public\Nail_Smoke.h" />
     <ClInclude Include="..\public\Nail_Trail.h" />
     <ClInclude Include="..\Public\LD_LensFlare.h" />
@@ -460,6 +466,11 @@
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Mant.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />
@@ -482,6 +493,7 @@
     <ClCompile Include="..\private\Leopard_Impact.cpp" />
     <ClCompile Include="..\private\Leopard_Meteo.cpp" />
     <ClCompile Include="..\private\Leopard_Slash.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Body.cpp" />
     <ClCompile Include="..\private\Nail_Smoke.cpp" />
     <ClCompile Include="..\private\Nail_Trail.cpp" />
     <ClCompile Include="..\Private\LD_LensFlare.cpp" />
@@ -918,6 +930,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_Metaknight.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
