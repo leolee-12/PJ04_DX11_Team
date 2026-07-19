@@ -221,6 +221,9 @@ void CKirby_Deform_Cylinder::Enter_DeformCylinderState(CKirby* pKirby, DEFORM_CY
         case DEFORM_CYLINDER_STATE::CLASH:
         {
             pAnimator->Play("Clash", false, false, 0.1f, 1.5f);
+            m_fRotL_Degree = 0.f;
+            pAnimator->SetBoneRotation("RotL", m_fRotL_Degree, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Stop();
             pMovement->Set_GravityScale(0.f);
@@ -277,6 +280,7 @@ void CKirby_Deform_Cylinder::Update_DeformCylinderState(CKirby* pKirby, _float f
                 return;
             }
             Roll(pKirby, fTimeDelta);
+            Roll_RotL(pKirby, fTimeDelta);
             Update_RollState(pKirby, fTimeDelta);
             break;
         }
@@ -400,6 +404,25 @@ void CKirby_Deform_Cylinder::Roll(CKirby* pKirby, _float fTimeDelta)
     pKirby->Get_Movement()->Add_Acceleration(vLook * fRollAcceleration);
 }
 
+void CKirby_Deform_Cylinder::Roll_RotL(CKirby* pKirby, _float fTimeDelta)
+{
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    _float3 vVelocity = pMovement->Get_Velocity();
+    _vector vSpeedXZ = XMLoadFloat3(&vVelocity);
+    vSpeedXZ = XMVectorSetY(vSpeedXZ, 0.f);
+
+    _float fSpeedXZ = XMVectorGetX(XMVector3Length(vSpeedXZ));
+    if (fSpeedXZ < Helper::fEpsilon)
+        return;
+
+    constexpr _float fRotScale = 40.f;
+    m_fRotL_Degree += fSpeedXZ * fRotScale * fTimeDelta;
+    m_fRotL_Degree = fmodf(m_fRotL_Degree, 360.f);
+
+    CAnimator* pAnimator = pKirby->Get_CurrentDeformModel()->Get_Animator();
+    pAnimator->SetBoneRotation("RotL", m_fRotL_Degree, XMVectorSet(-1.f, 0.f, 0.f, 0.f));
+}
+
 void CKirby_Deform_Cylinder::Change_RollState(CKirby* pKirby, ROLL_STATE eNext)
 {
     if (m_eRollState == eNext)
@@ -468,7 +491,9 @@ void CKirby_Deform_Cylinder::Update_RollState(CKirby* pKirby, _float fTimeDelta)
 
         case ROLL_STATE::FALL:
         {
-            if (pMovement->Is_Grounded())
+            if (m_bTryJump && pMovement->Try_Jump(fJumpSpeed))
+                Change_RollState(pKirby, ROLL_STATE::JUMP);
+            else if (pMovement->Is_Grounded())
                 Change_RollState(pKirby, ROLL_STATE::LANDING);
             break;
         }

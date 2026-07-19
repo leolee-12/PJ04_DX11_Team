@@ -171,6 +171,8 @@ public:
 	void Set_TriggerDeformObj(IDeformable* pTriggerDeformObj) { m_pTriggerDeformObj = pTriggerDeformObj; }
 	_bool IsTriggerDeformObj() { return m_pTriggerDeformObj != nullptr; }
 
+
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();

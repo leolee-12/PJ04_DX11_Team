@@ -73,6 +73,7 @@ private:
 
 	void Rot_MoveDir(CKirby* pKirby, _float fTimeDelta);
 	void Roll(CKirby* pKirby, _float fTimeDelta);
+	void Roll_RotL(CKirby* pKirby, _float fTimeDelta);
 
 private:
 	void Change_RollState(CKirby* pKirby, ROLL_STATE eNext);
@@ -87,6 +88,7 @@ private:
 private:
 	ROLL_STATE m_eRollState{};
 	_bool m_bTryJump{};
+	_float m_fRotL_Degree{};
 
 public:
 	static CKirby_Deform_Cylinder* Create();

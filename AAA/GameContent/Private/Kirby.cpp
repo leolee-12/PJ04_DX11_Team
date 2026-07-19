@@ -1004,6 +1004,7 @@ HRESULT CKirby::SetUp_Collider_Callback()
         }
     );
 
+#pragma region Breakable HitBox
     m_KirbyColliders[BREAKERABLE_HITBOX]->Set_OnEnter(
         [this](CCollider* pOther)
         {
@@ -1023,6 +1024,7 @@ HRESULT CKirby::SetUp_Collider_Callback()
             pMonster->Damaged(tAttackInfo);
         }
     );
+#pragma endregion
 
     Route_CollisionToState(KIRBY_COLLIDER::SLIDE_COLLIDER);
 
