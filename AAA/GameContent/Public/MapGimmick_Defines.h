@@ -32,6 +32,7 @@ struct MAP_GIMMICK_SECTION_ENTRY
 	const _tchar* pObjectTag;
 
 	COLLISION_LAYER eTriggerLayer;
+	_float			fTriggerPadding;
 
 	// CEffect_Loader에 사전 등록된 ID만 사용한다.
 	const _tchar* pBreakEffectID;
@@ -205,6 +206,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage1-2_GsDefault_4",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		0.5f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -227,6 +229,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_7",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		0.5f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -249,6 +252,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_8",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		0.5f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -271,6 +275,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_9",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		0.5f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -293,6 +298,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_10",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		0.5f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -315,6 +321,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_9",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		2.f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -337,6 +344,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_10",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		2.f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -359,6 +367,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_11",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		2.f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -381,6 +390,7 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"MapGimmickSection_Stage3-2_Land_GsAllBuilding_12",
 
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
+		2.f,
 
 		L"Split_Stone_Ultra",
 		1.f,

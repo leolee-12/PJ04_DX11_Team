@@ -315,8 +315,7 @@ HRESULT CMapGimmickSection::Ready_Trigger()
 
 	BoundingBox TriggerBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
 
-	constexpr _float fPadding = 0.5f;
-	if (!GeometryUtils::Expand_AABB(&TriggerBounds, fPadding))
+	if (!GeometryUtils::Expand_AABB(&TriggerBounds, m_pEntry->fTriggerPadding))
 		return E_FAIL;
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
