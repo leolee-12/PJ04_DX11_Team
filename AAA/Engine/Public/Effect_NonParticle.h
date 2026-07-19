@@ -66,6 +66,10 @@ class ENGINE_DLL CEffect_NonParticle abstract : public CEffect_Part
     // Rot
     PROPERTY(_float3, m_vBaseRotationDegree, L"Base Rotation_R", L"Rot");
 
+    PROPERTY(_bool, m_bRandomBaseRotation, L"Random Base Rotation_R", L"Rot");
+    PROPERTY(_float3, m_vRandomBaseRotationMin, L"Random Rotation Min_R", L"Rot");
+    PROPERTY(_float3, m_vRandomBaseRotationMax, L"Random Rotation Max_R", L"Rot");
+
     PROPERTY(_bool, m_bRotationChange,   L"Rotation Change_R",    L"Rot");
 
     PROPERTY(_float, m_fRotationDegree,  L"Rotation Degree_R",    L"Rot");
@@ -101,6 +105,8 @@ protected:
     virtual ~CEffect_NonParticle() = default;
 
 public:
+    virtual void Effect_Start() override;
+
     // Color
     void Set_Color(const _float3& vColor) { m_vColor = vColor; }
     void Set_ColorChange(_bool bColorChange) { m_bColorChange = bColorChange; }
@@ -109,6 +115,7 @@ protected:
     HRESULT Bind_ShaderValue();
 
 protected:
+    virtual void On_Deserialized() override;
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
     virtual _bool Use_LocalRotationAxis() const { return false; }
 
@@ -121,9 +128,11 @@ protected:
 
 protected:
     _float              m_fRoll{};
+    _float3             m_vResolvedBaseRotationDegree{};
 
 private:
     void Init_PropertyValue();
+    void Resolve_BaseRotation();
 };
 
 NS_END
