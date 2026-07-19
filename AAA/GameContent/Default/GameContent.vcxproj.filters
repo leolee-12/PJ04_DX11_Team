@@ -502,6 +502,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice">
       <UniqueIdentifier>{91d84220-16da-4a06-882e-ad195ee2cc42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep">
+      <UniqueIdentifier>{b5c6a7d8-e9f0-4a1b-8c2d-3e4f5a6b7c8d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform">
       <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
     </Filter>
@@ -546,6 +549,9 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat">
       <UniqueIdentifier>{109bd620-9956-4e72-8af9-dfbd48ee4c64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\04. SleepHat">
+      <UniqueIdentifier>{c6d7e8f9-a0b1-4c2d-9e3f-4a5b6c7d8e9f}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
@@ -1941,6 +1947,9 @@
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Sleep.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Normal.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClInclude>
@@ -2039,6 +2048,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_IceHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SleepHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\04. SleepHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_InputManager.h">
       <Filter>00. GameObject\05. Kirby\00. System\01. Kirby_InputManager</Filter>
@@ -3221,6 +3233,9 @@
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClCompile>
@@ -3313,6 +3328,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_IceHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SleepHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\04. SleepHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_InputManager.cpp">
       <Filter>00. GameObject\05. Kirby\00. System\01. Kirby_InputManager</Filter>

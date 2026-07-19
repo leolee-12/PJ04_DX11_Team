@@ -15,6 +15,7 @@
 #include "Kirby_Body.h"
 #include "Kirby_BombHat.h"
 #include "Kirby_IceHat.h"
+#include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -33,6 +34,7 @@
 #include "Kirby_Ability_Sword.h"
 #include "Kirby_Ability_Bomb.h"
 #include "Kirby_Ability_Ice.h"
+#include "Kirby_Ability_Sleep.h"
 
 // Deform
 #include "Kirby_Deform_Car.h"
@@ -284,8 +286,8 @@ CKirby_OnOffPart* CKirby::Find_WeaponPart(COPY_ABILITY_TYPE eType)
 {
     switch (eType)
     {
-    case COPY_ABILITY_TYPE::SWORD:
-        return Find_OnOffPart(CKirby_Sword::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::SWORD:
+            return Find_OnOffPart(CKirby_Sword::Kirby_PartTag);
     }
 
     return nullptr;
@@ -299,6 +301,8 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
             return Find_OnOffPart(CKirby_BombHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::ICE:
             return Find_OnOffPart(CKirby_IceHat::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::SLEEP:
+            return Find_OnOffPart(CKirby_SleepHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::SWORD:
             return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
     }
@@ -700,6 +704,16 @@ HRESULT CKirby::Ready_PartObjects()
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_IceHat::PROTOTYPE_TAG, CKirby_IceHat::Kirby_PartTag, &IceHatDesc)))
         return E_FAIL;
 
+    // SleepHat
+    CKirby_SleepHat::KIRBY_SLEEP_HAT_DESC SleepHatDesc{};
+    SleepHatDesc.pParentMatrix = &m_RenderWorldMatrix;
+    SleepHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    SleepHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    SleepHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SleepHat::PROTOTYPE_TAG, CKirby_SleepHat::Kirby_PartTag, &SleepHatDesc)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -736,6 +750,7 @@ HRESULT CKirby::Ready_Ability()
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))   return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::BOMB, CKirby_Ability_Bomb::Create())))     return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::ICE, CKirby_Ability_Ice::Create())))       return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SLEEP, CKirby_Ability_Sleep::Create())))   return E_FAIL;
 
     auto iter = m_Abilities.find(COPY_ABILITY_TYPE::NORMAL);
     if (iter == m_Abilities.end())
