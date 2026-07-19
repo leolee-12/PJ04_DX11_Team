@@ -42,6 +42,8 @@ namespace Client
 		DEFORM_OBJECT,
 		DROP_STAR,
 		LD_ITEM,
+		DEFORM_RELEASE_AREA,
+
 		ENV_TRIGGER = 100
 	};
 

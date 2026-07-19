@@ -13,6 +13,7 @@ class CLensFlare final : public CEffect_Container
 	PROPERTY(_float, m_fAxisSourceZ, L"Axis Source Z", L"LensFlare");
 	PROPERTY(_float, m_fAxisOppositeZ, L"Axis Opposite Z", L"LensFlare");
 	PROPERTY(_float, m_fAxisExtent, L"Axis Extent", L"LensFlare");
+	PROPERTY(_float, m_fViewDepthScale, L"View Depth Scale", L"LensFlare");
 	PROPERTY(_float, m_fScreenCullMargin, L"Screen Cull Margin", L"LensFlare");
 
 public:

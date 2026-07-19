@@ -32,6 +32,8 @@ public:
 
 #pragma region Editable
 	virtual HRESULT On_EditTransformChanged() override;
+	CLIENT_DLL void Set_EditorPreviewActive(_bool bActive);
+	CLIENT_DLL Engine::CEffect_Container* Get_EditorPreviewEffect() const;
 #pragma endregion
 
 private:
@@ -45,6 +47,7 @@ private:
 	_float4x4 m_matEffectAnchorWorld = {};
 
 	_uint m_iActivatorCount = { 0u };
+	_bool m_bEditorPreviewActive = { false };
 
 private:
 	HRESULT Ready_Components(const LD_PARSED_OBJECT& Desc);
@@ -57,6 +60,7 @@ private:
 	void Handle_TriggerEnter(CCollider* pOther);
 	void Handle_TriggerExit(CCollider* pOther);
 	_bool Is_TriggerActivator(const CCollider* pOther) const;
+	_bool Is_LensFlareRequested() const;
 
 	void Start_LensFlare();
 	void Stop_LensFlare();

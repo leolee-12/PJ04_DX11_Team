@@ -86,6 +86,16 @@ namespace
 	};
 
 	constexpr _uint s_iNormalHitAnimSetCount = static_cast<_uint>(sizeof(s_NormalHitAnimSets) / sizeof(s_NormalHitAnimSets[0]));
+	
+	constexpr const _tchar* s_ArenaBattleAnimClips[] =
+	{
+			L"Cheering1",
+			L"Cheering2",
+			L"Cheering3",
+			L"Cheering4"
+	};
+
+	constexpr _uint s_iArenaBattleAnimClipCount = static_cast<_uint>(sizeof(s_ArenaBattleAnimClips) / sizeof(s_ArenaBattleAnimClips[0]));
 
 	constexpr _float s_fRotationPerSec = 180.f;
 	constexpr _float s_fWalkTimeLimit = 6.f;
@@ -102,6 +112,7 @@ namespace
 	static_assert(s_fHurtBoxRadius > 0.f);
 	static_assert(s_fHurtBoxHeight >= 0.f);
 	static_assert(s_iNormalHitAnimSetCount > 0);
+	static_assert(s_iArenaBattleAnimClipCount > 0);
 }
 
 CWaddleDee::CWaddleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -630,8 +641,11 @@ void CWaddleDee::Update_Angry(_float fTimeDelta)
 	Change_State(WADDLEDEE_STATE::IDLE);
 }
 
-_wstring CWaddleDee::Resolve_FixedAnim(const _wstring& strVariation)
+_wstring CWaddleDee::Resolve_FixedAnim(const _wstring& strVariation, _uint iSeed)
 {
+	if (JsonUtils::Equals_NoCase(strVariation.c_str(), L"Battle"))
+		return s_ArenaBattleAnimClips[iSeed % s_iArenaBattleAnimClipCount];
+
 	for (const WADDLEDEE_VARIATION_ANIM_DESC& Desc : s_WaddleDeeVariationAnimDescs)
 	{
 		if (JsonUtils::Equals_NoCase(strVariation.c_str(), Desc.szVariation))

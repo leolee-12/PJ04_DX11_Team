@@ -6,6 +6,8 @@
 #include "LevelDesign_Boundary.h"
 #include "LevelDesign_Rail.h"
 #include "LevelDesign_FallBorder.h"
+#include "LD_WaterArea.h"
+#include "LD_LavaArea.h"
 #include "LD_AudioArea.h"
 #include "LD_LensFlare.h"
 
@@ -53,6 +55,12 @@ namespace
 			_wstring strVariation;
 			if (JsonUtils::Try_ReadString(jEntry, "Chara.TalkWaddleDee.Variation.VariationType", &strVariation))
 				Desc.strAIVariation = CWaddleDee::Resolve_FixedAnim(strVariation);
+		}
+		else if (JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"ArenaSpectator"))
+		{
+			_wstring strVariation;
+			if (JsonUtils::Try_ReadString(jEntry, "Variation", &strVariation))
+				Desc.strAIVariation = CWaddleDee::Resolve_FixedAnim(strVariation, CommonDesc.iUid);
 		}
 
 		XMStoreFloat4(&Desc.vRight, XMVectorNegate(XMLoadFloat4(&Desc.vRight)));
@@ -265,7 +273,8 @@ void CLevelDesign_Registry::Register_Volumes()
 {
 	CLevelDesign_Boundary::Register_LevelDesignSpecs();
 	CLevelDesign_FallBorder::Register_LevelDesignSpecs();
-	Register_Unsupported(L"WaterArea", LD_CATEGORY::VOLUME, L"Layer_LevelDesign_Volume");
+	CLD_WaterArea::Register_LevelDesignSpecs();
+	CLD_LavaArea::Register_LevelDesignSpecs();
 }
 
 void CLevelDesign_Registry::Register_GuideAudio()
@@ -283,7 +292,8 @@ void CLevelDesign_Registry::Register_NPCs()
 	const _tchar* ObjectNames[] =
 	{
 			L"MerchantWaddleDee",
-			L"TalkWaddleDee"
+			L"TalkWaddleDee",
+			L"ArenaSpectator"
 	};
 
 	for (const _tchar* pObjectName : ObjectNames)

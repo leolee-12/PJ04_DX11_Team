@@ -1171,6 +1171,9 @@
     <Filter Include="00. GameObject\96. LevelDesign\Visible\07. CopyEssence">
       <UniqueIdentifier>{d0d0886f-7c91-4d0a-8ef4-da4ac993eece}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\08. Fluid">
+      <UniqueIdentifier>{1c9cb35f-560e-4da6-a416-4964a6f0a337}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject">
       <UniqueIdentifier>{cad72eff-ed18-4366-b3fe-facecee465d1}</UniqueIdentifier>
     </Filter>
@@ -2136,6 +2139,9 @@
     <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LD_LavaArea.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_LensFlare.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
     </ClInclude>
@@ -2153,6 +2159,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_WaterArea.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LensFlare.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
@@ -3413,6 +3422,9 @@
     <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LD_LavaArea.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LD_LensFlare.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
     </ClCompile>
@@ -3430,6 +3442,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_WaterArea.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LensFlare.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>

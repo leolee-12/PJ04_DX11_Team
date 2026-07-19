@@ -20,6 +20,7 @@
 #include "Env_SpotLight.h"
 #include "Env_InstanceController.h"
 #include "LevelDesign_Registry.h"
+#include "LD_LensFlare.h"
 
 #include "GameInstance.h"
 
@@ -1407,10 +1408,16 @@ void CLevel_Edit::Set_Selected(CGameObject* pSelected)
 	if (auto* pPrevStatic = dynamic_cast<CEnvObject_Static*>(m_pSelected))
 		pPrevStatic->Set_EditorForceMainPassNonInstanced(false);
 
+	if (auto* pPrevLensFlare = dynamic_cast<Client::CLD_LensFlare*>(m_pSelected))
+		pPrevLensFlare->Set_EditorPreviewActive(false);
+
 	m_pSelected = pSelected;
 
 	if (auto* pNewStatic = dynamic_cast<CEnvObject_Static*>(m_pSelected))
 		pNewStatic->Set_EditorForceMainPassNonInstanced(true);
+
+	if (auto* pLensFlare = dynamic_cast<Client::CLD_LensFlare*>(m_pSelected))
+		pLensFlare->Set_EditorPreviewActive(true);
 
 	if (auto* pRenderGlobals = dynamic_cast<CEnvTrigger_RenderGlobals*>(m_pSelected))
 		pRenderGlobals->Apply_RenderGlobals();
