@@ -428,6 +428,8 @@ HRESULT CEffect_Part::Bind_ShaderValue()
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vTextureOffset", &m_vCurTextureUVOffset, sizeof(m_vCurTextureUVOffset))))
             return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fTextureUVRotationDegree", &m_fTextureUVRotationDegree, sizeof(m_fTextureUVRotationDegree))))
+            return E_FAIL;
     }
     else
     {
@@ -447,6 +449,8 @@ HRESULT CEffect_Part::Bind_ShaderValue()
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskTiling", &m_vMaskTiling, sizeof(m_vMaskTiling))))
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskOffset", &m_vCurMaskUVOffset, sizeof(m_vCurMaskUVOffset))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskUVRotationDegree", &m_fMaskUVRotationDegree, sizeof(m_fMaskUVRotationDegree))))
             return E_FAIL;
 
         Helper::IntClamp(m_iMaskBlendMode, MaskBlendMode::MASK_MULTIPLY, MaskBlendMode::MASK_BLEND_END - 1);
@@ -540,6 +544,7 @@ void CEffect_Part::Init_PropertyValue()
     m_bUseTextureCom = false;
     m_vTextureTiling = { 1.f, 1.f };
     m_vTextureOffset = { 0.f, 0.f };
+    m_fTextureUVRotationDegree = 0.f;
 
     m_bTextureUVScroll = false;
     m_vTextureUVScrollCount = { 0.f, 0.f };
@@ -548,6 +553,7 @@ void CEffect_Part::Init_PropertyValue()
     m_bUseMaskCom = false;
     m_vMaskTiling = { 1.f, 1.f };
     m_vMaskOffset = { 0.f, 0.f };
+    m_fMaskUVRotationDegree = 0.f;
 
     m_bMaskUVScroll = false;
     m_vMaskUVScrollCount = { 0.f, 0.f };

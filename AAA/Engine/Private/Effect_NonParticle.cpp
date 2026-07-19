@@ -30,6 +30,18 @@ HRESULT CEffect_NonParticle::Bind_ShaderValue()
     return S_OK;
 }
 
+void CEffect_NonParticle::Effect_Start()
+{
+    __super::Effect_Start();
+    Resolve_BaseRotation();
+}
+
+void CEffect_NonParticle::On_Deserialized()
+{
+    __super::On_Deserialized();
+    Resolve_BaseRotation();
+}
+
 void CEffect_NonParticle::Init_PropertyValue()
 {
     // Alpha
@@ -83,6 +95,10 @@ void CEffect_NonParticle::Init_PropertyValue()
 
     // Rot
     m_vBaseRotationDegree = { 0.f, 0.f, 0.f };
+    m_bRandomBaseRotation = false;
+    m_vRandomBaseRotationMin = { 0.f, 0.f, 0.f };
+    m_vRandomBaseRotationMax = { 360.f, 360.f, 360.f };
+    m_vResolvedBaseRotationDegree = m_vBaseRotationDegree;
     m_bRotationChange = { false };
     m_fRotationDegree = { 360.f };
     m_vRotationAxis = { 0.f, 1.f, 0.f };
@@ -182,13 +198,17 @@ void CEffect_NonParticle::Update_Rot(const _float fTimeDelta, const _float fRati
     else
         vAxis = XMVector3Normalize(vAxis);
 
-    m_fRoll = XMConvertToRadians(m_vBaseRotationDegree.z + fAnimDegree);
+    const _float3& vBaseRotationDegree = m_bRandomBaseRotation == true
+        ? m_vResolvedBaseRotationDegree
+        : m_vBaseRotationDegree;
+
+    m_fRoll = XMConvertToRadians(vBaseRotationDegree.z + fAnimDegree);
     _float3 vScale = m_pTransformCom->Get_Scaled();
 
     _matrix matBaseRot = XMMatrixRotationRollPitchYaw(
-        XMConvertToRadians(m_vBaseRotationDegree.x),
-        XMConvertToRadians(m_vBaseRotationDegree.y),
-        XMConvertToRadians(m_vBaseRotationDegree.z));
+        XMConvertToRadians(vBaseRotationDegree.x),
+        XMConvertToRadians(vBaseRotationDegree.y),
+        XMConvertToRadians(vBaseRotationDegree.z));
 
     if (Use_LocalRotationAxis() == true)
         vAxis = XMVector3Normalize(XMVector3TransformNormal(vAxis, matBaseRot));
@@ -233,4 +253,26 @@ void CEffect_NonParticle::Update_MoveSin(const _float fTimeDelta, const _float f
     _vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
 
     m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fCurOffsetY, 0.f, 0.f));
+}
+
+void CEffect_NonParticle::Resolve_BaseRotation()
+{
+    m_vResolvedBaseRotationDegree = m_vBaseRotationDegree;
+
+    if (m_bRandomBaseRotation == false)
+        return;
+
+    _float3 vMin = m_vRandomBaseRotationMin;
+    _float3 vMax = m_vRandomBaseRotationMax;
+
+    if (vMax.x < vMin.x)
+        std::swap(vMin.x, vMax.x);
+    if (vMax.y < vMin.y)
+        std::swap(vMin.y, vMax.y);
+    if (vMax.z < vMin.z)
+        std::swap(vMin.z, vMax.z);
+
+    m_vResolvedBaseRotationDegree.x = m_pGameInstance_Proxy->RandomFloat(vMin.x, vMax.x);
+    m_vResolvedBaseRotationDegree.y = m_pGameInstance_Proxy->RandomFloat(vMin.y, vMax.y);
+    m_vResolvedBaseRotationDegree.z = m_pGameInstance_Proxy->RandomFloat(vMin.z, vMax.z);
 }
