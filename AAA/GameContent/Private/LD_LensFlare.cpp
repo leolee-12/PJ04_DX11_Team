@@ -298,6 +298,12 @@ void CLD_LensFlare::Stop_LensFlare()
 
 void CLD_LensFlare::Release_LensFlare()
 {
+	if (nullptr == m_pGameInstance_Proxy || !m_pGameInstance_Proxy->IsConnected())
+	{
+		m_LensFlareHandle.Clear();
+		return;
+	}
+
 	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
 
 	if (pEffectLoader->Is_Current(m_LensFlareHandle))
