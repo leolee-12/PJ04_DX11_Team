@@ -148,6 +148,8 @@
 #include "Cappy.h"
 #include "NormalEnemyWild.h"
 #include "Dekabu.h"
+#include "Bouncy.h"
+#include "RabbitEnemy.h"
 
 // MonsterPart
 #include "BladeKnight_Body.h"
@@ -160,6 +162,8 @@
 #include "Cappy_Hat.h"
 #include "NormalEnemyWild_Body.h"
 #include "Dekabu_Body.h"
+#include "Bouncy_Body.h"
+#include "RabbitEnemy_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -583,6 +587,36 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Body/Kabu.ysh",
                     XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // Bouncy
+    Register
+    (
+        CBouncy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CBouncy),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBouncy_Body::PROTOTYPE_TAG, CBouncy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Bouncy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Bouncy/Body/Bouncy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // RabbitEnemy
+    Register
+    (
+        CRabbitEnemy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CRabbitEnemy),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRabbitEnemy_Body::PROTOTYPE_TAG, CRabbitEnemy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_RabbitEnemy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM,  "../../Resources/CHJ/Monster/RabbitEnemy/Body/RabbitEnemy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 

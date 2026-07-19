@@ -1,6 +1,7 @@
 #include "BrontoBurt_Brain.h"
 #include "BrontoBurt.h"
 #include "Monster_RailMovement.h"
+#include "Transform.h"
 
 CBrontoBurt_Brain::CBrontoBurt_Brain()
 {
@@ -19,24 +20,62 @@ void CBrontoBurt_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTim
 	if (nullptr == m_pOwner)
 		return;
 
-    if (!Can_Decide(BlackBoard))
-        return;
+	if (!Can_Decide(BlackBoard))
+		return;
 
-    UNREFERENCED_PARAMETER(fTimeDelta);
+	CMonster_Movement* pMove = static_cast<CMonster_Movement*>(m_pOwner->Get_Movement());
+	if (pMove && pMove->Is_Launched())
+	{
+		m_fTimer += fTimeDelta;
+		if (m_fTimer >= s_fFallRecoverTime)
+		{
+			m_fTimer = 0.f;
+			pMove->Cancle_Launch();
+			if (m_pOwner->Has_State(MONSTER_STATE_TYPE::RETURN))
+				m_pOwner->Change_State(MONSTER_STATE_TYPE::RETURN);
+		}
+		return;
+	}
+	m_fTimer = 0.f;
 
-    if (m_pOwner->Get_StateType()
-        != MONSTER_STATE_TYPE::IDLE)
-        return;
+	if (m_pOwner->Get_AIType() == 1)
+	{
+		const MONSTER_STATE_TYPE eCur = m_pOwner->Get_StateType();
+		const _bool bTarget = (nullptr != BlackBoard.pTarget);
 
-    if (!m_pOwner->Has_State(MONSTER_STATE_TYPE::RETURN))
-        return;
+		_float3 vBaseF = m_pOwner->Get_BasePos();
+		_vector vPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+		_vector vXZ = XMVectorSetY(XMVectorSubtract(vPos, XMLoadFloat3(&vBaseF)), 0.f);
+		_float  fXZ = XMVectorGetX(XMVector3Length(vXZ));
+		_float  fDy = fabsf(XMVectorGetY(vPos) - vBaseF.y);
+		const _bool bInLeash = (fXZ <= 40.f) && (fDy <= 20.f);
 
-    auto pRail = static_cast<CMonster_RailMovement*>(m_pOwner->Get_Movement());
-    if (nullptr == pRail || !pRail->Has_Rail())
-        return;
+		if (bTarget && bInLeash)
+		{
+			if (eCur == MONSTER_STATE_TYPE::IDLE)
+				m_pOwner->Change_State(MONSTER_STATE_TYPE::DETECT);   
+		}
+		else
+		{
+			if (eCur == MONSTER_STATE_TYPE::CHASE)
+				m_pOwner->Change_State(MONSTER_STATE_TYPE::RETURN);  
+		}
+		return;
+	}
 
-    if (pRail->Is_OffPath())
-        m_pOwner->Change_State(MONSTER_STATE_TYPE::RETURN);
+	// AIType 0: current rail return logic.
+	if (m_pOwner->Get_StateType() != MONSTER_STATE_TYPE::IDLE)
+		return;
+
+	if (!m_pOwner->Has_State(MONSTER_STATE_TYPE::RETURN))
+		return;
+
+	auto pRail = static_cast<CMonster_RailMovement*>(m_pOwner->Get_Movement());
+	if (nullptr == pRail || !pRail->Has_Rail())
+		return;
+
+	if (pRail->Is_OffPath())
+		m_pOwner->Change_State(MONSTER_STATE_TYPE::RETURN);
 }
 
 CBrontoBurt_Brain* CBrontoBurt_Brain::Create(CMonster* pOwner)

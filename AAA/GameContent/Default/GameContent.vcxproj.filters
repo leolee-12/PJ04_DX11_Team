@@ -727,6 +727,9 @@
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State">
       <UniqueIdentifier>{b14e5d4b-e541-461c-bc37-5e4e4711bb0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Chase">
+      <UniqueIdentifier>{1954345d-e00a-4689-af87-ee213970f404}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Idle">
       <UniqueIdentifier>{7d169597-3af1-47c4-8cec-1155bc9970ce}</UniqueIdentifier>
     </Filter>
@@ -772,8 +775,17 @@
     <Filter Include="00. GameObject\06. Monster\10. Bouncy\Parts">
       <UniqueIdentifier>{50db9364-75dc-4714-98b3-42178479ba94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\Parts\Body">
+      <UniqueIdentifier>{94640ab5-874e-4a13-b319-4cca217ad783}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\10. Bouncy\State">
       <UniqueIdentifier>{412fdb9c-38a7-4181-ba8a-c181f1feaddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\State\Fall">
+      <UniqueIdentifier>{4ad27578-dd52-4213-a6e3-54b8efe4095f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\State\Idle">
+      <UniqueIdentifier>{ee79ffa2-fc91-4e18-8fce-349a467ebc8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\11. Scarfy">
       <UniqueIdentifier>{94e610fe-842e-4cb8-8ab7-8cfc18f75c05}</UniqueIdentifier>
@@ -810,6 +822,9 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy\State">
       <UniqueIdentifier>{1e642da8-508c-4050-a06e-0488b1efa3c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy\State\Jump">
+      <UniqueIdentifier>{f7b5b92a-afae-4cf4-b695-600eeed4b1f2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29">
       <UniqueIdentifier>{718a3379-8dbd-482d-bfdf-c467b909a130}</UniqueIdentifier>
@@ -1204,6 +1219,9 @@
     <Filter Include="01. Projectile\00. PhysicsProjectile\02. KoKabu">
       <UniqueIdentifier>{bd02d882-8d9d-4bb9-acde-f8024bf59fc0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\03.">
+      <UniqueIdentifier>{da473f75-77ec-480a-b2ed-18e3035027aa}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
     </Filter>
@@ -1413,6 +1431,21 @@
     <ClInclude Include="..\public\BossNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Bouncy.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_Body.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_Brain.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_State_Fall.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Fall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bouncy_State_Idle.h">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Idle</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BreakWallEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
@@ -1424,6 +1457,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt_Brain.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_State_Chase.h">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Chase</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt_State_Idle.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Idle</Filter>
@@ -2256,6 +2292,18 @@
     <ClInclude Include="..\public\Projectile_Partner.h">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy_Body.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy_Brain.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RabbitEnemy_State_Jump.h">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\State\Jump</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\RailRideable.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
@@ -2633,6 +2681,21 @@
     <ClCompile Include="..\private\BossNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Bouncy.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_State_Fall.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Fall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bouncy_State_Idle.cpp">
+      <Filter>00. GameObject\06. Monster\10. Bouncy\State\Idle</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\BreakWallEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
@@ -2644,6 +2707,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt_Brain.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_State_Chase.cpp">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Chase</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Idle</Filter>
@@ -3409,6 +3475,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Partner.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RabbitEnemy_State_Jump.cpp">
+      <Filter>00. GameObject\06. Monster\13. RabbitEnemy\State\Jump</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
