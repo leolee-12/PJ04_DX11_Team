@@ -34,6 +34,7 @@ public:
 	virtual void    Update(_float fTimeDelta) override;
 	virtual void    Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual json	Serialize() const override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 	_bool Is_Playing() const { return m_bIsPlay; }
@@ -47,6 +48,7 @@ private:
 
 	unordered_map<_wstring, LENS_ELEMENT> m_LensElements;
 	_bool m_bLensElementCacheReady = false;
+	_bool m_bLensElementCacheWarningLogged = false;
 	_bool m_bAuthorPlacementRestored = false;
 
 private:

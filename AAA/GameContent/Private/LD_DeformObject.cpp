@@ -24,7 +24,7 @@ namespace
 	static constexpr _float s_fGroundProbeDistance = { 0.02f };
 	static constexpr _float s_fMinSweepHalfExtent = { 0.05f };
 
-	static constexpr _float s_fAnimSpeed = { 1.f };
+	static constexpr _float s_fAnimSpeed = { 1.5f };
 
 	enum class DEFORM_ANIM_SLOT : _uint
 	{

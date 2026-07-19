@@ -13,42 +13,13 @@ CItemEffect::CItemEffect(const CItemEffect& Prototype)
 {
 }
 
-HRESULT CItemEffect::Initialize_Prototype()
-{
-	return S_OK;
-}
-
 HRESULT CItemEffect::Initialize(void* pArg)
 {
-	EFFECT_CONTAINER_DESC* pDesc = static_cast<EFFECT_CONTAINER_DESC*>(pArg);
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_EffectPartObjects()))
 		return E_FAIL;
-
-	return S_OK;
-}
-
-void CItemEffect::Priority_Update(_float fTimeDelta)
-{
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CItemEffect::Update(_float fTimeDelta)
-{
-	__super::Update(fTimeDelta);
-}
-
-void CItemEffect::Late_Update(_float fTimeDelta)
-{
-	__super::Late_Update(fTimeDelta);
-}
-
-HRESULT CItemEffect::Render()
-{
-	__super::Render();
 
 	return S_OK;
 }
@@ -115,9 +86,4 @@ CGameObject* CItemEffect::Clone(void* pArg)
 	}
 
 	return pInstance;
-}
-
-void CItemEffect::Free()
-{
-	__super::Free();
 }

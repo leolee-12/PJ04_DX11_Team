@@ -43,6 +43,7 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+	virtual _bool   Is_CullTransformDynamic() const override { return m_bCullTransformDynamic; }
 
 	void			Spawn_DestroyEffects();
 

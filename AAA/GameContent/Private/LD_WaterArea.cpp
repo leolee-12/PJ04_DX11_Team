@@ -229,6 +229,9 @@ HRESULT CLD_WaterArea::Render_Model()
         if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
             return E_FAIL;
 
+        if (Result.bSkipMesh)
+            continue;
+
         if (FAILED(m_pShaderCom->Begin(Result.iPass)))
             return E_FAIL;
 

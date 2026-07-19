@@ -263,11 +263,9 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 
 	CEffect_Loader::GetInstance()->Spawn(L"Split_Bush", Get_LevelIndex(), vPos);
 
-	_int			iIdx = m_pGameInstance_Proxy->RandomInt(1, 4);
-	_tchar			szSoundKey[MAX_PATH] = {};
+	_int	iIdx = m_pGameInstance_Proxy->RandomInt(1, 4);
+	_tchar	szSoundKey[MAX_PATH] = {};
 
-	// RandomInt 0 Clamp
-	iIdx =	min(iIdx, 1);
 	swprintf_s(szSoundKey, L"GimmickBush_Cut%d.wav", iIdx);
 	m_pGameInstance_Proxy->Play_SFX(szSoundKey, 0.3f);
 

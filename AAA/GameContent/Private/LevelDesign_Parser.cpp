@@ -198,6 +198,19 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 			continue;
 		}
 
+		const LD_SPAWN_SPEC* pSpec = CLevelDesign_Registry::Find(CommonDesc.strObjectName);
+		if (nullptr != pSpec && nullptr != pSpec->pBuildDesc)
+		{
+#ifdef _DEBUG
+			const _wstring strMessage =
+				L"[LevelDesign_Parser] descriptor build failed: "
+				+ CommonDesc.strObjectName
+				+ L" (" + CommonDesc.strEntryKey + L")\n";
+			OutputDebugStringW(strMessage.c_str());
+#endif
+			continue;
+		}
+
 		LD_PARSED_OBJECT Desc{};
 		static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 		Fill_SpecialFields(Iter.value(), &Desc);

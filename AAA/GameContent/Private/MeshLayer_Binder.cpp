@@ -113,6 +113,7 @@ namespace
 	HRESULT Bind_World(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
 	{
 		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
+		pOutResult->bSkipMesh = ETOI(WORLD_PASS::DISCARD) == Layer.iPass;
 
 		switch (Ctx.eKind)
 		{

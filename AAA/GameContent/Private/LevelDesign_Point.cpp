@@ -313,6 +313,8 @@ HRESULT CLevelDesign_Point::Render_Model()
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 			return E_FAIL;
+		if (Result.bSkipMesh)
+			continue;
 		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
