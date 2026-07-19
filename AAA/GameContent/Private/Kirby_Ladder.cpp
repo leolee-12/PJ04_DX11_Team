@@ -190,7 +190,7 @@ void CKirby_Ladder::Enter_LadderState(CKirby* pKirby, LADDER_STATE eState)
             pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_L);
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
-            pMovement->Force_Jump(2.7f);
+            pMovement->Force_Jump(3.f);
 
             break;
         }

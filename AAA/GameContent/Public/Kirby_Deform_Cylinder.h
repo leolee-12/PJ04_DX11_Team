@@ -90,6 +90,8 @@ private:
 	_bool m_bTryJump{};
 	_float m_fRotL_Degree{};
 
+	CSound_Handle m_RollSound{};
+
 public:
 	static CKirby_Deform_Cylinder* Create();
 

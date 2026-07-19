@@ -41,14 +41,29 @@ void CKirby_Deform_Cylinder::Enter_Deform(CKirby* pKirby)
     pMovement->Set_GravityScale(2.f);
 
     // CCT
-    pKirby->Set_CollisionSize(s_fCylinder_CCT_Radius, s_fCylinder_CCT_Height);
+    pKirby->Set_CCTSize(s_fCylinder_CCT_Radius, s_fCylinder_CCT_Height);
+
+    constexpr _float fRadiusPadding = 0.5f;
+
+    // Hurt Box
+    CCollider::COLLIDER_DESC tHurtDesc{};
+    tHurtDesc.pOwner = pKirby;
+    tHurtDesc.fRadius = 1.8f;
+    tHurtDesc.fHeight = 4.7f;
+    tHurtDesc.vCenter =
+    {
+        tHurtDesc.fHeight / 2.f + tHurtDesc.fRadius,
+        tHurtDesc.fRadius / 2.f + fRadiusPadding,
+        0.f
+    };
+    tHurtDesc.vRadians = _float3(0.f, 0.f, XMConvertToRadians(90.f));
+    pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
 
     // Hit Box
     CCollider::COLLIDER_DESC tBreakerableHitDesc{};
     tBreakerableHitDesc.pOwner = pKirby;
     tBreakerableHitDesc.fRadius = 2.3f;
     tBreakerableHitDesc.fHeight = 4.7f;
-    constexpr _float fRadiusPadding = 0.5f;
     tBreakerableHitDesc.vCenter =
     {
         tBreakerableHitDesc.fHeight / 2.f + tBreakerableHitDesc.fRadius,
@@ -65,7 +80,7 @@ void CKirby_Deform_Cylinder::Exit_Deform(CKirby* pKirby)
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     pMovement->Set_GravityScale(1.f);
 
-    pKirby->Set_CollisionSize(CKirby::s_fCCT_Radius, CKirby::s_fCCT_Height);
+    pKirby->Set_CCTSize(CKirby::s_fCCT_Radius, CKirby::s_fCCT_Height);
 }
 
 void CKirby_Deform_Cylinder::Enter_AttackState(CKirby* pKirby, _int iFlag)
@@ -211,6 +226,8 @@ void CKirby_Deform_Cylinder::Enter_DeformCylinderState(CKirby* pKirby, DEFORM_CY
         }
         case DEFORM_CYLINDER_STATE::ROLL:
         {
+            m_RollSound = m_pGameInstance_Proxy->Play_SFX_Section_Loop(L"HeroDeformCylinder_RollingFast.wav", 0.0829f, 0.2959f, 0.2f);
+
             m_bTryJump = false;
             m_eRollState = ROLL_STATE::ROLL_STATE_END;
             Change_RollState(pKirby, ROLL_STATE::MOVE);
@@ -334,6 +351,7 @@ void CKirby_Deform_Cylinder::Exit_DeformCylinderState(CKirby* pKirby, DEFORM_CYL
         }
         case DEFORM_CYLINDER_STATE::ROLL:
         {
+            Change_RollState(pKirby, ROLL_STATE::ROLL_STATE_END);
             pKirby->Set_ColliderEnabled(CKirby::BREAKERABLE_HITBOX, false);
             break;
         }
@@ -444,10 +462,13 @@ void CKirby_Deform_Cylinder::Enter_RollState(CKirby* pKirby, ROLL_STATE eState)
     switch (eState)
     {
         case ROLL_STATE::MOVE:
+            if (m_RollSound.Is_Valid())
+                m_RollSound.Set_Paused(false);
             pAnimator->Play("Rolling", true, false, 0.1f, 1.5f);
             break;
 
         case ROLL_STATE::JUMP:
+            m_pGameInstance_Proxy->Play_SFX(L"HeroDeformCylinder_Jump.wav", 0.2f);
             pAnimator->Play("Rolling", true, false, 0.1f, 1.5f);            
             break;
 
@@ -456,10 +477,14 @@ void CKirby_Deform_Cylinder::Enter_RollState(CKirby* pKirby, ROLL_STATE eState)
             break;
 
         case ROLL_STATE::LANDING:
+            if (m_RollSound.Is_Valid())
+                m_RollSound.Set_Paused(false);
             pAnimator->Play("Landing", false, false, 0.1f, 2.f);
             break;
 
         case ROLL_STATE::ROLL_STATE_END:
+            if (m_RollSound.Is_Valid())
+                m_RollSound.Stop();
             break;
     }
 }
@@ -521,7 +546,11 @@ void CKirby_Deform_Cylinder::Exit_RollState(CKirby* pKirby, ROLL_STATE eState)
     switch (eState)
     {
         case ROLL_STATE::MOVE:
+        {
+            if (m_RollSound.Is_Valid())
+                m_RollSound.Set_Paused(true);
             break;
+        }
 
         case ROLL_STATE::JUMP:
             break;

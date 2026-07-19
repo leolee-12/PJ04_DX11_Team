@@ -360,19 +360,9 @@ CKirby_Deform_Model* CKirby::Find_DeformModel(const wchar_t* pPartTag)
     return dynamic_cast<CKirby_Deform_Model*>(iter->second);
 }
 
-void CKirby::Set_CollisionSize(_float fCCTRadius, _float fCCTHeight)
+void CKirby::Set_CCTSize(_float fCCTRadius, _float fCCTHeight)
 {
     m_pController->Set_CapsuleSize(fCCTRadius, fCCTHeight);
-
-    CCollider::COLLIDER_DESC HurtDesc{};
-    HurtDesc.pOwner = this;
-    HurtDesc.vCenter = _float3(0.f, 0.f, 0.f);
-    HurtDesc.fRadius = fCCTRadius + s_fHurtBoxRadiusPadding;
-    HurtDesc.fHeight = fCCTHeight;
-
-    m_KirbyColliders[HURT_BOX]->Reset_Bounding(HurtDesc);
-
-    m_KirbyColliders[HURT_BOX]->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 void CKirby::Add_MoveDir(const _float3& vWishDir)
@@ -925,6 +915,7 @@ HRESULT CKirby::Ready_AnimEvents()
 
 HRESULT CKirby::SetUp_Collider_Callback()
 {
+#pragma region Hurt Box
     m_KirbyColliders[HURT_BOX]->Set_OnEnter(
         [this](CCollider* pOther)
         {
@@ -947,11 +938,6 @@ HRESULT CKirby::SetUp_Collider_Callback()
                 tAttackDesc.fDamage = 10.f;
                 tAttackDesc.fKnockback = 2.f;
                 Damaged(tAttackDesc);
-#ifdef _DEBUG
-                char szBuf[128];
-                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
-                OutputDebugStringA(szBuf);
-#endif
             }
             else if (iGroup == ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE))
             {
@@ -1003,6 +989,7 @@ HRESULT CKirby::SetUp_Collider_Callback()
             }
         }
     );
+#pragma endregion
 
 #pragma region Breakable HitBox
     m_KirbyColliders[BREAKERABLE_HITBOX]->Set_OnEnter(
@@ -1312,6 +1299,7 @@ void CKirby::Set_ColliderDesc(KIRBY_COLLIDER eKirbyCollider, const CCollider::CO
         return;
 
     pCollider->Reset_Bounding(Desc);
+    pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 void CKirby::Set_ColliderEnabled(KIRBY_COLLIDER eKirbyCollider, _bool bEnabled)

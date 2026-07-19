@@ -111,7 +111,7 @@ public:
 	CKirby_Deform_Model* Find_DeformModel(const wchar_t* pPartTag);
 
 	// Controller
-	void Set_CollisionSize(_float fCCTRadius, _float fCCTHeight);
+	void Set_CCTSize(_float fCCTRadius, _float fCCTHeight);
 
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);
@@ -170,8 +170,8 @@ public:
 	IDeformable* Get_TriggerDeformObj() { return m_pTriggerDeformObj; }
 	void Set_TriggerDeformObj(IDeformable* pTriggerDeformObj) { m_pTriggerDeformObj = pTriggerDeformObj; }
 	_bool IsTriggerDeformObj() { return m_pTriggerDeformObj != nullptr; }
-
-
+	void Set_DeformEndTrigger(_bool bDeformEnd) { m_bDeformEndTrigger = bDeformEnd; }
+	_bool Get_DeformEndTrigger() { return m_bDeformEndTrigger; }
 
 private:
 	HRESULT Ready_Components();
@@ -243,6 +243,7 @@ private:
 	// Deform
 	CKirby_Deform* m_pKirby_Deform{};
 	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
+	_bool m_bDeformEndTrigger{};
 
 	// CutScene Attach
 	_bool m_bIsAttach{};
