@@ -3829,6 +3829,9 @@
     <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
+    </None>
     <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
@@ -3867,9 +3870,6 @@
     </None>
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
-      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
   </ItemGroup>
 </Project>

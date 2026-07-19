@@ -42,7 +42,8 @@ namespace
 	_bool Should_CookMapCollisionMesh(const string& strMeshName)
 	{
 		const string strLowerName = ToLower_ASCII(strMeshName);
-		return strLowerName.find("moco") == string::npos;
+		return (strLowerName.find("moco") == string::npos
+			&& strLowerName.find("dirtparts") == string::npos);
 	}
 }
 
