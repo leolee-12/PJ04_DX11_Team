@@ -12,6 +12,7 @@
 #include "Dekabu.h"
 #include "Bouncy.h"
 #include "RabbitEnemy.h"
+#include "Gigatzo.h"
 
 NS_BEGIN(Client)
 
@@ -75,6 +76,11 @@ namespace
 		return CRabbitEnemy::Create(pDevice, pContext);
 	}
 
+	CGameObject* Create_GigatzoPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CGigatzo::Create(pDevice, pContext);
+	}
+
 	static const LD_MONSTER_CATALOG g_MonsterCatalog[] =
 	{
 			{ L"BladeKnight",		CBladeKnight::PROTOTYPE_TAG,		&Create_BladeKnightPrototype },
@@ -88,6 +94,7 @@ namespace
 			{ L"Bouncy",			CBouncy::PROTOTYPE_TAG,				&Create_BouncyPrototype},
 			{ L"Scarfy",			CBrontoBurt::PROTOTYPE_TAG,			&Create_BrontoBurtPrototype },
 			{ L"RabbitEnemy",		CRabbitEnemy::PROTOTYPE_TAG,		&Create_RabbitEnemyPrototype },
+			{ L"Gigatzo",			CGigatzo::PROTOTYPE_TAG,			&Create_GigatzoPrototype },
 			//{ L"NormalEnemy",		CNormalEnemy::PROTOTYPE_TAG,		&Create_NormalEnemyPrototype },
 	};
 }

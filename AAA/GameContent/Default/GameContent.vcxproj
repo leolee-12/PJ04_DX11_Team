@@ -51,6 +51,11 @@
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
+    <ClInclude Include="..\Public\Gigatzo.h" />
+    <ClInclude Include="..\Public\GigatzoBullet.h" />
+    <ClInclude Include="..\Public\Gigatzo_Body.h" />
+    <ClInclude Include="..\Public\Gigatzo_Brain.h" />
+    <ClInclude Include="..\Public\Gigatzo_State_Attack.h" />
     <ClInclude Include="..\Public\KasaCatchEffect.h" />
     <ClInclude Include="..\Public\KasaUpEffect.h" />
     <ClInclude Include="..\Public\Kirby_DeformContext.h" />
@@ -73,6 +78,8 @@
     <ClInclude Include="..\Public\LaunchSmoke.h" />
     <ClInclude Include="..\Public\MoveSmoke.h" />
     <ClInclude Include="..\Public\MapGimmick_Defines.h" />
+    <ClInclude Include="..\Public\Noddy.h" />
+    <ClInclude Include="..\Public\Noddy_Body.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
@@ -484,6 +491,11 @@
     <ClCompile Include="..\Private\Bouncy_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Chase.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\Private\Gigatzo.cpp" />
+    <ClCompile Include="..\Private\GigatzoBullet.cpp" />
+    <ClCompile Include="..\Private\Gigatzo_Body.cpp" />
+    <ClCompile Include="..\Private\Gigatzo_Brain.cpp" />
+    <ClCompile Include="..\Private\Gigatzo_State_Attack.cpp" />
     <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />
@@ -514,6 +526,8 @@
     <ClCompile Include="..\Private\LD_SlopeBoardB.cpp" />
     <ClCompile Include="..\Private\LaunchSmoke.cpp" />
     <ClCompile Include="..\Private\MoveSmoke.cpp" />
+    <ClCompile Include="..\Private\Noddy.cpp" />
+    <ClCompile Include="..\Private\Noddy_Body.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />

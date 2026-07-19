@@ -151,6 +151,7 @@
 #include "Dekabu.h"
 #include "Bouncy.h"
 #include "RabbitEnemy.h"
+#include "Gigatzo.h"
 
 // MonsterPart
 #include "BladeKnight_Body.h"
@@ -165,6 +166,8 @@
 #include "Dekabu_Body.h"
 #include "Bouncy_Body.h"
 #include "RabbitEnemy_Body.h"
+#include "Gigatzo_Body.h"
+#include "GigatzoBullet.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -611,7 +614,7 @@ void CGameObject_Factory::Register_Container()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Body/Kabu.ysh",
-                    XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+                    XMMatrixScaling(1.4f, 1.4f, 1.4f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
@@ -639,9 +642,33 @@ void CGameObject_Factory::Register_Container()
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CRabbitEnemy_Body::PROTOTYPE_TAG, CRabbitEnemy_Body::Create(pDevice, pContext));
 
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_RabbitEnemy_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM,  "../../Resources/CHJ/Monster/RabbitEnemy/Body/RabbitEnemy.ysh",
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_RabbitEnemyBig_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM,  "../../Resources/CHJ/Monster/RabbitEnemyBig/Body/RabbitEnemyBig.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // Gigatzo
+    Register
+    (
+        CGigatzo::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CGigatzo),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzo_Body::PROTOTYPE_TAG,
+                CGigatzo_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Gigatzo_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM,
+                    "../../Resources/CHJ/Monster/Gigatzo/Body/Gigatzo.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // GigatzoBullet (Projectile)
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBullet::PROTOTYPE_TAG, CGigatzoBullet::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBullet::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Gigatzo/Bullet/Gigatzo_Bullet.ysh",
+                    XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
