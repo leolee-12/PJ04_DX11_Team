@@ -327,7 +327,7 @@ HRESULT CMapGimmickSection::Ready_Trigger()
 			TriggerBounds.Extents.z * 2.f
 	};
 
-	m_pTrigger = Add_Component<CCollider>(L"Com_BoostTrigger", CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
+	m_pTrigger = Add_Component<CCollider>(L"Com_Trigger", CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
 	if (nullptr == m_pTrigger)
 		return E_FAIL;
 

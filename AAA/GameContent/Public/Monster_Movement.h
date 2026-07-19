@@ -37,6 +37,7 @@ public:
 	void						Begin_JumpArc(_fvector vTargetPos, _float fDuration, _float fHeight);
 	_bool						Is_JumpArc() const { return m_bJumpArc; }
 	_bool						Update_JumpArc(_float fTimeDelta);
+	_bool						Fly_Toward(_fvector vWorldTarget, _float fSpeed, _float fTimeDelta, _float fArriveDist = 0.3f);
 
 	_bool						Is_KO()       const { return m_bKO; }
 	_bool						Is_Bouncing() const { return m_bBouncing; }

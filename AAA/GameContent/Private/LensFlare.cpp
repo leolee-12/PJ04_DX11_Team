@@ -9,6 +9,7 @@ CLensFlare::CLensFlare(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     , m_fAxisSourceZ{ 40.f }
     , m_fAxisOppositeZ{ 110.f }
     , m_fAxisExtent{ 2.f }
+    , m_fViewDepthScale{ 1.f }
     , m_fScreenCullMargin{ 1.25f }
 {
 }
@@ -19,6 +20,7 @@ CLensFlare::CLensFlare(const CLensFlare& Prototype)
     , m_fAxisSourceZ{ Prototype.m_fAxisSourceZ }
     , m_fAxisOppositeZ{ Prototype.m_fAxisOppositeZ }
     , m_fAxisExtent{ Prototype.m_fAxisExtent }
+    , m_fViewDepthScale{ Prototype.m_fViewDepthScale }
     , m_fScreenCullMargin{ Prototype.m_fScreenCullMargin }
 {
 }
@@ -228,7 +230,7 @@ _float2 CLensFlare::Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisRa
 
 _bool CLensFlare::Unproject_AtViewDepth(const _float2& vNDC, _float fViewDepth, _float3* pOutWorldPosition) const
 {
-    if (pOutWorldPosition == nullptr)
+    if (pOutWorldPosition == nullptr || fViewDepth <= Helper::fEpsilon)
         return false;
 
     const _matrix matInvProj = XMLoadFloat4x4(
@@ -288,8 +290,9 @@ _bool CLensFlare::Update_LensFlarePlacement()
         const _float2 vGhostNDC = Calculate_GhostNDC(vSourceNDC, fAxisRatio);
 
         _float3 vGhostWorld{};
+        const _float fViewDepth = Element.vAuthorLocalPosition.z * m_fViewDepthScale;
 
-        if (Unproject_AtViewDepth(vGhostNDC, Element.vAuthorLocalPosition.z, &vGhostWorld) == false)
+        if (Unproject_AtViewDepth(vGhostNDC, fViewDepth, &vGhostWorld) == false)
             continue;
 
         const _vector vGhostLocal = XMVector3TransformCoord(XMLoadFloat3(&vGhostWorld), matInvContainer);

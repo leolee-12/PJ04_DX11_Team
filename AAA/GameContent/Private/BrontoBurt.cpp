@@ -1,6 +1,7 @@
 #include "BrontoBurt.h"
 #include "GameInstance.h"
 #include "Monster_RailMovement.h"
+#include "Monster_Movement.h"
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
 #include "Monster_StateMachine.h"
@@ -9,6 +10,9 @@
 #include "BrontoBurt_Brain.h"
 #include "BrontoBurt_State_Idle.h"
 #include "BrontoBurt_State_Return.h"
+#include "Monster_State_Idle.h"
+#include "Monster_State_Detect.h"
+#include "BrontoBurt_State_Chase.h"
 
 #include "Monster_State_KnockBack.h"
 #include "Monster_State_KnockBackDeath.h"
@@ -40,6 +44,8 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
 	m_fCullDist = 95.f;
+
+	XMStoreFloat3(&m_vBasePos, m_pTransformCom->Get_State(STATE::POSITION));
 
 	if (m_pTransformCom)
 		m_pTransformCom->Set_RotationPerSec(360.f);
@@ -86,10 +92,24 @@ CMonsterBrain* CBrontoBurt::Create_Brain()
 
 HRESULT CBrontoBurt::Create_Movement()
 {
-	m_pMovement = Add_Component<CMonster_RailMovement>(TEXT("Com_Movement"), CMonster_RailMovement::Create(m_pDevice, m_pContext));
+	if (m_iAIType == 1)
+	{
+		auto pMove = Add_Component<CMonster_Movement>(TEXT("Com_Movement"),
+			CMonster_Movement::Create(m_pDevice, m_pContext));
+		if (nullptr == pMove)
+			return E_FAIL;
 
+		pMove->Set_GravityEnabled(false);
+		m_pMovement = pMove;
+		return S_OK;
+	}
+
+	// AIType 0: current rail movement.
+	m_pMovement = Add_Component<CMonster_RailMovement>(TEXT("Com_Movement"),
+		CMonster_RailMovement::Create(m_pDevice, m_pContext));
 	if (nullptr == m_pMovement)
 		return E_FAIL;
+
 	auto pRail = static_cast<CMonster_RailMovement*>(m_pMovement);
 	pRail->Set_PathSpeed(4.f);
 	pRail->Set_FaceTangent(true);
@@ -99,7 +119,7 @@ HRESULT CBrontoBurt::Create_Movement()
 
 HRESULT CBrontoBurt::Ready_State()
 {
-	if (m_pStateMachine == nullptr)
+	if (nullptr == m_pStateMachine)
 		return E_FAIL;
 
 	if (FAILED(__super::Ready_State()))
@@ -107,41 +127,77 @@ HRESULT CBrontoBurt::Ready_State()
 
 	ANI_PLAY_INFO Info{};
 
-	// IDLE 
-	Info.strAniName = "Fly";
-	Info.bLoop = true;
-	Info.fSpeed = 1.0f;
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CBrontoBurt_State_Idle::Create(Info))))
-		return E_FAIL;
+	// AI-specific idle.
+	if (m_iAIType == 0)
+	{
+		Info.strAniName = "Fly";
+		Info.bLoop = true;
+		Info.fSpeed = 1.0f;
+		if (FAILED(m_pStateMachine->Register_State(
+			MONSTER_STATE_TYPE::IDLE, CBrontoBurt_State_Idle::Create(Info))))
+			return E_FAIL;
+	}
+	else
+	{
+		Info.strAniName = "Wait";
+		Info.bLoop = true;
+		Info.fSpeed = 1.0f;
+		if (FAILED(m_pStateMachine->Register_State(
+			MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
+			return E_FAIL;
+	}
 
-	// KNOCKBACK
+	// Common reaction states.
 	Info.strAniName = "Damage";
 	Info.bLoop = false;
 	Info.fSpeed = 1.5f;
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(
+		MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
 		return E_FAIL;
 
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(
+		MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
 		return E_FAIL;
 
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(
+		MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
 		return E_FAIL;
 
-	// CAPTURED
 	Info.bLoop = true;
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(
+		MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
 		return E_FAIL;
 
-	// SPAT
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(
+		MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
 		return E_FAIL;
 
-	// RETURN
 	Info.strAniName = "Fly";
 	Info.bLoop = true;
 	Info.fSpeed = 1.0f;
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::RETURN, CBrontoBurt_State_Return::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(
+		MONSTER_STATE_TYPE::RETURN, CBrontoBurt_State_Return::Create(Info))))
 		return E_FAIL;
+
+	// 추격형 전용: DETECT + CHASE
+	if (m_iAIType == 1)
+	{
+		Info.strAniName = "FlyStart";
+		Info.bLoop = false;
+		Info.fSpeed = 1.0f;
+		CMonster_State_Detect* pDetect = CMonster_State_Detect::Create(Info);
+		if (nullptr == pDetect)
+			return E_FAIL;
+		pDetect->Set_NextState(MONSTER_STATE_TYPE::CHASE);
+		if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, pDetect)))
+			return E_FAIL;
+
+		Info.strAniName = "Fly";
+		Info.bLoop = true;
+		Info.fSpeed = 1.0f;
+		if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CBrontoBurt_State_Chase::Create(Info))))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -181,9 +237,10 @@ HRESULT CBrontoBurt::Ready_AnimEvents()
 
 void CBrontoBurt::Apply_AIVariation(const _wstring& strVariation)
 {
-	if (strVariation == L"MoveOnRail") m_iAIType = 0;  // 레일 이동
-	else if (strVariation == L"Wait")  m_iAIType = 0;  // 제자리(공중)
-	else                               m_iAIType = 0;
+	if (strVariation == L"MoveOnRail")			m_iAIType = 0;  // 레일 이동
+	else if (strVariation == L"WaitPursuit")	m_iAIType = 1;  // 플레이어 추격형
+	else if (strVariation == L"Wait")			m_iAIType = 0;  // 제자리(공중)
+	else										m_iAIType = 1;
 }
 
 void CBrontoBurt::On_Exit(MONSTER_STATE_TYPE eNextState)
