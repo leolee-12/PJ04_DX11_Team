@@ -9,6 +9,9 @@ NS_BEGIN(Client)
 
 class CKirby;
 
+class CLevelDesign_Rail;
+class CRailTrack;
+
 class CLIENT_DLL CKirby_Deform_RollerCoaster final : public CKirby_Deform
 {
 private:
@@ -34,9 +37,9 @@ public:
 	virtual _bool HasDemoModel() { return false; }
 
 	// GetDeform 변신 추가 로직
-	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
-	virtual _bool Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
-	virtual void Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
+	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& tDeformContext) override;
+	virtual _bool Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& tDeformContext, _float fTimeDelta) override;
+	virtual void Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& tDeformContext) override;
 
 	// DeformDump용 함수
 	virtual void On_DumpSpitStart(CKirby* pKirby) override {};
@@ -44,9 +47,22 @@ public:
 public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }
 
+private:
+	_bool Update_OnRail(CKirby* pKirby, _float fRailDist, _float fTimeDelta);
+	_bool Set_OnRail(CKirby* pKirby, _float fRailDist);
+
+private:
+	_uint m_iRailUid{};
+	_uint m_iStartNodeIndex{};
+
+	const CLevelDesign_Rail* m_pRail{};
+	const CRailTrack* m_pRailTrack{};
+
+	_float m_fRailLength{};
+	_float m_fCurRailDist{};
+
 public:
 	static CKirby_Deform_RollerCoaster* Create();
-
 private:
 	virtual void Free() override;
 };

@@ -196,22 +196,19 @@ void CKirby_GetDeform::Update_GetDeformState(CKirby* pKirby, _float fTimeDelta)
         {
             if (m_tPostDeformEndContext.eDeformKind == DEFORM_OBJECT_KIND::FIXED)
             {
-                // Test
                 CTransform* pTransform = pKirby->Get_Transform();
                 CMovement_Child* pMovement = pKirby->Get_Movement();
 
                 const _vector vTargetPos = XMVectorSetW(XMLoadFloat3(&m_tPostDeformEndContext.vStartPos), 1.f);
-                const _vector vCurrentPos = pTransform->Get_State(STATE::POSITION);
-                const _vector vToTarget = vTargetPos - vCurrentPos;
+                const _vector vCurtPos = pTransform->Get_State(STATE::POSITION);
+                const _vector vCurToTarget = vTargetPos - vCurtPos;
 
                 constexpr _float fMoveSpeed = 15.f;
-                const _float fMoveDistance = fMoveSpeed * fTimeDelta;
-                const _float fDistanceSq = XMVectorGetX(XMVector3LengthSq(vToTarget));
+                const _float fMoveDist = fMoveSpeed * fTimeDelta;
 
-                pMovement->Set_GravityScale(0.f);
                 pMovement->Clear_Forces();
 
-                if (fDistanceSq <= fMoveDistance * fMoveDistance)
+                if (XMVectorGetX(XMVector3LengthSq(vCurToTarget)) <= fMoveDist * fMoveDist)
                 {
                     pTransform->Set_State(STATE::POSITION, vTargetPos);
                     pMovement->Set_Velocity(XMVectorZero());
@@ -219,7 +216,7 @@ void CKirby_GetDeform::Update_GetDeformState(CKirby* pKirby, _float fTimeDelta)
                 }
                 else
                 {
-                    const _vector vMoveDirection = XMVector3Normalize(vToTarget);
+                    const _vector vMoveDirection = XMVector3Normalize(vCurToTarget);
                     pMovement->Set_Velocity(vMoveDirection * fMoveSpeed);
                 }
             }
@@ -265,6 +262,18 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::SUPER_INHALE_LOOP:
         {
+            if (!pPendingDeform->HasDemoModel())
+            {
+                CTransform* pTransform = pKirby->Get_Transform();
+                CMovement_Child* pMovement = pKirby->Get_Movement();
+
+                const _vector vTargetPos = XMVectorSetW(XMLoadFloat3(&m_tPostDeformEndContext.vStartPos), 1.f);
+
+                pTransform->Set_State(STATE::POSITION, vTargetPos);
+                pMovement->Set_Velocity(XMVectorZero());
+                pMovement->Sync_To_Controller();
+            }
+
             break;
         }
         case DEFORM_STATE::DEFORM_STATE_DEFORM:
@@ -320,14 +329,17 @@ void CKirby_GetDeform::Handle_DeformEvent(CKirby* pKirby, const DEFORM_ACQUIRED_
     Effect_Stop(m_pInhaleEffect);
     pKirby->Get_Body()->Stop_SoundHandle();
 
-    m_pGameInstance_Proxy->Set_TimeScale(0.f);
-
     pKirby->Get_Body()->Set_Active(false);
+
+    m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
     // Ä«¸Þ¶ó ÁÜ
     KIRBY_ABILITY_CHANGED tDesc{};
     tDesc.bBegin = true;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
+
+    m_tPostDeformEndContext.iRailUid = pDesc->iRailUid;
+    m_tPostDeformEndContext.iStartNodeIndex = pDesc->iStartNodeIndex;
 
     if(pPendingDeform->HasDemoModel())
         Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_STATE_DEFORM);
