@@ -29,6 +29,7 @@ namespace Client
         OnOffMesh = 17,
         AbilityFx = 18,
         UI        = 19,
+        DropStars = 20
         // 추가는 항상 끝에, 기존 값 변경 금지 (저장 데이터 안정성)
     };
 

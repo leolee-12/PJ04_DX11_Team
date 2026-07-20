@@ -155,6 +155,8 @@
 #include "RabbitEnemy.h"
 #include "Gigatzo.h"
 #include "Noddy.h"
+#include "RangerEnemy.h"
+#include "SirKibble.h"
 
 // MonsterPart
 #include "BladeKnight_Body.h"
@@ -171,6 +173,8 @@
 #include "RabbitEnemy_Body.h"
 #include "Gigatzo_Body.h"
 #include "Noddy_Body.h"
+#include "RangerEnemy_Body.h"
+#include "SirKibble_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -234,6 +238,7 @@
 #include "LD_GarageRadio.h"
 #include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
+#include "LD_MeteorGenerator.h"
 
 // EnvObject
 #include "EnvTrigger_Generic.h"
@@ -251,6 +256,9 @@
 #include "Spit_Projectile.h"
 #include "KoKabu.h"
 #include "GigatzoBullet.h"
+#include "MeteorRock.h"
+#include "MeteorRock_Large.h"
+#include "MeteorRock_Small.h"
 
 // Ability Bubble
 #include "EssenceBubble.h"
@@ -697,6 +705,36 @@ void CGameObject_Factory::Register_Container()
         )
     );
 
+    // RangerEnemy
+    Register
+    (
+        CRangerEnemy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CRangerEnemy),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRangerEnemy_Body::PROTOTYPE_TAG, CRangerEnemy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_RangerEnemy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/RangerEnemy/Body/RangerEnemy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // SirKibble
+    Register
+    (
+        CSirKibble::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CSirKibble),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSirKibble_Body::PROTOTYPE_TAG, CSirKibble_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SirKibble_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/SirKibble/Body/SirKibble.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
 #pragma endregion
 
     // NPC
@@ -768,6 +806,20 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
             CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
+    Register(CLD_MeteorGenerator::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_MeteorGenerator),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorRock_Large::PROTOTYPE_TAG, CMeteorRock_Large::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorRock_Large::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Large/VolcanoRock_L.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorRock_Small::PROTOTYPE_TAG, CMeteorRock_Small::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorRock_Small::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Small/VolcanoRock_S.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_AnimObject()

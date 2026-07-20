@@ -118,6 +118,16 @@ HRESULT CDropStar_Manager::Spawn_Pattern(_uint iLayerLevel, _fmatrix matCaster, 
     return S_OK;
 }
 
+HRESULT CDropStar_Manager::Spawn_Preset(_uint iLayerLevel, _fmatrix matCaster, _uint iPreset, const _float3& vOffset)
+{
+    return S_OK;
+}
+
+CDropStar_Manager::STAR_SPAWN_DESC CDropStar_Manager::Get_Preset(STAR_SPAWN_PRESET ePreset) const
+{
+    return STAR_SPAWN_DESC();
+}
+
 void CDropStar_Manager::Return(_uint iLevel, const _wstring& strKey, CDropStar* pStar)
 {
 	m_Dormant[POOL_KEY{ iLevel, strKey }].push_back(pStar);

@@ -48,6 +48,10 @@
     <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
+    <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
+    <ClInclude Include="..\Public\MeteorRock.h" />
+    <ClInclude Include="..\Public\MeteorRock_Large.h" />
+    <ClInclude Include="..\Public\MeteorRock_Small.h" />
     <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
@@ -84,6 +88,12 @@
     <ClInclude Include="..\Public\Noddy.h" />
     <ClInclude Include="..\Public\Noddy_Body.h" />
     <ClInclude Include="..\Public\Noddy_Brain.h" />
+    <ClInclude Include="..\Public\RangerEnemy.h" />
+    <ClInclude Include="..\Public\RangerEnemy_Body.h" />
+    <ClInclude Include="..\Public\RangerEnemy_Brain.h" />
+    <ClInclude Include="..\Public\SirKibble.h" />
+    <ClInclude Include="..\Public\SirKibble_Body.h" />
+    <ClInclude Include="..\Public\SirKibble_Brain.h" />
     <ClInclude Include="..\Public\Noddy_State_Chase.h" />
     <ClInclude Include="..\Public\Noddy_State_Find.h" />
     <ClInclude Include="..\Public\Noddy_State_SleepStart.h" />
@@ -513,6 +523,10 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
+    <ClCompile Include="..\Private\MeteorRock.cpp" />
+    <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
+    <ClCompile Include="..\Private\MeteorRock_Small.cpp" />
     <ClCompile Include="..\Private\OnLadderEffect.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
@@ -541,6 +555,12 @@
     <ClCompile Include="..\Private\Noddy.cpp" />
     <ClCompile Include="..\Private\Noddy_Body.cpp" />
     <ClCompile Include="..\Private\Noddy_Brain.cpp" />
+    <ClCompile Include="..\Private\RangerEnemy.cpp" />
+    <ClCompile Include="..\Private\RangerEnemy_Body.cpp" />
+    <ClCompile Include="..\Private\RangerEnemy_Brain.cpp" />
+    <ClCompile Include="..\Private\SirKibble.cpp" />
+    <ClCompile Include="..\Private\SirKibble_Body.cpp" />
+    <ClCompile Include="..\Private\SirKibble_Brain.cpp" />
     <ClCompile Include="..\Private\Noddy_State_Chase.cpp" />
     <ClCompile Include="..\Private\Noddy_State_Find.cpp" />
     <ClCompile Include="..\Private\Noddy_State_SleepStart.cpp" />

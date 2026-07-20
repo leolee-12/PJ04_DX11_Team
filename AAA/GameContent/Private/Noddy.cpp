@@ -42,7 +42,7 @@ HRESULT CNoddy::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    m_eCopyAbility = COPY_ABILITY_TYPE::NONE;       // PR 받으면 SLEEP으로 교체
+    m_eCopyAbility = COPY_ABILITY_TYPE::SLEEP;
     m_fCullDist = 95.f;
 
     if (m_pMovement)

@@ -17,6 +17,11 @@ public:
 	static constexpr const _tchar* DROPSTAR_LAYER_TAG = L"Layer_DropStar";
 
     enum class STAR_SPAWN_TYPE { SWEEP, CIRCLE };
+    enum class STAR_SPAWN_PRESET 
+    { 
+        // GORILLA 
+        GORILLA_ARM_SWEEP, 
+    };
 
     struct STAR_SPAWN_DESC {
         STAR_SPAWN_TYPE     eType = STAR_SPAWN_TYPE::SWEEP;
@@ -57,7 +62,9 @@ public:
 
     HRESULT                 Spawn(_uint iTargetLevel, const _float3& vPos, const _float3& vLook = { 0.f, 0.f, 0.f }, const _float3& vDir = { 0.f, 0.f, 0.f }, _float fDelay = 0.f, CDropStar * *ppOut = nullptr);
     HRESULT                 Spawn_Pattern(_uint iLayerLevel, _fmatrix matCaster, const STAR_SPAWN_DESC& Desc);
+    HRESULT                 Spawn_Preset(_uint iLayerLevel, _fmatrix matCaster, _uint iPreset, const _float3& vOffset = {});
 
+    STAR_SPAWN_DESC         Get_Preset(STAR_SPAWN_PRESET ePreset) const;
     void                    Return(_uint iLevel, const _wstring& strKey, CDropStar* pStar);
     void                    Clear_Level(_uint iLevel);
 
