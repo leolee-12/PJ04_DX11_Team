@@ -1,5 +1,6 @@
 #include "LensFlare.h"
 #include "GameContent_const.h"
+#include "GameContent_Log.h"
 #include "RectEmitterCommon.h"
 #include "MeshEmitterCommon.h"
 
@@ -32,8 +33,6 @@ HRESULT CLensFlare::Initialize_Prototype()
 
 HRESULT CLensFlare::Initialize(void* pArg)
 {
-    EFFECT_CONTAINER_DESC* pDesc = static_cast<EFFECT_CONTAINER_DESC*>(pArg);
-
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -81,6 +80,27 @@ void CLensFlare::Late_Update(_float fTimeDelta)
 HRESULT CLensFlare::Render()
 {
     return __super::Render();
+}
+
+json CLensFlare::Serialize() const
+{
+    json j = __super::Serialize();
+
+    if (m_bLensElementCacheReady == false || m_bAuthorPlacementRestored == true || j.contains("EffectPartObjects") == false)
+        return j;
+
+    for (const auto& [strTag, Element] : m_LensElements)
+    {
+        const string strKey = WstrToStr(strTag);
+
+        if (j["EffectPartObjects"].contains(strKey) == false)
+            continue;
+
+        const _float3& vAuthorPosition = Element.vAuthorLocalPosition;
+        j["EffectPartObjects"][strKey]["Transform"]["vPosition"] = { vAuthorPosition.x, vAuthorPosition.y, vAuthorPosition.z, 1.f };
+    }
+
+    return j;
 }
 
 HRESULT CLensFlare::Ready_EffectPartObjects()
@@ -162,13 +182,19 @@ void CLensFlare::Cache_LensElements()
 
     for (auto& [strTag, pPart] : m_EffestParts)
     {
-        if (pPart == nullptr)
-            continue;
-
-        CTransform* pTransform = pPart->Get_Transform();
+        CTransform* pTransform = pPart == nullptr ? nullptr : pPart->Get_Transform();
 
         if (pTransform == nullptr)
+        {
+            if (m_bLensElementCacheWarningLogged == false)
+            {
+                const char* pReason = pPart == nullptr ? "part is null" : "transform is null";
+                Client::Log_GameContentWarning("[LensFlare] Lens element cache failed: tag=" + WstrToStr(strTag) + ", reason=" + pReason);
+                m_bLensElementCacheWarningLogged = true;
+            }
+
             continue;
+        }
 
         _float3 vAuthorPosition{};
         XMStoreFloat3(&vAuthorPosition, pTransform->Get_State(STATE::POSITION));
@@ -181,6 +207,9 @@ void CLensFlare::Cache_LensElements()
     }
 
     m_bLensElementCacheReady = m_LensElements.size() == m_EffestParts.size();
+
+    if (m_bLensElementCacheReady == true)
+        m_bLensElementCacheWarningLogged = false;
 }
 
 _bool CLensFlare::Project_SourceToNDC(_float2* pOutSourceNDC) const

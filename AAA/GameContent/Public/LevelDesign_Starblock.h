@@ -25,7 +25,6 @@ class CLevelDesign_Starblock final
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Starblock";
 	static constexpr const _tchar* STARBLOCK_H1W1_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H1W1";
-	static constexpr const _tchar* STARBLOCK_H2W2_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H2W2";
 	static constexpr const _tchar* STARBLOCK_H3W3_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H3W3";
 	static constexpr const _tchar* STARBLOCK_MODEL_PROTO_TAG = STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
@@ -43,6 +42,7 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+	virtual _bool   Is_CullTransformDynamic() const override { return m_bCullTransformDynamic; }
 
 	void			Spawn_DestroyEffects();
 

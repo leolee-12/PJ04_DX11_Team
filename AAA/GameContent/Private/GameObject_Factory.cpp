@@ -195,6 +195,17 @@
 #include "Boss_Leopard_Body.h"
 #include "Projectile_Nail.h"
 
+#include "Boss_Metaknight.h"
+#include "Boss_Metaknight_Body.h"
+#include "Boss_Metaknight_Sword.h"
+#include "Boss_Metaknight_ReplicaSword.h"
+#include "Boss_Metaknight_Mant.h"
+#include "Projectile_MoonShot.h"
+#include "Excalibur.h"
+#include "Excalibur_Body.h"
+#include "Excalibur_GetIt.h"
+#include "MetaknightNamePlate.h"
+
 //Boss Effect
 #include "Armadillo_RutA.h"
 #include "Armadillo_RutB.h"
@@ -1109,9 +1120,9 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockBombH2W2Piece.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockStarH2W2Piece.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Stone"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_Stone.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_StoneDust.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_SmokeSphereOriginal.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 
@@ -1122,10 +1133,10 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Nature_Piece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LandBreak/Nature_Piece01.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Nature_Piece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LandBreak/Nature_Piece02.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Stone"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_Stone.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_StoneDust.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneHiMesh"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneHiMesh.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_SmokeSphereOriginal.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 
@@ -1176,8 +1187,8 @@ void CGameObject_Factory::Register_Effect()
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_StoneDust.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_SmokeSphereOriginal.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 
@@ -1228,7 +1239,7 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_Tire"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_Tire.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_WingA"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_WingA.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_WingB"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_WingB.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_SmokeSphereOriginal.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 
@@ -1239,7 +1250,7 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cylinder_DrainM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CylinderBreak/DrainM.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cylinder_PieceM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CylinderBreak/PieceM.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_SmokeSphereOriginal.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 
@@ -1562,6 +1573,67 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
                 CBoss_Gorilla_Body::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Metaknight::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Metaknight),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Body/Model_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Body::PROTOTYPE_TAG, CBoss_Metaknight_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Sword::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Sword/Sword.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Sword::PROTOTYPE_TAG,
+                CBoss_Metaknight_Sword::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_ReplicaSword::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/ReplicaSword/ReplicaSword.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_ReplicaSword::PROTOTYPE_TAG,
+                CBoss_Metaknight_ReplicaSword::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Mant/Mant_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::PROTOTYPE_TAG,
+                CBoss_Metaknight_Mant::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_MoonShot::PROTOTYPE_TAG, CProjectile_MoonShot::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CMetaknightNamePlate::PROTOTYPE_TAG, TEXT("NamePlate"),
+        CREATOR(CMetaknightNamePlate),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaknightNamePlate::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/NamePlate/Model.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        ));
+
+    Register(CExcalibur::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CExcalibur),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur::PROTOTYPE_TAG,
+                CExcalibur::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Excalibur/Body/Sword.ysh"
+                    , XMMatrixRotationX(XMConvertToRadians(-90.f)) * XMMatrixTranslation(0.f, 1.4f, 0.f)
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_Body::PROTOTYPE_TAG,
+                CExcalibur_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Excalibur/GetIt/Model.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::PROTOTYPE_TAG,
+                CExcalibur_GetIt::Create(pDevice, pContext));
         )
     );
 }

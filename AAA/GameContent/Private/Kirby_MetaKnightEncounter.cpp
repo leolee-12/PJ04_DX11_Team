@@ -36,12 +36,12 @@ void CKirby_MetaKnightEncounter::Update(CKirby* pKirby, const _float fTimeDelta)
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-    if (pAnimator->Get_CurrentAnimName() == "Metaknight_DemoAppearCut5" && pAnimator->Is_Finished())
-    {
+    //if (pAnimator->Get_CurrentAnimName() == "Metaknight_DemoAppearCut5" && pAnimator->Is_Finished())
+    //{
 
 
-        Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
-    }
+    //    Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
+    //}
 }
 
 void CKirby_MetaKnightEncounter::Exit(CKirby* pKirby)
@@ -82,6 +82,8 @@ void CKirby_MetaKnightEncounter::Request_PositionSync(CKirby* pKirby, const KIRB
             CTransform* pTransform = pKirby->Get_Transform();
             pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
 
+            pKirby->Get_Movement()->Sync_To_Controller();
+
             // Ani
             CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
             pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
@@ -89,8 +91,8 @@ void CKirby_MetaKnightEncounter::Request_PositionSync(CKirby* pKirby, const KIRB
             CAnimator::ANI_PLAY_INFO tInfo{};
             tInfo.bLoop = false;
             tInfo.bRestart = true;
-            tInfo.fBlend = 0.1f;
-            tInfo.fSpeed = 1.5f;
+            tInfo.fBlend = pDesc->fBlendDuration;
+            tInfo.fSpeed = pDesc->fAnimSpeed;
 
             tInfo.strAniName = "Metaknight_DemoAppearCut1";
             pAnimator->Play(&tInfo);
@@ -126,6 +128,28 @@ void CKirby_MetaKnightEncounter::Request_PositionSync_End(CKirby* pKirby, const 
         }
         case KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_INTRO_END:
         {
+            CTransform* pTransform = pKirby->Get_Transform();
+            CKirby_Body* pBody = pKirby->Get_Body();
+
+            const _float4x4* pBone = pBody->Get_BoneMatrixPtr("TopL");
+            if (pBone)
+            {
+                _matrix matBoneWorld = XMLoadFloat4x4(pBone)
+                    * XMLoadFloat4x4(pBody->Get_CombinedWorldMatrixPtr());
+                _vector vBonePos = matBoneWorld.r[3];
+
+                _vector vCur = pTransform->Get_State(STATE::POSITION);
+                _vector vLook = XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
+                
+                _vector vNew = XMVectorSetY(vBonePos, XMVectorGetY(vCur));
+
+                pTransform->Set_State(STATE::POSITION, vNew);
+                pTransform->LookTo(-vLook);
+                pKirby->Get_Movement()->Sync_To_Controller();
+            }
+
+
+            pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
             break;
         }
         default:

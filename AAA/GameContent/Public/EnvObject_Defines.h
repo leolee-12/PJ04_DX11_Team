@@ -45,9 +45,18 @@ enum class ENV_INTERACT_TYPE
 	PUSHABLE,
 	COLLECTABLE,
 	PHYSICS_PROP,
+	BLOOM_PROP,
 	ANIMATED_PROP,
 	SMALL_CREATURE,
 	UNKNOWN,
+	END
+};
+
+enum class ENV_INTERACT_SHAPE : _uint
+{
+	BOX,
+	SPHERE,
+	CAPSULE,
 	END
 };
 
@@ -145,11 +154,42 @@ struct ENV_EFFECT_DESC
 	wstring strKind;
 };
 
+struct ENV_INTERACT_PRESET
+{
+	ENV_INTERACT_TYPE eType = { ENV_INTERACT_TYPE::NONE };
+	ENV_INTERACT_SHAPE eShape = { ENV_INTERACT_SHAPE::BOX };
+
+	_bool   bTouchByPlayerBody = { false };
+	_bool   bDamageable = { false };
+
+	_float  fDensity = { 10.f };
+	_float  fKickPower = { 11.f };
+	_float  fUpImpulse = { 4.f };
+	_float  fMaxSpeed = { 13.f };
+	_float  fBounceRestitution = { 0.6f };
+	_float  fBounceFriction = { 0.2f };
+
+	_float  fTriggerRadius = { 0.8f };
+	_float3 vFallbackSize = { 1.f, 1.f, 1.f };
+
+	_bool   bGrantReward = { false };
+	_uint   iRewardChancePercent = { 0 };
+	_int    iPointStarAmount = { 0 };
+
+	wstring wstrTouchSoundKey;
+	wstring wstrBreakSoundKey;
+	wstring wstrBloomSoundKey;
+	wstring wstrTouchEffectKey;
+	wstring wstrBreakEffectKey;
+	wstring wstrBloomEffectKey;
+};
+
 struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 {
-	ENV_OBJECT_KIND	eKind = { ENV_OBJECT_KIND::UNKNOWN };
+	ENV_OBJECT_KIND eKind = { ENV_OBJECT_KIND::UNKNOWN };
 	ENV_SOURCE_TYPE eSourceType = { ENV_SOURCE_TYPE::UNKNOWN };
 	ENV_INTERACT_TYPE eInteractType = { ENV_INTERACT_TYPE::NONE };
+	ENV_INTERACT_PRESET tInteractPreset = {};
 
 	_wstring wstrSourceFile;
 	_wstring wstrSection;

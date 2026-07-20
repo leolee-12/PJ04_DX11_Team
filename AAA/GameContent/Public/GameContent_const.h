@@ -41,6 +41,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_Gorilla = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Gorilla"), TEXT("../Bin/ShaderFiles/Shader_Gorilla.hlsl") };
 	inline constexpr SHADER_DESC Shader_Armadillo = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Armadillo"), TEXT("../Bin/ShaderFiles/Shader_Armadillo.hlsl") };
 	inline constexpr SHADER_DESC Shader_Leopard = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Leopard"), TEXT("../Bin/ShaderFiles/Shader_Leopard.hlsl") };
+	inline constexpr SHADER_DESC Shader_Metaknight = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Metaknight"), TEXT("../Bin/ShaderFiles/Shader_Metaknight.hlsl") };
 	inline constexpr SHADER_DESC Shader_Monster = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Monster"), TEXT("../Bin/ShaderFiles/Shader_Monster.hlsl") };
 	inline constexpr SHADER_DESC Shader_WaddleDee = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_WaddleDee"), TEXT("../Bin/ShaderFiles/Shader_WaddleDee.hlsl") };
 	inline constexpr SHADER_DESC Shader_Bomb = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Bomb"), TEXT("../Bin/ShaderFiles/Shader_Bomb.hlsl") };
@@ -56,6 +57,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_World_NonAnim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_NonAnim"), TEXT("../Bin/ShaderFiles/Shader_World_NonAnim.hlsl") };
 	inline constexpr SHADER_DESC Shader_World_Anim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Anim"), TEXT("../Bin/ShaderFiles/Shader_World_Anim.hlsl") };
 	inline constexpr SHADER_DESC Shader_World_Instance = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Instance"), TEXT("../Bin/ShaderFiles/Shader_World_Instance.hlsl") };
+	inline constexpr SHADER_DESC Shader_Fluid = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Fluid"), TEXT("../Bin/ShaderFiles/Shader_Fluid.hlsl") };
 	inline constexpr SHADER_DESC Shader_SkySphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SkySphere"), TEXT("../Bin/ShaderFiles/Shader_SkySphere.hlsl") };
 
 	inline constexpr SHADER_DESC Shader_UI = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_UI"), TEXT("../Bin/ShaderFiles/Shader_UI.hlsl") };
@@ -116,6 +118,10 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle02	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle02"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle02.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle03	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle03"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle03.png"), 1 };
 
+	inline constexpr COMPONENT_DESC Model_Stone = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Stone") };
+	inline constexpr COMPONENT_DESC Model_StoneDust = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_StoneDust") };
+	inline constexpr COMPONENT_DESC Model_SmokeSphereOriginal = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SmokeSphereOriginal") };
+
 	//Marb1e
 	inline constexpr TEXTURE_DESC Texture_LeoSlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LeoSlash"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Ring/spin01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_NailTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_NailTrail"), TEXT("../../Resources/YSH/Boss/Leopard/Nail/Trail.png"), 1 };
@@ -132,6 +138,7 @@ namespace ProtoDesc
 	inline constexpr COMPONENT_DESC Collider_AABB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB") };
 	inline constexpr COMPONENT_DESC Collider_OBB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB") };
 	inline constexpr COMPONENT_DESC Collider_Capsule = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Capsule") };
+	inline constexpr COMPONENT_DESC Collider_Torus = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Torus") };
 
 	// Monster Effect
 	inline constexpr TEXTURE_DESC Texture_BK_CommonSlash = { ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_BK_CommonSlash"),  TEXT("../../Resources/CHJ/Effect/Monster/BladeKnight/common_slash.png"), 1 };

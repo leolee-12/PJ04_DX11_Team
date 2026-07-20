@@ -12,6 +12,10 @@ float3 g_vMRA = float3(0.f, 1.f, 1.f);
 
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
+float4 g_vConstantDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+float3 g_vConstantMRA = float3(0.f, 1.f, 1.f);
+float4 g_vConstantEmissive = float4(0.f, 0.f, 0.f, 1.f);
+
 uint g_iMaterialID = 0;
 
 uint g_iUVIndex = 0;
@@ -279,6 +283,54 @@ PS_OUT PS_WHITE(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_DNM_UV0(PS_IN In)
+{
+    PS_OUT Out;
+
+    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vBase.a < 0.1f)
+        discard;
+
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+
+    float3 Nw = mul(nTS, TBN);
+
+    Out.vDiffuse = float4(vBase.rgb, vBase.a);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, 1.f);
+    Out.vMaterialID = g_iMaterialID;
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+
+    return Out;
+}
+
+PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
+{
+    PS_OUT Out;
+
+    Out.vDiffuse = g_vConstantDiffuse;
+    Out.vNormal = float4(normalize(In.vNormal).xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(g_vConstantMRA, 1.f);
+    Out.vEmissive = g_vConstantEmissive;
+    Out.vEmissive.rgb += g_vEmissiveColor.rgb;
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+
+    return Out;
+}
+
 //============================ Shadow (depth-only) ============================
 struct VS_SHADOW_OUT
 {
@@ -359,156 +411,156 @@ PS_OUT PS_COLOR_MRA_DITHER(PS_IN In)
 
 technique11 DefaultTechnique
 {
-	pass DefaultPass // 0
-	{
-		SetRasterizerState(RS_Default);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass DefaultPass // 0
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
-	}
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
 
-	pass DiffusePass // 1
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass DiffusePass // 1
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_DIFFUSE();
-	}
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DIFFUSE();
+    }
 
-	pass ShadowPass // 2
-	{
-		SetRasterizerState(RS_Cull_None); // 피터팬 심하면 앞면 컬링 RS로 교체
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
-		VertexShader = compile vs_5_0 VS_SHADOW();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_SHADOW();
-	}
+    pass ShadowPass // 2
+    {
+        SetRasterizerState(RS_Cull_None); // 피터팬 심하면 앞면 컬링 RS로 교체
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_SHADOW();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHADOW();
+    }
 
-	pass WhitePass // 3
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_WHITE();
-	}
+    pass WhitePass // 3
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_WHITE();
+    }
 
-	pass DitherDiffusePass // 4
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_DIFFUSE_DITHER();
-	}
-	pass DIFF_Pass	// 5
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass DitherDiffusePass // 4
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DIFFUSE_DITHER();
+    }
+    pass DIFF_Pass // 5
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass DMN_Pass	// 6
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass DMN_Pass // 6
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass UKWN_Pass	// 7
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass UKWN_Pass // 7
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass UMN_Pass	// 8
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass UMN_Pass // 8
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass DMNU_Pass // 9
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass DMNU_Pass // 9
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass TREESHADOW_Pass // 10
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass TREESHADOW_Pass // 10
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass GRASS_FUR_Pass // 11
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass GRASS_FUR_Pass // 11
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass COLOR_Pass // 12
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass COLOR_Pass // 12
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass DISCARD_Pass // 13
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass DISCARD_Pass // 13
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-	pass ColorMRADitherPass // 14
-	{
-		SetRasterizerState(RS_Cull_None);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_COLOR_MRA_DITHER();
-	}
-	pass Decal_Pass // 15
-	{
-		SetRasterizerState(RS_Cull_CW);
-		SetDepthStencilState(DSS_Z_Disable, 0);
-		SetBlendState(BS_Decal, float4(0, 0, 0, 0), 0xffffffff);
+    pass ColorMRADitherPass // 14
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_COLOR_MRA_DITHER();
+    }
+    pass Decal_Pass // 15
+    {
+        SetRasterizerState(RS_Cull_CW);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Decal, float4(0, 0, 0, 0), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
-	}
+    }
     pass COLOR2_Pass // 16
     {
         SetRasterizerState(RS_Cull_None);
@@ -517,5 +569,23 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
+    }
+    pass DNM_UV0_Pass // 17
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DNM_UV0();
+    }
+    pass Constant_Pass // 18
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_CONSTANT_MATERIAL();
     }
 }

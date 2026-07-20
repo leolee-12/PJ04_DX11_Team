@@ -88,6 +88,7 @@ void CBossBase::Update_AI(_float fTimeDelta)
             }
             if (Is_Intro_Finished())
             {
+                On_Intro_End();
                 Publish_Boss_Appeared();
                 m_eLife = EBOSS_LIFE::ACTIVE;
             }

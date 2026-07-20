@@ -1,5 +1,6 @@
 #pragma once
 #include "LevelDesignObject.h"
+#include "Water_Defines.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -35,6 +36,12 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+#pragma region Editable
+public:
+	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
+	virtual HRESULT Apply_EditCustomDesc(const EDIT_CUSTOM_DESC& Desc) override;
+#pragma endregion
+
 	static void Register_LevelDesignSpecs();
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -44,6 +51,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 
 	LD_SURFACE_AREA_DESC m_tSurfaceAreaDesc = {};
+	WATER_RENDER_DESC m_tWaterRenderDesc = {};
 
 private:
 	HRESULT Ready_RenderComponents();
@@ -55,6 +63,7 @@ public:
 	virtual CGameObject* Clone(void* pArg) override;
 
 protected:
+	virtual void Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const override;
 	virtual void Free() override;
 };
 

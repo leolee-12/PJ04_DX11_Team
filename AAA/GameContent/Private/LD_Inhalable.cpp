@@ -19,8 +19,6 @@ CLD_Inhalable::CLD_Inhalable(const CLD_Inhalable& Prototype)
 	, m_vBaseScale(Prototype.m_vBaseScale)
 	, m_fScaleRatio(Prototype.m_fScaleRatio)
 	, m_fLifeTime(Prototype.m_fLifeTime)
-	, s_fSpatDamage(Prototype.s_fSpatDamage)
-	, s_fSpatKnockback(Prototype.s_fSpatKnockback)
 {
 }
 

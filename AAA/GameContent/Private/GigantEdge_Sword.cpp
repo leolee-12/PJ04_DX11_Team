@@ -55,7 +55,7 @@ HRESULT CGigantEdge_Sword::Render()
             return E_FAIL;
     }
 
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 HRESULT CGigantEdge_Sword::Ready_Components()

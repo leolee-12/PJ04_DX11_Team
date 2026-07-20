@@ -12,42 +12,13 @@ CSplit_Starblock::CSplit_Starblock(const CSplit_Starblock& Prototype)
 {
 }
 
-HRESULT CSplit_Starblock::Initialize_Prototype()
-{
-	return S_OK;
-}
-
 HRESULT CSplit_Starblock::Initialize(void* pArg)
 {
-	EFFECT_CONTAINER_DESC* pDesc = static_cast<EFFECT_CONTAINER_DESC*>(pArg);
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_EffectPartObjects()))
 		return E_FAIL;
-
-	return S_OK;
-}
-
-void CSplit_Starblock::Priority_Update(_float fTimeDelta)
-{
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CSplit_Starblock::Update(_float fTimeDelta)
-{
-	__super::Update(fTimeDelta);
-}
-
-void CSplit_Starblock::Late_Update(_float fTimeDelta)
-{
-	__super::Late_Update(fTimeDelta);
-}
-
-HRESULT CSplit_Starblock::Render()
-{
-	__super::Render();
 
 	return S_OK;
 }
@@ -68,15 +39,15 @@ HRESULT CSplit_Starblock::Ready_EffectPartObjects()
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Piece_2"), &tDesc)))
 		return E_FAIL;
 
-	tDesc.wstrModelTag = L"Prototype_Component_Model_Stone";
+	tDesc.wstrModelTag = Model_Stone.szProtoTag;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Stone"), &tDesc)))
 		return E_FAIL;
 
-	tDesc.wstrModelTag = L"Prototype_Component_Model_StoneDust";
+	tDesc.wstrModelTag = Model_StoneDust.szProtoTag;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("StoneDust"), &tDesc)))
 		return E_FAIL;
 
-	tDesc.wstrModelTag = L"Prototype_Component_Model_SmokeSphereOriginal";
+	tDesc.wstrModelTag = Model_SmokeSphereOriginal.szProtoTag;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Smoke"), &tDesc)))
 		return E_FAIL;
 
@@ -107,9 +78,4 @@ CGameObject* CSplit_Starblock::Clone(void* pArg)
 	}
 
 	return pInstance;
-}
-
-void CSplit_Starblock::Free()
-{
-	__super::Free();
 }

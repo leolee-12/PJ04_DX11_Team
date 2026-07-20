@@ -100,7 +100,7 @@ CBTNode* CBoss_Brain::FaceWindup(const string& clip, _float deg, _float speed)
     auto on = make_shared<bool>(false);
     return CBTAction::Create(
         [this, on, clip, deg, speed](CBlackboard*, _float dt) -> BT_STATUS {
-            if (!*on) { Anim()->Play(clip, false, true, 0.1f, speed); *on = true; }
+            if (!*on) { Anim()->Play(clip, false, true, 0.2f, speed); *on = true; }
             RotateYawTo(Dir_ToTargetXZ(), deg, dt);
             if (Anim()->Is_Finished()) { *on = false; return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
