@@ -48,6 +48,7 @@
     <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
+    <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
@@ -61,6 +62,8 @@
     <ClInclude Include="..\Public\Kirby_DeformContext.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
     <ClInclude Include="..\Public\LandingSmoke.h" />
+    <ClInclude Include="..\Public\LD_LavaArea.h" />
+    <ClInclude Include="..\Public\LD_WaterArea.h" />
     <ClInclude Include="..\public\LeoJump_Smoke.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Assault.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Jump.h" />
@@ -366,6 +369,7 @@
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Bomb.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
@@ -404,6 +408,7 @@
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
     <ClInclude Include="..\Public\Kirby_IceHat.h" />
+    <ClInclude Include="..\Public\Kirby_SleepHat.h" />
     <ClInclude Include="..\public\UI_Eraser.h" />
     <ClInclude Include="..\public\UI_FadeIn.h" />
     <ClInclude Include="..\public\UI_FadeOut.h" />
@@ -508,12 +513,15 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\OnLadderEffect.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
     <ClCompile Include="..\Private\KasaUpEffect.cpp" />
     <ClCompile Include="..\Private\KoKabu.cpp" />
     <ClCompile Include="..\Private\LandingSmoke.cpp" />
+    <ClCompile Include="..\Private\LD_LavaArea.cpp" />
+    <ClCompile Include="..\Private\LD_WaterArea.cpp" />
     <ClCompile Include="..\private\LeoJump_Smoke.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp" />
@@ -768,6 +776,7 @@
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
@@ -845,6 +854,7 @@
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
     <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_SleepHat.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />

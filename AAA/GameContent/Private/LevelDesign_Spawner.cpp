@@ -30,7 +30,8 @@ namespace
 					|| is_same_v<T, LD_DEFORMOBJECT_DESC>
 					|| is_same_v<T, LD_FOOD_DESC>
 					|| is_same_v<T, LD_POINT_DESC>
-					|| is_same_v<T, LD_BUSH_DESC>)
+					|| is_same_v<T, LD_BUSH_DESC>
+					|| is_same_v<T, LD_SURFACE_AREA_DESC>)
 				{
 					Desc.iModelProtoLevel = iModelProtoLevel;
 				}

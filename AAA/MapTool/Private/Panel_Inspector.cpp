@@ -13,15 +13,17 @@
 #include "Editable.h"
 #include "EffectPart_Enum.h"
 #include "GameContent_Events.h"
+#include "LD_LensFlare.h"
 
 #include "GameInstance.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
 #include "UIContainerObject.h"
 #include "UIPartObject.h"
+#include "Effect_Container.h"
+#include "Effect_Part.h"
 
 #include "imgui.h"
-#include <cmath>
 
 namespace
 {
@@ -407,6 +409,50 @@ void CPanel_Inspector::Render()
 			pRenderGlobals->Apply_RenderGlobals();
 	}
 
+	if (auto* pLDLensFlare = dynamic_cast<Client::CLD_LensFlare*>(pSelected))
+	{
+		Engine::CEffect_Container* pLensFlare = pLDLensFlare->Get_EditorPreviewEffect();
+
+		ImGui::Separator();
+
+		if (nullptr == pLensFlare)
+		{
+			ImGui::TextDisabled("LensFlare preview is not available.");
+		}
+		else if (ImGui::CollapsingHeader("LensFlare Preview", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::PushID(pLensFlare);
+
+			Draw_Properties(pLensFlare);
+
+			const auto& EffectParts = pLensFlare->Get_EffectPartObject();
+			vector<pair<_wstring, Engine::CEffect_Part*>> SortedParts(EffectParts.begin(), EffectParts.end());
+
+			sort(SortedParts.begin(), SortedParts.end(),
+				[](const auto& Left, const auto& Right)
+				{
+					return Left.first < Right.first;
+				});
+
+			for (auto& [strTag, pPart] : SortedParts)
+			{
+				if (nullptr == pPart)
+					continue;
+
+				const string strLabel = "Part - " + WstrToStr(strTag);
+
+				if (ImGui::CollapsingHeader(strLabel.c_str()))
+				{
+					ImGui::PushID(pPart);
+					Draw_Properties(pPart);
+					ImGui::PopID();
+				}
+			}
+
+			ImGui::PopID();
+		}
+	}
+
 	for (auto& [tag, pComponent] : pSelected->Get_Components())
 	{
 		if (!pComponent) continue;
@@ -516,7 +562,21 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 			ImGui::Text(strPropName.c_str());
 			int* pValue = (int*)pData;
 			const string strID = "##" + strPropName;
-			if (const Engine::EFFECTPART_ENUM_ITEMS* pEnumItems = Engine::Find_EffectPartPropertyEnum(prop))
+			const _bool bTriggerCollisionLayer = prop.strCategory == L"Trigger" && prop.strName == L"Collision Layer";
+
+			if (bTriggerCollisionLayer)
+			{
+				const int iEnvTriggerLayer = static_cast<int>(COLLISION_LAYER::ENV_TRIGGER);
+				const int iDeformReleaseLayer = static_cast<int>(COLLISION_LAYER::DEFORM_RELEASE_AREA);
+				int iLayerIndex = *pValue == iDeformReleaseLayer ? 1 : 0;
+
+				if (ImGui::Combo(strID.c_str(), &iLayerIndex, "ENV_TRIGGER\0DEFORM_RELEASE_AREA\0\0"))
+				{
+					*pValue = 1 == iLayerIndex ? iDeformReleaseLayer : iEnvTriggerLayer;
+					bChanged = true;
+				}
+			}
+			else if (const Engine::EFFECTPART_ENUM_ITEMS* pEnumItems = Engine::Find_EffectPartPropertyEnum(prop))
 			{
 				const wstring* pEnumName = Engine::Find_EffectPartEnumName(*pEnumItems, *pValue);
 				string strPreview = pEnumName ? WstrToStr(*pEnumName) : to_string(*pValue);

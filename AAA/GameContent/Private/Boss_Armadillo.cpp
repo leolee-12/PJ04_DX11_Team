@@ -57,7 +57,8 @@ void CBoss_Armadillo::Update(_float fTimeDelta)
     if (m_pGameInstance_Proxy->Key_Down(DIK_0))
         Appear();
     if (m_pGameInstance_Proxy->Key_Down(DIK_9))
-        m_bDebugWallHit = true;
+        Die();
+
 #endif
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);

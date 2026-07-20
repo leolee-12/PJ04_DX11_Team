@@ -30,6 +30,7 @@ EffectMesh::VALUES CEffect_MeshParticle::Make_MeshValues()
             m_bUseDiffuseTexture,
             m_vDiffuseTiling,
             m_vDiffuseOffset,
+            m_fDiffuseUVRotationDegree,
             m_vDiffuseUVScroll,
             m_vDiffuseUVScrollCount,
             m_vCurDiffuseUVOffset
@@ -43,11 +44,14 @@ EffectMesh::VALUES CEffect_MeshParticle::Make_MeshValues()
             m_fDiffuseUVEdgeFadePower
         },
         m_bUseNormalTexture,
+        m_fNormalUVRotationDegree,
         m_bUseMRATexture,
+        m_fMRAUVRotationDegree,
         {
             m_bUseUnknownTexture,
             m_vUnknownTiling,
             m_vUnknownOffset,
+            m_fUnknownUVRotationDegree,
             m_vUnknownUVScroll,
             m_vUnknownUVScrollCount,
             m_vCurUnknownUVOffset

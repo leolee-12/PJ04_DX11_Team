@@ -101,6 +101,37 @@ HRESULT CLD_LensFlare::On_EditTransformChanged()
 
 	return S_OK;
 }
+
+void CLD_LensFlare::Set_EditorPreviewActive(_bool bActive)
+{
+	if (m_bEditorPreviewActive == bActive)
+		return;
+
+	const _bool bWasRequested = Is_LensFlareRequested();
+
+	m_bEditorPreviewActive = bActive;
+
+	const _bool bIsRequested = Is_LensFlareRequested();
+	if (bWasRequested == bIsRequested)
+		return;
+
+	if (bIsRequested)
+		Start_LensFlare();
+	else
+		Stop_LensFlare();
+}
+
+Engine::CEffect_Container* CLD_LensFlare::Get_EditorPreviewEffect() const
+{
+	if (nullptr == m_pGameInstance_Proxy || !m_pGameInstance_Proxy->IsConnected())
+		return nullptr;
+
+	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
+
+	return pEffectLoader->Is_Current(m_LensFlareHandle)
+		? m_LensFlareHandle.p
+		: nullptr;
+}
 #pragma endregion
 
 HRESULT CLD_LensFlare::Ready_Components(const LD_PARSED_OBJECT& Desc)
@@ -221,9 +252,11 @@ void CLD_LensFlare::Handle_TriggerEnter(CCollider* pOther)
 	if (!Is_TriggerActivator(pOther))
 		return;
 
+	const _bool bWasRequested = Is_LensFlareRequested();
+
 	++m_iActivatorCount;
 
-	if (1u == m_iActivatorCount)
+	if (!bWasRequested)
 		Start_LensFlare();
 }
 
@@ -235,9 +268,11 @@ void CLD_LensFlare::Handle_TriggerExit(CCollider* pOther)
 	if (0u == m_iActivatorCount)
 		return;
 
+	const _bool bWasRequested = Is_LensFlareRequested();
+
 	--m_iActivatorCount;
 
-	if (0u == m_iActivatorCount)
+	if (bWasRequested && !Is_LensFlareRequested())
 		Stop_LensFlare();
 }
 
@@ -245,6 +280,11 @@ _bool CLD_LensFlare::Is_TriggerActivator(const CCollider* pOther) const
 {
 	return nullptr != pOther
 		&& ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup();
+}
+
+_bool CLD_LensFlare::Is_LensFlareRequested() const
+{
+	return 0u < m_iActivatorCount || m_bEditorPreviewActive;
 }
 
 void CLD_LensFlare::Start_LensFlare()
@@ -293,7 +333,7 @@ void CLD_LensFlare::Stop_LensFlare()
 		return;
 	}
 
-	m_LensFlareHandle.p->Start_FadeOut();
+	m_LensFlareHandle.p->Start_FadeOut(1.5f);
 }
 
 void CLD_LensFlare::Release_LensFlare()

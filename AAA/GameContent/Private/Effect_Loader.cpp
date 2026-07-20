@@ -32,7 +32,7 @@ namespace
         { TEXT("BombAimDot"),             TEXT("../../Resources/YSE/EffectContainer/BombAimDot.JSON") },
         { TEXT("SlideSmoke"),             TEXT("../../Resources/YSE/EffectContainer/SlideSmoke.JSON") },
         { TEXT("InhaleContainer"),        TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
-
+        { TEXT("OnLadderEffect"),         TEXT("../../Resources/YSE/EffectContainer/OnLadderEffect.JSON") },
         { TEXT("SwordSlash1"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },
         { TEXT("SwordSlash3"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash3.json") },
         { TEXT("JumpSlash_1"),            TEXT("../../Resources/YSE/EffectContainer/JumpSlash_1.json") },
@@ -46,9 +46,11 @@ namespace
         { TEXT("RockFloor"),              TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
         { TEXT("MoveGas"),               TEXT("../../Resources/YSE/EffectContainer/MoveGas.json") },
+        { TEXT("CylinderRollGas"),        TEXT("../../Resources/YSE/EffectContainer/CylinderRollGas.JSON") },
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/YSE/EffectContainer/CarMilkyWay_Final2.json") },
 
-        { TEXT("GetAbilityEffect"),       TEXT("../../Resources/YSH/Effects/GetAbilityEffect.json") },
+        { TEXT("GetAbilityEffect"),       TEXT("../../Resources/YSE/EffectContainer/GetAbilityEffect.JSON") },
+        { TEXT("GetDeformEffect"),        TEXT("../../Resources/YSE/EffectContainer/GetDeformEffect .JSON") },
         { TEXT("DespawnEffect"),          TEXT("../../Resources/CHJ/Effect/DespawnEffect.JSON") },
 
         { TEXT("DeathSmoke"),             TEXT("../../Resources/YSH/Effects/Proto_DeathSmoke_0.json") },

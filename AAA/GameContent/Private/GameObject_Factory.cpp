@@ -46,6 +46,7 @@
 #include "Kirby_DeformCylinder_Main.h"
 #include "Kirby_BombHat.h"
 #include "Kirby_IceHat.h"
+#include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -92,6 +93,7 @@
 #include "CarLanding.h"
 #include "PickUpEffect.h"
 #include "DropStarEffect.h"
+#include "OnLadderEffect.h"
 #include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
@@ -459,6 +461,12 @@ void CGameObject_Factory::Register_Container()
                 CKirby_IceHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh"));
+
+            // Sleep Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SleepHat::PROTOTYPE_TAG,
+                CKirby_SleepHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SleepHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sleep/SleepHat/SleepHat.ysh"));
 
             //Kirby_Projectile
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSpit_Projectile::PROTOTYPE_TAG,
@@ -1029,6 +1037,17 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
+    Register(COnLadderEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(COnLadderEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag,
+                    Texture_Star2D.iNumTex));
+        ));
     // CKirby_SwordTrail
     Register(CKirby_SwordTrail::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CKirby_SwordTrail),

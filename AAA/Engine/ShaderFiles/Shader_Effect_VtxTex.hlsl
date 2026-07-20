@@ -17,6 +17,7 @@ float g_fTextureUVEdgeFadeEndRange = { 0.1f };
 float g_fTextureUVEdgeFadePower = { 1.f };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
+float g_fTextureUVRotationDegree = { 0.f };
 
 bool g_bSpriteAniTexture = { false };
 float2 g_vSpriteAniTexUV = { 0.f, 0.f };
@@ -26,6 +27,7 @@ Texture2D g_Mask;
 bool g_bUseMask = { false };
 float2 g_vMaskTiling = { 1.f, 1.f };
 float2 g_vMaskOffset = { 0.f, 0.f };
+float g_fMaskUVRotationDegree = { 0.f };
 int g_iMaskBlendMode = { 0 };
 int g_iMaskChannel = { 0 };
 bool g_bMaskInvert = { false };
@@ -196,6 +198,18 @@ float4 ApplyUVEdgeFade(
     return vTextureValue;
 }
 
+float2 RotateEffectUV(float2 vTexcoord, float fDegree)
+{
+    float fSin = 0.f;
+    float fCos = 1.f;
+    sincos(radians(fDegree), fSin, fCos);
+
+    float2 vCentered = vTexcoord - float2(0.5f, 0.5f);
+    return float2(
+        vCentered.x * fCos - vCentered.y * fSin,
+        vCentered.x * fSin + vCentered.y * fCos) + float2(0.5f, 0.5f);
+}
+
 float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
 {
     if (In.vTexcoord.x > (1.f - g_fUVCutRight) || In.vTexcoord.x < g_fUVCutLeft)
@@ -218,11 +232,12 @@ float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
     if (g_bUseMask == true)
     {
         float2 vUV = float2(0.f, 0.f);
+        float2 vRotatedUV = RotateEffectUV(In.vTexcoord, g_fMaskUVRotationDegree);
 
         if (g_bSpriteAniMask == true)
-            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
+            vUV = vRotatedUV * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
         else
-            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+            vUV = g_vMaskOffset + vRotatedUV * g_vMaskTiling;
 
         vMaskValue = ResolveMaskValue(g_Mask.Sample(EffectSampler, vUV));
 
@@ -233,11 +248,12 @@ float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
     if (g_bUseTexture == true)
     {
         float2 vUV = float2(0.f, 0.f);
+        float2 vRotatedUV = RotateEffectUV(In.vTexcoord, g_fTextureUVRotationDegree);
         
         if (g_bSpriteAniTexture == true)
-            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV + vUVDistortion;
+            vUV = vRotatedUV * g_vSpriteAniTexSize + g_vSpriteAniTexUV + vUVDistortion;
         else
-            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
+            vUV = g_vTextureOffset + vRotatedUV * g_vTextureTiling + vUVDistortion;
         
         float4 vTextureValue = ApplyColorToAlpha(
             g_Texture.Sample(EffectSampler, vUV), g_bTextureColorToAlpha);
@@ -485,6 +501,95 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Max, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+
+
+    pass DefaultPass_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_DEFAULT()));
+    }
+
+    pass AlphaBlend_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+
+    pass Additive_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+
+    pass Max_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Max, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+
+    pass DefaultPass_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_DEFAULT_MIRROR()));
+    }
+
+    pass AlphaBlend_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+
+    pass Additive_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+
+    pass Max_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
         SetBlendState(BS_Max, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
