@@ -21,6 +21,8 @@ class CExcalibur final : public CContainerObject, public IInhalable
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Excalibur";
 
+    static constexpr _float LOOKAROUND_DELAY = 0.5f;
+
 private:
     CExcalibur(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CExcalibur(const CExcalibur& Prototype);
@@ -53,6 +55,9 @@ private:
     CExcalibur_Body* m_pBody = { nullptr };
     CExcalibur_GetIt* m_pGetIt = { nullptr };
     CCollider* m_pHurtBox = { nullptr };
+
+    _bool  m_bTriggered = { false };
+    _float m_fSyncTimer = { 0.f };
 
 public:
     static CExcalibur* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -34,6 +34,26 @@ void CExcalibur::Update(_float fTimeDelta)
         return;
 
     __super::Update(fTimeDelta);
+
+    if (!m_bTriggered)
+        return;
+
+    m_fSyncTimer += fTimeDelta;
+    if (m_fSyncTimer >= LOOKAROUND_DELAY)
+    {
+        KIRBY_POSITION_SYNC_BEGIN_DESC Desc{};
+        Desc.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOOKAROUND;
+        Desc.AnchorWorld = *(m_pTransformCom->Get_WorldMatrixPtr());
+        m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Desc);
+
+        _bool bShow = false;
+        m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
+        m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
+
+        m_pGameInstance_Proxy->Publish(TEXT("Metaknight_Appear"), nullptr);
+
+        Set_Active(false);
+    }
 }
 
 void CExcalibur::Late_Update(_float fTimeDelta)
@@ -87,6 +107,16 @@ HRESULT CExcalibur::Ready_Collider()
         if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
             return;
         
+        if (m_bTriggered)
+            return;
+
+        m_bTriggered = true;
+        m_fSyncTimer = 0.f;
+
+        if (m_pBody)  m_pBody->Set_Active(false);
+        if (m_pGetIt) m_pGetIt->Set_Active(false);
+
+        if (m_pHurtBox) m_pHurtBox->Set_Enabled(false);
         
         });
 

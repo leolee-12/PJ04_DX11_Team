@@ -20,6 +20,9 @@ HRESULT CExcalibur_GetIt::Initialize(void* pArg)
 
 void CExcalibur_GetIt::Update(_float fTimeDelta)
 {
+    if (!Is_Active())
+        return;
+
     __super::Update(fTimeDelta);
 
     m_fAccTime += fTimeDelta;
@@ -31,6 +34,9 @@ void CExcalibur_GetIt::Update(_float fTimeDelta)
 
 void CExcalibur_GetIt::Late_Update(_float fTimeDelta)
 {
+    if (!Is_Active())
+        return;
+
     Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }

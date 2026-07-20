@@ -82,6 +82,8 @@ void CKirby_MetaKnightEncounter::Request_PositionSync(CKirby* pKirby, const KIRB
             CTransform* pTransform = pKirby->Get_Transform();
             pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
 
+            pKirby->Get_Movement()->Sync_To_Controller();
+
             // Ani
             CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
             pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
@@ -89,8 +91,8 @@ void CKirby_MetaKnightEncounter::Request_PositionSync(CKirby* pKirby, const KIRB
             CAnimator::ANI_PLAY_INFO tInfo{};
             tInfo.bLoop = false;
             tInfo.bRestart = true;
-            tInfo.fBlend = 0.1f;
-            tInfo.fSpeed = 1.5f;
+            tInfo.fBlend = pDesc->fBlendDuration;
+            tInfo.fSpeed = pDesc->fAnimSpeed;
 
             tInfo.strAniName = "Metaknight_DemoAppearCut1";
             pAnimator->Play(&tInfo);

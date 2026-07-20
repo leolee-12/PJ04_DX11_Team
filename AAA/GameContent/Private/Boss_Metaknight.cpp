@@ -19,6 +19,18 @@ const _float3 CBoss_Metaknight::s_vGigaPoints[CBoss_Metaknight::GIGA_POINT_COUNT
 
 const vector<_float> CBoss_Metaknight::s_Thresholds = {};
 
+namespace
+{
+    _matrix Strip_Scale(_fmatrix m)
+    {
+        _matrix r = m;
+        r.r[0] = XMVector3Normalize(m.r[0]);
+        r.r[1] = XMVector3Normalize(m.r[1]);
+        r.r[2] = XMVector3Normalize(m.r[2]);
+        return r;
+    }
+}
+
 CBoss_Metaknight::CBoss_Metaknight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CBoss(pDevice, pContext) {
 }
@@ -35,6 +47,15 @@ HRESULT CBoss_Metaknight::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
+
+    Subscribe_Event(APPEAR_TAG, [this](void*) {
+        if (m_bAppearPending || Get_Life() != EBOSS_LIFE::HIDDEN)
+            return;
+        m_bAppearPending = true;
+        m_fAppearTimer = 0.f;
+        Set_Active(true);
+        Hide_AllParts();
+        });
 
     m_strBossName = L"메타나이트";
     m_fMaxHP = 100.f;
@@ -67,6 +88,16 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
     if (m_fGigaCooldown > 0.f)
         m_fGigaCooldown -= fTimeDelta;
 
+    if (m_bAppearPending)
+    {
+        m_fAppearTimer += fTimeDelta;
+        if (m_fAppearTimer >= APPEAR_DELAY)
+        {
+            m_bAppearPending = false;
+            Appear();
+        }
+    }
+
     __super::Update(fTimeDelta);
 }
 
@@ -82,12 +113,25 @@ CMonsterBrain* CBoss_Metaknight::Create_Brain()
 
 void CBoss_Metaknight::Play_Intro()
 {
+    if (m_pBody) m_pBody->Set_Active(true);
+    if (m_pMant) m_pMant->Set_Active(true);
+    Set_ActiveSword(m_eActiveSword);
+
+    m_pController->Set_Solid(false);
+
     if (s_bSkipIntro)
     {
         if (CAnimator* pAnim = Get_BodyAnimator())
             pAnim->Play("Wait", true, true, 0.f, s_fDefaultAnimSpeed);
         return;
     }
+
+    KIRBY_POSITION_SYNC_BEGIN_DESC Sync{};
+    Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_INTRO;
+    XMStoreFloat4x4(&Sync.AnchorWorld,
+        Strip_Scale(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+    Sync.fAnimSpeed = s_fDefaultAnimSpeed;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Sync);
 
     static constexpr const _char* INTRO_CUTS[] = {
         "DemoAppearCut1", "DemoAppearCut2", "DemoAppearCut3", "DemoAppearCut4", "DemoAppearCut5",
@@ -112,11 +156,6 @@ void CBoss_Metaknight::Play_Intro()
         pBodyAnim->Enqueue(tInfo);
         if (pMantAnim) pMantAnim->Enqueue(tInfo);
     }
-
-    m_pController->Set_Solid(false);
-
-    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 _bool CBoss_Metaknight::Is_Intro_Finished() const
@@ -325,6 +364,14 @@ void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)
     cam.pProgress = Get_BodyAnimator();
     cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+void CBoss_Metaknight::Hide_AllParts()
+{
+    if (m_pBody)    m_pBody->Set_Active(false);
+    if (m_pMant)    m_pMant->Set_Active(false);
+    if (m_pSword)   m_pSword->Set_Active(false);
+    if (m_pReplica) m_pReplica->Set_Active(false);
 }
 
 CBoss_Metaknight* CBoss_Metaknight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

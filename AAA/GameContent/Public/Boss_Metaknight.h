@@ -15,6 +15,9 @@ class CBoss_Metaknight final : public CBoss
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Boss_Metaknight";
 
+    static constexpr const _tchar* APPEAR_TAG = TEXT("Metaknight_Appear");
+    static constexpr _float APPEAR_DELAY = 1.5f;
+
     static constexpr _float s_fCCT_Radius = 0.75f;
     static constexpr _float s_fCCT_Height = 0.1f;
     static constexpr _float s_fDefaultAnimSpeed = 1.5f;
@@ -56,7 +59,7 @@ protected:
     virtual _float         Get_CorpseLinger() const override { return 0.f; }
 
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }
-    virtual const _tchar* Get_AppearEventTag() const override { return TEXT("Metaknight_Appear"); }
+    virtual const _tchar* Get_AppearEventTag() const override { return nullptr; }
 
     virtual _float Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
@@ -109,11 +112,15 @@ private:
 
     _float m_fGigaCooldown = { s_fGigaCooldown };
 
+    _bool  m_bAppearPending = { false };
+    _float m_fAppearTimer = { 0.f };
+
     // µð¹ö±×
-    static constexpr _bool s_bSkipIntro = true;
+    static constexpr _bool s_bSkipIntro = false;
 
 private:
     void Fire_CutsceneCamera(const _tchar* szTrack);
+    void Hide_AllParts();
 
 public:
     static CBoss_Metaknight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
