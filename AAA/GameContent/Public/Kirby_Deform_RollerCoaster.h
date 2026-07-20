@@ -33,7 +33,7 @@ public:
 
 	virtual _bool HasDemoModel() { return false; }
 
-	// GetDeform
+	// GetDeform 변신 추가 로직
 	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
 	virtual _bool Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
 	virtual void Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;

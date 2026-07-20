@@ -43,7 +43,7 @@ public:
 	virtual void Enter_Deform(CKirby* pKirby) = 0;
 	virtual void Exit_Deform(CKirby* pKirby) = 0;
 
-	// GetDeform
+	// GetDeform 변신 추가 로직
 	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {};
 	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) { return true; }
 	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}

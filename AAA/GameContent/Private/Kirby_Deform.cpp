@@ -41,16 +41,11 @@ void CKirby_Deform::Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFO
 
 _bool CKirby_Deform::Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
 {
+    // È¸Àü
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Rotate_To_Direction(XMLoadFloat3(&m_vRotationDir), fTimeDelta);
 
-    CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
-    CAnimator* pMainAnimator = pDeformModel_Main->Get_Animator();
-
-    if (pMainAnimator->Is_Finished())
-        return true;
-
-    return false;
+    return true;
 }
 
 void CKirby_Deform::Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)

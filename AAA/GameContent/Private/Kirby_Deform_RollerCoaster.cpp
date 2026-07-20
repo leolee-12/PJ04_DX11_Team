@@ -63,13 +63,8 @@ void CKirby_Deform_RollerCoaster::Enter_DeformState_Deform_End(CKirby* pKirby, c
 
 _bool CKirby_Deform_RollerCoaster::Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
 {
-    CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
-    CAnimator* pMainAnimator = pDeformModel_Main->Get_Animator();
-
-    if (pMainAnimator->Is_Finished())
-        return true;
-
-    return false;
+    // 유지 필요
+    return true;
 }
 
 void CKirby_Deform_RollerCoaster::Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
