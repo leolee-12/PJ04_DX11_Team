@@ -5,6 +5,7 @@
 #include "Bounding_OBB.h"
 #include "Bounding_Sphere.h"
 #include "Bounding_Capsule.h"
+#include "Bounding_Torus.h"
 
 NS_BEGIN(Engine)
 
