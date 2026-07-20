@@ -92,6 +92,10 @@ HRESULT CToolApp::Ready_Engine()
 	}
 
 	m_pGI_Proxy = CGameInstance::GetProxy();
+	if (nullptr == m_pGI_Proxy)
+		return E_FAIL;
+
+	m_pGI_Proxy->Set_EditMode(true);
 	return S_OK;
 }
 

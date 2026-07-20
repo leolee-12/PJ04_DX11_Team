@@ -1,6 +1,7 @@
 #include "Map_Parser.h"
 #include "GameContent_Log.h"
 #include "Env_CollisionCatalog.h"
+#include "EnvInteract_PresetCatalog.h"
 
 #include "DataLoader.h"
 #include "Parsing_Utils.h"
@@ -540,6 +541,18 @@ void CMap_Parser::Parse_ToyObjEntry(
 
 	if (!JsonUtils::Try_ReadString(jEntry, "Basic.ObjectName", &Desc.wstrObjectName))
 		return;
+
+	ENV_INTERACT_PRESET InteractPreset{};
+	if (CEnvInteract_PresetCatalog::Try_Find(Desc.wstrObjectName, &InteractPreset))
+	{
+		Desc.eInteractType = InteractPreset.eType;
+		Desc.tInteractPreset = InteractPreset;
+	}
+	else
+	{
+		Desc.eInteractType = ENV_INTERACT_TYPE::UNKNOWN;
+		Desc.tInteractPreset.eType = Desc.eInteractType;
+	}
 
 	Fill_CommonFlags(jEntry, &Desc);
 	JsonUtils::Try_ReadFloat3Array(jEntry, "Basic.BasicInfo.Position", &Desc.vPosition);

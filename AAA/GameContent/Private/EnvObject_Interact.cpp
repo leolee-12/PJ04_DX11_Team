@@ -32,6 +32,9 @@ HRESULT CEnvObject_Interact::Initialize(void* pArg)
 	if (FAILED(Rebuild_PhysicsActor()))
 		return E_FAIL;
 
+	if (FAILED(Ready_InteractComponents()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -53,9 +56,9 @@ void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
-void CEnvObject_Interact::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
+HRESULT CEnvObject_Interact::Ready_InteractComponents()
 {
-	__super::Copy_PrototypeName(pOutData);
+	return S_OK;
 }
 
 CEnvObject_Interact* CEnvObject_Interact::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

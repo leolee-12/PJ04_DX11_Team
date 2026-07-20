@@ -82,11 +82,29 @@ void CRigidBody::Add_Impulse(_fvector v) {
         m_pBody->addForce(PxVec3(f.x, f.y, f.z), PxForceMode::eIMPULSE);
     }
 }
+_vector CRigidBody::Get_LinearVelocity() const {
+    const PxVec3 vVelocity = m_pBody->getLinearVelocity();
+    return XMVectorSet(vVelocity.x, vVelocity.y, vVelocity.z, 0.f);
+}
 void CRigidBody::Set_LinearVelocity(_fvector v) {
     if (m_pBody) {
         _float3 f; XMStoreFloat3(&f, v);
         m_pBody->setLinearVelocity(PxVec3(f.x, f.y, f.z));
     }
+}
+void CRigidBody::Set_Enabled(_bool bEnabled) {
+    if (nullptr == m_pBody) return;
+
+    Set_SceneQueryEnabled(bEnabled);
+    m_pBody->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !bEnabled);
+}
+void CRigidBody::Set_SceneQueryEnabled(_bool bEnabled) {
+    const PxU32 iNumShapes = m_pBody->getNbShapes();
+    std::vector<PxShape*> shapes(iNumShapes);
+    m_pBody->getShapes(shapes.data(), iNumShapes);
+
+    for (PxShape* pShape : shapes)
+        pShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, bEnabled);
 }
 void CRigidBody::WakeUp() { if (m_pBody && !m_bKinematic) m_pBody->wakeUp(); }
 
