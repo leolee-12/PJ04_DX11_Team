@@ -422,7 +422,6 @@ void CLevelDesign_Point::Begin_Pickup(const _float3& vPickupStartPos)
 	m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
 
 	m_fPickupElapsed = 0.f;
-	m_bPickingUp = true;
 }
 
 void CLevelDesign_Point::Update_Pickup(_float fTimeDelta)

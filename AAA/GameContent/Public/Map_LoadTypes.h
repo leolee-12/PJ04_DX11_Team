@@ -162,9 +162,6 @@ inline _bool Has_AnyClassOverride(const EDIT_CLASS_OVERRIDE& ClassOverride)
 	if (const EDIT_ENVOBJECT_OVERRIDE* pEnvOverride = get_if<EDIT_ENVOBJECT_OVERRIDE>(&ClassOverride))
 		return pEnvOverride->bHasNearDistAlpha || pEnvOverride->bHasDecalAlpha;
 
-	if (const EDIT_LD_BUSH_OVERRIDE* pBushOverride = get_if<EDIT_LD_BUSH_OVERRIDE>(&ClassOverride))
-		return pBushOverride->bHasGenerateItem;
-
 	return false;
 }
 

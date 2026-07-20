@@ -85,18 +85,11 @@ struct EDIT_LEVELDESIGN_OVERRIDE
 {
 };
 
-struct EDIT_LD_BUSH_OVERRIDE
-{
-	_bool bHasGenerateItem = { false };
-	_bool bGenerateItem = { false };
-};
-
 using EDIT_CLASS_OVERRIDE = variant<
 	monostate,
 	EDIT_MAPSECTION_OVERRIDE,
 	EDIT_ENVOBJECT_OVERRIDE,
-	EDIT_LEVELDESIGN_OVERRIDE,
-	EDIT_LD_BUSH_OVERRIDE>;
+	EDIT_LEVELDESIGN_OVERRIDE>;
 
 struct EDIT_OBJECT_OVERRIDE_DESC
 {

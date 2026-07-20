@@ -8,6 +8,9 @@
 
 namespace
 {
+	constexpr _float LADDER_TRIGGER_RADIUS = 0.3f;
+	constexpr _float3 LADDER_TRIGGER_CENTER = { 0.f, -0.75f, -1.f };
+
 	struct LD_LADDER_CATALOG
 	{
 		const _tchar* pObjectName;
@@ -302,8 +305,8 @@ HRESULT CLevelDesign_Ladder::Ready_Trigger()
 	CCollider::COLLIDER_DESC Desc{};
 	Desc.pOwner = this;
 	Desc.fHeight = (_float)m_tLadderDesc.iLength * m_fSegmentStepY;
-	Desc.fRadius = 0.3f;
-	Desc.vCenter = _float3(0.f, -0.75f, -1.f);
+	Desc.fRadius = LADDER_TRIGGER_RADIUS;
+	Desc.vCenter = LADDER_TRIGGER_CENTER;
 
 	m_pTrigger = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_Trigger"), &Desc);
 	if (nullptr == m_pTrigger)

@@ -76,9 +76,8 @@ private:
 	void Handle_TriggerEnter(CCollider* pOther);
 	void Handle_TriggerStay(CCollider* pOther);
 	void Handle_TriggerExit(CCollider* pOther);
-	void Grant_Reward(CCollider* pOther);
+	void Grant_Reward();
 	_bool Play_Animation(const _char* pAnimName, _bool bLoop);
-	_bool Is_PlayerCollider(CCollider* pOther) const;
 	void Update_AnimationSpeed();
 	_int Find_MeshIndex_ByName(const _char* pMeshName) const;
 	_bool Should_RenderMesh(_uint iMeshIndex) const;

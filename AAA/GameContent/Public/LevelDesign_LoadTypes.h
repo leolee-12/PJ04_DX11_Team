@@ -147,7 +147,6 @@ struct LD_BUSH_DESC : public LD_OBJECT_DESC
 	_wstring wstrCutProtoTag;
 	MODEL eBasicType = { MODEL::ANIM };
 	MODEL eCutType = { MODEL::NONANIM };
-	_bool bGenerateItem = { false };
 };
 #pragma endregion
 

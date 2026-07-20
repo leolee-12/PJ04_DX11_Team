@@ -526,8 +526,6 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 		{
 			if (nullptr == pOther)
 				return;
-			if (ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE) != pOther->Get_RegisteredGroup())
-				return;
 
 			PLAYER_QUERY PlayerQuery{};
 			m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &PlayerQuery);
