@@ -56,6 +56,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_World_NonAnim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_NonAnim"), TEXT("../Bin/ShaderFiles/Shader_World_NonAnim.hlsl") };
 	inline constexpr SHADER_DESC Shader_World_Anim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Anim"), TEXT("../Bin/ShaderFiles/Shader_World_Anim.hlsl") };
 	inline constexpr SHADER_DESC Shader_World_Instance = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Instance"), TEXT("../Bin/ShaderFiles/Shader_World_Instance.hlsl") };
+	inline constexpr SHADER_DESC Shader_Fluid = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Fluid"), TEXT("../Bin/ShaderFiles/Shader_Fluid.hlsl") };
 	inline constexpr SHADER_DESC Shader_SkySphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SkySphere"), TEXT("../Bin/ShaderFiles/Shader_SkySphere.hlsl") };
 
 	inline constexpr SHADER_DESC Shader_UI = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_UI"), TEXT("../Bin/ShaderFiles/Shader_UI.hlsl") };
@@ -115,6 +116,10 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle01	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle01"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle02	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle02"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle02.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle03	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle03"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle03.png"), 1 };
+
+	inline constexpr COMPONENT_DESC Model_Stone = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Stone") };
+	inline constexpr COMPONENT_DESC Model_StoneDust = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_StoneDust") };
+	inline constexpr COMPONENT_DESC Model_SmokeSphereOriginal = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SmokeSphereOriginal") };
 
 	//Marb1e
 	inline constexpr TEXTURE_DESC Texture_LeoSlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LeoSlash"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Ring/spin01.png"), 1 };

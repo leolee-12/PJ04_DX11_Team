@@ -18,6 +18,7 @@ namespace
 	constexpr _float s_fInhalePullAccel = 40.f;
 	constexpr _float s_fInhaleMouthFwd = 0.6f;
 	constexpr _float s_fInhaleMouthUp = 0.6f;
+	constexpr _float s_fInhaleActivationGraceTime = 0.25f;
 
 	constexpr const _tchar* ITEM_EFFECT_ID = L"ItemEffect";
 
@@ -75,6 +76,7 @@ HRESULT CLevelDesign_Food::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_tFoodDesc = *static_cast<const LD_FOOD_DESC*>(pArg);
+	m_ItemEffectHandle.Clear();
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -136,6 +138,8 @@ void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 	if (!m_bActive || Is_Dead())
 		return;
 
+	m_fInhaleGraceTime = max(0.f, m_fInhaleGraceTime - fTimeDelta);
+
 	if (m_bPickingUp)
 	{
 		Update_Pickup(fTimeDelta);
@@ -164,6 +168,7 @@ void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 	}
 
 	Check_Visible();
+	m_bInhaleDisplaced = false;
 	Submit_RenderGroups();
 }
 
@@ -244,8 +249,13 @@ void CLevelDesign_Food::On_LDEventReceived(const _wstring& strEventTag)
 	if (m_bPickingUp || Is_Dead() || Is_Active())
 		return;
 
-	if (nullptr == m_pItemEffect && FAILED(Ready_Effect()))
+	if (FAILED(Ready_Effect()))
 		return;
+
+	m_fInhaleGraceTime = s_fInhaleActivationGraceTime;
+	m_bInhalePullRequested = false;
+	m_fInhalePullSpeed = 0.f;
+	m_pInhaler = nullptr;
 
 	Set_Active(true);
 
@@ -288,29 +298,49 @@ HRESULT CLevelDesign_Food::Ready_RenderComponents()
 
 HRESULT CLevelDesign_Food::Ready_Effect()
 {
+	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
+	if (pEffectLoader->Is_Current(m_ItemEffectHandle))
+		return S_OK;
+
+	m_ItemEffectHandle.Clear();
+
 	_float3 vEffectPosition{};
 	XMStoreFloat3(&vEffectPosition, m_pTransformCom->Get_State(STATE::POSITION));
 	vEffectPosition.y += s_fFoodFloatHeight * 1.5f;
 
-	if (FAILED(CEffect_Loader::GetInstance()->Spawn(
+	if (FAILED(pEffectLoader->Spawn(
 		ITEM_EFFECT_ID,
 		Get_LevelIndex(),
 		vEffectPosition,
 		_float3(0.f, 0.f, 0.f),
 		_float3(0.f, 0.f, 0.f),
 		nullptr,
-		&m_pItemEffect)))
+		nullptr,
+		&m_ItemEffectHandle)))
 	{
-		m_pItemEffect = nullptr;
+		m_ItemEffectHandle.Clear();
 		return E_FAIL;
 	}
-	else
-	{
-		const _float3 vFoodScale = m_pTransformCom->Get_Scaled();
-		m_pItemEffect->Get_Transform()->Set_Scale(vFoodScale.x, vFoodScale.y, vFoodScale.z);
-	}
+
+	const _float3 vFoodScale = m_pTransformCom->Get_Scaled();
+	m_ItemEffectHandle.p->Get_Transform()->Set_Scale(vFoodScale.x, vFoodScale.y, vFoodScale.z);
 
 	return S_OK;
+}
+
+void CLevelDesign_Food::Release_Effect()
+{
+	if (nullptr == m_pGameInstance_Proxy || !m_pGameInstance_Proxy->IsConnected())
+	{
+		m_ItemEffectHandle.Clear();
+		return;
+	}
+
+	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
+	if (pEffectLoader->Is_Current(m_ItemEffectHandle))
+		m_ItemEffectHandle.p->EffectContainer_Stop();
+
+	m_ItemEffectHandle.Clear();
 }
 
 HRESULT CLevelDesign_Food::Bind_ShaderResources()
@@ -429,11 +459,7 @@ void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
 
 	pKirby->Add_HP(m_tFoodDesc.fHealAmount);
 
-	if (m_pItemEffect)
-	{
-		m_pItemEffect->EffectContainer_Stop();
-		m_pItemEffect = nullptr;
-	}
+	Release_Effect();
 
 	if (m_pHurtBox)
 		m_pHurtBox->Set_Enabled(false);
@@ -486,7 +512,7 @@ void CLevelDesign_Food::Handle_InhalePull(CCollider* pOther)
 		return;
 	if (ETOUI(COLLISION_LAYER::PLAYER_INHALE) != pOther->Get_RegisteredGroup())
 		return;
-	if (Is_Dead() || m_bPickingUp)
+	if (!Is_Active() || Is_Dead() || m_bPickingUp || m_fInhaleGraceTime > 0.f)
 		return;
 
 	CGameObject* pInhaler = pOther->Get_Owner();
@@ -517,11 +543,16 @@ void CLevelDesign_Food::Update_InhalePull(_float fTimeDelta)
 	const _float fMoveDistance = min(m_fInhalePullSpeed * fTimeDelta, fDistance);
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition + XMVector3Normalize(vDirection) * fMoveDistance);
 
-	if (nullptr != m_pItemEffect)
+	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
+	if (pEffectLoader->Is_Current(m_ItemEffectHandle))
 	{
 		const _vector vEffectPosition = m_pTransformCom->Get_State(STATE::POSITION)
 			+ XMVectorSet(0.f, s_fFoodFloatHeight * 1.5f, 0.f, 0.f);
-		m_pItemEffect->Get_Transform()->Set_State(STATE::POSITION, XMVectorSetW(vEffectPosition, 1.f));
+		m_ItemEffectHandle.p->Get_Transform()->Set_State(STATE::POSITION, XMVectorSetW(vEffectPosition, 1.f));
+	}
+	else
+	{
+		m_ItemEffectHandle.Clear();
 	}
 
 	if (fMoveDistance > 0.f)
@@ -558,6 +589,8 @@ CGameObject* CLevelDesign_Food::Clone(void* pArg)
 
 void CLevelDesign_Food::Free()
 {
+	Release_Effect();
+
 	__super::Free();
 }
 

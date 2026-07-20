@@ -52,6 +52,8 @@
     <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
+    <ClInclude Include="..\Public\EnvInteract_KickProp.h" />
+    <ClInclude Include="..\Public\EnvInteract_PresetCatalog.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
     <ClInclude Include="..\Public\KasaCatchEffect.h" />
     <ClInclude Include="..\Public\KasaUpEffect.h" />
@@ -469,6 +471,8 @@
     <ClInclude Include="..\Public\WalkSmoke.h" />
     <ClInclude Include="..\Public\WarpInEffect.h" />
     <ClInclude Include="..\Public\WarpOutEffect.h" />
+    <ClInclude Include="..\Public\Water_Defines.h" />
+    <ClInclude Include="..\Public\Water_RenderBinder.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
@@ -492,6 +496,8 @@
     <ClCompile Include="..\Private\Bouncy_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Chase.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
+    <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
     <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />
@@ -892,6 +898,7 @@
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
     <ClCompile Include="..\Private\WarpInEffect.cpp" />
     <ClCompile Include="..\Private\WarpOutEffect.cpp" />
+    <ClCompile Include="..\Private\Water_RenderBinder.cpp" />
     <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -970,6 +977,9 @@
     <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

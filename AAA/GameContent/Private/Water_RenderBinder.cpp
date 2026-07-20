@@ -1,0 +1,126 @@
+#include "Water_RenderBinder.h"
+
+#include "Math_Utils.h"
+#include "Shader.h"
+
+#include <cmath>
+
+namespace
+{
+	constexpr _double WATER_GAME_TIME_PERIOD = { 60000.0 };
+	constexpr _float MIN_NORMAL_TILING = { 0.0001f };
+	constexpr _float MIN_FOAM_NOISE_TILING = { 0.0001f };
+	constexpr _float MIN_CAUSTIC_TILING = { 0.0001f };
+}
+
+void Client::Sanitize_WaterRenderDesc(WATER_RENDER_DESC* pDesc)
+{
+	if (nullptr == pDesc)
+		return;
+
+	const WATER_RENDER_DESC Default{};
+
+	pDesc->vShallowColor = MathUtils::Sanitize_FiniteFloat4(pDesc->vShallowColor, Default.vShallowColor);
+	pDesc->vDeepColor = MathUtils::Sanitize_FiniteFloat4(pDesc->vDeepColor, Default.vDeepColor);
+
+	pDesc->fOpacity = MathUtils::Sanitize_ClampedFloat(pDesc->fOpacity, Default.fOpacity, 0.f, 1.f);
+	pDesc->fDepthFadeDistance = MathUtils::Sanitize_MinimumFloat(pDesc->fDepthFadeDistance, Default.fDepthFadeDistance, 0.001f);
+
+	pDesc->vNormalTiling0.x = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vNormalTiling0.x, Default.vNormalTiling0.x, MIN_NORMAL_TILING);
+	pDesc->vNormalTiling0.y = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vNormalTiling0.y, Default.vNormalTiling0.y, MIN_NORMAL_TILING);
+	pDesc->vNormalTiling1.x = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vNormalTiling1.x, Default.vNormalTiling1.x, MIN_NORMAL_TILING);
+	pDesc->vNormalTiling1.y = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vNormalTiling1.y, Default.vNormalTiling1.y, MIN_NORMAL_TILING);
+
+	pDesc->vNormalSpeed0 = MathUtils::Sanitize_FiniteFloat2(pDesc->vNormalSpeed0, Default.vNormalSpeed0);
+	pDesc->vNormalSpeed1 = MathUtils::Sanitize_FiniteFloat2(pDesc->vNormalSpeed1, Default.vNormalSpeed1);
+
+	pDesc->fNormalStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fNormalStrength, Default.fNormalStrength, 0.f, 4.f);
+	pDesc->fFresnelPower = MathUtils::Sanitize_ClampedFloat(pDesc->fFresnelPower, Default.fFresnelPower, 0.1f, 16.f);
+	pDesc->fReflectionStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fReflectionStrength, Default.fReflectionStrength, 0.f, 4.f);
+	pDesc->fRefractionStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fRefractionStrength, Default.fRefractionStrength, 0.f, 0.1f);
+	pDesc->fSpecularPower = MathUtils::Sanitize_ClampedFloat(pDesc->fSpecularPower, Default.fSpecularPower, 1.f, 256.f);
+	pDesc->fSpecularStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fSpecularStrength, Default.fSpecularStrength, 0.f, 8.f);
+
+	pDesc->fFoamWidth = MathUtils::Sanitize_ClampedFloat(pDesc->fFoamWidth, Default.fFoamWidth, 0.f, 5.f);
+	pDesc->fFoamStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fFoamStrength, Default.fFoamStrength, 0.f, 4.f);
+	pDesc->vFoamNoiseTiling.x = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vFoamNoiseTiling.x, Default.vFoamNoiseTiling.x, MIN_FOAM_NOISE_TILING);
+	pDesc->vFoamNoiseTiling.y = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vFoamNoiseTiling.y, Default.vFoamNoiseTiling.y, MIN_FOAM_NOISE_TILING);
+	pDesc->vFoamNoiseSpeed = MathUtils::Sanitize_FiniteFloat2(pDesc->vFoamNoiseSpeed, Default.vFoamNoiseSpeed);
+	pDesc->fFoamNoiseStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fFoamNoiseStrength, Default.fFoamNoiseStrength, 0.f, 1.f);
+
+	pDesc->vCausticTiling.x = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vCausticTiling.x, Default.vCausticTiling.x, MIN_CAUSTIC_TILING);
+	pDesc->vCausticTiling.y = MathUtils::Sanitize_MinimumAbsoluteFloat(pDesc->vCausticTiling.y, Default.vCausticTiling.y, MIN_CAUSTIC_TILING);
+	pDesc->vCausticSpeed = MathUtils::Sanitize_FiniteFloat2(pDesc->vCausticSpeed, Default.vCausticSpeed);
+	pDesc->fCausticStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fCausticStrength, Default.fCausticStrength, 0.f, 4.f);
+
+	pDesc->fVisibility = MathUtils::Sanitize_ClampedFloat(pDesc->fVisibility, Default.fVisibility, 0.f, 1.f);
+}
+
+HRESULT Client::Bind_WaterRenderDesc(CShader* pShader, const WATER_RENDER_DESC& Desc, _double dGameTime)
+{
+	if (nullptr == pShader)
+		return E_INVALIDARG;
+
+	WATER_RENDER_DESC SafeDesc = Desc;
+	Sanitize_WaterRenderDesc(&SafeDesc);
+
+	const _double dWrappedGameTime = MathUtils::Wrap_FiniteDouble(dGameTime, WATER_GAME_TIME_PERIOD);
+	const _float fGameTime = static_cast<_float>(dWrappedGameTime);
+
+	if (FAILED(pShader->Bind_RawValue("g_vShallowColor", &SafeDesc.vShallowColor, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vDeepColor", &SafeDesc.vDeepColor, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fOpacity", &SafeDesc.fOpacity, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fDepthFadeDistance", &SafeDesc.fDepthFadeDistance, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_RawValue("g_vNormalTiling0", &SafeDesc.vNormalTiling0, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vNormalSpeed0", &SafeDesc.vNormalSpeed0, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vNormalTiling1", &SafeDesc.vNormalTiling1, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vNormalSpeed1", &SafeDesc.vNormalSpeed1, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fNormalStrength", &SafeDesc.fNormalStrength, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_RawValue("g_fFresnelPower", &SafeDesc.fFresnelPower, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fReflectionStrength", &SafeDesc.fReflectionStrength, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fRefractionStrength", &SafeDesc.fRefractionStrength, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_RawValue("g_fSpecularPower", &SafeDesc.fSpecularPower, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fSpecularStrength", &SafeDesc.fSpecularStrength, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_RawValue("g_fFoamWidth", &SafeDesc.fFoamWidth, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fFoamStrength", &SafeDesc.fFoamStrength, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vFoamNoiseTiling", &SafeDesc.vFoamNoiseTiling, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vFoamNoiseSpeed", &SafeDesc.vFoamNoiseSpeed, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fFoamNoiseStrength", &SafeDesc.fFoamNoiseStrength, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fVisibility", &SafeDesc.fVisibility, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_RawValue("g_vCausticTiling", &SafeDesc.vCausticTiling, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vCausticSpeed", &SafeDesc.vCausticSpeed, sizeof(_float2))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fCausticStrength", &SafeDesc.fCausticStrength, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_RawValue("g_fGameTime", &fGameTime, sizeof(_float))))
+		return E_FAIL;
+
+	return S_OK;
+}
