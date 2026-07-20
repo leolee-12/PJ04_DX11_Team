@@ -12,6 +12,7 @@ public:
         _float  fRingRadius;   // 링(대) 반지름: 중심~튜브 중심
         _float  fTubeRadius;   // 튜브(소) 반지름: 도넛 두께의 절반
         _float3 vRadians;      // 축 기울기 (기본 +Y up)
+        _float  fArcDeg;
     }BOUNDING_TORUS_DESC;
 
 private:
@@ -42,6 +43,10 @@ private:
     _float3 m_vWorldAxis = { 0.f, 1.f, 0.f };
     _float  m_fWorldRing = { 1.f };
     _float  m_fWorldTube = { 0.25f };
+
+    _float  m_fArcRad = { XM_2PI };          // 호 각도(라디안)
+    _float3 m_vLocalFwd = { 0.f, 0.f, 1.f }; // 호 중앙 방향 (로컬 +Z)
+    _float3 m_vWorldFwd = { 0.f, 0.f, 1.f };
 
 public:
     static CBounding_Torus* Create(ID3D11Device*, ID3D11DeviceContext*, const CBounding::BOUNDING_DESC*);

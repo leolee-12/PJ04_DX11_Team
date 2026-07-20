@@ -18,6 +18,9 @@ HRESULT CBounding_Torus::Initialize(const CBounding::BOUNDING_DESC* pBoundingDes
         pDesc->vRadians.x, pDesc->vRadians.y, pDesc->vRadians.z);
     XMStoreFloat3(&m_vLocalAxis, XMVector3TransformNormal(XMVectorSet(0.f, 1.f, 0.f, 0.f), matRot));
 
+    m_fArcRad = XMConvertToRadians(pDesc->fArcDeg);
+    XMStoreFloat3(&m_vLocalFwd, XMVector3TransformNormal(XMVectorSet(0.f, 0.f, 1.f, 0.f), matRot));
+
     return S_OK;
 }
 
@@ -27,6 +30,8 @@ void CBounding_Torus::Update(_fmatrix TransformMatrix)
         XMVector3TransformCoord(XMLoadFloat3(&m_vLocalCenter), TransformMatrix));
     XMStoreFloat3(&m_vWorldAxis,
         XMVector3Normalize(XMVector3TransformNormal(XMLoadFloat3(&m_vLocalAxis), TransformMatrix)));
+    XMStoreFloat3(&m_vWorldFwd,
+        XMVector3Normalize(XMVector3TransformNormal(XMLoadFloat3(&m_vLocalFwd), TransformMatrix)));
 
     const _float fScale = XMVectorGetX(XMVector3Length(TransformMatrix.r[0]));   // 균등 스케일 가정
     m_fWorldRing = m_fRing * fScale;
@@ -41,13 +46,32 @@ void CBounding_Torus::Reset_Desc(const CBounding::BOUNDING_DESC* pDesc)
 _float CBounding_Torus::Distance_ToSurface(_fvector vPoint) const
 {
     _vector vAxis = XMLoadFloat3(&m_vWorldAxis);
-    _vector v = vPoint - XMLoadFloat3(&m_vWorldCenter);
+    _vector vC = XMLoadFloat3(&m_vWorldCenter);
+    _vector v = vPoint - vC;
 
-    const _float h = XMVectorGetX(XMVector3Dot(v, vAxis));          // 축 방향 높이
-    const _float fRad = XMVectorGetX(XMVector3Length(v - vAxis * h)); // 축에서의 반경 거리
+    const _float h = XMVectorGetX(XMVector3Dot(v, vAxis));
+    _vector vRad = v - vAxis * h;
 
-    const _float dx = fRad - m_fWorldRing;
-    return sqrtf(dx * dx + h * h) - m_fWorldTube;
+    // 호 판정: 링 평면에서 호 중앙(Fwd) 기준 각도
+    _vector vF = XMLoadFloat3(&m_vWorldFwd);
+    _vector vS = XMVector3Cross(vAxis, vF);
+    const _float fTheta = atan2f(
+        XMVectorGetX(XMVector3Dot(vRad, vS)),
+        XMVectorGetX(XMVector3Dot(vRad, vF)));
+
+    const _float fHalfArc = m_fArcRad * 0.5f;
+    if (fabsf(fTheta) <= fHalfArc)
+    {
+        // 호 안: 일반 토러스 거리
+        const _float fRadLen = XMVectorGetX(XMVector3Length(vRad));
+        const _float dx = fRadLen - m_fWorldRing;
+        return sqrtf(dx * dx + h * h) - m_fWorldTube;
+    }
+
+    // 호 밖: 가까운 쪽 호 끝점(튜브 중심)까지의 거리
+    const _float fEnd = (fTheta > 0.f) ? fHalfArc : -fHalfArc;
+    _vector vEnd = vC + (vF * cosf(fEnd) + vS * sinf(fEnd)) * m_fWorldRing;
+    return XMVectorGetX(XMVector3Length(vPoint - vEnd)) - m_fWorldTube;
 }
 
 _bool CBounding_Torus::Intersects_Sphere(const BoundingSphere* pSphere) const
@@ -118,24 +142,27 @@ HRESULT CBounding_Torus::Render(PrimitiveBatch<VertexPositionColor>* pBatch)
     _vector vX = XMVector3Normalize(XMVector3Orthogonal(vAxis));
     _vector vZ = XMVector3Cross(vAxis, vX);
 
-    auto DrawRing = [&](_float fRadius, _float fHeight)
+    auto DrawArc = [&](_float fRadius, _float fHeight)
         {
-            constexpr _int SEG = 32;
+            constexpr _int SEG = 24;
+            const _float fHalf = m_fArcRad * 0.5f;
+            _vector vF = XMLoadFloat3(&m_vWorldFwd);
+            _vector vS = XMVector3Cross(vAxis, vF);
             _vector vBase = vC + vAxis * fHeight;
             for (_int i = 0; i < SEG; ++i)
             {
-                const _float a0 = XM_2PI * i / SEG;
-                const _float a1 = XM_2PI * (i + 1) / SEG;
-                _vector p0 = vBase + (vX * cosf(a0) + vZ * sinf(a0)) * fRadius;
-                _vector p1 = vBase + (vX * cosf(a1) + vZ * sinf(a1)) * fRadius;
+                const _float a0 = -fHalf + m_fArcRad * i / SEG;
+                const _float a1 = -fHalf + m_fArcRad * (i + 1) / SEG;
+                _vector p0 = vBase + (vF * cosf(a0) + vS * sinf(a0)) * fRadius;
+                _vector p1 = vBase + (vF * cosf(a1) + vS * sinf(a1)) * fRadius;
                 pBatch->DrawLine(VertexPositionColor(p0, color), VertexPositionColor(p1, color));
             }
         };
 
-    DrawRing(m_fWorldRing + m_fWorldTube, 0.f);   // 바깥 링
-    DrawRing(m_fWorldRing - m_fWorldTube, 0.f);   // 안쪽 링
-    DrawRing(m_fWorldRing, m_fWorldTube);        // 윗면 링
-    DrawRing(m_fWorldRing, -m_fWorldTube);       // 아랫면 링
+    DrawArc(m_fWorldRing + m_fWorldTube, 0.f);   // 바깥 링
+    DrawArc(m_fWorldRing - m_fWorldTube, 0.f);   // 안쪽 링
+    DrawArc(m_fWorldRing, m_fWorldTube);        // 윗면 링
+    DrawArc(m_fWorldRing, -m_fWorldTube);       // 아랫면 링
 
     return S_OK;
 }
