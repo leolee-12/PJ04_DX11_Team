@@ -1000,6 +1000,30 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Spot">
       <UniqueIdentifier>{5b5a61aa-7a1c-4825-b04a-0f34417aca22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight">
+      <UniqueIdentifier>{d512be1a-ab54-4143-8de1-61129c4437e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Brain">
+      <UniqueIdentifier>{97870331-6bd9-4123-bc30-69a39f54fa88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part">
+      <UniqueIdentifier>{2fc9d6b6-bb9a-4b3e-a015-0ccf6886121e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Body">
+      <UniqueIdentifier>{54e1e543-6811-480e-a352-c6dde5d95142}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant">
+      <UniqueIdentifier>{8889da8d-8df3-4363-a83d-d90d79299ddf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword">
+      <UniqueIdentifier>{cc608e8c-af5c-4970-b6ba-68aa9a8e8fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword">
+      <UniqueIdentifier>{20c04250-f71a-4340-862a-327e21b6b2d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Projectile">
+      <UniqueIdentifier>{3ad7e84a-9b3b-4a0a-946a-8876933bb653}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
     </Filter>
@@ -1420,30 +1444,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight">
-      <UniqueIdentifier>{d512be1a-ab54-4143-8de1-61129c4437e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part">
-      <UniqueIdentifier>{2fc9d6b6-bb9a-4b3e-a015-0ccf6886121e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Body">
-      <UniqueIdentifier>{54e1e543-6811-480e-a352-c6dde5d95142}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Brain">
-      <UniqueIdentifier>{97870331-6bd9-4123-bc30-69a39f54fa88}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword">
-      <UniqueIdentifier>{20c04250-f71a-4340-862a-327e21b6b2d2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword">
-      <UniqueIdentifier>{cc608e8c-af5c-4970-b6ba-68aa9a8e8fe0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant">
-      <UniqueIdentifier>{8889da8d-8df3-4363-a83d-d90d79299ddf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Projectile">
-      <UniqueIdentifier>{3ad7e84a-9b3b-4a0a-946a-8876933bb653}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1562,6 +1562,24 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss_Leopard_Brain.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Body.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Brain.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Mant.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Sword.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BossBase.h">
       <Filter>00. GameObject\07. Boss</Filter>
@@ -2469,6 +2487,9 @@
     <ClInclude Include="..\public\Projectile_Manager.h">
       <Filter>01. Projectile\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Projectile_MoonShot.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Projectile_Movement.h">
       <Filter>01. Projectile\Movement</Filter>
     </ClInclude>
@@ -2769,27 +2790,6 @@
     <ClInclude Include="..\Public\WarpOutEffect.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Boss_Metaknight.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Metaknight_Body.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Body</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Metaknight_Brain.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Brain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Metaknight_Sword.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Metaknight_Mant.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Projectile_MoonShot.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2905,6 +2905,24 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Body.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Brain.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Mant.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BossBase.cpp">
       <Filter>00. GameObject\07. Boss</Filter>
@@ -3740,6 +3758,9 @@
     <ClCompile Include="..\private\Projectile_Manager.cpp">
       <Filter>01. Projectile\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Projectile_MoonShot.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Projectile_Movement.cpp">
       <Filter>01. Projectile\Movement</Filter>
     </ClCompile>
@@ -4022,27 +4043,6 @@
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Boss_Metaknight.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Metaknight_Body.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Body</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Metaknight_Brain.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Brain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Metaknight_Mant.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Projectile_MoonShot.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
@@ -4074,6 +4074,9 @@
     </None>
     <None Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MetaKnight.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Monster.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
@@ -4107,12 +4110,6 @@
     </None>
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
-      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_MetaKnight.hlsl">
-      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -139,6 +139,9 @@
     <Filter Include="07. Component\Collider\Bounding\Sphere">
       <UniqueIdentifier>{93039028-e495-417a-801c-7e458b5a689f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="07. Component\Collider\Bounding\Torus">
+      <UniqueIdentifier>{b82903e8-b04d-42ce-9d02-2c80bd63c2f3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="07. Component\Collider\DebugDraw">
       <UniqueIdentifier>{0317c6e3-b75a-471f-b833-7e8bfa698015}</UniqueIdentifier>
     </Filter>
@@ -334,9 +337,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{2a09911f-6d40-4db8-baf2-7aa0d3c77798}</UniqueIdentifier>
     </Filter>
-    <Filter Include="07. Component\Collider\Bounding\Torus">
-      <UniqueIdentifier>{b82903e8-b04d-42ce-9d02-2c80bd63c2f3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Anim_Layer.h">
@@ -374,6 +374,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Bounding_Sphere.h">
       <Filter>07. Component\Collider\Bounding\Sphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bounding_Torus.h">
+      <Filter>07. Component\Collider\Bounding\Torus</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT.h">
       <Filter>21. Behavior Tree</Filter>
@@ -690,9 +693,6 @@
     <ClInclude Include="..\public\VIBuffer_Trail.h">
       <Filter>07. Component\VIBuffer\Trail</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Bounding_Torus.h">
-      <Filter>07. Component\Collider\Bounding\Torus</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Animation.cpp">
@@ -727,6 +727,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Bounding_Sphere.cpp">
       <Filter>07. Component\Collider\Bounding\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding_Torus.cpp">
+      <Filter>07. Component\Collider\Bounding\Torus</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BTComposite.cpp">
       <Filter>21. Behavior Tree\02. BTComposite</Filter>
@@ -991,9 +994,6 @@
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer_Trail.cpp">
       <Filter>07. Component\VIBuffer\Trail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Bounding_Torus.cpp">
-      <Filter>07. Component\Collider\Bounding\Torus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -19,6 +19,9 @@
     <Filter Include="01. Levels\02. Stage">
       <UniqueIdentifier>{865959bb-a7f5-486e-8d7e-80d5c958fbb3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\02. Stage\Arena">
+      <UniqueIdentifier>{fa533b06-17d1-41b4-9f5e-60bb438e6cd7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01. Levels\02. Stage\Boss">
       <UniqueIdentifier>{e24525fc-85c7-47c2-b9b6-33f08e443a64}</UniqueIdentifier>
     </Filter>
@@ -64,11 +67,11 @@
     <Filter Include="99. Defines">
       <UniqueIdentifier>{dd6aa0aa-c4c2-46b8-b52c-7511d9ad0e05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\02. Stage\Arena">
-      <UniqueIdentifier>{fa533b06-17d1-41b4-9f5e-60bb438e6cd7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\Arena.h">
+      <Filter>01. Levels\02. Stage\Arena</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Boss_Stage1.h">
       <Filter>01. Levels\02. Stage\Boss\BossStage1</Filter>
     </ClInclude>
@@ -129,9 +132,6 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Arena.h">
-      <Filter>01. Levels\02. Stage\Arena</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Launcher.ico">
@@ -147,6 +147,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Arena.cpp">
+      <Filter>01. Levels\02. Stage\Arena</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Boss_Stage1.cpp">
       <Filter>01. Levels\02. Stage\Boss\BossStage1</Filter>
     </ClCompile>
@@ -188,9 +191,6 @@
     </ClCompile>
     <ClCompile Include="Launcher.cpp">
       <Filter>98. Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Arena.cpp">
-      <Filter>01. Levels\02. Stage\Arena</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
