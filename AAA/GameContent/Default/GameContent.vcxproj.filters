@@ -511,6 +511,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\01. Deform_Cylinder">
       <UniqueIdentifier>{d7c7228e-2d75-4e9c-8e42-b4fd9a76a101}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\02. Deform_RollerCoaster">
+      <UniqueIdentifier>{889a7c35-46f3-49b8-b6dc-41648bea021d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts">
       <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
     </Filter>
@@ -531,6 +534,9 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\03. DeformCylinder_Main">
       <UniqueIdentifier>{ee54d883-8d4f-4a92-9b53-3c45a377fe02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\04. DeformRollerCoaster_Main">
+      <UniqueIdentifier>{016e2a1b-7c2c-4585-b57e-cdb01d394ada}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts">
       <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
@@ -2007,6 +2013,9 @@
     <ClInclude Include="..\Public\Kirby_Deform_Cylinder.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\01. Deform_Cylinder</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Deform_RollerCoaster.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\02. Deform_RollerCoaster</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Model.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClInclude>
@@ -2027,6 +2036,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCylinder_Main.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\03. DeformCylinder_Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformRollerCoaster_Main.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\04. DeformRollerCoaster_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
@@ -3299,6 +3311,9 @@
     <ClCompile Include="..\Private\Kirby_Deform_Cylinder.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\01. Deform_Cylinder</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Deform_RollerCoaster.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\02. Deform_RollerCoaster</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClCompile>
@@ -3316,6 +3331,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCylinder_Main.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\03. DeformCylinder_Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformRollerCoaster_Main.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\04. DeformRollerCoaster_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
