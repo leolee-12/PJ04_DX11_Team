@@ -11,6 +11,8 @@
 
 #include "Kirby_Jump.h"
 
+#include "Effect_Loader.h"
+
 CKirby_Ladder::CKirby_Ladder()
 {
 }
@@ -75,6 +77,10 @@ void CKirby_Ladder::Enter(CKirby* pKirby, _int iFlag)
 
     m_eLadderState = LADDER_STATE::LADDER_END;
     Change_LadderState(pKirby, LADDER_STATE::WAIT);
+
+    CEffect_Loader::GetInstance()->Spawn(L"OnLadderEffect", pKirby->Get_LevelIndex(),
+        _float3{ 0.f, -0.2f, 0.f }, _float3{ 0.f, 0.f, 0.f }, _float3{ 0.f, 0.f, 0.f },
+        pKirby->Get_Transform()->Get_WorldMatrixPtr());
 }
 
 void CKirby_Ladder::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -184,7 +190,7 @@ void CKirby_Ladder::Enter_LadderState(CKirby* pKirby, LADDER_STATE eState)
             pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_L);
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
-            pMovement->Force_Jump(2.5f);
+            pMovement->Force_Jump(3.f);
 
             break;
         }

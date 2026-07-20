@@ -315,4 +315,80 @@ technique11 DefaultTechnique
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
     }
+
+
+    pass DefaultPass_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+    pass AlphaBlend_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+    pass Additive_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+
+    pass Max_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Max, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+    pass DefaultPass_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+    pass AlphaBlend_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+    pass Additive_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+
+    pass Max_Mirror_DepthIgnoreStencilMask
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_SpotlightDarken, 1);
+        SetBlendState(BS_Max, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
 }

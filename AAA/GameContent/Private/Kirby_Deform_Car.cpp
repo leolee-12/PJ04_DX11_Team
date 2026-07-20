@@ -54,7 +54,15 @@ void CKirby_Deform_Car::Enter_Deform(CKirby* pKirby)
     pMovement->Set_MaxFallVelocity(s_fMaxCarFallVelocity);
 
     // CCT
-    pKirby->Set_CollisionSize(s_fCar_CCT_Radius, s_fCar_CCT_Height);
+    pKirby->Set_CCTSize(s_fCar_CCT_Radius, s_fCar_CCT_Height);
+
+    // Hurt Box
+    CCollider::COLLIDER_DESC tHurtDesc{};
+    tHurtDesc.pOwner = pKirby;
+    tHurtDesc.vCenter = { 0.f, 0.f, 0.f };
+    tHurtDesc.fRadius = s_fCar_CCT_Radius + CKirby::s_fHurtBoxRadiusPadding;
+    tHurtDesc.fHeight = s_fCar_CCT_Height;
+    pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
 
     // Hit Box
     CCollider::COLLIDER_DESC BreakerableHitBoxDesc{};
@@ -74,7 +82,15 @@ void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
 
-    pKirby->Set_CollisionSize(CKirby::s_fCCT_Radius, CKirby::s_fCCT_Height);
+    pKirby->Set_CCTSize(CKirby::s_fCCT_Radius, CKirby::s_fCCT_Height);
+
+    // Hurt Box
+    CCollider::COLLIDER_DESC tHurtDesc{};
+    tHurtDesc.pOwner = pKirby;
+    tHurtDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    tHurtDesc.fRadius = CKirby::s_fCCT_Radius + CKirby::s_fHurtBoxRadiusPadding;
+    tHurtDesc.fHeight = CKirby::s_fCCT_Height;
+    pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
 }
 
 void CKirby_Deform_Car::Enter_AttackState(CKirby* pKirby, _int iFlag)

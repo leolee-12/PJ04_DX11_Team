@@ -15,6 +15,7 @@
 #include "Kirby_Body.h"
 #include "Kirby_BombHat.h"
 #include "Kirby_IceHat.h"
+#include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -33,6 +34,7 @@
 #include "Kirby_Ability_Sword.h"
 #include "Kirby_Ability_Bomb.h"
 #include "Kirby_Ability_Ice.h"
+#include "Kirby_Ability_Sleep.h"
 
 // Deform
 #include "Kirby_Deform_Car.h"
@@ -284,8 +286,8 @@ CKirby_OnOffPart* CKirby::Find_WeaponPart(COPY_ABILITY_TYPE eType)
 {
     switch (eType)
     {
-    case COPY_ABILITY_TYPE::SWORD:
-        return Find_OnOffPart(CKirby_Sword::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::SWORD:
+            return Find_OnOffPart(CKirby_Sword::Kirby_PartTag);
     }
 
     return nullptr;
@@ -299,6 +301,8 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
             return Find_OnOffPart(CKirby_BombHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::ICE:
             return Find_OnOffPart(CKirby_IceHat::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::SLEEP:
+            return Find_OnOffPart(CKirby_SleepHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::SWORD:
             return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
     }
@@ -360,19 +364,9 @@ CKirby_Deform_Model* CKirby::Find_DeformModel(const wchar_t* pPartTag)
     return dynamic_cast<CKirby_Deform_Model*>(iter->second);
 }
 
-void CKirby::Set_CollisionSize(_float fCCTRadius, _float fCCTHeight)
+void CKirby::Set_CCTSize(_float fCCTRadius, _float fCCTHeight)
 {
     m_pController->Set_CapsuleSize(fCCTRadius, fCCTHeight);
-
-    CCollider::COLLIDER_DESC HurtDesc{};
-    HurtDesc.pOwner = this;
-    HurtDesc.vCenter = _float3(0.f, 0.f, 0.f);
-    HurtDesc.fRadius = fCCTRadius + s_fHurtBoxRadiusPadding;
-    HurtDesc.fHeight = fCCTHeight;
-
-    m_KirbyColliders[HURT_BOX]->Reset_Bounding(HurtDesc);
-
-    m_KirbyColliders[HURT_BOX]->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 void CKirby::Add_MoveDir(const _float3& vWishDir)
@@ -512,14 +506,14 @@ HRESULT CKirby::Ready_Components()
     m_KirbyColliders.resize(COLLIDER_END);
 
     // Collider HurtBox
-    CCollider::COLLIDER_DESC ColliderDesc{};
-    ColliderDesc.pOwner = this;
-    ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f); // 발 위치임
-    ColliderDesc.fRadius = s_fCCT_Radius + s_fHurtBoxRadiusPadding;
-    ColliderDesc.fHeight = s_fCCT_Height;
+    CCollider::COLLIDER_DESC tColliderDesc{};
+    tColliderDesc.pOwner = this;
+    tColliderDesc.vCenter = _float3(0.f, 0.f, 0.f); // 발 위치임
+    tColliderDesc.fRadius = s_fCCT_Radius + s_fHurtBoxRadiusPadding;
+    tColliderDesc.fHeight = s_fCCT_Height;
 
     m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
-        TEXT("HurtBox_Com"), &ColliderDesc);
+        TEXT("HurtBox_Com"), &tColliderDesc);
     if (m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] == nullptr)
         return E_FAIL;
 
@@ -711,6 +705,16 @@ HRESULT CKirby::Ready_PartObjects()
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_IceHat::PROTOTYPE_TAG, CKirby_IceHat::Kirby_PartTag, &IceHatDesc)))
         return E_FAIL;
 
+    // SleepHat
+    CKirby_SleepHat::KIRBY_SLEEP_HAT_DESC SleepHatDesc{};
+    SleepHatDesc.pParentMatrix = &m_RenderWorldMatrix;
+    SleepHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    SleepHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    SleepHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SleepHat::PROTOTYPE_TAG, CKirby_SleepHat::Kirby_PartTag, &SleepHatDesc)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -747,6 +751,7 @@ HRESULT CKirby::Ready_Ability()
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))   return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::BOMB, CKirby_Ability_Bomb::Create())))     return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::ICE, CKirby_Ability_Ice::Create())))       return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SLEEP, CKirby_Ability_Sleep::Create())))   return E_FAIL;
 
     auto iter = m_Abilities.find(COPY_ABILITY_TYPE::NORMAL);
     if (iter == m_Abilities.end())
@@ -926,6 +931,7 @@ HRESULT CKirby::Ready_AnimEvents()
 
 HRESULT CKirby::SetUp_Collider_Callback()
 {
+#pragma region Hurt Box
     m_KirbyColliders[HURT_BOX]->Set_OnEnter(
         [this](CCollider* pOther)
         {
@@ -948,11 +954,6 @@ HRESULT CKirby::SetUp_Collider_Callback()
                 tAttackDesc.fDamage = 10.f;
                 tAttackDesc.fKnockback = 2.f;
                 Damaged(tAttackDesc);
-#ifdef _DEBUG
-                char szBuf[128];
-                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
-                OutputDebugStringA(szBuf);
-#endif
             }
             else if (iGroup == ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE))
             {
@@ -966,6 +967,10 @@ HRESULT CKirby::SetUp_Collider_Callback()
             else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
             {
                 Set_TriggerDeformObj(static_cast<CLD_DeformObject*>(pGameObject));
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA))
+            {
+                Set_DeformEndTrigger(true);
             }
         }
     );
@@ -1002,9 +1007,15 @@ HRESULT CKirby::SetUp_Collider_Callback()
             {
                 Set_TriggerDeformObj(nullptr);
             }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA))
+            {
+                Set_DeformEndTrigger(false);
+            }
         }
     );
+#pragma endregion
 
+#pragma region Breakable HitBox
     m_KirbyColliders[BREAKERABLE_HITBOX]->Set_OnEnter(
         [this](CCollider* pOther)
         {
@@ -1024,6 +1035,7 @@ HRESULT CKirby::SetUp_Collider_Callback()
             pMonster->Damaged(tAttackInfo);
         }
     );
+#pragma endregion
 
     Route_CollisionToState(KIRBY_COLLIDER::SLIDE_COLLIDER);
 
@@ -1311,6 +1323,7 @@ void CKirby::Set_ColliderDesc(KIRBY_COLLIDER eKirbyCollider, const CCollider::CO
         return;
 
     pCollider->Reset_Bounding(Desc);
+    pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 void CKirby::Set_ColliderEnabled(KIRBY_COLLIDER eKirbyCollider, _bool bEnabled)

@@ -10,7 +10,6 @@ class CModel;
 class CAnimator;
 class CTexture;
 
-class CSound_Handle;
 class CEffect_Container;
 NS_END
 
