@@ -25,6 +25,8 @@
 
 #include "imgui.h"
 
+#include <type_traits>
+
 namespace
 {
 	const _char* TexTypeName(_uint t)
@@ -129,6 +131,56 @@ namespace
 			return nullptr;
 
 		return g_WorldShaderPassMetas[idx].szName;
+	}
+
+	_bool Draw_WaterMaterialEditor(EDIT_WATER_MATERIAL* pWater)
+	{
+		if (nullptr == pWater)
+			return false;
+
+		WATER_RENDER_DESC& Desc = pWater->RenderDesc;
+		_bool bChanged = false;
+
+		ImGui::TextUnformatted("Color / Depth");
+		bChanged |= ImGui::ColorEdit4("Shallow Color##WaterMaterial", (float*)&Desc.vShallowColor);
+		bChanged |= ImGui::ColorEdit4("Deep Color##WaterMaterial", (float*)&Desc.vDeepColor);
+		bChanged |= ImGui::DragFloat("Opacity##WaterMaterial", &Desc.fOpacity, 0.005f, 0.f, 1.f);
+		bChanged |= ImGui::DragFloat("Depth Fade Distance##WaterMaterial", &Desc.fDepthFadeDistance, 0.01f);
+
+		ImGui::Separator();
+		ImGui::TextUnformatted("Normal Layer 0");
+		bChanged |= ImGui::DragFloat2("Normal Tiling 0##WaterMaterial", (float*)&Desc.vNormalTiling0, 0.001f, 0.f, 0.f, "%.4f");
+		bChanged |= ImGui::DragFloat2("Normal Speed 0##WaterMaterial", (float*)&Desc.vNormalSpeed0, 0.0005f, 0.f, 0.f, "%.4f");
+
+		ImGui::Separator();
+		ImGui::TextUnformatted("Normal Layer 1");
+		bChanged |= ImGui::DragFloat2("Normal Tiling 1##WaterMaterial", (float*)&Desc.vNormalTiling1, 0.001f, 0.f, 0.f, "%.4f");
+		bChanged |= ImGui::DragFloat2("Normal Speed 1##WaterMaterial", (float*)&Desc.vNormalSpeed1, 0.0005f, 0.f, 0.f, "%.4f");
+
+		ImGui::Separator();
+		ImGui::TextUnformatted("Surface");
+		bChanged |= ImGui::DragFloat("Normal Strength##WaterMaterial", &Desc.fNormalStrength, 0.01f, 0.f, 4.f);
+		bChanged |= ImGui::DragFloat("Fresnel Power##WaterMaterial", &Desc.fFresnelPower, 0.02f, 0.1f, 16.f);
+		bChanged |= ImGui::DragFloat("Reflection Strength##WaterMaterial", &Desc.fReflectionStrength, 0.01f, 0.f, 4.f);
+		bChanged |= ImGui::DragFloat("Refraction Strength##WaterMaterial", &Desc.fRefractionStrength, 0.0001f, 0.f, 0.1f, "%.4f");
+		bChanged |= ImGui::DragFloat("Specular Power##WaterMaterial", &Desc.fSpecularPower, 0.5f, 1.f, 256.f);
+		bChanged |= ImGui::DragFloat("Specular Strength##WaterMaterial", &Desc.fSpecularStrength, 0.01f, 0.f, 8.f);
+
+		ImGui::Separator();
+		ImGui::TextUnformatted("Foam");
+		bChanged |= ImGui::DragFloat("Foam Width##WaterMaterial", &Desc.fFoamWidth, 0.01f, 0.f, 5.f);
+		bChanged |= ImGui::DragFloat("Foam Strength##WaterMaterial", &Desc.fFoamStrength, 0.01f, 0.f, 4.f);
+		bChanged |= ImGui::DragFloat2("Foam Noise Tiling##WaterMaterial", (float*)&Desc.vFoamNoiseTiling, 0.001f, 0.f, 0.f, "%.4f");
+		bChanged |= ImGui::DragFloat2("Foam Noise Speed##WaterMaterial", (float*)&Desc.vFoamNoiseSpeed, 0.0005f, 0.f, 0.f, "%.4f");
+		bChanged |= ImGui::DragFloat("Foam Noise Strength##WaterMaterial", &Desc.fFoamNoiseStrength, 0.01f, 0.f, 1.f);
+
+		ImGui::Separator();
+		ImGui::TextUnformatted("Caustic");
+		bChanged |= ImGui::DragFloat2("Caustic Tiling##WaterMaterial", (float*)&Desc.vCausticTiling, 0.001f, 0.f, 0.f, "%.4f");
+		bChanged |= ImGui::DragFloat2("Caustic Speed##WaterMaterial", (float*)&Desc.vCausticSpeed, 0.0005f, 0.f, 0.f, "%.4f");
+		bChanged |= ImGui::DragFloat("Caustic Strength##WaterMaterial", &Desc.fCausticStrength, 0.01f, 0.f, 4.f);
+
+		return bChanged;
 	}
 
 	struct MESH_LAYER_UI_CONTEXT
@@ -375,6 +427,7 @@ void CPanel_Inspector::Render()
 
 	ImGui::Separator();
 	Draw_EditableObjectPolicyPanel(pSelected);
+	Draw_EditableCustomPanel(pSelected);
 
 	if (dynamic_cast<CEnvObject*>(pSelected))
 	{
@@ -824,6 +877,84 @@ void CPanel_Inspector::Draw_EditableObjectPolicyPanel(CGameObject* pObject)
 		if (!ApplyPolicyDraft())
 			MSG_BOX("OBJECT POLICY APPLY FAILED");
 	}
+}
+
+void CPanel_Inspector::Draw_EditableCustomPanel(CGameObject* pObject)
+{
+	IEditable* pEditable = dynamic_cast<IEditable*>(pObject);
+	if (nullptr == pEditable)
+		return;
+
+	EDITABLE_DESC EditDesc{};
+	if (!pEditable->Get_EditDesc(&EditDesc))
+		return;
+
+	if (holds_alternative<monostate>(EditDesc.CustomDesc))
+		return;
+
+	EDIT_CUSTOM_DESC EditedDesc = EditDesc.CustomDesc;
+	_bool bPanelVisible = false;
+	_bool bChanged = false;
+
+	std::visit([&](auto& CustomDesc)
+		{
+			using CUSTOM_TYPE = std::decay_t<decltype(CustomDesc)>;
+
+			if constexpr (std::is_same_v<CUSTOM_TYPE, EDIT_WATER_MATERIAL>)
+			{
+				if (0u == (EditDesc.iCapabilities & EDIT_CAP_WATER_MATERIAL))
+					return;
+
+				ImGui::Separator();
+				if (!ImGui::CollapsingHeader("Water Material##EditableCustom", ImGuiTreeNodeFlags_DefaultOpen))
+					return;
+
+				bPanelVisible = true;
+				bChanged |= Draw_WaterMaterialEditor(&CustomDesc);
+			}
+		},
+		EditedDesc);
+
+	if (!bPanelVisible)
+		return;
+
+	ImGui::Separator();
+
+	if (ImGui::Button("Reset Default##EditableCustom"))
+	{
+		std::visit([](auto& CustomDesc)
+			{
+				using CUSTOM_TYPE = std::decay_t<decltype(CustomDesc)>;
+				CustomDesc = CUSTOM_TYPE{};
+			},
+			EditedDesc);
+
+		bChanged = true;
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Copy Settings##EditableCustom"))
+		m_EditCustomClipboard = EditedDesc;
+
+	ImGui::SameLine();
+
+	const _bool bCanPaste =
+		!holds_alternative<monostate>(m_EditCustomClipboard)
+		&& m_EditCustomClipboard.index() == EditedDesc.index();
+
+	ImGui::BeginDisabled(!bCanPaste);
+	if (ImGui::Button("Paste Settings##EditableCustom"))
+	{
+		EditedDesc = m_EditCustomClipboard;
+		bChanged = true;
+	}
+	ImGui::EndDisabled();
+
+	ImGui::TextDisabled("Live preview only. Persistence is added in the class override step.");
+
+	if (bChanged && FAILED(pEditable->Apply_EditCustomDesc(EditedDesc)))
+		MSG_BOX("EDITABLE CUSTOM DESC APPLY FAILED");
 }
 
 void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject)

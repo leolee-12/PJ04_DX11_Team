@@ -1,9 +1,11 @@
 #include "LD_WaterArea.h"
+#include "GameContent_const.h"
 #include "LevelDesign_Registry.h"
-#include "Parsing_Utils.h"
-#include "MeshLayer_Binder.h"
+#include "Water_RenderBinder.h"
 
 #include "GameInstance.h"
+#include "Parsing_Utils.h"
+#include "CullingState.h"
 
 NS_BEGIN(Client)
 
@@ -32,11 +34,13 @@ namespace
 CLD_WaterArea::CLD_WaterArea(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevelDesignObject(pDevice, pContext)
 {
+    m_bUseShadow = false;
 }
 
 CLD_WaterArea::CLD_WaterArea(const CLD_WaterArea& Prototype)
     : CLevelDesignObject(Prototype)
     , m_tSurfaceAreaDesc(Prototype.m_tSurfaceAreaDesc)
+    , m_tWaterRenderDesc(Prototype.m_tWaterRenderDesc)
 {
 }
 
@@ -51,6 +55,8 @@ HRESULT CLD_WaterArea::Initialize(void* pArg)
         return E_FAIL;
 
     m_tSurfaceAreaDesc = *static_cast<const LD_SURFACE_AREA_DESC*>(pArg);
+    m_tWaterRenderDesc = m_tSurfaceAreaDesc.tWaterRenderDesc;
+    Sanitize_WaterRenderDesc(&m_tWaterRenderDesc);
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -98,7 +104,7 @@ void CLD_WaterArea::Late_Update(_float fTimeDelta)
         return;
 
     Check_Visible();
-    Submit_RenderGroups();
+    Submit_RenderGroups(RENDERID::BLEND_HDR);
 }
 
 HRESULT CLD_WaterArea::Render()
@@ -116,6 +122,34 @@ void CLD_WaterArea::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
     pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
+
+#pragma region Editable
+_bool CLD_WaterArea::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
+{
+    if (!__super::Get_EditDesc(pOutDesc))
+        return false;
+
+    pOutDesc->iCapabilities |= EDIT_CAP_WATER_MATERIAL;
+
+    EDIT_WATER_MATERIAL WaterMaterial{};
+    WaterMaterial.RenderDesc = m_tWaterRenderDesc;
+    pOutDesc->CustomDesc = WaterMaterial;
+
+    return true;
+}
+
+HRESULT CLD_WaterArea::Apply_EditCustomDesc(const EDIT_CUSTOM_DESC& Desc)
+{
+    const EDIT_WATER_MATERIAL* pWaterMaterial = get_if<EDIT_WATER_MATERIAL>(&Desc);
+    if (nullptr == pWaterMaterial)
+        return E_FAIL;
+
+    m_tWaterRenderDesc = pWaterMaterial->RenderDesc;
+    Sanitize_WaterRenderDesc(&m_tWaterRenderDesc);
+
+    return S_OK;
+}
+#pragma endregion
 
 void CLD_WaterArea::Register_LevelDesignSpecs()
 {
@@ -178,11 +212,12 @@ HRESULT CLD_WaterArea::Ready_RenderComponents()
     if (m_tSurfaceAreaDesc.wstrModelProtoTag.empty())
         return E_FAIL;
 
-    m_pShaderCom = Add_Component<CShader>(Shader_World_NonAnim.iLevelID, Shader_World_NonAnim.szProtoTag, TEXT("Com_Shader"));
+    m_pShaderCom = Add_Component<CShader>(Shader_Fluid.iLevelID, Shader_Fluid.szProtoTag, TEXT("Com_Shader"));
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 
-    m_pModelCom = Add_Component<CModel>(m_tSurfaceAreaDesc.iModelProtoLevel, m_tSurfaceAreaDesc.wstrModelProtoTag.c_str(), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(m_tSurfaceAreaDesc.iModelProtoLevel, m_tSurfaceAreaDesc.wstrModelProtoTag.c_str(),
+        TEXT("Com_Model"));
     if (nullptr == m_pModelCom)
         return E_FAIL;
 
@@ -200,7 +235,42 @@ HRESULT CLD_WaterArea::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance_Proxy->Get_CamPosition(), sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_SSR"), m_pShaderCom, "g_SceneTexture")))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
+        return E_FAIL;
+
+    const ENVIRONMENT_DESC& Environment = m_pGameInstance_Proxy->Get_CurrentEnvironment();
+
+    if (FAILED(m_pShaderCom->Bind_SRV("g_IrradianceCube", Environment.pDiffuseSRV)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_SRV("g_PrefilteredCube", Environment.pSpecularSRV)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iSpecularMip", &Environment.iSpecularMip, sizeof(_uint))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fIBLIntensity", &Environment.fIntensity, sizeof(_float))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderCom, { "g_vLightDir", "g_vLightSpecular" })))
+        return E_FAIL;
+
+    WATER_RENDER_DESC Desc = m_tWaterRenderDesc;
+    Desc.fVisibility = 1.f - m_pCullingState->Get_Dissolve(CCullingState::CHANNEL::MAIN);
+
+    if (FAILED(Bind_WaterRenderDesc(m_pShaderCom, Desc, m_pGameInstance_Proxy->Get_GameTime())))
         return E_FAIL;
 
     return S_OK;
@@ -212,27 +282,19 @@ HRESULT CLD_WaterArea::Render_Model()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-        MESH_LAYER_BIND_CONTEXT Ctx{};
-        Ctx.pShader = m_pShaderCom;
-        Ctx.pModel = m_pModelCom;
-        Ctx.pCullingState = m_pCullingState;
-        Ctx.pGI_Proxy = m_pGameInstance_Proxy;
-        Ctx.iMesh = i;
-        Ctx.pLayer = &Layer;
-        Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
-        Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-        Ctx.iFallbackPass = ETOUI(WORLD_PASS::UMN);
-
-        MESH_LAYER_BIND_RESULT Result{};
-        if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_WaterNormalTexture1", i, MTEX_TYPE::NORMALS, 0)))
             return E_FAIL;
 
-        if (Result.bSkipMesh)
-            continue;
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_WaterNormalTexture2", i, MTEX_TYPE::NORMALS, 1)))
+            return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_WaterCausticTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+            return E_FAIL;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_WaterNoiseTexture", i, MTEX_TYPE::UNKNOWN, 1)))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderCom->Begin(ETOUI(WATER_PASS::SURFACE))))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -266,6 +328,11 @@ CGameObject* CLD_WaterArea::Clone(void* pArg)
     }
 
     return pInstance;
+}
+
+void CLD_WaterArea::Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const
+{
+    UNREFERENCED_PARAMETER(pOutSlots);
 }
 
 void CLD_WaterArea::Free()
