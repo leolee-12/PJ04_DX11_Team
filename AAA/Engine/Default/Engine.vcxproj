@@ -271,7 +271,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\public\Prototype_Manager.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\Public\RenderTarget.h" />
-    <ClInclude Include="..\Public\RigIdBody.h" />
+    <ClInclude Include="..\Public\RigidBody.h" />
     <ClInclude Include="..\Public\Shader.h" />
     <ClInclude Include="..\Public\ShaderCache_Utils.h" />
     <ClInclude Include="..\public\ShaderGlobal_Manager.h" />
@@ -381,7 +381,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\private\Prototype_Manager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\Private\RenderTarget.cpp" />
-    <ClCompile Include="..\private\RigIdBody.cpp" />
+    <ClCompile Include="..\private\RigidBody.cpp" />
     <ClCompile Include="..\Private\Shader.cpp" />
     <ClCompile Include="..\private\ShaderGlobal_Manager.cpp" />
     <ClCompile Include="..\private\Shadow_Dir.cpp" />

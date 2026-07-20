@@ -1,5 +1,6 @@
 #pragma once
 #include "LevelDesignObject.h"
+#include "Effect_Loader.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -48,7 +49,7 @@ private:
 	CShader*			m_pShaderCom = { nullptr };
 	CModel*				m_pModelCom = { nullptr };
 	CCollider*			m_pHurtBox = { nullptr };
-	CEffect_Container*	m_pItemEffect = { nullptr };
+	FX_HANDLE			m_ItemEffectHandle = {};
 
 	LD_FOOD_DESC		m_tFoodDesc = {};
 	_bool				m_bPickingUp = { false };
@@ -60,6 +61,7 @@ private:
 	_bool				m_bInhalePullRequested = { false };
 	_bool				m_bInhaleDisplaced = { false };
 	_float				m_fInhalePullSpeed = {};
+	_float				m_fInhaleGraceTime = {};
 	CGameObject*		m_pInhaler = { nullptr };
 
 private:
@@ -68,6 +70,7 @@ private:
 	HRESULT			Ready_Components();
 	HRESULT			Ready_RenderComponents();
 	HRESULT			Ready_Effect();
+	void			Release_Effect();
 	HRESULT			Bind_ShaderResources();
 	HRESULT			Render_Model();
 	const _tchar*	Resolve_ModelProtoTag() const;

@@ -12,42 +12,13 @@ CSplit_Bush::CSplit_Bush(const CSplit_Bush& Prototype)
 {
 }
 
-HRESULT CSplit_Bush::Initialize_Prototype()
-{
-	return S_OK;
-}
-
 HRESULT CSplit_Bush::Initialize(void* pArg)
 {
-	EFFECT_CONTAINER_DESC* pDesc = static_cast<EFFECT_CONTAINER_DESC*>(pArg);
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_EffectPartObjects()))
 		return E_FAIL;
-
-	return S_OK;
-}
-
-void CSplit_Bush::Priority_Update(_float fTimeDelta)
-{
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CSplit_Bush::Update(_float fTimeDelta)
-{
-	__super::Update(fTimeDelta);
-}
-
-void CSplit_Bush::Late_Update(_float fTimeDelta)
-{
-	__super::Late_Update(fTimeDelta);
-}
-
-HRESULT CSplit_Bush::Render()
-{
-	__super::Render();
 
 	return S_OK;
 }
@@ -99,9 +70,4 @@ CGameObject* CSplit_Bush::Clone(void* pArg)
 	}
 
 	return pInstance;
-}
-
-void CSplit_Bush::Free()
-{
-	__super::Free();
 }

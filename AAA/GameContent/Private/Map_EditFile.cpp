@@ -260,16 +260,15 @@ namespace
 		if (nullptr == pOutEntry)
 			return;
 
-		const EDIT_LD_BUSH_OVERRIDE* pBushOverride = get_if<EDIT_LD_BUSH_OVERRIDE>(&ClassOverride);
-		if (nullptr == pBushOverride)
+		const EDIT_LD_WATER_OVERRIDE* pWaterOverride = get_if<EDIT_LD_WATER_OVERRIDE>(&ClassOverride);
+		if (nullptr == pWaterOverride)
 			return;
 
-		LD_BUSH_DESC* pBushDesc = get_if<LD_BUSH_DESC>(pOutEntry);
-		if (nullptr == pBushDesc)
+		LD_SURFACE_AREA_DESC* pSurfaceDesc = get_if<LD_SURFACE_AREA_DESC>(pOutEntry);
+		if (nullptr == pSurfaceDesc)
 			return;
 
-		if (pBushOverride->bHasGenerateItem)
-			pBushDesc->bGenerateItem = pBushOverride->bGenerateItem;
+		pSurfaceDesc->tWaterRenderDesc = pWaterOverride->RenderDesc;
 	}
 
 	void Apply_EditObjectOverrideToEnvDesc(ENV_OBJECT_DESC* pOutDesc, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
@@ -628,7 +627,6 @@ namespace
 	const char* Get_ClassOverrideName(const EDIT_CLASS_OVERRIDE& ClassOverride)
 	{
 		if (holds_alternative<EDIT_ENVOBJECT_OVERRIDE>(ClassOverride))		return "EnvObject";
-		if (holds_alternative<EDIT_LD_BUSH_OVERRIDE>(ClassOverride))		return "Bush";
 		if (holds_alternative<EDIT_MAPSECTION_OVERRIDE>(ClassOverride))		return "MapSection";
 		if (holds_alternative<EDIT_LEVELDESIGN_OVERRIDE>(ClassOverride))	return "LevelDesignObject";
 
@@ -643,10 +641,6 @@ namespace
 		{
 			if (pEnvOverride->bHasNearDistAlpha)	jClassOverride["UseNearDistAlpha"] = static_cast<bool>(pEnvOverride->bUseNearDistAlpha);
 			if (pEnvOverride->bHasDecalAlpha)		jClassOverride["DecalAlpha"] = pEnvOverride->fDecalAlpha;
-		}
-		else if (const EDIT_LD_BUSH_OVERRIDE* pBushOverride = get_if<EDIT_LD_BUSH_OVERRIDE>(&ClassOverride))
-		{
-			if (pBushOverride->bHasGenerateItem)	jClassOverride["GenerateItem"] = static_cast<bool>(pBushOverride->bGenerateItem);
 		}
 
 		return jClassOverride;
@@ -692,19 +686,7 @@ namespace
 
 		if ("Bush" == strClassName)
 		{
-			EDIT_LD_BUSH_OVERRIDE BushOverride{};
-
-			const auto IterGenerateItem = jClassOverride.find("GenerateItem");
-			if (IterGenerateItem != jClassOverride.end())
-			{
-				if (!IterGenerateItem->is_boolean())
-					return E_FAIL;
-
-				BushOverride.bHasGenerateItem = true;
-				BushOverride.bGenerateItem = IterGenerateItem->get<bool>();
-			}
-
-			*pOutClassOverride = BushOverride;
+			// Legacy GenerateItem override: keep old edit files loadable, but discard the removed value.
 			return S_OK;
 		}
 

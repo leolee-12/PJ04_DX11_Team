@@ -31,7 +31,10 @@ public:
 
     void  Add_Force(_fvector vForce);     // 지속력 (질량 영향 O)
     void  Add_Impulse(_fvector vImpulse); // 순간 충격
+    _vector Get_LinearVelocity() const;
     void  Set_LinearVelocity(_fvector vVel);
+    void  Set_Enabled(_bool bEnabled);
+    void  Set_SceneQueryEnabled(_bool bEnabled);
     void  Set_Kinematic(_bool bKinematic);
     void  WakeUp();
 

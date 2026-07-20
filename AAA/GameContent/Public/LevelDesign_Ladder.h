@@ -11,7 +11,7 @@ NS_END
 NS_BEGIN(Client)
 struct LD_SPAWN_SPEC;
 
-class CLevelDesign_Ladder : public CLevelDesignObject
+class CLevelDesign_Ladder final : public CLevelDesignObject
 {
 	GENERATED_BODY(CLevelDesign_Ladder)
 

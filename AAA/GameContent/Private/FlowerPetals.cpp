@@ -1,7 +1,5 @@
 #include "FlowerPetals.h"
-#include "GameInstance.h"
 #include "GameContent_const.h"
-
 #include "MeshEmitterCommon.h"
 
 CFlowerPetals::CFlowerPetals(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -14,15 +12,8 @@ CFlowerPetals::CFlowerPetals(const CFlowerPetals& Prototype)
 {
 }
 
-HRESULT CFlowerPetals::Initialize_Prototype()
-{
-	return S_OK;
-}
-
 HRESULT CFlowerPetals::Initialize(void* pArg)
 {
-	EFFECT_CONTAINER_DESC* pDesc = static_cast<EFFECT_CONTAINER_DESC*>(pArg);
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -32,32 +23,8 @@ HRESULT CFlowerPetals::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CFlowerPetals::Priority_Update(_float fTimeDelta)
-{
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CFlowerPetals::Update(_float fTimeDelta)
-{
-	__super::Update(fTimeDelta);
-}
-
-void CFlowerPetals::Late_Update(_float fTimeDelta)
-{
-	__super::Late_Update(fTimeDelta);
-}
-
-HRESULT CFlowerPetals::Render()
-{
-	__super::Render();
-
-	return S_OK;
-}
-
 HRESULT CFlowerPetals::Ready_EffectPartObjects()
 {
-	//const _uint iSharedEffectLevel = ETOUI(LEVEL::STATIC);
-
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
 	tDesc.wstrModelTag = L"Prototype_Component_Model_Flower";
@@ -100,9 +67,4 @@ CGameObject* CFlowerPetals::Clone(void* pArg)
 	}
 
 	return pInstance;
-}
-
-void CFlowerPetals::Free()
-{
-	__super::Free();
 }

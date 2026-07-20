@@ -55,7 +55,6 @@ private:
 	void SetUp_Collider_Callback();
 
 	void Handle_TriggerEnter(CCollider* pOther);
-	void Handle_TriggerStay(CCollider* pOther);
 	void Handle_TriggerExit(CCollider* pOther);
 
 	_bool Is_TriggerActivator(CCollider* pOther) const;

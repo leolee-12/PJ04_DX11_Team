@@ -618,7 +618,7 @@
     <ClInclude Include="..\Public\RenderTarget.h">
       <Filter>14. RenderTargets</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\RigIdBody.h">
+    <ClInclude Include="..\Public\RigidBody.h">
       <Filter>07. Component\RigidBody</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Shader.h">
@@ -923,7 +923,7 @@
     <ClCompile Include="..\Private\RenderTarget.cpp">
       <Filter>14. RenderTargets</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\RigIdBody.cpp">
+    <ClCompile Include="..\private\RigidBody.cpp">
       <Filter>07. Component\RigidBody</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Shader.cpp">

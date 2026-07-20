@@ -36,7 +36,7 @@ private:
 	virtual ~CLevelDesign_Bush() = default;
 
 	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArwlsg) override;
+	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Validate_Initialized() override;
 
 public:

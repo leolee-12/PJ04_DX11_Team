@@ -49,6 +49,9 @@
     <Filter Include="00. GameObject\02. EnvObject\Instance">
       <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\Interact">
+      <UniqueIdentifier>{5fc8b917-0701-419f-8990-fff829de29f0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\02. EnvObject\SpotLight">
       <UniqueIdentifier>{e2a9ab56-0259-439a-9340-671198eb11ea}</UniqueIdentifier>
     </Filter>
@@ -1839,6 +1842,12 @@
     <ClInclude Include="..\Public\Env_SpotLight.h">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EnvInteract_KickProp.h">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvInteract_PresetCatalog.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\EnvObject.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
@@ -1846,7 +1855,7 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Interact.h">
-      <Filter>00. GameObject\02. EnvObject</Filter>
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Static.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
@@ -2856,6 +2865,12 @@
     <ClInclude Include="..\Public\WarpOutEffect.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Water_Defines.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Water_RenderBinder.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3197,11 +3212,17 @@
     <ClCompile Include="..\Private\Env_SpotLight.cpp">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\EnvInteract_KickProp.cpp">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\EnvObject.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Interact.cpp">
-      <Filter>00. GameObject\02. EnvObject</Filter>
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Static.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
@@ -4136,6 +4157,9 @@
     <ClCompile Include="..\Private\WarpOutEffect.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Water_RenderBinder.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
@@ -4207,5 +4231,10 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
