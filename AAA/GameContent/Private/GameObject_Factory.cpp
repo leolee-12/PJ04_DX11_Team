@@ -152,6 +152,7 @@
 #include "Bouncy.h"
 #include "RabbitEnemy.h"
 #include "Gigatzo.h"
+#include "Noddy.h"
 
 // MonsterPart
 #include "BladeKnight_Body.h"
@@ -167,7 +168,7 @@
 #include "Bouncy_Body.h"
 #include "RabbitEnemy_Body.h"
 #include "Gigatzo_Body.h"
-#include "GigatzoBullet.h"
+#include "Noddy_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -247,6 +248,7 @@
 #include "KirbyBomb.h"
 #include "Spit_Projectile.h"
 #include "KoKabu.h"
+#include "GigatzoBullet.h"
 
 // Ability Bubble
 #include "EssenceBubble.h"
@@ -669,6 +671,21 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBullet::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Gigatzo/Bullet/Gigatzo_Bullet.ysh",
                     XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // Noddy
+    Register
+    (
+        CNoddy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CNoddy),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CNoddy_Body::PROTOTYPE_TAG, CNoddy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Noddy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Noddy/Body/Noddy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 

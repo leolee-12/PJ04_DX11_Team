@@ -64,9 +64,19 @@ void CGigatzoBullet::Launch(const _float3& vPos, const _float3& vDir)
 {
     __super::Launch(vPos, vDir);   
 
-    //_vector vP = XMLoadFloat3(&vPos);
-    //_vector vD = XMVector3Normalize(XMLoadFloat3(&vDir));
-    //m_pTransformCom->LookAt(XMVectorAdd(vP, vD));
+    _vector vUp = XMVector3Normalize(XMLoadFloat3(&vDir));
+
+    _vector vRef = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    if (fabsf(XMVectorGetX(XMVector3Dot(vUp, vRef))) > 0.99f)
+        vRef = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vRef, vUp));
+    _vector vLook = XMVector3Cross(vRight, vUp);
+
+    _float3 vScaled = m_pTransformCom->Get_Scaled();
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSetW(vRight * vScaled.x, 0.f));
+    m_pTransformCom->Set_State(STATE::UP, XMVectorSetW(vUp * vScaled.y, 0.f));
+    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSetW(vLook * vScaled.z, 0.f));
 }
 
 void CGigatzoBullet::Configure(_float fSpeed, _float fDamage, _float fLifeSec)

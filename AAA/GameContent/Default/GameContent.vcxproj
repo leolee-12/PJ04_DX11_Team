@@ -80,6 +80,10 @@
     <ClInclude Include="..\Public\MapGimmick_Defines.h" />
     <ClInclude Include="..\Public\Noddy.h" />
     <ClInclude Include="..\Public\Noddy_Body.h" />
+    <ClInclude Include="..\Public\Noddy_Brain.h" />
+    <ClInclude Include="..\Public\Noddy_State_Chase.h" />
+    <ClInclude Include="..\Public\Noddy_State_Find.h" />
+    <ClInclude Include="..\Public\Noddy_State_SleepStart.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
@@ -528,6 +532,10 @@
     <ClCompile Include="..\Private\MoveSmoke.cpp" />
     <ClCompile Include="..\Private\Noddy.cpp" />
     <ClCompile Include="..\Private\Noddy_Body.cpp" />
+    <ClCompile Include="..\Private\Noddy_Brain.cpp" />
+    <ClCompile Include="..\Private\Noddy_State_Chase.cpp" />
+    <ClCompile Include="..\Private\Noddy_State_Find.cpp" />
+    <ClCompile Include="..\Private\Noddy_State_SleepStart.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />

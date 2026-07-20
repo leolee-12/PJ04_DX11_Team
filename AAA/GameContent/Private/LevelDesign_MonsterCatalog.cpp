@@ -13,6 +13,7 @@
 #include "Bouncy.h"
 #include "RabbitEnemy.h"
 #include "Gigatzo.h"
+#include "Noddy.h"
 
 NS_BEGIN(Client)
 
@@ -81,6 +82,11 @@ namespace
 		return CGigatzo::Create(pDevice, pContext);
 	}
 
+	CGameObject* Create_NoddyPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CNoddy::Create(pDevice, pContext);
+	}
+
 	static const LD_MONSTER_CATALOG g_MonsterCatalog[] =
 	{
 			{ L"BladeKnight",		CBladeKnight::PROTOTYPE_TAG,		&Create_BladeKnightPrototype },
@@ -95,6 +101,7 @@ namespace
 			{ L"Scarfy",			CBrontoBurt::PROTOTYPE_TAG,			&Create_BrontoBurtPrototype },
 			{ L"RabbitEnemy",		CRabbitEnemy::PROTOTYPE_TAG,		&Create_RabbitEnemyPrototype },
 			{ L"Gigatzo",			CGigatzo::PROTOTYPE_TAG,			&Create_GigatzoPrototype },
+			{ L"Noddy",				CNoddy::PROTOTYPE_TAG,				&Create_NoddyPrototype },
 			//{ L"NormalEnemy",		CNormalEnemy::PROTOTYPE_TAG,		&Create_NormalEnemyPrototype },
 	};
 }
