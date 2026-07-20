@@ -86,7 +86,13 @@ public:
 protected:
     enum ShaderPass { Default, AlphaBlend, Additive, Max, ShaderPass_End };
     enum Sampler { DEFAULT, MIRROR, SAMPLER_END };
-    enum DepthMode { DEPTH_DEFAULT, DEPTH_IGNORE, DEPTH_MODE_END };
+    enum DepthMode
+    {
+        DEPTH_DEFAULT,
+        DEPTH_IGNORE,
+        DEPTH_IGNORE_STENCIL_MASK,
+        DEPTH_MODE_END
+    };
     enum MaskBlendMode { MASK_MULTIPLY, MASK_ADD, MASK_SUBTRACT, MASK_REPLACE, MASK_BLEND_END };
     enum MaskChannel { MASK_RGBA, MASK_RED, MASK_GREEN, MASK_BLUE, MASK_ALPHA, MASK_CHANNEL_END };
 

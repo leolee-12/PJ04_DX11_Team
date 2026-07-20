@@ -83,21 +83,21 @@ void CKirby_Ability_Normal::Update_AttackState(CKirby* pKirby, _float fTimeDelta
     Update_SuperInhaleTimer(fTimeDelta);
     Update_InhaleState(pKirby, fTimeDelta);
 
-    if (m_pGameInstance_Proxy->Key_Down(DIK_T))
+    if (m_pGameInstance_Proxy->Key_Down(DIK_6))
     {
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::SWORD);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         Off_InhaleEffect();
     }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_Y))
+    if (m_pGameInstance_Proxy->Key_Down(DIK_7))
     {
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::BOMB);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         Off_InhaleEffect();
     }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_U))
+    if (m_pGameInstance_Proxy->Key_Down(DIK_8))
     {
-        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::ICE);
+        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::SLEEP);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         Off_InhaleEffect();
     }

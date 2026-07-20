@@ -4,6 +4,7 @@
 
 #include "GameContent_Events.h"     // UI_RBTN_PROBE / WORLD_RBTN_DOWN
 #include "Editable.h"
+#include "LevelDesignObject.h"
 
 #include "GameInstance.h"
 
@@ -280,9 +281,22 @@ void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos
 #ifdef _DEBUG
 			if (FAILED(hr))
 				OutputDebugStringA("[MapTool] IEditable::On_EditTransformChanged failed in Viewport.\n");
-#else
-			UNREFERENCED_PARAMETER(hr);
 #endif
+
+			CLevel_Edit* pLevel = CEditInstance::GetInstance()->Get_Level();
+			if (SUCCEEDED(hr)
+				&& nullptr != pLevel
+				&& nullptr != dynamic_cast<CLevelDesignObject*>(pSelected)
+				&& pLevel->Is_MapPreviewObject(pSelected))
+			{
+				const _bool bTracked = pLevel->Commit_MapEditObjectFromCurrentState(pSelected);
+#ifdef _DEBUG
+				if (!bTracked)
+					OutputDebugStringA("[MapTool] LevelDesign transform override tracking failed in Viewport.\n");
+#else
+				UNREFERENCED_PARAMETER(bTracked);
+#endif
+			}
 		}
 	}
 }

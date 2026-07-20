@@ -55,7 +55,7 @@ public:
 public:
     _bool Update_RigidBody(_float fTimeDelta);
 
-    _bool Check_GroundBelow();
+    _bool Check_GroundBelow(_float fPermitDistance, _float& fOutGroundGap);
 
     // Unity Rigidbody.AddForce ´À³¦.
     void Add_Force(_fvector vValue, FORCE_MODE eMode = FORCE_MODE::FORCE);

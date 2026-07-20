@@ -238,7 +238,7 @@ namespace Client
     };
 #pragma endregion
 
-#pragma region ÄÆ¾À
+#pragma region ÄÆ¾À, KIRBY_POSITION_SYNC
     enum class STAGECLEAR_ANIM { CUT1, DANCE, _COUNT };
 
     struct CUTSCENE_STAGECLEAR
@@ -253,6 +253,8 @@ namespace Client
     enum class KIRBY_POSITION_SYNC_CONTEXT : _uint
     {
         CAR_BRIDGE,
+        METAKNIGHT_LOOKAROUND,
+        METAKNIGHT_INTRO,
         _COUNT
     };
 
@@ -267,6 +269,8 @@ namespace Client
     enum class KIRBY_POSITION_SYNC_END_REASON : _uint
     {
         CAR_BRIDGE_END,
+        METAKNIGHT_ENCOUNTER_END,
+        METAKNIGHT_INTRO_END,
         _COUNT
     };
 

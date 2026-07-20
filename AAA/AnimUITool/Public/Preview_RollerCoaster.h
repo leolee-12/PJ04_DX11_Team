@@ -13,16 +13,15 @@ NS_END
 
 NS_BEGIN(AnimUITool)
 
-class CPreview_DeformCylinder_Demo final : public CGameObject
+class CPreview_RollerCoaster final : public CGameObject
 {
-	GENERATED_BODY(CPreview_DeformCylinder_Demo)
+	GENERATED_BODY(CPreview_RollerCoaster)
 
 public:
-	enum DEFORM_CYLINDER_DEMO_MESH : _uint
+	enum ROLLER_COASTER_MESH : _uint
 	{
-		MESH_BODY_A = 0,
-		MESH_BODY_B = 1,
-		MESH_LIMBS = 2,
+		MESH_KIRBY = 0,
+		MESH_COASTER = 1,
 		MESH_END
 	};
 
@@ -40,20 +39,21 @@ private:
 	}
 
 public:
-	typedef struct tagPreviewDeformCylinderDemoDesc : public CGameObject::GAMEOBJECT_DESC
+	typedef struct tagPreviewRollerCoasterDesc : public CGameObject::GAMEOBJECT_DESC
 	{
 		const _tchar* szKirbyShaderTag = { L"Proto_Shader_Kirby" };
-		const _tchar* szModelTag = { L"Proto_Model_DeformCylinder_Demo" };
+		const _tchar* szPBRShaderTag = { L"Proto_Shader_AnimMesh" };
+		const _tchar* szModelTag = { L"Proto_Model_RollerCoaster" };
 		_uint iProtoLevel = { 0 };
 		_wstring strAnimEvents = {};
-	} PREVIEW_DEFORMCYLINDER_DEMO_DESC;
+	} PREVIEW_ROLLERCOASTER_DESC;
 
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Preview_DeformCylinder_Demo";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Preview_RollerCoaster";
 
 protected:
-	CPreview_DeformCylinder_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPreview_DeformCylinder_Demo(const CPreview_DeformCylinder_Demo& Prototype);
-	virtual ~CPreview_DeformCylinder_Demo() = default;
+	CPreview_RollerCoaster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPreview_RollerCoaster(const CPreview_RollerCoaster& Prototype);
+	virtual ~CPreview_RollerCoaster() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -74,12 +74,14 @@ public:
 
 private:
 	CShader* m_pKirbyShaderCom = { nullptr };
+	CShader* m_pPBRShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	CAnimator* m_pAnimatorCom = { nullptr };
 	CTexture* m_pEyeTextureCom = { nullptr };
 	CTexture* m_pEyeMaskTextureCom = { nullptr };
 
-	PREVIEW_DEFORMCYLINDER_DEMO_DESC m_Desc{};
+	CAnimator* m_pAnimatorCom = { nullptr };
+
+	PREVIEW_ROLLERCOASTER_DESC m_Desc{};
 	KIRBY_EYE_STATE m_eEye = { KIRBY_EYE_STATE::IDLE };
 	vector<_bool> m_MeshVisible;
 
@@ -90,11 +92,12 @@ private:
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_EyeTextures();
-	HRESULT Bind_ShaderResources();
+	HRESULT Bind_CommonResources(CShader* pShader);
+	HRESULT Render_PBRMesh(_uint iMeshIndex);
 	HRESULT Render_KirbyMesh(_uint iMeshIndex);
 
 public:
-	static CPreview_DeformCylinder_Demo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPreview_RollerCoaster* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 protected:

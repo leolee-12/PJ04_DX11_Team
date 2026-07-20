@@ -55,9 +55,9 @@ namespace
 		  { L"DeformCar", L"Proto_Component_Model_DeformCar", "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh",
 		  MODEL::ANIM, DEFORM_TYPE::CAR, DEFORM_OBJECT_KIND::MOBILE, 6.5f, nullptr, { "Wait", "Shake", "Fall", "Landing" } },
 		  { L"DeformCylinder", L"Proto_Component_Model_DeformCylinder", "../../Resources/Map/Gimmick/Anim/DeformCylinder/DeformCylinder.ysh",
-		  MODEL::ANIM, DEFORM_TYPE::CYLINDER, DEFORM_OBJECT_KIND::MOBILE, 3.f, L"Split_Cylinder", { "Wait", "Wait", "Fall", "Landing" } },
+		  MODEL::ANIM, DEFORM_TYPE::CYLINDER, DEFORM_OBJECT_KIND::MOBILE, 6.5f, L"Split_Cylinder", { "Wait", "Wait", "Fall", "Landing" } },
 		  { L"DeformCoaster", L"Proto_Component_Model_DeformCoaster", "../../Resources/Map/Gimmick/Anim/DeformCoaster/DeformCoaster.ysh",
-		  MODEL::ANIM, DEFORM_TYPE::COASTER, DEFORM_OBJECT_KIND::FIXED, 3.f, L"Split_Coaster", { "Wait", "Wait", "", "" } },
+		  MODEL::ANIM, DEFORM_TYPE::COASTER, DEFORM_OBJECT_KIND::FIXED, 6.5f, L"Split_Coaster", { "Wait", "Wait", "", "" } },
 	};
 
 	void Apply_DeformObjectCatalog(const LD_DEFORMOBJECT_CATALOG& Entry, Client::LD_DEFORMOBJECT_DESC* pDesc)

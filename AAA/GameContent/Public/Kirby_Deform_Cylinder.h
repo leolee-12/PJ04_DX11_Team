@@ -13,6 +13,7 @@ class CLIENT_DLL CKirby_Deform_Cylinder final : public CKirby_Deform
 {
 private:
 	static constexpr _float s_fCylinderMaxHorizontalSpeed = 35.f;
+	static constexpr _float s_fCylinderCarFallVelocity = -42.f;
 
 	// Controller
 	static constexpr _float s_fCylinder_CCT_Radius = 1.4f;
@@ -49,17 +50,14 @@ public:
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
-	// Get_Deform 변신 추가 로직
-	virtual void Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
-	virtual _bool Update_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
-	virtual void Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
+	// GetDeform 변신 추가 로직
+	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
+	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
+	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
 
 	// DeformDump용 함수
 	virtual void On_DumpSpitStart(CKirby* pKirby) override {};
 	virtual void On_DumpSpitDeform(CKirby* pKirby) override;
-
-public:
-	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }
@@ -72,6 +70,9 @@ private:
 
 	void Rot_MoveDir(CKirby* pKirby, _float fTimeDelta);
 	void Roll(CKirby* pKirby, _float fTimeDelta);
+	void Roll_RotL(CKirby* pKirby, _float fTimeDelta);
+
+	_bool Check_FrontCollision(CKirby* pKirby);
 
 private:
 	void Change_RollState(CKirby* pKirby, ROLL_STATE eNext);
@@ -86,6 +87,9 @@ private:
 private:
 	ROLL_STATE m_eRollState{};
 	_bool m_bTryJump{};
+	_float m_fRotL_Degree{};
+
+	CSound_Handle m_RollSound{};
 
 public:
 	static CKirby_Deform_Cylinder* Create();

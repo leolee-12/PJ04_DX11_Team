@@ -8,6 +8,7 @@
 #include "MapGimmickSection.h"
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
+#include "LevelDesignObject.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "LevelDesign_Bush.h"
 #include "Editable.h"
@@ -419,9 +420,20 @@ void CPanel_Inspector::Render()
 #ifdef _DEBUG
 			if (FAILED(hr))
 				OutputDebugStringA("[MapTool] IEditable::On_EditTransformChanged failed in Inspector.\n");
-#else
-			UNREFERENCED_PARAMETER(hr);
 #endif
+
+			if (SUCCEEDED(hr)
+				&& nullptr != dynamic_cast<CLevelDesignObject*>(pSelected)
+				&& pLevel->Is_MapPreviewObject(pSelected))
+			{
+				const _bool bTracked = pLevel->Commit_MapEditObjectFromCurrentState(pSelected);
+#ifdef _DEBUG
+				if (!bTracked)
+					OutputDebugStringA("[MapTool] LevelDesign transform override tracking failed in Inspector.\n");
+#else
+				UNREFERENCED_PARAMETER(bTracked);
+#endif
+			}
 		}
 	}
 

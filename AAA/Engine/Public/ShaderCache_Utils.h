@@ -26,7 +26,8 @@ namespace ShaderCache
 
         for (const auto& entry : fs::directory_iterator(srcPath.parent_path(), ec))
         {
-            if (entry.path().extension() == L".hlsli")
+            const fs::path Extension = entry.path().extension();
+            if (Extension == L".hlsli" || Extension == L".hlsl")
             {
                 const auto incTime = fs::last_write_time(entry.path(), ec);
                 if (ec || incTime > cacheTime)

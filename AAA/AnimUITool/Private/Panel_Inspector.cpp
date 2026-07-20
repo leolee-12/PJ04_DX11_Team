@@ -8,8 +8,7 @@
 #include "Property.h"
 #include "EffectPart_Enum.h"
 #include "Preview_Kirby.h"
-#include "Preview_DeformCylinder_Main.h"
-#include "Preview_DeformCylinder_Demo.h"
+#include "Preview_RollerCoaster.h"
 #include "Kirby_States.h"
 #include "UIPartObject.h"
 #include "UIContainerObject.h"
@@ -556,50 +555,41 @@ void CPanel_Inspector::Render_Meshs()
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
 
     CPreview_Actor* pActor = dynamic_cast<CPreview_Actor*>(ctx.pOwner);
-    CPreview_DeformCylinder_Main* pDeformCylinderMain = dynamic_cast<CPreview_DeformCylinder_Main*>(ctx.pOwner);
-    CPreview_DeformCylinder_Demo* pDeformCylinderDemo = dynamic_cast<CPreview_DeformCylinder_Demo*>(ctx.pOwner);
+    CPreview_RollerCoaster* pRollerCoaster = dynamic_cast<CPreview_RollerCoaster*>(ctx.pOwner);
     CModel* pModel = ctx.pModel;
 
-    if ((!pActor && !pDeformCylinderMain && !pDeformCylinderDemo) || !pModel)
+    if ((!pActor && !pRollerCoaster) || !pModel)
         return;
 
-    auto IsMeshVisible = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_uint iMesh)
+    auto IsMeshVisible = [pActor, pRollerCoaster](_uint iMesh)
         {
             if (pActor)
                 return pActor->Is_MeshVisible(iMesh);
-            if (pDeformCylinderMain)
-                return pDeformCylinderMain->Is_MeshVisible(iMesh);
-            return pDeformCylinderDemo->Is_MeshVisible(iMesh);
+            return pRollerCoaster->Is_MeshVisible(iMesh);
         };
 
-    auto SetMeshVisible = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_uint iMesh, _bool bVisible)
+    auto SetMeshVisible = [pActor, pRollerCoaster](_uint iMesh, _bool bVisible)
         {
             if (pActor)
                 pActor->Set_MeshVisible(iMesh, bVisible);
-            else if (pDeformCylinderMain)
-                pDeformCylinderMain->Set_MeshVisible(iMesh, bVisible);
             else
-                pDeformCylinderDemo->Set_MeshVisible(iMesh, bVisible);
+                pRollerCoaster->Set_MeshVisible(iMesh, bVisible);
         };
 
-    auto SetAllMeshVisible = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_bool bVisible)
+    auto SetAllMeshVisible = [pActor, pRollerCoaster](_bool bVisible)
         {
             if (pActor)
                 pActor->Set_AllMeshVisible(bVisible);
-            else if (pDeformCylinderMain)
-                pDeformCylinderMain->Set_AllMeshVisible(bVisible);
             else
-                pDeformCylinderDemo->Set_AllMeshVisible(bVisible);
+                pRollerCoaster->Set_AllMeshVisible(bVisible);
         };
 
-    auto SetSoloMesh = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_uint iMesh)
+    auto SetSoloMesh = [pActor, pRollerCoaster](_uint iMesh)
         {
             if (pActor)
                 pActor->Set_SoloMesh(iMesh);
-            else if (pDeformCylinderMain)
-                pDeformCylinderMain->Set_SoloMesh(iMesh);
             else
-                pDeformCylinderDemo->Set_SoloMesh(iMesh);
+                pRollerCoaster->Set_SoloMesh(iMesh);
         };
 
     if (!ImGui::CollapsingHeader("Meshes", ImGuiTreeNodeFlags_DefaultOpen))
