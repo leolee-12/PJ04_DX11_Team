@@ -222,6 +222,15 @@ _bool CKirby_State::Try_Transition_Ladder_CommandDown(CKirby* pKirby)
     return true;
 }
 
+void CKirby_State::Effect_Stop(CEffect_Container*& pContainer)
+{
+    if (pContainer != nullptr)
+    {
+        pContainer->EffectContainer_StopAfterEmission();
+        pContainer = nullptr;
+    }
+}
+
 void CKirby_State::Free()
 {
     Safe_Release(m_pGameInstance_Proxy);

@@ -44,11 +44,13 @@ public:
 	virtual void Exit_Deform(CKirby* pKirby) = 0;
 
 	// Get_Deform 변신 추가 로직
-	virtual void Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
-	virtual _bool Update_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) { return true; }
-	virtual void Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
+	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
+	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) { return true; }
+	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
 
-	// Deform Dump용 함수
+	virtual _bool HasDemoModel() { return true; }
+
+	// DeformDump용 함수
 	virtual void On_DumpSpitStart(CKirby* pKirby);
 	virtual void On_DumpSpitDeform(CKirby* pKirby) {}
 

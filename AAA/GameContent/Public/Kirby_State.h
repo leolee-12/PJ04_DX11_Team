@@ -97,6 +97,8 @@ protected:
 	_bool Try_Transition_Ladder_CommandUp(CKirby* pKirby);
 	_bool Try_Transition_Ladder_CommandDown(CKirby* pKirby);
 
+	void Effect_Stop(CEffect_Container*& pContainer);
+
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 

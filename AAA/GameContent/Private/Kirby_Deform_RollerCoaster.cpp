@@ -44,6 +44,10 @@ _bool CKirby_Deform_RollerCoaster::Handle_Command(CKirby* pKirby, CKirby_Command
     return false;
 }
 
+void CKirby_Deform_RollerCoaster::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+}
+
 CKirby_Deform_RollerCoaster* CKirby_Deform_RollerCoaster::Create()
 {
     CKirby_Deform_RollerCoaster* pInstance = new CKirby_Deform_RollerCoaster();

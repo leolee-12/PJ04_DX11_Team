@@ -122,42 +122,15 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             pBodyAnimator->Play("SuperInhale", true, false, 0.05f, 1.5f);
             break;
         }
-        case DEFORM_STATE::DEFORM:
+        case DEFORM_STATE::DEFORM_STATE_DEFORM:
         {
-            m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DeformingSwallow1.wav", 0.2f);
-
-            if (m_pInhaleEffect)
-            {
-                m_pInhaleEffect->EffectContainer_Stop();
-                m_pInhaleEffect = nullptr;
-            }
+            Effect_Stop(m_pInhaleEffect);
             pKirby->Get_Body()->Stop_SoundHandle();
 
-            KIRBY_ABILITY_CHANGED tDesc{};
-            tDesc.bBegin = true;
-            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
-
-            CMovement_Child* pMovement = pKirby->Get_Movement();
-            pMovement->Set_GravityScale(0.f);
-            pMovement->Set_Velocity(XMVectorSet(0.f, 0.f, 0.f, 0.f));
-            pMovement->Clear_Forces();
-
-            m_pGameInstance_Proxy->Set_TimeScale(0.f);
-
-            pKirby->Get_Body()->Set_Active(false);
-
-            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
-            pDeformModel_Demo->Set_Active(true);
-            pDeformModel_Demo->Get_Animator()->Play("Deform", false, true, 0.1f, 1.8f);
-
-            pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
-                pDeformModel_Demo->Get_HatBoneMatirx());
-
-            pPendingDeform->Enter_Deform(pKirby, m_tPostDeformEndContext);
-
+            pPendingDeform->Enter_DeformState_Deform(pKirby, m_tPostDeformEndContext);
             break;
         }
-        case DEFORM_STATE::DEFORM_END:
+        case DEFORM_STATE::DEFORM_STATE_DEFORM_END:
         {
             m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_GetAbility.wav", 0.2f);
 
@@ -214,19 +187,19 @@ void CKirby_GetDeform::Update_GetDeformState(CKirby* pKirby, _float fTimeDelta)
         {
             break;
         }
-        case DEFORM_STATE::DEFORM:
+        case DEFORM_STATE::DEFORM_STATE_DEFORM:
         {
             CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
             CAnimator* pDemoAnimator = pDeformModel_Demo->Get_Animator();
 
-            _bool bUniqueDeformLogicFinished = pPendingDeform->Update_Deform(pKirby, m_tPostDeformEndContext, fTimeDelta);
+            _bool bUniqueDeformLogicFinished = pPendingDeform->Update_DeformState_Deform(pKirby, m_tPostDeformEndContext, fTimeDelta);
 
             if (pDemoAnimator->Is_Finished() && bUniqueDeformLogicFinished)
-                    Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_END);
+                    Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_STATE_DEFORM_END);
 
             break;
         }
-        case DEFORM_STATE::DEFORM_END:
+        case DEFORM_STATE::DEFORM_STATE_DEFORM_END:
         {
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Rotate_To_Direction(XMLoadFloat3(&m_vRotationDir), fTimeDelta);
@@ -254,13 +227,12 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         {
             break;
         }
-        case DEFORM_STATE::DEFORM:
+        case DEFORM_STATE::DEFORM_STATE_DEFORM:
         {
-            pPendingDeform->Exit_Deform(pKirby, m_tPostDeformEndContext);
-
+            pPendingDeform->Exit_DeformState_Deform(pKirby, m_tPostDeformEndContext);
             break;
         }
-        case DEFORM_STATE::DEFORM_END:
+        case DEFORM_STATE::DEFORM_STATE_DEFORM_END:
         {
             KIRBY_ABILITY_CHANGED Desc{};
             Desc.bBegin = false;
@@ -332,8 +304,9 @@ void CKirby_GetDeform::Unsubscribe_DeformEvent()
 
 void CKirby_GetDeform::Handle_DeformEvent(CKirby* pKirby, const DEFORM_ACQUIRED_EVENT* pDesc)
 {
-    // DEFORM 이후는 문제없음
+    // DEFORM_STATE_DEFORM 이후는 문제없음
     m_tPostDeformEndContext.pDeformable = pDesc->pSource;
+    m_tPostDeformEndContext.eDeformType = m_eDeformType;
 
     const _matrix PreDeformWorld =XMLoadFloat4x4(&pDesc->PreDeformWorld);
 
@@ -343,7 +316,7 @@ void CKirby_GetDeform::Handle_DeformEvent(CKirby* pKirby, const DEFORM_ACQUIRED_
     _vector vStartLook =XMVector3Normalize(XMVectorSetY(PreDeformWorld.r[2], 0.f));
     XMStoreFloat3(&m_tPostDeformEndContext.vStartLook, vStartLook);
 
-    Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM);
+    Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_STATE_DEFORM);
 }
 
 CKirby_GetDeform* CKirby_GetDeform::Create()
