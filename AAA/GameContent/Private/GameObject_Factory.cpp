@@ -204,6 +204,7 @@
 #include "Excalibur.h"
 #include "Excalibur_Body.h"
 #include "Excalibur_GetIt.h"
+#include "MetaknightNamePlate.h"
 
 //Boss Effect
 #include "Armadillo_RutA.h"
@@ -1603,6 +1604,15 @@ void CGameObject_Factory::Register_MainBoss()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_MoonShot::PROTOTYPE_TAG, CProjectile_MoonShot::Create(pDevice, pContext));
         )
     );
+
+    Register(CMetaknightNamePlate::PROTOTYPE_TAG, TEXT("NamePlate"),
+        CREATOR(CMetaknightNamePlate),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaknightNamePlate::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/NamePlate/Model.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        ));
 
     Register(CExcalibur::PROTOTYPE_TAG, TEXT("MainBoss"),
         CREATOR(CExcalibur),

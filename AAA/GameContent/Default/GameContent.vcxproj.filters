@@ -1045,6 +1045,9 @@
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant">
       <UniqueIdentifier>{8889da8d-8df3-4363-a83d-d90d79299ddf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\NamePlate">
+      <UniqueIdentifier>{0897852f-355c-48a5-ab53-ba14325ed1c8}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword">
       <UniqueIdentifier>{cc608e8c-af5c-4970-b6ba-68aa9a8e8fe0}</UniqueIdentifier>
     </Filter>
@@ -1071,6 +1074,9 @@
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossNamePlate\Gorilla">
       <UniqueIdentifier>{4640c1d8-ee75-4758-a51f-cd0fd9fb282d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossNamePlate\MetaKnight">
+      <UniqueIdentifier>{798c026e-5966-4cbc-a415-8acb101f9e17}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\MiniBoss">
       <UniqueIdentifier>{fcb754da-89ef-4c38-87c3-bb9cc19f1998}</UniqueIdentifier>
@@ -2379,6 +2385,9 @@
     <ClInclude Include="..\Public\MeshParticleCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MetaknightNamePlate.h">
+      <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\MiniBoss.h">
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
     </ClInclude>
@@ -3365,6 +3374,9 @@
     <ClCompile Include="..\Private\Kirby_Damaged.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Deform.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car</Filter>
     </ClCompile>
@@ -3679,6 +3691,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MeshParticleCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MetaknightNamePlate.cpp">
+      <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MiniBoss.cpp">
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
@@ -4123,12 +4138,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Deform.cpp">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

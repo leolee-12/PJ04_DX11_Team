@@ -98,6 +98,13 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
         }
     }
 
+    if (Get_Life() == EBOSS_LIFE::INTRO && !s_bSkipIntro)
+    {
+        CAnimator* pAnim = Get_BodyAnimator();
+        if (pAnim && pAnim->Is_Finished())
+            m_fIntroHoldTimer += fTimeDelta;
+    }
+
     __super::Update(fTimeDelta);
 }
 
@@ -163,8 +170,7 @@ _bool CBoss_Metaknight::Is_Intro_Finished() const
     if (s_bSkipIntro)
         return true;
 
-    CAnimator* pAnim = Get_BodyAnimator();
-    return pAnim ? pAnim->Is_Finished() : true;
+    return m_fIntroHoldTimer >= INTRO_HOLD_TIME;
 }
 
 void CBoss_Metaknight::On_Intro_End()
@@ -251,6 +257,21 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
                     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
                     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
                 }
+                break;
+            }
+
+            case EANIM_EVENT::PubEvent:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+                if (e.strParam.empty()) break;
+
+                wstring w = StrToWstr(e.strParam);
+
+                void* pPayload = (e.iIntParam == 1)
+                    ? const_cast<_float4x4*>(m_pTransformCom->Get_WorldMatrixPtr())
+                    : nullptr;
+
+                m_pGameInstance_Proxy->Publish(w.c_str(), pPayload);
                 break;
             }
         }

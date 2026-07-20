@@ -17,6 +17,7 @@ public:
 
     static constexpr const _tchar* APPEAR_TAG = TEXT("Metaknight_Appear");
     static constexpr _float APPEAR_DELAY = 1.5f;
+    static constexpr _float INTRO_HOLD_TIME = 2.f;
 
     static constexpr _float s_fCCT_Radius = 0.75f;
     static constexpr _float s_fCCT_Height = 0.1f;
@@ -114,6 +115,7 @@ private:
 
     _bool  m_bAppearPending = { false };
     _float m_fAppearTimer = { 0.f };
+    _float m_fIntroHoldTimer = { 0.f };
 
     // µð¹ö±×
     static constexpr _bool s_bSkipIntro = false;

@@ -100,10 +100,17 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
         1.f 
       },
-        {
+      {
         TEXT("Volcano"),
         TEXT("../../Resources/YSH/Env/IBL/Stage1/Diffuse.dds"),
         TEXT("../../Resources/YSH/Env/IBL/Stage1/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/LUT/Volcano01.dds"),
+        1.f
+      },
+        {
+        TEXT("Arena"),
+        TEXT("../../Resources/YSH/Env/IBL/Arena/Diffuse.dds"),
+        TEXT("../../Resources/YSH/Env/IBL/Arena/Specular.dds"),
         TEXT("../../Resources/YSH/Env/LUT/Volcano01.dds"),
         1.f
       },
