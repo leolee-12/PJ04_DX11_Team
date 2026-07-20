@@ -128,12 +128,30 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM_STATE_DEFORM:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DeformingSwallow1.wav", 0.2f);
+
+            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_tPostDeformEndContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+            pDeformModel_Demo->Set_Active(true);
+            pDeformModel_Demo->Get_Animator()->Play("Deform", false, true, 0.1f, 1.8f);
+
+            pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
+                pDeformModel_Demo->Get_HatBoneMatirx());
+
             pPendingDeform->Enter_DeformState_Deform(pKirby, m_tPostDeformEndContext);
+            
             break;
         }
         case DEFORM_STATE::DEFORM_STATE_DEFORM_END:
         {
             pPendingDeform->Enter_DeformState_Deform_End(pKirby, m_tPostDeformEndContext);
+
+            // Sound
+            m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_GetAbility.wav", 0.2f);
+
+            // 모자 교체
+            COPY_ABILITY_TYPE eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
+            CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(m_tPostDeformEndContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
+            pKirby->Change_HatSocketMatrix(eAbilityType, pDeformModel_Main->Get_HatBoneMatirx());
 
             // 이름 바꾸기
             KIRBY_NAME_UPDATED tNameDesc{};
@@ -208,7 +226,13 @@ void CKirby_GetDeform::Update_GetDeformState(CKirby* pKirby, _float fTimeDelta)
         }
         case DEFORM_STATE::DEFORM_STATE_DEFORM:
         {
-            if(pPendingDeform->Update_DeformState_Deform(pKirby, m_tPostDeformEndContext, fTimeDelta))
+            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_tPostDeformEndContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+            CAnimator* pDemoAnimator = pDeformModel_Demo->Get_Animator();
+
+            _bool bAniFinished = pDemoAnimator->Is_Finished();
+            _bool bDeformFinished = pPendingDeform->Update_DeformState_Deform(pKirby, m_tPostDeformEndContext, fTimeDelta);
+
+            if(bAniFinished && bDeformFinished)
                 Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_STATE_DEFORM_END);
 
             break;
@@ -243,6 +267,13 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         case DEFORM_STATE::DEFORM_STATE_DEFORM_END:
         {
             pPendingDeform->Exit_DeformState_Deform_End(pKirby, m_tPostDeformEndContext);
+
+            // 카메라 줌
+            KIRBY_ABILITY_CHANGED Desc{};
+            Desc.bBegin = false;
+            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
+
+            m_pGameInstance_Proxy->Set_TimeScale(1.f);
 
             break;
         }
@@ -280,6 +311,15 @@ void CKirby_GetDeform::Handle_DeformEvent(CKirby* pKirby, const DEFORM_ACQUIRED_
 {
     Effect_Stop(m_pInhaleEffect);
     pKirby->Get_Body()->Stop_SoundHandle();
+
+    m_pGameInstance_Proxy->Set_TimeScale(0.f);
+
+    pKirby->Get_Body()->Set_Active(false);
+
+    // 카메라 줌
+    KIRBY_ABILITY_CHANGED tDesc{};
+    tDesc.bBegin = true;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
 
     if(pPendingDeform->HasDemoModel())
         Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_STATE_DEFORM);

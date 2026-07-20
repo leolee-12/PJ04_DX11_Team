@@ -21,51 +21,21 @@ HRESULT CKirby_Deform::Initialize()
     return S_OK;
 }
 
-void CKirby_Deform::Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
-{
-    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DeformingSwallow1.wav", 0.2f);
-
-    m_pGameInstance_Proxy->Set_TimeScale(0.f);
-
-    KIRBY_ABILITY_CHANGED tDesc{};
-    tDesc.bBegin = true;
-    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
-
-    pKirby->Get_Body()->Set_Active(false);
-
-    CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
-    pDeformModel_Demo->Set_Active(true);
-    pDeformModel_Demo->Get_Animator()->Play("Deform", false, true, 0.1f, 1.8f);
-
-    pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
-        pDeformModel_Demo->Get_HatBoneMatirx());
-}
-
-_bool CKirby_Deform::Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
-{   
-    CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
-    CAnimator* pDemoAnimator = pDeformModel_Demo->Get_Animator();
-
-    return pDemoAnimator->Is_Finished();
-}
-
 void CKirby_Deform::Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
-    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_GetAbility.wav", 0.2f);
-
+    // Model 교체
     CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
     pDeformModel_Demo->Set_Active(false);
-
     CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
     pDeformModel_Main->Set_Active(true);
 
+    // Animation
     pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, true, 0.f, 3.5f);
 
-    COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
-    pKirby->Change_HatSocketMatrix(m_eAbilityType, pDeformModel_Main->Get_HatBoneMatirx());
-
+    // 회전
     CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Set_RotationSpeed(560.f);
+    constexpr _float fRotSpeed = 560.f;
+    pMovement->Set_RotationSpeed(fRotSpeed);
     Set_RotationDir(pKirby);
 }
 
@@ -85,14 +55,8 @@ _bool CKirby_Deform::Update_DeformState_Deform_End(CKirby* pKirby, const POST_DE
 
 void CKirby_Deform::Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
-    KIRBY_ABILITY_CHANGED Desc{};
-    Desc.bBegin = false;
-    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
-
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
-
-    m_pGameInstance_Proxy->Set_TimeScale(1.f);
 }
 
 void CKirby_Deform::On_DumpSpitStart(CKirby* pKirby)

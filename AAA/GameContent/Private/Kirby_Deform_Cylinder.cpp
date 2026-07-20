@@ -151,8 +151,6 @@ _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
 
 void CKirby_Deform_Cylinder::Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
-    __super::Enter_DeformState_Deform(pKirby, DeformContext);
-
     CMovement_Child* pMovement = pKirby->Get_Movement();
     _float fMaxHorizontalSpeed = 35.f;
     pMovement->Set_MaxHorizontalSpeed(fMaxHorizontalSpeed);
@@ -163,8 +161,6 @@ void CKirby_Deform_Cylinder::Enter_DeformState_Deform(CKirby* pKirby, const POST
 
 _bool CKirby_Deform_Cylinder::Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
 {
-    _bool bParentFinished = __super::Update_DeformState_Deform(pKirby, DeformContext, fTimeDelta);
-
     CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::DEMO);
     _float fRatio = pDeformModel->Get_Animator()->Get_Progress();
 
@@ -186,7 +182,7 @@ _bool CKirby_Deform_Cylinder::Update_DeformState_Deform(CKirby* pKirby, const PO
     {
         pTransform->Set_State(STATE::POSITION, vTargetPos);
         pMovement->Sync_To_Controller();
-        return true && bParentFinished;
+        return true;
     }
 
     vMoveDir = XMVector3Normalize(vMoveDir);

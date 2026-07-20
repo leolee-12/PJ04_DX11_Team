@@ -44,8 +44,8 @@ public:
 	virtual void Exit_Deform(CKirby* pKirby) = 0;
 
 	// GetDeform
-	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
-	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta);
+	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {};
+	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) { return true; }
 	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
 
 	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
