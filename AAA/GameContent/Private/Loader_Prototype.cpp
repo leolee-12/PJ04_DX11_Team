@@ -88,6 +88,10 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         CCollider::Create(pDevice, pContext, COLLIDER::CAPSULE))))
         return E_FAIL;
 
+    if (FAILED(pProxy->Add_Prototype(Collider_Torus.iLevelID, Collider_Torus.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::TORUS))))
+        return E_FAIL;
+
     static const ENV_ENTRY g_EnvTable[] = {
       { 
         TEXT("Default"), 
@@ -96,10 +100,17 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
         1.f 
       },
-        {
+      {
         TEXT("Volcano"),
         TEXT("../../Resources/YSH/Env/IBL/Stage1/Diffuse.dds"),
         TEXT("../../Resources/YSH/Env/IBL/Stage1/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/LUT/Volcano01.dds"),
+        1.f
+      },
+        {
+        TEXT("Arena"),
+        TEXT("../../Resources/YSH/Env/IBL/Arena/Diffuse.dds"),
+        TEXT("../../Resources/YSH/Env/IBL/Arena/Specular.dds"),
         TEXT("../../Resources/YSH/Env/LUT/Volcano01.dds"),
         1.f
       },
@@ -216,6 +227,10 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
 
     if (FAILED(pProxy->Add_Prototype(Shader_AbillityModel.iLevelID, Shader_AbillityModel.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_AbillityModel.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Shader_Metaknight.iLevelID, Shader_Metaknight.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Metaknight.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
         return E_FAIL;
 
     

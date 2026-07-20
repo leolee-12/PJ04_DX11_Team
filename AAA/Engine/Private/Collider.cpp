@@ -93,6 +93,18 @@ HRESULT CCollider::Initialize(void* pArg)
         break;
     }
 
+    case COLLIDER::TORUS:
+    {
+        CBounding_Torus::BOUNDING_TORUS_DESC d{};
+        d.vCenter = pColliderDesc->vCenter;
+        d.fRingRadius = pColliderDesc->fRadius;   // fRadius = 링 반지름
+        d.fTubeRadius = pColliderDesc->fHeight;   // fHeight = 튜브 반지름으로 재활용
+        d.vRadians = pColliderDesc->vRadians;
+        d.fArcDeg = (pColliderDesc->vSize.x > 1.f) ? pColliderDesc->vSize.x : 360.f;
+        m_pBounding = CBounding_Torus::Create(m_pDevice, m_pContext, &d);
+        break;
+    }
+
     default:
         return E_FAIL;
     }
@@ -149,6 +161,18 @@ void CCollider::Reset_Bounding(const COLLIDER_DESC& Desc)
             BoundingDesc.fHeight = Desc.fHeight;
             BoundingDesc.vRadians = Desc.vRadians;
             m_pBounding->Reset_Desc(&BoundingDesc);
+            break;
+        }
+
+        case COLLIDER::TORUS:
+        {
+            CBounding_Torus::BOUNDING_TORUS_DESC d{};
+            d.vCenter = Desc.vCenter;
+            d.fRingRadius = Desc.fRadius;   // fRadius = 링 반지름
+            d.fTubeRadius = Desc.fHeight;   // fHeight = 튜브 반지름으로 재활용
+            d.vRadians = Desc.vRadians;
+            d.fArcDeg = (Desc.vSize.x > 1.f) ? Desc.vSize.x : 360.f;
+            m_pBounding->Reset_Desc(&d);
             break;
         }
     }

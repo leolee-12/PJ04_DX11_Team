@@ -139,6 +139,9 @@
     <Filter Include="07. Component\Collider\Bounding\Sphere">
       <UniqueIdentifier>{93039028-e495-417a-801c-7e458b5a689f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="07. Component\Collider\Bounding\Torus">
+      <UniqueIdentifier>{b82903e8-b04d-42ce-9d02-2c80bd63c2f3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="07. Component\Collider\DebugDraw">
       <UniqueIdentifier>{0317c6e3-b75a-471f-b833-7e8bfa698015}</UniqueIdentifier>
     </Filter>
@@ -371,6 +374,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Bounding_Sphere.h">
       <Filter>07. Component\Collider\Bounding\Sphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bounding_Torus.h">
+      <Filter>07. Component\Collider\Bounding\Torus</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT.h">
       <Filter>21. Behavior Tree</Filter>
@@ -721,6 +727,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Bounding_Sphere.cpp">
       <Filter>07. Component\Collider\Bounding\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding_Torus.cpp">
+      <Filter>07. Component\Collider\Bounding\Torus</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BTComposite.cpp">
       <Filter>21. Behavior Tree\02. BTComposite</Filter>

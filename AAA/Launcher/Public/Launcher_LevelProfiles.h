@@ -34,6 +34,9 @@ struct LAUNCHER_LEVEL_PROFILES final
 	static constexpr const _tchar* LEVEL_STAGE1_STEP3 =
 		L"../../Resources/YSH/Level_Manifest/Level_Stage1_Step3.json";
 
+	static constexpr const _tchar* LEVEL_ARENA =
+		L"../../Resources/YSH/Level_Manifest/Level_Arena.json";
+
 	static constexpr const _tchar* LEVEL_TEST =
 		L"../../Resources/YSH/Level_Manifest/Level_Test.json";
 };

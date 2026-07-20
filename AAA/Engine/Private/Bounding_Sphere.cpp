@@ -2,6 +2,7 @@
 #include "Bounding_OBB.h"
 #include "Bounding_Sphere.h"
 #include "Bounding_Capsule.h"
+#include "Bounding_Torus.h"
 #include "DebugDraw.h"
 #include "DebugCapsule.h"
 
@@ -55,6 +56,9 @@ _bool CBounding_Sphere::Intersect(COLLIDER eTargetType, CBounding* pBounding)
     case COLLIDER::CAPSULE:
         m_isColl = dynamic_cast<CBounding_Capsule*>(pBounding)->Intersects_Sphere(m_pDesc);
         break;
+
+    case COLLIDER::TORUS:
+        m_isColl = dynamic_cast<CBounding_Torus*>(pBounding)->Intersects_Sphere(m_pDesc); break;
     }
 
     return m_isColl;

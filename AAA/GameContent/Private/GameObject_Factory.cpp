@@ -195,6 +195,17 @@
 #include "Boss_Leopard_Body.h"
 #include "Projectile_Nail.h"
 
+#include "Boss_Metaknight.h"
+#include "Boss_Metaknight_Body.h"
+#include "Boss_Metaknight_Sword.h"
+#include "Boss_Metaknight_ReplicaSword.h"
+#include "Boss_Metaknight_Mant.h"
+#include "Projectile_MoonShot.h"
+#include "Excalibur.h"
+#include "Excalibur_Body.h"
+#include "Excalibur_GetIt.h"
+#include "MetaknightNamePlate.h"
+
 //Boss Effect
 #include "Armadillo_RutA.h"
 #include "Armadillo_RutB.h"
@@ -1562,6 +1573,67 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
                 CBoss_Gorilla_Body::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Metaknight::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Metaknight),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Body/Model_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Body::PROTOTYPE_TAG, CBoss_Metaknight_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Sword::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Sword/Sword.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Sword::PROTOTYPE_TAG,
+                CBoss_Metaknight_Sword::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_ReplicaSword::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/ReplicaSword/ReplicaSword.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_ReplicaSword::PROTOTYPE_TAG,
+                CBoss_Metaknight_ReplicaSword::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Mant/Mant_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::PROTOTYPE_TAG,
+                CBoss_Metaknight_Mant::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_MoonShot::PROTOTYPE_TAG, CProjectile_MoonShot::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CMetaknightNamePlate::PROTOTYPE_TAG, TEXT("NamePlate"),
+        CREATOR(CMetaknightNamePlate),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaknightNamePlate::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/NamePlate/Model.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        ));
+
+    Register(CExcalibur::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CExcalibur),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur::PROTOTYPE_TAG,
+                CExcalibur::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Excalibur/Body/Sword.ysh"
+                    , XMMatrixRotationX(XMConvertToRadians(-90.f)) * XMMatrixTranslation(0.f, 1.4f, 0.f)
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_Body::PROTOTYPE_TAG,
+                CExcalibur_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Excalibur/GetIt/Model.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::PROTOTYPE_TAG,
+                CExcalibur_GetIt::Create(pDevice, pContext));
         )
     );
 }

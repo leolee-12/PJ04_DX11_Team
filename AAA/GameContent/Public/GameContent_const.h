@@ -41,6 +41,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_Gorilla = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Gorilla"), TEXT("../Bin/ShaderFiles/Shader_Gorilla.hlsl") };
 	inline constexpr SHADER_DESC Shader_Armadillo = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Armadillo"), TEXT("../Bin/ShaderFiles/Shader_Armadillo.hlsl") };
 	inline constexpr SHADER_DESC Shader_Leopard = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Leopard"), TEXT("../Bin/ShaderFiles/Shader_Leopard.hlsl") };
+	inline constexpr SHADER_DESC Shader_Metaknight = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Metaknight"), TEXT("../Bin/ShaderFiles/Shader_Metaknight.hlsl") };
 	inline constexpr SHADER_DESC Shader_Monster = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Monster"), TEXT("../Bin/ShaderFiles/Shader_Monster.hlsl") };
 	inline constexpr SHADER_DESC Shader_WaddleDee = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_WaddleDee"), TEXT("../Bin/ShaderFiles/Shader_WaddleDee.hlsl") };
 	inline constexpr SHADER_DESC Shader_Bomb = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Bomb"), TEXT("../Bin/ShaderFiles/Shader_Bomb.hlsl") };
@@ -137,6 +138,7 @@ namespace ProtoDesc
 	inline constexpr COMPONENT_DESC Collider_AABB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB") };
 	inline constexpr COMPONENT_DESC Collider_OBB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB") };
 	inline constexpr COMPONENT_DESC Collider_Capsule = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Capsule") };
+	inline constexpr COMPONENT_DESC Collider_Torus = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Torus") };
 
 	// Monster Effect
 	inline constexpr TEXTURE_DESC Texture_BK_CommonSlash = { ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_BK_CommonSlash"),  TEXT("../../Resources/CHJ/Effect/Monster/BladeKnight/common_slash.png"), 1 };

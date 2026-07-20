@@ -188,6 +188,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\public\Bounding_Capsule.h" />
     <ClInclude Include="..\Public\Bounding_OBB.h" />
     <ClInclude Include="..\Public\Bounding_Sphere.h" />
+    <ClInclude Include="..\public\Bounding_Torus.h" />
     <ClInclude Include="..\Public\BT.h" />
     <ClInclude Include="..\public\BTComposite.h" />
     <ClInclude Include="..\public\BTDecorator.h" />
@@ -309,6 +310,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\Private\Bounding_AABB.cpp" />
     <ClCompile Include="..\Private\Bounding_OBB.cpp" />
     <ClCompile Include="..\Private\Bounding_Sphere.cpp" />
+    <ClCompile Include="..\private\Bounding_Torus.cpp" />
     <ClCompile Include="..\private\BTComposite.cpp" />
     <ClCompile Include="..\private\BTDecorator.cpp" />
     <ClCompile Include="..\private\BTNode.cpp" />
