@@ -17,29 +17,45 @@ protected:
 private:
     static constexpr _float SPD = CBoss_Metaknight::s_fDefaultAnimSpeed;
     static constexpr _float TURN_DEG = 360.f;
-    static constexpr _float REST_TIME = 0.8f;
 
     static constexpr _float STEP_SPEED = 4.f;        // 사인 윈도우 피크 속도
-    static constexpr _float STEP_PAUSE = 0.3f;       // 스텝 사이 멈춤
-    static constexpr _float STEP_KEEP_DIST = 8.f;
+    static constexpr _float STEP_PAUSE = 0.15f;       // 스텝 사이 멈춤
+
+    static constexpr _float SIDE_SPEED = 5.f;
+    static constexpr _float RADIUS_GAIN = 1.5f;
 
     static constexpr _float DASH_SPEED = 15.f;       // 돌진 속도 (고정)
-    static constexpr _float DASH_STOP_DIST = 2.f;    // 락온 지점 = 커비 앞 이 거리
+    static constexpr _float DASH_STOP_DIST = 3.f;    // 락온 지점 = 커비 앞 이 거리
     static constexpr _float DASH_ARRIVE_DIST = 0.5f; // 도착 판정 반경
     static constexpr _float DASH_TIMEOUT = 2.5f;
 
     static constexpr _float COMBO_RANGE = 6.f;
+    static constexpr _float ATK_LUNGE_SPEED = 10.f;
+
+    static constexpr _float DODGE_DIST = 10.f;         
 
 private:
+    _int m_iLastCombo = { 0 };
+
+private:
+    // 조건판별
+    CBTNode* Make_UnlessInRange(CBTNode* pNode);
+
     // 움직임
-    CBTNode* Make_Rest();
     CBTNode* Make_Step();        
     CBTNode* Make_StepApproach();
     CBTNode* Make_DashIn();
+    CBTNode* Make_SideStep(_bool bRight);
+    CBTNode* Make_RandStep();
+    CBTNode* Make_Dodge();
 
     // 기본공격
     CBTNode* Make_SwordHit(_bool bOn);
-    CBTNode* Make_SwordCombo();
+    CBTNode* Make_SwordCombo(_int iHits);
+    CBTNode* Make_AttackLunge(const string& strClip);
+
+    //콤보
+    CBTNode* Make_ComboPick();
 
 public:
     static CBoss_Metaknight_Brain* Create(CMonster* pOwner);

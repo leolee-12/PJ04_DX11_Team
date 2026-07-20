@@ -15,9 +15,11 @@ class CBoss_Metaknight final : public CBoss
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Boss_Metaknight";
 
-    static constexpr _float s_fCCT_Radius = 1.2f;
-    static constexpr _float s_fCCT_Height = 2.4f;
+    static constexpr _float s_fCCT_Radius = 0.75f;
+    static constexpr _float s_fCCT_Height = 0.1f;
     static constexpr _float s_fDefaultAnimSpeed = 1.5f;
+
+    static constexpr _float s_fDodgeCooldown = 2.f;
 
     static constexpr const _char* WEAPON_BONE = "RHaveL";
 
@@ -62,6 +64,8 @@ protected:
     virtual HRESULT Ready_PartObjects() override;
     virtual const _float4x4* Get_FxParentMatrix(const _wstring& strFx) const override;
 
+    virtual void Damaged(const ATTACK_INFO& tInfo) override;
+
 public:
     void      Set_ActiveSword(EMK_SWORD eSword);
     EMK_SWORD Get_ActiveSword() const { return m_eActiveSword; }
@@ -69,6 +73,16 @@ public:
 
     void      Show_Mant(_bool bOn);
     void      Play_MantSync(const _char* szClip, _bool bLoop, _float fBland = 0.2f, _float fSpeed = 1.5f);
+
+    void    Set_DodgeInvincible(_bool bOn) { m_bDodgeInvuln = bOn; }
+    void    Set_AttackBusy(_bool bOn) { m_bAttackBusy = bOn; }
+    _bool Consume_DodgeRequest()
+    {
+        if (!m_bDodgeRequested) return false;
+        m_bDodgeRequested = false;
+        m_fDodgeCooldown = s_fDodgeCooldown;
+        return true;
+    }
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
@@ -78,6 +92,12 @@ private:
     CBoss_Metaknight_ReplicaSword* m_pReplica = { nullptr }; 
     CBoss_Metaknight_Mant* m_pMant = { nullptr };
     EMK_SWORD m_eActiveSword = { EMK_SWORD::GALAXIA };
+
+    _bool      m_bDodgeInvuln = { false };
+
+    _bool  m_bDodgeRequested = { false };
+    _bool  m_bAttackBusy = { false };    
+    _float m_fDodgeCooldown = { 0.f };
 
     // µð¹ö±×
     static constexpr _bool s_bSkipIntro = true;

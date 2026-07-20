@@ -52,6 +52,9 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
     if (m_pGameInstance_Proxy->Key_Down(DIK_0))
         Appear();
 #endif
+    if (m_fDodgeCooldown > 0.f)
+        m_fDodgeCooldown -= fTimeDelta;
+
     __super::Update(fTimeDelta);
 }
 
@@ -102,11 +105,6 @@ void CBoss_Metaknight::Play_Intro()
 
     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
-
-    BOSSCAM_CONFIG_DESC cfg{};
-    cfg.fAimHeight = 2.6f;
-    cfg.fShoulderOffset = 0.f;
-    m_pGameInstance_Proxy->Publish(EventTag::BossCam_Config, &cfg);
 }
 
 _bool CBoss_Metaknight::Is_Intro_Finished() const
@@ -122,8 +120,17 @@ void CBoss_Metaknight::On_Intro_End()
 {
     Show_Mant(false);
 
+    if (m_pController)
+        m_pController->Set_Solid(false);
+
     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+
+    BOSSCAM_CONFIG_DESC cfg{};
+    cfg.fAimHeight = 0.f;
+    cfg.fHeight = 4.f;
+    cfg.fShoulderOffset = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::BossCam_Config, &cfg);
 }
 
 void CBoss_Metaknight::Play_Death()
@@ -232,6 +239,20 @@ HRESULT CBoss_Metaknight::Ready_PartObjects()
 const _float4x4* CBoss_Metaknight::Get_FxParentMatrix(const _wstring& strFx) const
 {
     return m_pTransformCom->Get_WorldMatrixPtr();
+}
+
+void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
+{
+    if (m_bDodgeInvuln)
+        return;
+
+    if (!m_bAttackBusy && m_fDodgeCooldown <= 0.f)
+    {
+        m_bDodgeRequested = true;
+        return;
+    }
+
+    __super::Damaged(tInfo);
 }
 
 void CBoss_Metaknight::Set_ActiveSword(EMK_SWORD eSword)
