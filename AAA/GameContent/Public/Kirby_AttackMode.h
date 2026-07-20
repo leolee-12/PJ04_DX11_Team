@@ -63,7 +63,7 @@ public:
 
 public:
 	void Clear_Overlay(CKirby* pKirby, _uint iSlot = 1, _float fOverlayBlendTime = 0.1f);
-	void Effect_Stop(CEffect_Container*& pContainer1);
+	void Effect_Stop(CEffect_Container*& pContainer);
 
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};

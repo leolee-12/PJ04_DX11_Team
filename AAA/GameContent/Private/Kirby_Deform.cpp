@@ -5,6 +5,7 @@
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
+#include "Kirby_Ability.h"
 
 #include "Movement_Child.h"
 
@@ -20,6 +21,31 @@ HRESULT CKirby_Deform::Initialize()
     m_AniInfos.resize(ETOUI(DEFORM_ANI::END));
 
     return S_OK;
+}
+
+void CKirby_Deform::Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
+{
+    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DeformingSwallow1.wav", 0.2f);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_GravityScale(0.f);
+    pMovement->Set_Velocity(XMVectorSet(0.f, 0.f, 0.f, 0.f));
+    pMovement->Clear_Forces();
+
+    m_pGameInstance_Proxy->Set_TimeScale(0.f);
+
+    KIRBY_ABILITY_CHANGED tDesc{};
+    tDesc.bBegin = true;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
+
+    pKirby->Get_Body()->Set_Active(false);
+
+    CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+    pDeformModel_Demo->Set_Active(true);
+    pDeformModel_Demo->Get_Animator()->Play("Deform", false, true, 0.1f, 1.8f);
+
+    pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
+        pDeformModel_Demo->Get_HatBoneMatirx());
 }
 
 void CKirby_Deform::On_DumpSpitStart(CKirby* pKirby)

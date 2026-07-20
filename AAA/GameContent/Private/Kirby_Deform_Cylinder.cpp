@@ -149,8 +149,10 @@ _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     return false;
 }
 
-void CKirby_Deform_Cylinder::Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
+void CKirby_Deform_Cylinder::Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
+    __super::Enter_DeformState_Deform(pKirby, DeformContext);
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     _float fMaxHorizontalSpeed = 35.f;
     pMovement->Set_MaxHorizontalSpeed(fMaxHorizontalSpeed);
@@ -159,7 +161,7 @@ void CKirby_Deform_Cylinder::Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_
     m_fMoveDir = DeformContext.vStartLook;
 }
 
-_bool CKirby_Deform_Cylinder::Update_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
+_bool CKirby_Deform_Cylinder::Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
 {
     CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::DEMO);
     _float fRatio = pDeformModel->Get_Animator()->Get_Progress();
@@ -192,7 +194,7 @@ _bool CKirby_Deform_Cylinder::Update_Deform(CKirby* pKirby, const POST_DEFORM_EN
     return false;
 }
 
-void CKirby_Deform_Cylinder::Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
+void CKirby_Deform_Cylinder::Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
