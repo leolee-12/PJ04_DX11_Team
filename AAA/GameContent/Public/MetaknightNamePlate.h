@@ -41,7 +41,7 @@ private:
 
     static constexpr _float4 s_vColorBlack = { 0.f, 0.f, 0.f, 1.f };
     //static constexpr _float4 s_vColorBlue = { 93.f / 255.f, 101.f / 255.f, 1.f, 1.f };
-    static constexpr _float4 s_vColorBlue = { 20.f / 255.f, 26.f / 255.f, 120.f / 255.f, 1.f };
+    static constexpr _float4 s_vColorBlue = { 12.f / 255.f, 16.f / 255.f, 135.f / 255.f, 1.f };
     static constexpr _float4 s_vColorWhite = { 1.f, 1.f, 1.f, 1.f };
 
 public:
