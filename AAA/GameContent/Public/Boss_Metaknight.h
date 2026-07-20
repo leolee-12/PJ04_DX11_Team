@@ -23,6 +23,10 @@ public:
 
     static constexpr const _char* WEAPON_BONE = "RHaveL";
 
+    static constexpr _uint  GIGA_POINT_COUNT = 4;
+    static const _float3    s_vGigaPoints[GIGA_POINT_COUNT];
+    static constexpr _float s_fGigaCooldown = 12.f;
+
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
 
 private:
@@ -84,6 +88,10 @@ public:
         return true;
     }
 
+    _bool Is_GigaReady() const { return m_fGigaCooldown <= 0.f; }
+    void  Start_GigaCooldown() { m_fGigaCooldown = s_fGigaCooldown; }
+    void  Fire_GigaMoonShot();
+
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
@@ -98,6 +106,8 @@ private:
     _bool  m_bDodgeRequested = { false };
     _bool  m_bAttackBusy = { false };    
     _float m_fDodgeCooldown = { 0.f };
+
+    _float m_fGigaCooldown = { s_fGigaCooldown };
 
     // µð¹ö±×
     static constexpr _bool s_bSkipIntro = true;

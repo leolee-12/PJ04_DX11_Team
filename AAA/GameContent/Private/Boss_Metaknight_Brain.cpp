@@ -20,39 +20,57 @@ namespace
 
 CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int)
 {
-    CBTNode* pDodgeBranch = CBTSequence::Create({
-        CBTCondition::Create([this](CBlackboard*) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_DodgeRequest(); }),
-        Make_Dodge(),
-        });
-
     return CBTReactiveSelector::Create({
-        pDodgeBranch,
+        Make_DodgeBranch(),
         CBTSequence::Create({
+            Make_GigaBranch(),
             Make_StepApproach(),
             Make_UnlessInRange(Make_DashIn()),
-            CBTSelector::Create({
-                CBTSequence::Create({
-                    CBTCondition::Create([](CBlackboard* pBB) {
-                        return pBB->Get<_float>("DistToTarget", FLT_MAX) <= COMBO_RANGE; }),
-                    Make_ComboPick(),
-                }),
-                CBTCondition::Create([](CBlackboard*) { return true; }),
-            }),
+            Make_ComboBranch(),
         }),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_Optional(CBTNode* pCond, CBTNode* pBody)
+{
+    return CBTSelector::Create({
+        CBTSequence::Create({ pCond, pBody }),
+        CBTCondition::Create([](CBlackboard*) { return true; }),
         });
 }
 
 CBTNode* CBoss_Metaknight_Brain::Make_UnlessInRange(CBTNode* pNode)
 {
-    return CBTSelector::Create({
-        CBTSequence::Create({
-            CBTCondition::Create([](CBlackboard* pBB) {
-                return pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
-            pNode,
-        }),
-        CBTCondition::Create([](CBlackboard*) { return true; }),
+    return Make_Optional(
+        CBTCondition::Create([](CBlackboard* pBB) {
+            return pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
+            pNode);
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_DodgeBranch()
+{
+    return CBTSequence::Create({
+        CBTCondition::Create([this](CBlackboard*) {
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_DodgeRequest(); }),
+        Make_Dodge(),
         });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_GigaBranch()
+{
+    return Make_Optional(
+        CBTCondition::Create([this](CBlackboard* pBB) {
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_GigaReady()
+                && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
+        Make_GigaMoonShot());
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_ComboBranch()
+{
+    return Make_Optional(
+        CBTCondition::Create([](CBlackboard* pBB) {
+            return pBB->Get<_float>("DistToTarget", FLT_MAX) <= COMBO_RANGE; }),
+            Make_ComboPick());
 }
 
 CBTNode* CBoss_Metaknight_Brain::Make_Step()
@@ -91,15 +109,10 @@ CBTNode* CBoss_Metaknight_Brain::Make_StepApproach()
         });
 
     auto Optional = [this](_int n) -> CBTNode* {
-        return CBTSelector::Create({
-            CBTSequence::Create({
-                CBTCondition::Create([n](CBlackboard* pBB) {
-                    return pBB->Get<_int>("StepCount", 1) >= n; }),
-                Loop("Wait", STEP_PAUSE, SPD),
-                Make_RandStep(),
-            }),
-            CBTCondition::Create([](CBlackboard*) { return true; }),
-            });
+        return Make_Optional(
+            CBTCondition::Create([n](CBlackboard* pBB) {
+                return pBB->Get<_int>("StepCount", 1) >= n; }),
+                CBTSequence::Create({ Loop("Wait", STEP_PAUSE, SPD), Make_RandStep() }));
         };
 
     return CBTSequence::Create({
@@ -382,6 +395,131 @@ CBTNode* CBoss_Metaknight_Brain::Make_ComboPick()
 
     return CBTSequence::Create({ pRoll,
         CBTSelector::Create({ Branch(1), Branch(2), Branch(3) }),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_GigaFly()
+{
+    auto bOn = make_shared<bool>(false);
+    auto iPhase = make_shared<_int>(0);     // 0=상승, 1=수평 비행, 2=하강
+    auto vGoal = make_shared<_float3>();
+    auto vCorner = make_shared<_float3>();
+    auto vDirLaunch = make_shared<_float3>();
+
+    return CBTAction::Create(
+        [this, bOn, iPhase, vGoal, vCorner, vDirLaunch](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            _vector vSelf = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+
+            if (!*bOn)
+            {
+                _vector vK = XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos);
+                _float fBest = -1.f; _uint iBest = 0;
+                for (_uint i = 0; i < CBoss_Metaknight::GIGA_POINT_COUNT; ++i)
+                {
+                    _vector vP = XMLoadFloat3(&CBoss_Metaknight::s_vGigaPoints[i]);
+                    const _float d = XMVectorGetX(XMVector3LengthSq(XMVectorSetY(vP - vK, 0.f)));
+                    if (d > fBest) { fBest = d; iBest = i; }
+                }
+                *vCorner = CBoss_Metaknight::s_vGigaPoints[iBest];
+
+                Anim()->Play("Jump", false, true, 0.1f, SPD);
+                mv->Set_GravityEnabled(false);
+                XMStoreFloat3(vGoal.get(), vSelf + XMVectorSet(0.f, GIGA_FLY_H, 0.f, 0.f));
+                *iPhase = 0;
+                *bOn = true;
+            }
+
+            if (*iPhase == 2)
+            {
+                const _float fRemain = XMVectorGetX(XMVector3Length(
+                    XMLoadFloat3(vGoal.get()) - vSelf));
+                const _float t = SmoothStep01(1.f - fRemain / GIGA_FLY_H);
+
+                _vector vDirK = Dir_ToTargetXZ();
+                _vector vBlend = XMLoadFloat3(vDirLaunch.get()) * (1.f - t) + vDirK * t;
+                if (XMVectorGetX(XMVector3LengthSq(vBlend)) > 1e-4f)
+                    RotateYawTo(XMVector3Normalize(vBlend), 720.f, dt);
+                else
+                    RotateYawTo(vDirK, 720.f, dt);
+            }
+
+            const _float fSpeed = (*iPhase == 1) ? GIGA_FLY_SPEED : GIGA_RISE_SPEED;
+            if (mv->Fly_Toward(XMLoadFloat3(vGoal.get()), fSpeed, dt, GIGA_ARRIVE))
+            {
+                if (*iPhase == 0)
+                {
+                    Anim()->Play("HoverDashStart", false, true, 0.15f, SPD);
+
+                    CAnimator::ANI_PLAY_INFO tInfo{};
+                    tInfo.strAniName = "HoverDash";
+                    tInfo.bLoop = true;
+                    tInfo.bRestart = true;
+                    tInfo.fBlend = 0.1f;
+                    tInfo.fSpeed = SPD;
+                    Anim()->Enqueue(tInfo);
+
+                    _vector vC = XMLoadFloat3(vCorner.get());
+                    mv->Face_Instant(vC);
+                    XMStoreFloat3(vGoal.get(), vC + XMVectorSet(0.f, GIGA_FLY_H, 0.f, 0.f));
+                    *iPhase = 1;
+                }
+                else if (*iPhase == 1)
+                {
+                    Anim()->Play("HoverDashEnd", false, true, 0.15f, SPD);
+
+                    _vector vLook = XMVector3Normalize(XMVectorSetY(
+                        m_pOwner->Get_Transform()->Get_State(STATE::LOOK), 0.f));
+                    XMStoreFloat3(vDirLaunch.get(), vLook);
+
+                    XMStoreFloat3(vGoal.get(), XMLoadFloat3(vCorner.get()));
+                    *iPhase = 2;
+                }
+                else
+                {
+                    mv->Set_GravityEnabled(true);
+                    *bOn = false; *iPhase = 0;
+                    return BT_STATUS::SUCCESS;
+                }
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, iPhase] {
+            *bOn = false; *iPhase = 0;
+            m_pOwner->Get_Movement()->Set_GravityEnabled(true);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
+{
+    auto* pBegin = CBTAction::Create(
+        [this](CBlackboard*, _float) {
+            auto* pBoss = static_cast<CBoss_Metaknight*>(m_pOwner);
+            pBoss->Set_AttackBusy(true);
+            pBoss->Start_GigaCooldown();
+            return BT_STATUS::SUCCESS;
+        },
+        [this] { static_cast<CBoss_Metaknight*>(m_pOwner)->Set_AttackBusy(false); });
+
+    auto* pFace = CBTAction::Create([this](CBlackboard*, _float) {
+        m_pOwner->Get_Movement()->Face_Instant(
+            XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos));
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto* pFire = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Fire_GigaMoonShot();
+        return BT_STATUS::SUCCESS;
+        });
+
+    return CBTSequence::Create({
+        pBegin,
+        Make_GigaFly(),
+        Clip("Landing", SPD, 0.2f),
+        pFace,
+        Clip("GigaMoonCharge", SPD, 0.2f),
+        pFire,
+        Clip("GigaMoonShot", SPD, 0.2f),
         });
 }
 

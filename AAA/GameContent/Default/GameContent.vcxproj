@@ -84,6 +84,7 @@
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
+    <ClInclude Include="..\public\Projectile_MoonShot.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
     <ClInclude Include="..\Public\RabbitEnemy.h" />
@@ -533,6 +534,7 @@
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
+    <ClCompile Include="..\private\Projectile_MoonShot.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy.cpp" />

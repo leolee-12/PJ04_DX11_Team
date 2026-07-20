@@ -197,6 +197,7 @@
 #include "Boss_Metaknight_Sword.h"
 #include "Boss_Metaknight_ReplicaSword.h"
 #include "Boss_Metaknight_Mant.h"
+#include "Projectile_MoonShot.h"
 
 //Boss Effect
 #include "Armadillo_RutA.h"
@@ -1568,6 +1569,8 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::PROTOTYPE_TAG,
                 CBoss_Metaknight_Mant::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_MoonShot::PROTOTYPE_TAG, CProjectile_MoonShot::Create(pDevice, pContext));
         )
     );
 }

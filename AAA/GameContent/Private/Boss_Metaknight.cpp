@@ -7,6 +7,16 @@
 #include "Boss_Metaknight_Sword.h"
 #include "Boss_Metaknight_Mant.h"
 
+#include "Projectile_Manager.h"
+#include "Projectile_MoonShot.h"
+
+const _float3 CBoss_Metaknight::s_vGigaPoints[CBoss_Metaknight::GIGA_POINT_COUNT] = {
+    { 20.5f, 7.23f, 15.f },
+    { 20.5f, 7.23f, -15.f },
+    { -20.5f, 7.23f, 15.f },
+    { -20.5f, 7.23f, -15.f },
+};
+
 const vector<_float> CBoss_Metaknight::s_Thresholds = {};
 
 CBoss_Metaknight::CBoss_Metaknight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -54,6 +64,8 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
 #endif
     if (m_fDodgeCooldown > 0.f)
         m_fDodgeCooldown -= fTimeDelta;
+    if (m_fGigaCooldown > 0.f)
+        m_fGigaCooldown -= fTimeDelta;
 
     __super::Update(fTimeDelta);
 }
@@ -285,6 +297,24 @@ void CBoss_Metaknight::Play_MantSync(const _char* szClip, _bool bLoop, _float fB
 {
     if (m_pMant && m_pMant->Is_Active())
         m_pMant->Get_Animator()->Play(szClip, bLoop, true, fBland, fSpeed);
+}
+
+void CBoss_Metaknight::Fire_GigaMoonShot()
+{
+    CProjectile* p = nullptr;
+    CProjectile_Manager::GetInstance()->Spawn(Get_PrototypeLevelIndex(), Get_LevelIndex(),
+        CProjectile_MoonShot::POOL_KEY, CProjectile_MoonShot::PROTOTYPE_TAG, &p);
+    if (!p) return;
+
+    _vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vDir = XMVectorSetY(XMLoadFloat3(&Get_BlackBoard().vTargetPos) - vSelf, 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) < 1e-6f)
+        vDir = m_pTransformCom->Get_State(STATE::LOOK);
+    vDir = XMVector3Normalize(vDir);
+
+    _float3 vPos; XMStoreFloat3(&vPos, vSelf + vDir * 1.5f + XMVectorSet(0.f, 1.2f, 0.f, 0.f));
+    _float3 vD;   XMStoreFloat3(&vD, vDir);
+    p->Launch(vPos, vD);
 }
 
 void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)

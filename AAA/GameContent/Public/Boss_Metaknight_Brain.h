@@ -32,15 +32,17 @@ private:
     static constexpr _float COMBO_RANGE = 6.f;
     static constexpr _float ATK_LUNGE_SPEED = 10.f;
 
-    static constexpr _float DODGE_DIST = 10.f;         
+    static constexpr _float DODGE_DIST = 10.f;        
+
+    static constexpr _float GIGA_FLY_H = 6.f;      
+    static constexpr _float GIGA_FLY_SPEED = 25.f; 
+    static constexpr _float GIGA_RISE_SPEED = 12.f;
+    static constexpr _float GIGA_ARRIVE = 0.6f;
 
 private:
     _int m_iLastCombo = { 0 };
 
 private:
-    // 조건판별
-    CBTNode* Make_UnlessInRange(CBTNode* pNode);
-
     // 움직임
     CBTNode* Make_Step();        
     CBTNode* Make_StepApproach();
@@ -56,6 +58,22 @@ private:
 
     //콤보
     CBTNode* Make_ComboPick();
+
+    // 기가문샷
+    CBTNode* Make_GigaFly();
+    CBTNode* Make_GigaMoonShot();
+
+
+
+    // 트리 조립 유틸
+    CBTNode* Make_Optional(CBTNode* pCond, CBTNode* pBody);
+    CBTNode* Make_UnlessInRange(CBTNode* pNode);
+
+    // 트리 분기
+    CBTNode* Make_DodgeBranch();
+    CBTNode* Make_GigaBranch();
+    CBTNode* Make_ComboBranch();
+
 
 public:
     static CBoss_Metaknight_Brain* Create(CMonster* pOwner);
