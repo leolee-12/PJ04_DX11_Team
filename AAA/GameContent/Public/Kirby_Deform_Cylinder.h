@@ -50,7 +50,7 @@ public:
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
-	// Get_Deform 변신 추가 로직
+	// GetDeform 변신 추가 로직
 	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
 	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
 	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
@@ -58,9 +58,6 @@ public:
 	// DeformDump용 함수
 	virtual void On_DumpSpitStart(CKirby* pKirby) override {};
 	virtual void On_DumpSpitDeform(CKirby* pKirby) override;
-
-public:
-	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }

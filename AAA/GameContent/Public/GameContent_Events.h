@@ -253,7 +253,8 @@ namespace Client
     enum class KIRBY_POSITION_SYNC_CONTEXT : _uint
     {
         CAR_BRIDGE,
-        METAKNIGHT_ENCOUNTER,
+        METAKNIGHT_LOOKAROUND,
+        METAKNIGHT_INTRO,
         _COUNT
     };
 
@@ -269,6 +270,7 @@ namespace Client
     {
         CAR_BRIDGE_END,
         METAKNIGHT_ENCOUNTER_END,
+        METAKNIGHT_INTRO_END,
         _COUNT
     };
 

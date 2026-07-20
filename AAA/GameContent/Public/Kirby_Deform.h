@@ -43,10 +43,14 @@ public:
 	virtual void Enter_Deform(CKirby* pKirby) = 0;
 	virtual void Exit_Deform(CKirby* pKirby) = 0;
 
-	// Get_Deform 변신 추가 로직
+	// GetDeform
 	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
-	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) { return true; }
+	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta);
 	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
+
+	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
+	virtual _bool Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta);
+	virtual void Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
 
 	virtual _bool HasDemoModel() { return true; }
 
@@ -54,7 +58,16 @@ public:
 	virtual void On_DumpSpitStart(CKirby* pKirby);
 	virtual void On_DumpSpitDeform(CKirby* pKirby) {}
 
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override {};
+
 	void Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni);
+
+protected:
+	void Set_RotationDir(CKirby* pKirby);
+
+protected:
+	_float3 m_vRotationDir{};
+
 
 protected:
 	void Set_FullBodyAni(DEFORM_ANI eAni, const _string& strAniName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.1f, _float fSpeed = 1.f);

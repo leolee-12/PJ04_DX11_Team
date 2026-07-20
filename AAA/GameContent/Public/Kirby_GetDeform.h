@@ -17,6 +17,8 @@ class CKirby;
 class CKirby_Body;
 class CKirby_Deform;
 
+enum class DEFORM_OBJECT_KIND;
+
 struct DEFORM_ACQUIRED_EVENT;
 
 class CLIENT_DLL CKirby_GetDeform final : public CKirby_State
@@ -55,12 +57,12 @@ private:
 	void Update_GetDeformState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState);
 
-	void Set_RotationDir(CKirby* pKirby);
-
 	// Event
 	void Subscribe_DeformEvent(CKirby* pKirby);
 	void Unsubscribe_DeformEvent();
 	void Handle_DeformEvent(CKirby* pKirby, const DEFORM_ACQUIRED_EVENT* pDesc);
+
+	void Capture_DeformContext(IDeformable* pDeformable);
 
 private:
 	DEFORM_STATE m_eDeformState{};
@@ -68,16 +70,14 @@ private:
 	// 변신할 타입
 	POST_DEFORM_END_CONTEXT m_tPostDeformEndContext{};
 	CKirby_Deform* pPendingDeform{};
-	DEFORM_TYPE m_eDeformType{};
 
 	// Effect
 	CEffect_Container* m_pInhaleEffect{};
 
-	_float3 m_vRotationDir{};
-
 	// Event
 	SUBHANDLE m_DeformEvent{};
 	_bool m_bSubscribedDeformEvent{};
+
 
 public:
 	static CKirby_GetDeform* Create();
