@@ -37,10 +37,6 @@ public:
 	virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc) override;
 	virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc) override;
 
-private:
-	_float4x4 m_matAnchorWorld{};
-	_bool m_bIsPositioned{};
-
 public:
 	static CKirby_MetaKnightEncounter* Create();
 private:

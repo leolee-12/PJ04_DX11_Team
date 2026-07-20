@@ -28,35 +28,6 @@ KIRBY_STATE_TYPE CKirby_MetaKnightEncounter::Get_StateType()
 void CKirby_MetaKnightEncounter::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
-
-    m_bIsPositioned = false;
-
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
-
-    CAnimator::ANI_PLAY_INFO tInfo{};
-    tInfo.bLoop = false;
-    tInfo.bRestart = false;
-    tInfo.fBlend = 0.1f;
-    tInfo.fSpeed = 1.5f;
-
-    tInfo.strAniName = "LookAround";
-    pAnimator->Play(&tInfo);
-
-    tInfo.strAniName = "Metaknight_DemoAppearCut1";
-    pAnimator->Enqueue(tInfo);
-
-    tInfo.strAniName = "Metaknight_DemoAppearCut2";
-    pAnimator->Enqueue(tInfo);
-
-    tInfo.strAniName = "Metaknight_DemoAppearCut3";
-    pAnimator->Enqueue(tInfo);
-
-    tInfo.strAniName = "Metaknight_DemoAppearCut4";
-    pAnimator->Enqueue(tInfo);
-
-    tInfo.strAniName = "Metaknight_DemoAppearCut5";
-    pAnimator->Enqueue(tInfo);
 }
 
 void CKirby_MetaKnightEncounter::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -65,23 +36,9 @@ void CKirby_MetaKnightEncounter::Update(CKirby* pKirby, const _float fTimeDelta)
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-    if (m_bIsPositioned == false && pAnimator->Get_CurrentAnimName() == "Metaknight_DemoAppearCut1")
-    {
-        if (m_matAnchorWorld._44 <= Helper::fEpsilon)
-        {
-            MSG_BOX("m_matAnchorWorld has not been set : CKirby_MetaKnightEncounter");
-        }
-        else
-        {
-            CTransform* pTransform = pKirby->Get_Transform();
-            pTransform->Set_WorldMatrix(m_matAnchorWorld);
-        }
-
-        m_bIsPositioned = true;
-    }
-
     if (pAnimator->Get_CurrentAnimName() == "Metaknight_DemoAppearCut5" && pAnimator->Is_Finished())
     {
+
 
         Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
     }
@@ -104,9 +61,51 @@ void CKirby_MetaKnightEncounter::Request_PositionSync(CKirby* pKirby, const KIRB
 {
     switch (pDesc->eType)
     {
-        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_ENCOUNTER:
+        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOOKAROUND:
         {
-            m_matAnchorWorld = pDesc->AnchorWorld;
+            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+            CAnimator::ANI_PLAY_INFO tInfo{};
+            tInfo.bLoop = true;
+            tInfo.bRestart = true;
+            tInfo.fBlend = 0.1f;
+            tInfo.fSpeed = 1.5f;
+
+            tInfo.strAniName = "LookAround";
+            pAnimator->Play(&tInfo);
+
+            break;
+        }
+        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_INTRO:
+        {
+            // À§Ä¡
+            CTransform* pTransform = pKirby->Get_Transform();
+            pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
+
+            // Ani
+            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+            pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
+
+            CAnimator::ANI_PLAY_INFO tInfo{};
+            tInfo.bLoop = false;
+            tInfo.bRestart = true;
+            tInfo.fBlend = 0.1f;
+            tInfo.fSpeed = 1.5f;
+
+            tInfo.strAniName = "Metaknight_DemoAppearCut1";
+            pAnimator->Play(&tInfo);
+
+            tInfo.strAniName = "Metaknight_DemoAppearCut2";
+            pAnimator->Enqueue(tInfo);
+
+            tInfo.strAniName = "Metaknight_DemoAppearCut3";
+            pAnimator->Enqueue(tInfo);
+
+            tInfo.strAniName = "Metaknight_DemoAppearCut4";
+            pAnimator->Enqueue(tInfo);
+
+            tInfo.strAniName = "Metaknight_DemoAppearCut5";
+            pAnimator->Enqueue(tInfo);
             break;
         }
         default:
@@ -122,6 +121,10 @@ void CKirby_MetaKnightEncounter::Request_PositionSync_End(CKirby* pKirby, const 
     switch (pDesc->eType)
     {
         case KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_ENCOUNTER_END:
+        {
+            break;
+        }
+        case KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_INTRO_END:
         {
             break;
         }

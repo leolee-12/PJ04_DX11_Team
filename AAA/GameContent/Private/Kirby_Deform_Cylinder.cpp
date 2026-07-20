@@ -163,6 +163,8 @@ void CKirby_Deform_Cylinder::Enter_DeformState_Deform(CKirby* pKirby, const POST
 
 _bool CKirby_Deform_Cylinder::Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
 {
+    _bool bParentFinished = __super::Update_DeformState_Deform(pKirby, DeformContext, fTimeDelta);
+
     CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::DEMO);
     _float fRatio = pDeformModel->Get_Animator()->Get_Progress();
 
@@ -184,7 +186,7 @@ _bool CKirby_Deform_Cylinder::Update_DeformState_Deform(CKirby* pKirby, const PO
     {
         pTransform->Set_State(STATE::POSITION, vTargetPos);
         pMovement->Sync_To_Controller();
-        return true;
+        return true && bParentFinished;
     }
 
     vMoveDir = XMVector3Normalize(vMoveDir);
@@ -204,11 +206,6 @@ void CKirby_Deform_Cylinder::Exit_DeformState_Deform(CKirby* pKirby, const POST_
 void CKirby_Deform_Cylinder::On_DumpSpitDeform(CKirby* pKirby)
 {
     pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 20.f, 0.f, 0.f));
-}
-
-void CKirby_Deform_Cylinder::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-
 }
 
 void CKirby_Deform_Cylinder::Change_DeformCylinderState(CKirby* pKirby, DEFORM_CYLINDER_STATE eNext)

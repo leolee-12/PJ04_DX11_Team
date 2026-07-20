@@ -1,7 +1,5 @@
 #include "Kirby_Deform.h"
 
-#include "GameInstance.h"
-
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
@@ -27,11 +25,6 @@ void CKirby_Deform::Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_E
 {
     m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DeformingSwallow1.wav", 0.2f);
 
-    CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Set_GravityScale(0.f);
-    pMovement->Set_Velocity(XMVectorSet(0.f, 0.f, 0.f, 0.f));
-    pMovement->Clear_Forces();
-
     m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
     KIRBY_ABILITY_CHANGED tDesc{};
@@ -46,6 +39,60 @@ void CKirby_Deform::Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_E
 
     pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
         pDeformModel_Demo->Get_HatBoneMatirx());
+}
+
+_bool CKirby_Deform::Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
+{   
+    CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+    CAnimator* pDemoAnimator = pDeformModel_Demo->Get_Animator();
+
+    return pDemoAnimator->Is_Finished();
+}
+
+void CKirby_Deform::Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
+{
+    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_GetAbility.wav", 0.2f);
+
+    CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+    pDeformModel_Demo->Set_Active(false);
+
+    CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
+    pDeformModel_Main->Set_Active(true);
+
+    pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, true, 0.f, 3.5f);
+
+    COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
+    pKirby->Change_HatSocketMatrix(m_eAbilityType, pDeformModel_Main->Get_HatBoneMatirx());
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_RotationSpeed(560.f);
+    Set_RotationDir(pKirby);
+}
+
+_bool CKirby_Deform::Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
+{
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Rotate_To_Direction(XMLoadFloat3(&m_vRotationDir), fTimeDelta);
+
+    CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(DeformContext.eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
+    CAnimator* pMainAnimator = pDeformModel_Main->Get_Animator();
+
+    if (pMainAnimator->Is_Finished())
+        return true;
+
+    return false;
+}
+
+void CKirby_Deform::Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
+{
+    KIRBY_ABILITY_CHANGED Desc{};
+    Desc.bBegin = false;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
+
+    m_pGameInstance_Proxy->Set_TimeScale(1.f);
 }
 
 void CKirby_Deform::On_DumpSpitStart(CKirby* pKirby)
@@ -65,6 +112,32 @@ void CKirby_Deform::Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni)
 
     if (tDesc.ePlayType == ANI_PLAY_TYPE::OVERLAY)
         pAnimator->Apply_Overlay(tDesc.tLayerAniInfo);
+}
+
+void CKirby_Deform::Set_RotationDir(CKirby* pKirby)
+{
+    _vector vCamPos = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition());
+    _vector vPlayerPos = pKirby->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vDir = XMVectorSetY(vCamPos - vPlayerPos, 0.f);
+    vDir = XMVector3Normalize(vDir);
+
+    _float fRadian = XMConvertToRadians(15.f);
+
+    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    _vector vLeftDir = XMVector3Rotate(vDir, XMQuaternionRotationAxis(vUp, -fRadian));
+    _vector vRightDir = XMVector3Rotate(vDir, XMQuaternionRotationAxis(vUp, fRadian));
+
+    _vector vCurLook = XMVectorSetY(pKirby->Get_Transform()->Get_State(STATE::LOOK), 0.f);
+    vCurLook = XMVector3Normalize(vCurLook);
+
+    _float fLeftDot = XMVectorGetX(XMVector3Dot(vCurLook, vLeftDir));
+    _float fRightDot = XMVectorGetX(XMVector3Dot(vCurLook, vRightDir));
+
+    if (fLeftDot > fRightDot)
+        XMStoreFloat3(&m_vRotationDir, vLeftDir);
+    else
+        XMStoreFloat3(&m_vRotationDir, vRightDir);
 }
 
 void CKirby_Deform::Set_FullBodyAni(DEFORM_ANI eAni, const _string& strAniName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
