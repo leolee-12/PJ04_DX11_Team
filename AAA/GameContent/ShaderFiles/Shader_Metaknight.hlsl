@@ -288,6 +288,20 @@ PS_OUT PS_SWORD(VS_OUT In)
     return Out;
 }
 
+struct PS_FORWARD_OUT
+{
+    float4 vColor : SV_TARGET0;
+};
+
+PS_FORWARD_OUT PS_GETIT(VS_OUT In)
+{
+    float4 vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+
+    PS_FORWARD_OUT Out;
+    Out.vColor = vDiffuse;
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass ShadowPass // 0
@@ -361,5 +375,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN_NA();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SWORD();
+    }
+    pass GetIt // 8
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN_NA();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_GETIT();
     }
 }

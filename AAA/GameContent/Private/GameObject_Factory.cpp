@@ -201,6 +201,9 @@
 #include "Boss_Metaknight_ReplicaSword.h"
 #include "Boss_Metaknight_Mant.h"
 #include "Projectile_MoonShot.h"
+#include "Excalibur.h"
+#include "Excalibur_Body.h"
+#include "Excalibur_GetIt.h"
 
 //Boss Effect
 #include "Armadillo_RutA.h"
@@ -1598,6 +1601,29 @@ void CGameObject_Factory::Register_MainBoss()
                 CBoss_Metaknight_Mant::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_MoonShot::PROTOTYPE_TAG, CProjectile_MoonShot::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CExcalibur::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CExcalibur),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur::PROTOTYPE_TAG,
+                CExcalibur::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Excalibur/Body/Sword.ysh"
+                    , XMMatrixRotationX(XMConvertToRadians(-90.f)) * XMMatrixTranslation(0.f, 1.4f, 0.f)
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_Body::PROTOTYPE_TAG,
+                CExcalibur_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Excalibur/GetIt/Model.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::PROTOTYPE_TAG,
+                CExcalibur_GetIt::Create(pDevice, pContext));
         )
     );
 }

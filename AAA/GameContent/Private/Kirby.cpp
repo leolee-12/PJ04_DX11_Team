@@ -595,6 +595,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::LD_ITEM));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::EXCALIBUR));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_HURT));
@@ -991,6 +992,14 @@ HRESULT CKirby::SetUp_Collider_Callback()
             else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA))
             {
                 Set_DeformEndTrigger(true);
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::EXCALIBUR))
+            {
+                IInhalable* pExcalibur = dynamic_cast<IInhalable*>(pGameObject);
+                if (pExcalibur == nullptr)
+                    return;
+
+                m_pKirby_StateMachine->Get_EssenceBubble(pExcalibur->Get_CopyAbility());
             }
         }
     );

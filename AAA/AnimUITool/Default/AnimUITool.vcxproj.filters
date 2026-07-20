@@ -135,11 +135,11 @@
     <ClInclude Include="..\Public\Preview_Actor.h">
       <Filter>02. Objects\Preview_Actor</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Preview_RollerCoaster.h">
-      <Filter>02. Objects\Preview_RollerCoaster</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Preview_Kirby.h">
       <Filter>02. Objects\Preview_Kirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Preview_RollerCoaster.h">
+      <Filter>02. Objects\Preview_RollerCoaster</Filter>
     </ClInclude>
     <ClInclude Include="AnimUITool.h">
       <Filter>98. Default</Filter>
@@ -203,11 +203,11 @@
     <ClCompile Include="..\Private\Preview_Actor.cpp">
       <Filter>02. Objects\Preview_Actor</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Preview_RollerCoaster.cpp">
-      <Filter>02. Objects\Preview_RollerCoaster</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Preview_Kirby.cpp">
       <Filter>02. Objects\Preview_Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Preview_RollerCoaster.cpp">
+      <Filter>02. Objects\Preview_RollerCoaster</Filter>
     </ClCompile>
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp">
       <Filter>97. ImGui</Filter>

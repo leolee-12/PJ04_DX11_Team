@@ -53,6 +53,9 @@
     <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
+    <ClInclude Include="..\public\Excalibur.h" />
+    <ClInclude Include="..\public\Excalibur_Body.h" />
+    <ClInclude Include="..\public\Excalibur_GetIt.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
@@ -504,6 +507,9 @@
     <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp" />
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\private\Excalibur.cpp" />
+    <ClCompile Include="..\private\Excalibur_Body.cpp" />
+    <ClCompile Include="..\private\Excalibur_GetIt.cpp" />
     <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />

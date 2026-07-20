@@ -43,6 +43,7 @@ namespace Client
 		DROP_STAR,
 		LD_ITEM,
 		DEFORM_RELEASE_AREA,
+		EXCALIBUR,
 
 		ENV_TRIGGER = 100
 	};
