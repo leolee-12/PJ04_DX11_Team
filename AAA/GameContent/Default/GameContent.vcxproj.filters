@@ -3365,9 +3365,6 @@
     <ClCompile Include="..\Private\Kirby_Damaged.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Deform.cpp">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car</Filter>
     </ClCompile>
@@ -4126,6 +4123,12 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Deform.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

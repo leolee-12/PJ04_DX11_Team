@@ -221,11 +221,6 @@ _bool CKirby_Deform_Car::Enter_Attack_KeyUp(CKirby* pKirby)
     return true;
 }
 
-void CKirby_Deform_Car::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-    // 崔副 锭 面倒贸府
-}
-
 void CKirby_Deform_Car::Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext)
 {
     if (m_eDeformCar_State == eNext)
