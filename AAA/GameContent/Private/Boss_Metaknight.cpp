@@ -85,7 +85,7 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
 #endif
     if (m_fDodgeCooldown > 0.f)
         m_fDodgeCooldown -= fTimeDelta;
-    if (m_fGigaCooldown > 0.f)
+    if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fGigaCooldown > 0.f)
         m_fGigaCooldown -= fTimeDelta;
 
     if (m_bAppearPending)
@@ -175,6 +175,29 @@ _bool CBoss_Metaknight::Is_Intro_Finished() const
 
 void CBoss_Metaknight::On_Intro_End()
 {
+    if (m_pBody)
+    {
+        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("TopL");
+        if (pBone)
+        {
+            _matrix matBoneWorld = XMLoadFloat4x4(pBone)
+                * XMLoadFloat4x4(m_pBody->Get_CombinedWorldMatrixPtr());
+            _vector vBonePos = matBoneWorld.r[3];
+
+            _vector vCur = m_pTransformCom->Get_State(STATE::POSITION);
+            _vector vNew = XMVectorSetY(vBonePos, XMVectorGetY(vCur));
+
+            m_pTransformCom->Set_State(STATE::POSITION, vNew);
+            if (m_pController)
+                m_pController->Set_FootPosition(vNew);
+        }
+    }
+
+    //METAKNIGHT_INTRO_END;
+
+    KIRBY_POSITION_SYNC_END_DESC  SyncEnd{ KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_INTRO_END };
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &SyncEnd);
+
     Show_Mant(false);
 
     if (m_pController)

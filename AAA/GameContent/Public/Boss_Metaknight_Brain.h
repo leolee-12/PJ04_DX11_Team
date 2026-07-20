@@ -63,8 +63,6 @@ private:
     CBTNode* Make_GigaFly();
     CBTNode* Make_GigaMoonShot();
 
-
-
     // 트리 조립 유틸
     CBTNode* Make_Optional(CBTNode* pCond, CBTNode* pBody);
     CBTNode* Make_UnlessInRange(CBTNode* pNode);
