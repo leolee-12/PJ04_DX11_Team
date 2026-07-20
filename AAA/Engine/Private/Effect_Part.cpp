@@ -159,9 +159,12 @@ _int CEffect_Part::Resolve_ShaderPass()
     Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
     Helper::IntClamp(m_iDepthIgnore, DepthMode::DEPTH_DEFAULT, DepthMode::DEPTH_MODE_END - 1);
 
+    const _int iDepthModeOffset =
+        m_iDepthIgnore * ShaderPass::ShaderPass_End * Sampler::SAMPLER_END;
+
     return m_iShaderPass +
         (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0) +
-        (m_iDepthIgnore == DepthMode::DEPTH_IGNORE ? ShaderPass::ShaderPass_End * Sampler::SAMPLER_END : 0);
+        iDepthModeOffset;
 }
 
 HRESULT CEffect_Part::Bind_ViewProjectionMatrices()

@@ -153,8 +153,10 @@ _bool CMovement_Child::Update_RigidBody(_float fTimeDelta)
     return m_bGrounded;
 }
 
-_bool CMovement_Child::Check_GroundBelow()
+_bool CMovement_Child::Check_GroundBelow(_float fPermitDistance, _float& fOutGroundGap)
 {
+    fOutGroundGap = 0.f;
+
     // PxController가 속한 Scene을 가져옴.
     physx::PxScene* pScene = m_pController->getScene();
     if (pScene == nullptr)
@@ -165,16 +167,16 @@ _bool CMovement_Child::Check_GroundBelow()
 
     // Ray 시작 위치
     physx::PxVec3 vOrigin(
-        static_cast<float>(vFoot.x),
-        static_cast<float>(vFoot.y) + m_RayOriginOffsetFromFoot,
-        static_cast<float>(vFoot.z)
+        static_cast<_float>(vFoot.x),
+        static_cast<_float>(vFoot.y) + m_RayOriginOffsetFromFoot,
+        static_cast<_float>(vFoot.z)
     );
 
     // Ray 방향
     physx::PxVec3 vDir(0.f, -1.f, 0.f);
 
     // 총 거리
-    const _float fMaxDistance = m_RayOriginOffsetFromFoot + m_fGroundPermitDistance;
+    const _float fMaxDistance = m_RayOriginOffsetFromFoot + fPermitDistance;
 
     // 레이케스트 결과를 담는 버퍼
     physx::PxRaycastBuffer HitBuffer;
@@ -202,10 +204,15 @@ _bool CMovement_Child::Check_GroundBelow()
 
     // 45도 이하만 바닥으로 인정
     const _float fMinGroundNormalY = cosf(physx::PxPi / 4.f);
-
     if (Hit.normal.y < fMinGroundNormalY)
         return false;
-    
+
+    // 실제 발과 지면 사이의 간격 계산
+    fOutGroundGap = Hit.distance - m_RayOriginOffsetFromFoot;
+
+    // 발이 지면에 살짝 파묻힌 경우 음수가 나올 수 있으므로 0으로 보정
+    if (fOutGroundGap < 0.f)
+        fOutGroundGap = 0.f;
 
     return true;
 }
@@ -545,6 +552,9 @@ void CMovement_Child::Clamp_Velocity(_vector& vVelocity)
 
 void CMovement_Child::Move_Controller(_fvector vVelocity, _float fTimeDelta, _vector& vOutVelocity)
 {
+    // 이전 접지 상태
+    const _bool bWasGrounded = m_bGrounded;
+
     // 변위 → CCT 이동 → Transform 위치 반영
     _float3 vDisp = {};
     XMStoreFloat3(&vDisp, XMVectorScale(vVelocity, fTimeDelta));
@@ -557,13 +567,48 @@ void CMovement_Child::Move_Controller(_fvector vVelocity, _float fTimeDelta, _ve
         physx::PxVec3(vDisp.x, vDisp.y, vDisp.z),
         0.001f, fTimeDelta, filters);
 
+    // Ground Snap 전에 기본 이동의 접지 결과 확인
+    _bool bControllerGrounded = flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
+
+    _bool bPermitGrounded = false;
+    _float fGroundGap = 0.f;
+
+    // CCT가 접지하지 못한 경우 일반 접지 또는 Ground Snap 검사
+    if (!bControllerGrounded)
+    {
+        // Ground Snap 가능 여부 계산
+        const _bool bCanGroundSnap = bWasGrounded && XMVectorGetY(vVelocity) <= 0.f;
+
+        // 기본적으로 기존 접지 검사 거리 사용
+        _float fGroundCheckDistance = m_fGroundPermitDistance;
+
+        if (bCanGroundSnap)
+        {
+            const _vector vHorizontalVelocity = XMVectorSetY(vVelocity, 0.f);
+            const _float fHorizontalSpeed = XMVectorGetX(XMVector3Length(vHorizontalVelocity));
+
+            // 수평 속도에 비례하여 발밑 지면 검사 거리를 증가
+            fGroundCheckDistance += fHorizontalSpeed * fTimeDelta;
+        }
+
+        bPermitGrounded = Check_GroundBelow(fGroundCheckDistance, fGroundGap);
+
+        // Ground Snap 가능한 상황에서 지면을 찾은 경우에만 아래로 이동
+        if (bCanGroundSnap && bPermitGrounded)
+        {
+            constexpr _float fSnapPadding = 0.01f;
+
+            physx::PxControllerCollisionFlags snapFlags = m_pController->move(
+                physx::PxVec3(0.f, -(fGroundGap + fSnapPadding), 0.f),
+                0.001f, fTimeDelta, filters);
+
+            bControllerGrounded = snapFlags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
+        }
+    }
+
     const physx::PxExtendedVec3& foot = m_pController->getFootPosition();
     m_pTransform->Set_State(STATE::POSITION,
         XMVectorSet(static_cast<_float>(foot.x), static_cast<_float>(foot.y), static_cast<_float>(foot.z), 1.f));
-
-    // 접지 정리
-    _bool bControllerGrounded = flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
-    _bool bPermitGrounded = Check_GroundBelow();
 
     m_bGrounded = bControllerGrounded || bPermitGrounded;
 

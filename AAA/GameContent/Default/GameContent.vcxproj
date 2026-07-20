@@ -53,6 +53,8 @@
     <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
+    <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
+    <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
@@ -230,6 +232,8 @@
     <ClInclude Include="..\Public\Kirby_DeformCylinder_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCylinder_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Cylinder.h" />
+    <ClInclude Include="..\Public\Kirby_DeformRollerCoaster_Main.h" />
+    <ClInclude Include="..\Public\Kirby_Deform_RollerCoaster.h" />
     <ClInclude Include="..\Public\Kirby_Deform.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
     <ClInclude Include="..\Public\Kirby_DeformCarBridge.h" />
@@ -364,6 +368,7 @@
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Bomb.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
@@ -402,6 +407,7 @@
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
     <ClInclude Include="..\Public\Kirby_IceHat.h" />
+    <ClInclude Include="..\Public\Kirby_SleepHat.h" />
     <ClInclude Include="..\public\UI_Eraser.h" />
     <ClInclude Include="..\public\UI_FadeIn.h" />
     <ClInclude Include="..\public\UI_FadeOut.h" />
@@ -506,6 +512,8 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
+    <ClCompile Include="..\Private\OnLadderEffect.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
@@ -679,6 +687,8 @@
     <ClCompile Include="..\Private\Kirby_DeformCylinder_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCylinder_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Cylinder.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformRollerCoaster_Main.cpp" />
+    <ClCompile Include="..\Private\Kirby_Deform_RollerCoaster.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp" />
@@ -764,6 +774,7 @@
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
@@ -841,6 +852,7 @@
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
     <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_SleepHat.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />

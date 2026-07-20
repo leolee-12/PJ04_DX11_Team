@@ -45,9 +45,11 @@ public:
 	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
 
 public:
+	// Attach
 	void Request_Attachment_StateMachine(const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc);
 	void Request_Attachment_End_StateMachine(const KIRBY_ATTACHMENT_END_DESC* pDesc);
 
+	// Position
 	void Request_PositionSync_StateMachine(const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc);
 	void Request_PositionSync_End_StateMachine(const KIRBY_POSITION_SYNC_END_DESC* pDesc);
 

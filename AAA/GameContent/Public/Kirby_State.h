@@ -30,7 +30,8 @@ enum class KIRBY_STATE_TYPE
 	GET_DEFORM, DEFORM_DUMP,
 
 
-	CUTSCENE_GRABBED, QTE_GRABBED, CAR_FIRST_BREAK_WALL, DEFORM_CAR_BRIDGE,
+	CUTSCENE_GRABBED, CAR_FIRST_BREAK_WALL, DEFORM_CAR_BRIDGE, METAKNIGHT_ENCOUNTER,
+	QTE_GRABBED,
 	STAGE_CLEAR,
 	SEQUENCE_LOCK,
 	DIALOGUE
@@ -95,6 +96,8 @@ protected:
 	_bool Transition_Fall_OR_Wait_OR_Run_Immediate(CKirby* pKirby);
 	_bool Try_Transition_Ladder_CommandUp(CKirby* pKirby);
 	_bool Try_Transition_Ladder_CommandDown(CKirby* pKirby);
+
+	void Effect_Stop(CEffect_Container*& pContainer);
 
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};

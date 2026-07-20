@@ -441,25 +441,13 @@ void CPanel_Manager::Render_ModeBar()
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Load DeformCylinder_Main (Test)"))
+    if (ImGui::Button("Load RollerCoaster (Test)"))
     {
         if (m_pLevel)
         {
-            Bind_Preview(m_pLevel->Load_DeformCylinder());
-            m_Context.strName = L"DeformCylinder_Main";
-            m_Context.strModelPath = L"../../Resources/YSE/DeformCylinder/Model/Main.ysh";
-        }
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Load DeformCylinder_Demo (Test)"))
-    {
-        if (m_pLevel)
-        {
-            Bind_Preview(m_pLevel->Load_DeformCylinder_Demo());
-            m_Context.strName = L"DeformCylinder_Demo";
-            m_Context.strModelPath = L"../../Resources/YSE/DeformCylinder/Demo/Demo.ysh";
+            Bind_Preview(m_pLevel->Load_RollerCoaster());
+            m_Context.strName = L"RollerCoaster";
+            m_Context.strModelPath = L"../../Resources/YSE/RollerCoaster/RollerCoaster.ysh";
         }
     }
 
