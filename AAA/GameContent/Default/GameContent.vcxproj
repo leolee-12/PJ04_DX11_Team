@@ -48,6 +48,7 @@
     <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
+    <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
@@ -497,6 +498,7 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
     <ClCompile Include="..\Private\OnLadderEffect.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />

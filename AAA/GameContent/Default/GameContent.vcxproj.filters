@@ -460,9 +460,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab">
       <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed">
-      <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock">
       <UniqueIdentifier>{177175b4-2098-427f-ad7d-a019dd2a0446}</UniqueIdentifier>
     </Filter>
@@ -1456,6 +1453,12 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\QTE">
+      <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter">
+      <UniqueIdentifier>{33020856-964e-4101-8c62-ae1ac0a1eb1a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2068,7 +2071,7 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\QTE</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Run.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
@@ -2790,6 +2793,9 @@
     <ClInclude Include="..\Public\WarpOutEffect.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3354,7 +3360,7 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\QTE</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Run.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
@@ -4030,6 +4036,9 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
