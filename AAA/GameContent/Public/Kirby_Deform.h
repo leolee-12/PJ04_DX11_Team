@@ -23,12 +23,6 @@ enum class DEFORM_ANI
 
 class CLIENT_DLL CKirby_Deform abstract : public CKirby_AttackMode
 {
-public:
-	struct POST_DEFORM_END_INFO
-	{
-		
-	};
-
 protected:
 	CKirby_Deform();
 	virtual ~CKirby_Deform() = default;
@@ -55,6 +49,7 @@ public:
 	virtual _bool HasDemoModel() { return true; }
 
 	// DeformDump¿ë ÇÔ¼ö
+	virtual _bool Has_SpitStartAni() { return true; }
 	virtual void On_DumpSpitStart(CKirby* pKirby);
 	virtual void On_DumpSpitDeform(CKirby* pKirby) {}
 

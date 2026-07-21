@@ -58,15 +58,20 @@ void CKirby_Deform_RollerCoaster::Enter_AttackState(CKirby* pKirby, _int iFlag)
     pMovement->Clear_Forces();
     pMovement->Set_UseGravity(false);
 
+    m_bReqEndAttackState = false;
+
     m_fRailLength = m_pRailTrack->Get_Length();
     m_fCurRailDist = 0.f;
 
     Set_OnRail(pKirby, m_fCurRailDist);
+
+    m_eRollerCoasterState = DEFORM_ROLLERCOASTER_STATE::ROLLERCOASTER_STATE_END;
+    Change_CoasterState(pKirby, DEFORM_ROLLERCOASTER_STATE::RUNNING);
 }
 
 void CKirby_Deform_RollerCoaster::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 {
-    Set_OnRail(pKirby, m_fCurRailDist);
+    Update_CoasterState(pKirby, fTimeDelta);
 }
 
 void CKirby_Deform_RollerCoaster::Exit_AttackState(CKirby* pKirby)
@@ -77,6 +82,32 @@ void CKirby_Deform_RollerCoaster::Exit_AttackState(CKirby* pKirby)
 
 _bool CKirby_Deform_RollerCoaster::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
+    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
+
+    switch (eCommandType)
+    {
+        // Dump
+        case KIRBY_COMMAND_TYPE::DUMP:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (m_eRollerCoasterState == DEFORM_ROLLERCOASTER_STATE::WAIT)
+            {
+                if (pKirby->Can_Dump() == true)
+                {
+                    Change_CoasterState(pKirby, DEFORM_ROLLERCOASTER_STATE::ROLLERCOASTER_STATE_END);
+                    pKirby->Reset_DumpCool();
+                    return true;
+                }
+
+                pKirby->Req_AbilityDumpCoolDecrease();
+            }
+
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -103,9 +134,87 @@ void CKirby_Deform_RollerCoaster::Exit_DeformState_Deform_End(CKirby* pKirby, co
 {
 }
 
+void CKirby_Deform_RollerCoaster::On_DumpSpitDeform(CKirby* pKirby)
+{
+    pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 20.f, 0.f, 0.f));
+}
+
+void CKirby_Deform_RollerCoaster::Change_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eNext)
+{
+    if (m_eRollerCoasterState == eNext)
+        return;
+
+    Exit_CoasterState(pKirby, m_eRollerCoasterState);
+
+    m_eRollerCoasterState = eNext;
+
+    Enter_CoasterState(pKirby, m_eRollerCoasterState);
+}
+
+void CKirby_Deform_RollerCoaster::Enter_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eState)
+{
+    CAnimator* pAnimator = pKirby->Get_CurrentDeformModel()->Get_Animator();
+
+    switch (eState)
+    {
+        case DEFORM_ROLLERCOASTER_STATE::RUNNING:
+        {
+            pAnimator->Play("Running", true, false, 0.1f, 1.5f);
+            break;
+        }
+        case DEFORM_ROLLERCOASTER_STATE::WAIT:
+        {
+            pAnimator->Play("Wait", true, false, 0.1f, 1.5f);
+            break;
+        }
+        case DEFORM_ROLLERCOASTER_STATE::ROLLERCOASTER_STATE_END:
+        {
+            m_bReqEndAttackState = true;
+            pKirby->Change_State(KIRBY_STATE_TYPE::DEFORM_DUMP);
+            break;
+        }
+    }
+}
+
+void CKirby_Deform_RollerCoaster::Update_CoasterState(CKirby* pKirby, _float fTimeDelta)
+{
+    switch (m_eRollerCoasterState)
+    {
+        case DEFORM_ROLLERCOASTER_STATE::RUNNING:
+        {
+            Update_OnRail(pKirby, m_fCurRailDist, fTimeDelta);
+
+            if (m_fCurRailDist >= m_fRailLength - Helper::fEpsilon)
+                Change_CoasterState(pKirby, DEFORM_ROLLERCOASTER_STATE::WAIT);
+            break;
+        }
+        case DEFORM_ROLLERCOASTER_STATE::WAIT:
+        {
+            break;
+        }
+    }
+}
+
+void CKirby_Deform_RollerCoaster::Exit_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eState)
+{
+    switch (eState)
+    {
+        case DEFORM_ROLLERCOASTER_STATE::RUNNING:
+            break;
+        case DEFORM_ROLLERCOASTER_STATE::WAIT:
+            break;
+    }
+}
+
 _bool CKirby_Deform_RollerCoaster::Update_OnRail(CKirby* pKirby, _float fRailDist, _float fTimeDelta)
 {
-    m_fCurRailDist += fTimeDelta;
+    if (m_fCurRailDist > m_fRailLength)
+    {
+        return false;
+    }
+
+    m_fCurRailDist += 600.f * fTimeDelta;
+    Helper::FloatClamp(m_fCurRailDist, 0.f, m_fRailLength);
 
     return Set_OnRail(pKirby, fRailDist);
 }

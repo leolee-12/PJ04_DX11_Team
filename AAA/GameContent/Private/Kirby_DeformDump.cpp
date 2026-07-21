@@ -32,8 +32,17 @@ void CKirby_DeformDump::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
+    DEFORM_TYPE eDeformType = {};
+
+    if (!pKirby->Has_Deform())
+        assert(false);
+
     m_eDeformDumpState = DEFORM_DUMP_STATE_END;
-    Change_DeformDumpState(pKirby, DEFORM_DUMP_STATE::SPIT_START);
+
+    if(pKirby->Get_KirbyDeform()->Has_SpitStartAni())
+        Change_DeformDumpState(pKirby, DEFORM_DUMP_STATE::SPIT_START);
+    else
+        Change_DeformDumpState(pKirby, DEFORM_DUMP_STATE::SPIT_DEFORM);
 }
 
 void CKirby_DeformDump::Update(CKirby* pKirby, const _float fTimeDelta)

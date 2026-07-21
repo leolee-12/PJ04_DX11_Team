@@ -15,6 +15,9 @@ class CRailTrack;
 class CLIENT_DLL CKirby_Deform_RollerCoaster final : public CKirby_Deform
 {
 private:
+	enum DEFORM_ROLLERCOASTER_STATE { RUNNING, WAIT, ROLLERCOASTER_STATE_END };
+
+private:
 	CKirby_Deform_RollerCoaster();
 	virtual ~CKirby_Deform_RollerCoaster() = default;
 
@@ -42,14 +45,25 @@ public:
 	virtual void Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& tDeformContext) override;
 
 	// DeformDump¿ë ÇÔ¼ö
+	virtual _bool Has_SpitStartAni() { return false; }
 	virtual void On_DumpSpitStart(CKirby* pKirby) override {};
+	virtual void On_DumpSpitDeform(CKirby* pKirby) override;
 
 public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }
 
 private:
+	void Change_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eNext);
+	void Enter_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eState);
+	void Update_CoasterState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eState);
+
+private:
 	_bool Update_OnRail(CKirby* pKirby, _float fRailDist, _float fTimeDelta);
 	_bool Set_OnRail(CKirby* pKirby, _float fRailDist);
+
+private:
+	DEFORM_ROLLERCOASTER_STATE m_eRollerCoasterState{};
 
 private:
 	_uint m_iRailUid{};

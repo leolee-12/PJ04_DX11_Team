@@ -268,6 +268,19 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
                 CMovement_Child* pMovement = pKirby->Get_Movement();
 
                 const _vector vTargetPos = XMVectorSetW(XMLoadFloat3(&m_tPostDeformEndContext.vStartPos), 1.f);
+                
+
+                _vector vLookDir = XMLoadFloat3(&m_tPostDeformEndContext.vStartLook);
+                vLookDir = XMVectorSetY(vLookDir, 0.f);
+
+                if (XMVectorGetX(XMVector3LengthSq(vLookDir)) <= Helper::fEpsilon)
+                {
+                    assert(false);
+                    return;
+                }
+
+                vLookDir = XMVector3Normalize(vLookDir);
+                pTransform->LookTo(vLookDir);
 
                 pTransform->Set_State(STATE::POSITION, vTargetPos);
                 pMovement->Set_Velocity(XMVectorZero());

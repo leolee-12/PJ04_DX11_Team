@@ -115,25 +115,25 @@ _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     switch (eCommandType)
     {
         // Dump
-    case KIRBY_COMMAND_TYPE::DUMP:
-    {
-        if (!pCommand->IsPress())
-            return false;
-
-        if(m_eCylinderState == DEFORM_CYLINDER_STATE::CLASHED_WAIT)
+        case KIRBY_COMMAND_TYPE::DUMP:
         {
-            if (pKirby->Can_Dump() == true)
+            if (!pCommand->IsPress())
+                return false;
+
+            if(m_eCylinderState == DEFORM_CYLINDER_STATE::CLASHED_WAIT)
             {
-                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CYLINDER_STATE_END);
-                pKirby->Reset_DumpCool();
-                return true;
+                if (pKirby->Can_Dump() == true)
+                {
+                    Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CYLINDER_STATE_END);
+                    pKirby->Reset_DumpCool();
+                    return true;
+                }
+
+                pKirby->Req_AbilityDumpCoolDecrease();
             }
 
-            pKirby->Req_AbilityDumpCoolDecrease();
+            return true;
         }
-
-        return true;
-    }
         // Jump Down
         case KIRBY_COMMAND_TYPE::JUMP:
         {
