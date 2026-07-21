@@ -43,7 +43,7 @@ public:
 
     static constexpr _float PHASE_HOP_HEIGHT = 2.f;
     static constexpr _float PHASE_HOP_GRAVITY = 9.f;
-    static constexpr _float PHASE_WAIT_BLEND = 0.6f;
+    static constexpr _float PHASE_WAIT_BLEND = 0.4f;
 
 
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
@@ -111,16 +111,15 @@ public:
     }
 
     _bool Is_GigaReady() const { return m_fGigaCooldown <= 0.f; }
-    void  Start_GigaCooldown() { m_fGigaCooldown = s_fGigaCooldown; }
     void  Fire_GigaMoonShot();
 
     void  Begin_RockDecalSlide();
-
     void  Drop_Rocks();
     _bool Is_RockReady() const { return m_fRockCooldown <= 0.f; }
-    void  Start_RockCooldown() { m_fRockCooldown = s_fRockCooldown; }
 
     void  Set_TopViewCam(_bool bOn);
+
+    void Start_PatternCooldowns(_float fUsedCooldown);
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };

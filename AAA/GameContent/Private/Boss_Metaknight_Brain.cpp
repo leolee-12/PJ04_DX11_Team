@@ -505,9 +505,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
 {
     auto* pBegin = CBTAction::Create(
         [this](CBlackboard*, _float) {
-            auto* pBoss = static_cast<CBoss_Metaknight*>(m_pOwner);
-            pBoss->Set_AttackBusy(true);
-            pBoss->Start_GigaCooldown();
+            static_cast<CBoss_Metaknight*>(m_pOwner)->Set_AttackBusy(true);
             return BT_STATUS::SUCCESS;
         },
         [this] { static_cast<CBoss_Metaknight*>(m_pOwner)->Set_AttackBusy(false); });
@@ -523,6 +521,11 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         return BT_STATUS::SUCCESS;
         });
 
+    auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Start_PatternCooldowns(CBoss_Metaknight::s_fGigaCooldown);
+        return BT_STATUS::SUCCESS;
+        });
+
     return CBTSequence::Create({
         pBegin,
         Make_GigaFly(),
@@ -531,6 +534,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         Clip("GigaMoonCharge", SPD, 0.2f),
         pFire,
         Clip("GigaMoonShot", SPD, 0.2f),
+        pEnd,
         });
 }
 
@@ -668,7 +672,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
                 *risen += step;
             }
             *waitTimer += dt;
-            if (*waitTimer >= 3.f) { *waitOn = false; return BT_STATUS::SUCCESS; }
+            if (*waitTimer >= 2.f) { *waitOn = false; return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
         [this, waitOn] { *waitOn = false; });
@@ -776,8 +780,9 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
 
     auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
         m_pOwner->Get_Movement()->Set_GravityEnabled(true);
-        static_cast<CBoss_Metaknight*>(m_pOwner)->Set_TopViewCam(false);
-        static_cast<CBoss_Metaknight*>(m_pOwner)->Start_RockCooldown();
+        auto meta = static_cast<CBoss_Metaknight*>(m_pOwner);
+        meta->Set_TopViewCam(false);
+        meta->Start_PatternCooldowns(CBoss_Metaknight::s_fRockCooldown);
         return BT_STATUS::SUCCESS;
         });
 
@@ -805,6 +810,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockBranch()
         CBTCondition::Create([this](CBlackboard*) {
             return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_RockReady(); }),
         Make_RockDrop(),
+        Clip("Wait", SPD, 0.2f),
         });
 }
 

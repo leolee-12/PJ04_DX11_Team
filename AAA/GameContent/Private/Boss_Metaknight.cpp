@@ -514,6 +514,12 @@ void CBoss_Metaknight::Set_TopViewCam(_bool bOn)
     m_pGameInstance_Proxy->Publish(EventTag::BossCam_TopView, &d);
 }
 
+void CBoss_Metaknight::Start_PatternCooldowns(_float fUsedCooldown)
+{
+    if (s_fRockCooldown <= fUsedCooldown) m_fRockCooldown = s_fRockCooldown;
+    if (s_fGigaCooldown <= fUsedCooldown) m_fGigaCooldown = s_fGigaCooldown;
+}
+
 void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)
 {
     CUTSCENE_CAMERA_DESC cam{};
