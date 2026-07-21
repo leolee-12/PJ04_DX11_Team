@@ -18,11 +18,10 @@ namespace
 {
     struct EFFECT_DB_ENTRY
     {
-        const _tchar* szEffectId;    // ?§Ìè∞ ??
-        const _tchar* szConfigPath;  // ?úÎãù json (?∞Ïù¥?∞Î°ú ?†Ï?)
+        const _tchar* szEffectId;  
+        const _tchar* szConfigPath;
     };
 
-    // === ?¥Ìéô??DB : ???¥Ìéô?∏Îäî ?¨Í∏∞????Ï§?Ï∂îÍ? ===
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
         { TEXT("WalkSmoke"),              TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
@@ -45,6 +44,7 @@ namespace
 
         { TEXT("RockFloor"),              TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
+        { TEXT("CarThinGas"),             TEXT("../../Resources/YSE/EffectContainer/CarThinGas.JSON") },
         { TEXT("MoveGas"),               TEXT("../../Resources/YSE/EffectContainer/MoveGas.json") },
         { TEXT("CylinderRollGas"),        TEXT("../../Resources/YSE/EffectContainer/CylinderRollGas.JSON") },
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/YSE/EffectContainer/CarMilkyWay_Final2.json") },

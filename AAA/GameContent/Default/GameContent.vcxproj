@@ -211,6 +211,7 @@
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
     <ClInclude Include="..\Public\SmokeCollection.h" />
     <ClInclude Include="..\Public\CarLanding.h" />
+    <ClInclude Include="..\Public\CarThinGas.h" />
     <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
@@ -676,6 +677,7 @@
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp" />
     <ClCompile Include="..\Private\SmokeCollection.cpp" />
     <ClCompile Include="..\Private\CarLanding.cpp" />
+    <ClCompile Include="..\Private\CarThinGas.cpp" />
     <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />

@@ -92,6 +92,7 @@
 #include "LandingSmoke.h"
 #include "MoveSmoke.h"
 #include "CarLanding.h"
+#include "CarThinGas.h"
 #include "PickUpEffect.h"
 #include "DropStarEffect.h"
 #include "OnLadderEffect.h"
@@ -1089,6 +1090,18 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    // CarThinGas
+    Register(CCarThinGas::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CCarThinGas),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG,
+                CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCarThinGas::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/CarThinGas/Common_00_PuncSub.ysh"));
         ));
 
     // SmokeSphereOriginalEmitter
