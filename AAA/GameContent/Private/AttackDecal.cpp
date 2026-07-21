@@ -65,17 +65,20 @@ HRESULT CAttackDecal::Ready_Components()
 
 void CAttackDecal::Place(const _float3& vGroundPos, _float fRadius, _float fLifeTime)
 {
-    m_fAge = 0.f;
-    m_fLifeTime = fLifeTime;
-    m_bExpired = false;
-    m_fDecalAlpha = 0.f;
+    m_fAge = 0.f; m_fLifeTime = fLifeTime; m_bExpired = false; m_fDecalAlpha = 0.f;
+    m_bSliding = false;
+    m_vGroundPos = vGroundPos;
+    m_fRadius = fRadius;
+    Rebuild_World();
+}
 
-    const _float fSize = fRadius * 2.f;
-    _matrix matWorld =
-        XMMatrixScaling(fSize, fSize, fSize) *
-        XMMatrixTranslation(vGroundPos.x, vGroundPos.y, vGroundPos.z);
-
-    m_pTransformCom->Set_WorldMatrix(matWorld);
+void CAttackDecal::Slide_To(const _float3& vTarget, _float fDuration)
+{
+    m_vSlideFrom = m_vGroundPos;
+    m_vSlideTo = vTarget;
+    m_fSlideDur = (fDuration > 0.f) ? fDuration : 1e-4f;
+    m_fSlideElapsed = 0.f;
+    m_bSliding = true;
 }
 
 void CAttackDecal::Update(_float fTimeDelta)
@@ -85,6 +88,18 @@ void CAttackDecal::Update(_float fTimeDelta)
         m_fDecalAlpha = 1.f;
         m_bExpired = false;
         return;
+    }
+
+    if (m_bSliding)
+    {
+        m_fSlideElapsed += fTimeDelta;
+        _float t = Clamp01(m_fSlideElapsed / m_fSlideDur);
+        _float e = t * t * (3.f - 2.f * t);          // smoothstep ease (½µ ´À³¦)
+        m_vGroundPos.x = m_vSlideFrom.x + (m_vSlideTo.x - m_vSlideFrom.x) * e;
+        m_vGroundPos.y = m_vSlideFrom.y + (m_vSlideTo.y - m_vSlideFrom.y) * e;
+        m_vGroundPos.z = m_vSlideFrom.z + (m_vSlideTo.z - m_vSlideFrom.z) * e;
+        Rebuild_World();
+        if (t >= 1.f) m_bSliding = false;
     }
 
     if (m_bExpired)
@@ -98,8 +113,11 @@ void CAttackDecal::Update(_float fTimeDelta)
         return;
     }
 
-    _float t = (m_fLifeTime > 0.f) ? (m_fAge / m_fLifeTime) : 1.f;
-    m_fDecalAlpha = SmoothStep01(0.f, 0.15f, t);
+    //_float t = (m_fLifeTime > 0.f) ? (m_fAge / m_fLifeTime) : 1.f;
+    //m_fDecalAlpha = SmoothStep01(0.f, 0.15f, t);
+
+    _float fadeIn = 0.15f;
+    m_fDecalAlpha = SmoothStep01(0.f, fadeIn, m_fAge);
 }
 
 void CAttackDecal::Late_Update(_float fTimeDelta)
@@ -116,6 +134,14 @@ HRESULT CAttackDecal::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType)))) return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType)))) return E_FAIL;
     return S_OK;
+}
+
+void CAttackDecal::Rebuild_World()
+{
+    const _float fSize = m_fRadius * 2.f;
+    _matrix m = XMMatrixScaling(fSize, fSize, fSize) *
+        XMMatrixTranslation(m_vGroundPos.x, m_vGroundPos.y, m_vGroundPos.z);
+    m_pTransformCom->Set_WorldMatrix(m);
 }
 
 HRESULT CAttackDecal::Render_Decal()

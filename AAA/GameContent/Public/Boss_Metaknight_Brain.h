@@ -39,6 +39,10 @@ private:
     static constexpr _float GIGA_RISE_SPEED = 12.f;
     static constexpr _float GIGA_ARRIVE = 0.6f;
 
+    static constexpr _float ROCK_RISE_HEIGHT = 10.f;
+    static constexpr _float ROCK_RISE_SPEED = 2.5f;
+    static constexpr _float ROCK_JUMP_SPEED = 1.f;
+
 private:
     _int m_iLastCombo = { 0 };
 
@@ -62,6 +66,14 @@ private:
     // 기가문샷
     CBTNode* Make_GigaFly();
     CBTNode* Make_GigaMoonShot();
+
+    //낙석패턴
+    _bool    FlyNoClip(_fvector vGoal, _float fSpeed, _float dt, _float fArrive);
+    void     RiseToward(_float fTargetY, _float dt);
+    CBTNode* Make_RockFly();
+    CBTNode* Make_RockDrop(); 
+    CBTNode* Make_RockBranch(); 
+
 
     // 트리 조립 유틸
     CBTNode* Make_Optional(CBTNode* pCond, CBTNode* pBody);

@@ -1633,8 +1633,11 @@ void CGameObject_Factory::Register_MainBoss()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Excalibur/GetIt/Model.ysh"
                     , XMMatrixRotationY(XMConvertToRadians(180.f))
                 ));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::PROTOTYPE_TAG,
-                CExcalibur_GetIt::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::PROTOTYPE_TAG, CExcalibur_GetIt::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/RockDecal/Cube.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::PROTOTYPE_TAG, CAttackDecal::Create(pDevice, pContext));
         )
     );
 

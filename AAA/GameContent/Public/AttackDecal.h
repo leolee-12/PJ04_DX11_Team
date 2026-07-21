@@ -35,10 +35,7 @@ public:
     void  Place(const _float3& vGroundPos, _float fRadius, _float fLifeTime);
     _bool Is_Expired() const { return m_bExpired; }
     void  Set_Alpha(_float fAlpha) { m_fDecalAlpha = fAlpha; }
-
-private:
-    HRESULT Ready_Components();
-    HRESULT Bind_ShaderResources();
+    void  Slide_To(const _float3& vTarget, _float fDuration);
 
 private:
     CShader* m_pShaderCom = { nullptr };
@@ -53,6 +50,19 @@ private:
     _float  m_fLifeTime = { 1.f };
     _bool   m_bExpired = { false };
     _uint   m_iMaterialID = { WORLD_STATIC_ID };
+
+    _float3 m_vGroundPos = { 0.f, 0.f, 0.f };
+    _float  m_fRadius = { 1.f };
+    _bool   m_bSliding = { false };
+    _float3 m_vSlideFrom = {};
+    _float3 m_vSlideTo = {};
+    _float  m_fSlideDur = { 0.f };
+    _float  m_fSlideElapsed = { 0.f };
+
+private:
+    HRESULT Ready_Components();
+    HRESULT Bind_ShaderResources();
+    void    Rebuild_World();
 
 public:
     static CAttackDecal* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

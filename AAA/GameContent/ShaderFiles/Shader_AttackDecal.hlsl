@@ -66,15 +66,18 @@ PS_OUT PS_DECAL(VS_OUT In)
     uv.x = (lp.x - g_vDecalBoundsCenter.x) / (2.f * g_vDecalBoundsExtents.x) + 0.5f;
     uv.y = 0.5f - (lp.z - g_vDecalBoundsCenter.z) / (2.f * g_vDecalBoundsExtents.z);
 
-    float4 col = g_DiffuseTexture.Sample(LinearSampler, uv);
-    if (col.a <= 0.f)
+    float mask = g_DiffuseTexture.Sample(LinearSampler, uv).r;
+    float coverage = saturate(1.f - mask) * g_fDecalAlpha;
+    if (coverage <= 0.001f)
         discard;
-    float coverage = col.a * g_fDecalAlpha;
+    
+    float3 shadowMRA = float3(0.f, 1.f, 0.15f);
+    coverage *= 0.8f;
 
     PS_OUT Out = (PS_OUT) 0;
-    Out.vDiffuse = float4(col.rgb, coverage);
+    Out.vDiffuse = float4(0.f, 0.f, 0.f, coverage);
+    Out.vMRA = float4(shadowMRA, coverage);
     Out.vNormal = float4(0.f, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 0.f, 0.f, 0.f);
     return Out;
 }
 

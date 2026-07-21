@@ -7,6 +7,7 @@ class CBoss_Metaknight_Body;
 class CBoss_Metaknight_Sword;
 class CBoss_Metaknight_ReplicaSword;
 class CBoss_Metaknight_Mant;
+class CAttackDecal;
 
 class CBoss_Metaknight final : public CBoss
 {
@@ -30,6 +31,10 @@ public:
     static constexpr _uint  GIGA_POINT_COUNT = 4;
     static const _float3    s_vGigaPoints[GIGA_POINT_COUNT];
     static constexpr _float s_fGigaCooldown = 12.f;
+
+    static constexpr int    ROCK_TILE_COUNT = 23;
+    static constexpr _float ROCK_DECAL_RADIUS = 5.f;
+    static constexpr _float ROCK_SLIDE_TIME = 1.f;
 
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
 
@@ -96,6 +101,10 @@ public:
     void  Start_GigaCooldown() { m_fGigaCooldown = s_fGigaCooldown; }
     void  Fire_GigaMoonShot();
 
+    void  Begin_RockDecalSlide();
+    void  Request_RockDrop() { m_bRockRequested = true; }
+    _bool Consume_RockDropRequest() { if (!m_bRockRequested) return false; m_bRockRequested = false; return true; }
+
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
@@ -117,12 +126,18 @@ private:
     _float m_fAppearTimer = { 0.f };
     _float m_fIntroHoldTimer = { 0.f };
 
+    _float3       m_RockTiles[ROCK_TILE_COUNT];
+    CAttackDecal* m_pRockDecals[ROCK_TILE_COUNT] = {};
+    _bool         m_bRockRequested = { false };
+
     // µð¹ö±×
-    static constexpr _bool s_bSkipIntro = false;
+    static constexpr _bool s_bSkipIntro = true;
 
 private:
     void Fire_CutsceneCamera(const _tchar* szTrack);
     void Hide_AllParts();
+    void Build_RockTilePositions(const _float3 fCornersIn[4], _float3 fOutPos[23]);
+    void Test_SpawnRockDecals();
 
 public:
     static CBoss_Metaknight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

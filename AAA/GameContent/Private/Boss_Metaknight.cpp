@@ -7,6 +7,8 @@
 #include "Boss_Metaknight_Sword.h"
 #include "Boss_Metaknight_Mant.h"
 
+#include "AttackDecal.h"
+
 #include "Projectile_Manager.h"
 #include "Projectile_MoonShot.h"
 
@@ -28,6 +30,17 @@ namespace
         r.r[1] = XMVector3Normalize(m.r[1]);
         r.r[2] = XMVector3Normalize(m.r[2]);
         return r;
+    }
+
+    void Sort_CornersPerimeter(_float3 corners[4])
+    {
+        _float cx = 0.f, cz = 0.f;
+        for (int i = 0; i < 4; ++i) { cx += corners[i].x; cz += corners[i].z; }
+        cx *= 0.25f; cz *= 0.25f;
+
+        std::sort(corners, corners + 4, [cx, cz](const _float3& a, const _float3& b) {
+            return atan2f(a.z - cz, a.x - cx) < atan2f(b.z - cz, b.x - cx);
+            });
     }
 }
 
@@ -82,6 +95,8 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
     }
     if (m_pGameInstance_Proxy->Key_Down(DIK_0))
         Appear();
+    if (m_pGameInstance_Proxy->Key_Down(DIK_P))
+        Request_RockDrop();
 #endif
     if (m_fDodgeCooldown > 0.f)
         m_fDodgeCooldown -= fTimeDelta;
@@ -400,6 +415,31 @@ void CBoss_Metaknight::Fire_GigaMoonShot()
     p->Launch(vPos, vD);
 }
 
+void CBoss_Metaknight::Begin_RockDecalSlide()
+{
+    Build_RockTilePositions(s_vGigaPoints, m_RockTiles);
+
+    _vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+    const _float sx = XMVectorGetX(vSelf), sz = XMVectorGetZ(vSelf);
+
+    for (int i = 0; i < ROCK_TILE_COUNT; ++i)
+    {
+        CGameObject* pObj = nullptr;
+        if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+            m_iPrototypeLevel, CAttackDecal::PROTOTYPE_TAG,
+            m_iPrototypeLevel, TEXT("Layer_Effect"), TEXT("RockDecal"), nullptr)))
+            continue;
+
+        auto* pDecal = dynamic_cast<CAttackDecal*>(pObj);
+        if (!pDecal) continue;
+
+        _float3 vStart = { sx, m_RockTiles[i].y, sz };
+        pDecal->Place(vStart, ROCK_DECAL_RADIUS, 9999.f);
+        pDecal->Slide_To(m_RockTiles[i], ROCK_SLIDE_TIME);
+        m_pRockDecals[i] = pDecal;
+    }
+}
+
 void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)
 {
     CUTSCENE_CAMERA_DESC cam{};
@@ -416,6 +456,66 @@ void CBoss_Metaknight::Hide_AllParts()
     if (m_pMant)    m_pMant->Set_Active(false);
     if (m_pSword)   m_pSword->Set_Active(false);
     if (m_pReplica) m_pReplica->Set_Active(false);
+}
+
+void CBoss_Metaknight::Build_RockTilePositions(const _float3 fCornersIn[4], _float3 fOutPos[23])
+{
+    _float3 c[4] = { fCornersIn[0], fCornersIn[1], fCornersIn[2], fCornersIn[3] };
+    Sort_CornersPerimeter(c);
+
+    XMVECTOR c0 = XMLoadFloat3(&c[0]);
+    XMVECTOR c1 = XMLoadFloat3(&c[1]);
+    XMVECTOR c2 = XMLoadFloat3(&c[2]);
+    XMVECTOR c3 = XMLoadFloat3(&c[3]);
+
+    float lenA = XMVectorGetX(XMVector3Length(c1 - c0));
+    float lenB = XMVectorGetX(XMVector3Length(c3 - c0));
+
+    bool bLongIsU = (lenA >= lenB);
+    bool bTileAlongU = bLongIsU;
+
+    const int rowCounts[5] = { 5, 4, 5, 4, 5 };
+    int idx = 0;
+    for (int r = 0; r < 5; ++r)
+    {
+        float rowT = r / 4.f;
+        int   n = rowCounts[r];
+        for (int t = 0; t < n; ++t)
+        {
+            float tileT = (n == 5) ? (t / 4.f)
+                : ((t + 0.5f) / 4.f);
+
+            float u = bTileAlongU ? tileT : rowT;
+            float v = bTileAlongU ? rowT : tileT;
+
+            XMVECTOR bottom = XMVectorLerp(c0, c1, u);
+            XMVECTOR top = XMVectorLerp(c3, c2, u);
+            XMVECTOR p = XMVectorLerp(bottom, top, v);
+
+            XMStoreFloat3(&fOutPos[idx++], p);
+        }
+    }
+}
+
+void CBoss_Metaknight::Test_SpawnRockDecals()
+{
+    _float3 tiles[23];
+    Build_RockTilePositions(s_vGigaPoints, tiles);
+
+    const _float fRadius = 5.f;
+
+    for (int i = 0; i < 23; ++i)
+    {
+        CGameObject* pObj = nullptr;
+        if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+            m_iPrototypeLevel, CAttackDecal::PROTOTYPE_TAG,
+            m_iPrototypeLevel, TEXT("Layer_Effect"), TEXT("RockDecal_Test"),
+            nullptr)))
+            continue;
+
+        if (auto* pDecal = dynamic_cast<CAttackDecal*>(pObj))
+            pDecal->Place(tiles[i], fRadius, 9999.f);   // 오래 유지
+    }
 }
 
 CBoss_Metaknight* CBoss_Metaknight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

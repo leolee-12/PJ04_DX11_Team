@@ -23,6 +23,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int)
     return CBTReactiveSelector::Create({
         Make_DodgeBranch(),
         CBTSequence::Create({
+            Make_RockBranch(),
             Make_GigaBranch(),
             Make_StepApproach(),
             Make_UnlessInRange(Make_DashIn()),
@@ -520,6 +521,169 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         Clip("GigaMoonCharge", SPD, 0.2f),
         pFire,
         Clip("GigaMoonShot", SPD, 0.2f),
+        });
+}
+
+_bool CBoss_Metaknight_Brain::FlyNoClip(_fvector vGoal, _float fSpeed, _float dt, _float fArrive)
+{
+    auto* mv = m_pOwner->Get_Movement();
+    auto* tf = m_pOwner->Get_Transform();
+    _vector vSelf = tf->Get_State(STATE::POSITION);
+    _vector vTo = vGoal - vSelf;
+    _float  fDist = XMVectorGetX(XMVector3Length(vTo));
+    if (fDist <= fArrive)
+        return true;
+
+    _float fStep = min(fSpeed * dt, fDist);
+    tf->Set_State(STATE::POSITION, vSelf + XMVector3Normalize(vTo) * fStep);
+    mv->Sync_To_Controller();
+    return false;
+}
+
+void CBoss_Metaknight_Brain::RiseToward(_float fTargetY, _float dt)
+{
+    auto* tf = m_pOwner->Get_Transform();
+    _vector p = tf->Get_State(STATE::POSITION);
+    _float  y = XMVectorGetY(p);
+    if (y < fTargetY)
+        tf->Set_State(STATE::POSITION, XMVectorSetY(p, min(y + ROCK_RISE_SPEED * dt, fTargetY)));
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_RockFly()
+{
+    auto on = make_shared<bool>(false);
+    auto phase = make_shared<_int>(0);        // 0=제자리상승, 1=목표비행, 2=도착회전
+    auto vGoal = make_shared<_float3>();
+
+    return CBTAction::Create(
+        [this, on, phase, vGoal](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            auto* tf = m_pOwner->Get_Transform();
+            _vector vSelf = tf->Get_State(STATE::POSITION);
+            const _vector kDest = XMVectorSet(0.f, 16.f, 25.f, 0.f);
+
+            if (!*on) {
+                Anim()->Play("Jump", false, true, 0.1f, SPD);
+                mv->Set_GravityEnabled(false);
+                XMStoreFloat3(vGoal.get(), vSelf + XMVectorSet(0.f, GIGA_FLY_H, 0.f, 0.f));
+                *phase = 0; *on = true;
+                return BT_STATUS::RUNNING;
+            }
+
+            if (*phase == 0)
+            {
+                if (FlyNoClip(XMLoadFloat3(vGoal.get()), GIGA_FLY_SPEED, dt, GIGA_ARRIVE))
+                {
+                    Anim()->Play("HoverDashStart", false, true, 0.15f, SPD);
+                    CAnimator::ANI_PLAY_INFO info{};
+                    info.strAniName = "HoverDash"; info.bLoop = true; info.bRestart = true;
+                    info.fBlend = 0.1f; info.fSpeed = SPD;
+                    Anim()->Enqueue(info);
+                    *phase = 1;
+                }
+            }
+            else if (*phase == 1)
+            {
+                _vector vDir = XMVectorSetY(kDest - vSelf, 0.f);
+                if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-4f)
+                    RotateYawTo(XMVector3Normalize(vDir), 720.f, dt);
+
+                if (FlyNoClip(kDest, GIGA_FLY_SPEED, dt, GIGA_ARRIVE))
+                {
+                    Anim()->Play("HoverDashEnd", false, true, 0.15f, SPD);
+                    *phase = 2;
+                }
+            }
+            else
+            {
+                if (RotateYawTo(XMVectorSet(0.f, 0.f, -1.f, 0.f), 720.f, dt))
+                {
+                    *on = false; *phase = 0;
+                    return BT_STATUS::SUCCESS;
+                }
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, on, phase] { *on = false; *phase = 0; });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
+{
+    auto risen = make_shared<_float>(0.f);
+
+    auto startOn = make_shared<bool>(false);
+    auto* pStartRise = CBTAction::Create(
+        [this, startOn, risen](CBlackboard*, _float dt) -> BT_STATUS {
+            if (!*startOn) {
+                Anim()->Play("BurstTornadoStart", false, true, 0.2f, SPD);
+                *risen = 0.f;                       // 누적 리셋
+                *startOn = true;
+                return BT_STATUS::RUNNING;
+            }
+            if (*risen < ROCK_RISE_HEIGHT) {
+                _float step = min(ROCK_RISE_SPEED * dt, ROCK_RISE_HEIGHT - *risen);
+                auto* tf = m_pOwner->Get_Transform();
+                _vector p = tf->Get_State(STATE::POSITION);
+                tf->Set_State(STATE::POSITION, p + XMVectorSet(0.f, step, 0.f, 0.f));
+                m_pOwner->Get_Movement()->Sync_To_Controller();
+                *risen += step;
+            }
+            if (Anim()->Is_Finished()) { *startOn = false; return BT_STATUS::SUCCESS; }
+            return BT_STATUS::RUNNING;
+        },
+        [this, startOn] { *startOn = false; });
+
+    auto waitOn = make_shared<bool>(false);
+    auto waitTimer = make_shared<_float>(0.f);
+    auto* pWaitRise = CBTAction::Create(
+        [this, waitOn, waitTimer, risen](CBlackboard*, _float dt) -> BT_STATUS {
+            if (!*waitOn) {
+                Anim()->Play("BurstTornadoWait", true, true, 0.2f, SPD);
+                *waitTimer = 0.f; *waitOn = true;
+                return BT_STATUS::RUNNING;
+            }
+            if (*risen < ROCK_RISE_HEIGHT) {
+                _float step = min(ROCK_RISE_SPEED * dt, ROCK_RISE_HEIGHT - *risen);
+                auto* tf = m_pOwner->Get_Transform();
+                _vector p = tf->Get_State(STATE::POSITION);
+                tf->Set_State(STATE::POSITION, p + XMVectorSet(0.f, step, 0.f, 0.f));
+                m_pOwner->Get_Movement()->Sync_To_Controller();
+                *risen += step;
+            }
+            *waitTimer += dt;
+            if (*waitTimer >= 3.f) { *waitOn = false; return BT_STATUS::SUCCESS; }
+            return BT_STATUS::RUNNING;
+        },
+        [this, waitOn] { *waitOn = false; });
+
+    auto atkOn = make_shared<bool>(false);
+    auto* pAttack = CBTAction::Create(
+        [this, atkOn](CBlackboard*, _float) -> BT_STATUS {
+            if (!*atkOn) {
+                Anim()->Play("BurstTornadoAttack", false, true, 0.2f, SPD);
+                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_RockDecalSlide();
+                *atkOn = true;
+            }
+            if (Anim()->Is_Finished()) { *atkOn = false; return BT_STATUS::SUCCESS; }
+            return BT_STATUS::RUNNING;
+        },
+        [this, atkOn] { *atkOn = false; });
+
+    return CBTSequence::Create({
+        Make_RockFly(),
+        pStartRise,
+        pWaitRise,
+        pAttack,                          
+        // TODO: 3초 후 실제 돌 낙하
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_RockBranch()
+{
+    return CBTSequence::Create({
+        CBTCondition::Create([this](CBlackboard*) {
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_RockDropRequest(); }),
+        Make_RockDrop(),
         });
 }
 
