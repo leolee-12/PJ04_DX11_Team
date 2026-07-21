@@ -56,6 +56,7 @@ namespace Client
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
         inline constexpr const _tchar* BossCam_Focus = L"BossCam_Focus";
         inline constexpr const _tchar* BossCam_Config = L"BossCam_Config";
+        inline constexpr const _tchar* BossCam_TopView = L"BossCam_TopView";
 
         // Screen Fx
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
@@ -181,6 +182,13 @@ namespace Client
         _float fAimHeight = { 6.f };         // 시선 높이(보스 크면 키움)
         _float fSmoothTime = { 0.18f };      // 따라오는 부드러움
         _float fFovDeg = { 50.f };           // FOV
+    };
+
+    struct BOSSCAM_TOPVIEW_DESC
+    {
+        _bool   bOn = { false };
+        _float3 vCenter = { 0.f, 0.f, 0.f };
+        _float  fHeight = { 40.f };         
     };
 #pragma endregion
 

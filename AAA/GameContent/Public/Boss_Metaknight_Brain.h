@@ -11,7 +11,7 @@ private:
     virtual ~CBoss_Metaknight_Brain() = default;
 
 protected:
-    virtual _int     Get_PhaseCount() const override { return 1; }
+    virtual _int     Get_PhaseCount() const override { return 2; }
     virtual CBTNode* Build_PhaseTree(_int iPhase) override;
 
 private:
@@ -45,7 +45,7 @@ private:
 
     static constexpr _float ROCK_TRACK_SPEED = 6.f;    
     static constexpr _float DIVEBOMB_RANGE = 4.f;
-    static constexpr _float DIVEBOMB_FALL_SPEED = 10.f;
+    static constexpr _float DIVEBOMB_FALL_SPEED = 20.f;
     static constexpr _float ROCK_TRACK_Y = 13.f;
     static constexpr _float TRACK_DESCEND_SPEED = 12.f;
 
@@ -78,7 +78,6 @@ private:
     void     RiseToward(_float fTargetY, _float dt);
     CBTNode* Make_RockFly();
     CBTNode* Make_RockDrop(); 
-    CBTNode* Make_RockBranch(); 
 
 
     // 트리 조립 유틸
@@ -89,6 +88,7 @@ private:
     CBTNode* Make_DodgeBranch();
     CBTNode* Make_GigaBranch();
     CBTNode* Make_ComboBranch();
+    CBTNode* Make_RockBranch();
 
 
 public:

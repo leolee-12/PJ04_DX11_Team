@@ -59,6 +59,8 @@ private:
     _float  m_fSlideDur = { 0.f };
     _float  m_fSlideElapsed = { 0.f };
 
+    _float  m_fYaw = { 0.f };
+
 private:
     HRESULT Ready_Components();
     HRESULT Bind_ShaderResources();

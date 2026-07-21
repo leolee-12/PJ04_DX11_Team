@@ -18,17 +18,26 @@ namespace
     }
 }
 
-CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int)
+CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
 {
+    CBTNode* pCombat = CBTSequence::Create({
+        Make_GigaBranch(),
+        Make_StepApproach(),
+        Make_UnlessInRange(Make_DashIn()),
+        Make_ComboBranch(),
+        });
+
+    if (iPhase >= 1)
+    {
+        return CBTReactiveSelector::Create({
+            Make_DodgeBranch(),
+            Make_RockBranch(),
+            pCombat,
+            });
+    }
     return CBTReactiveSelector::Create({
         Make_DodgeBranch(),
-        CBTSequence::Create({
-            Make_RockBranch(),
-            Make_GigaBranch(),
-            Make_StepApproach(),
-            Make_UnlessInRange(Make_DashIn()),
-            Make_ComboBranch(),
-        }),
+        pCombat,
         });
 }
 
@@ -54,6 +63,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_DodgeBranch()
         CBTCondition::Create([this](CBlackboard*) {
             return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_DodgeRequest(); }),
         Make_Dodge(),
+        Clip("Wait", SPD, 0.2f),
         });
 }
 
@@ -611,6 +621,13 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
 {
     auto risen = make_shared<_float>(0.f);
 
+    auto* pBegin = CBTAction::Create(
+        [this](CBlackboard*, _float) {
+            static_cast<CBoss_Metaknight*>(m_pOwner)->Set_AttackBusy(true);
+            return BT_STATUS::SUCCESS;
+        },
+        [this] { static_cast<CBoss_Metaknight*>(m_pOwner)->Set_AttackBusy(false); });
+
     auto startOn = make_shared<bool>(false);
     auto* pStartRise = CBTAction::Create(
         [this, startOn, risen](CBlackboard*, _float dt) -> BT_STATUS {
@@ -660,8 +677,10 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
     auto* pAttack = CBTAction::Create(
         [this, atkOn](CBlackboard*, _float) -> BT_STATUS {
             if (!*atkOn) {
+                auto meta = static_cast<CBoss_Metaknight*>(m_pOwner);
                 Anim()->Play("BurstTornadoAttack", false, true, 0.2f, SPD);
-                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_RockDecalSlide();
+                meta->Begin_RockDecalSlide();
+                meta->Set_TopViewCam(true);
                 *atkOn = true;
             }
             if (Anim()->Is_Finished()) { *atkOn = false; return BT_STATUS::SUCCESS; }
@@ -691,7 +710,11 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
         [this, descOn](CBlackboard*, _float dt) -> BT_STATUS {
             auto* tf = m_pOwner->Get_Transform();
             auto* mv = m_pOwner->Get_Movement();
-            if (!*descOn) { Anim()->Play("FlightWait", true, true, 0.2f, SPD); *descOn = true; }
+            if (!*descOn) { 
+                Anim()->Play("FlightWait", true, true, 0.2f, SPD);
+                static_cast<CBoss_Metaknight*>(m_pOwner)->Set_TopViewCam(false);
+                *descOn = true; 
+            }
 
             _vector p = tf->Get_State(STATE::POSITION);
             _float  y = XMVectorGetY(p);
@@ -736,7 +759,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
                 return BT_STATUS::RUNNING;
             }
             _vector p = tf->Get_State(STATE::POSITION);
-            _float floorY = m_pOwner->Get_BlackBoard().vTargetPos.y;
+            _float floorY = CBoss_Metaknight::s_vGigaPoints[0].y;
             _float y = XMVectorGetY(p) - DIVEBOMB_FALL_SPEED * dt;
 
             if (y <= floorY) {
@@ -753,10 +776,13 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
 
     auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
         m_pOwner->Get_Movement()->Set_GravityEnabled(true);
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Set_TopViewCam(false);
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Start_RockCooldown();
         return BT_STATUS::SUCCESS;
         });
 
     return CBTSequence::Create({
+        pBegin,
         Make_RockFly(),
         pStartRise,
         pWaitRise,
@@ -777,7 +803,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockBranch()
 {
     return CBTSequence::Create({
         CBTCondition::Create([this](CBlackboard*) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_RockDropRequest(); }),
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_RockReady(); }),
         Make_RockDrop(),
         });
 }

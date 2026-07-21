@@ -69,6 +69,7 @@ void CAttackDecal::Place(const _float3& vGroundPos, _float fRadius, _float fLife
     m_bSliding = false;
     m_vGroundPos = vGroundPos;
     m_fRadius = fRadius;
+    m_fYaw = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
     Rebuild_World();
 }
 
@@ -83,6 +84,8 @@ void CAttackDecal::Slide_To(const _float3& vTarget, _float fDuration)
 
 void CAttackDecal::Update(_float fTimeDelta)
 {
+    if (!m_bActive) return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
     {
         m_fDecalAlpha = 1.f;
@@ -113,18 +116,13 @@ void CAttackDecal::Update(_float fTimeDelta)
         return;
     }
 
-    //_float t = (m_fLifeTime > 0.f) ? (m_fAge / m_fLifeTime) : 1.f;
-    //m_fDecalAlpha = SmoothStep01(0.f, 0.15f, t);
-
     _float fadeIn = 0.15f;
     m_fDecalAlpha = SmoothStep01(0.f, fadeIn, m_fAge);
 }
 
 void CAttackDecal::Late_Update(_float fTimeDelta)
 {
-    if (m_bExpired)
-        return;
-
+    if (m_bExpired || !m_bActive) return;
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::DECAL, this);
 }
 
@@ -139,8 +137,9 @@ HRESULT CAttackDecal::Bind_ShaderResources()
 void CAttackDecal::Rebuild_World()
 {
     const _float fSize = m_fRadius * 2.f;
-    _matrix m = XMMatrixScaling(fSize, fSize, fSize) *
-        XMMatrixTranslation(m_vGroundPos.x, m_vGroundPos.y, m_vGroundPos.z);
+    _matrix m = XMMatrixScaling(fSize, fSize, fSize)
+        * XMMatrixRotationY(m_fYaw)
+        * XMMatrixTranslation(m_vGroundPos.x, m_vGroundPos.y, m_vGroundPos.z);
     m_pTransformCom->Set_WorldMatrix(m);
 }
 

@@ -20,7 +20,7 @@ const _float3 CBoss_Metaknight::s_vGigaPoints[CBoss_Metaknight::GIGA_POINT_COUNT
     { -20.5f, 7.23f, -15.f },
 };
 
-const vector<_float> CBoss_Metaknight::s_Thresholds = {};
+const vector<_float> CBoss_Metaknight::s_Thresholds = { 0.5f };
 
 namespace
 {
@@ -97,12 +97,14 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
     if (m_pGameInstance_Proxy->Key_Down(DIK_0))
         Appear();
     if (m_pGameInstance_Proxy->Key_Down(DIK_P))
-        Request_RockDrop();
+        Debug_TriggerPhaseTransition();
 #endif
     if (m_fDodgeCooldown > 0.f)
         m_fDodgeCooldown -= fTimeDelta;
     if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fGigaCooldown > 0.f)
         m_fGigaCooldown -= fTimeDelta;
+    if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fRockCooldown > 0.f)
+        m_fRockCooldown -= fTimeDelta;
 
     if (m_bAppearPending)
     {
@@ -122,6 +124,9 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
     }
 
     __super::Update(fTimeDelta);
+
+    if (Is_PhaseTransitioning())
+        Update_PhaseTransition(fTimeDelta);
 }
 
 void CBoss_Metaknight::Late_Update(_float fTimeDelta)
@@ -252,6 +257,26 @@ void CBoss_Metaknight::On_Enter_Corpse()
     m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
 }
 
+void CBoss_Metaknight::Play_PhaseTransition(_int iNewPhase)
+{
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Play("Damage2", false, true, 0.1f, s_fDefaultAnimSpeed);
+
+    m_fPhaseBaseY = XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION));
+    m_fPhaseVelY = sqrtf(2.f * PHASE_HOP_GRAVITY * PHASE_HOP_HEIGHT);
+    m_ePhaseTrans = EPhaseTrans::HOP;
+    m_pMovement->Set_GravityEnabled(false);
+}
+
+_bool CBoss_Metaknight::Is_PhaseTransition_Finished() const
+{
+    return m_ePhaseTrans == EPhaseTrans::DONE;
+}
+
+void CBoss_Metaknight::On_PhaseChanged(_int iOldPhase, _int iNewPhase)
+{
+}
+
 _bool CBoss_Metaknight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
     Out.fRadius = s_fCCT_Radius + 0.1f;
@@ -329,11 +354,13 @@ HRESULT CBoss_Metaknight::Ready_PartObjects()
         CBoss_Metaknight_Sword::PROTOTYPE_TAG, CBoss_Metaknight_Sword::PART_TAG,
         m_pBody->Get_BoneMatrixPtr("RHaveL"));
     if (!m_pSword) return E_FAIL;
+    m_pSword->Set_IgnoreSocketScale(true);
 
     m_pReplica = Add_MonsterPart<CBoss_Metaknight_ReplicaSword>(
         CBoss_Metaknight_ReplicaSword::PROTOTYPE_TAG, CBoss_Metaknight_ReplicaSword::PART_TAG,
         m_pBody->Get_BoneMatrixPtr("RHaveL"));
     if (!m_pReplica) return E_FAIL;
+    m_pReplica->Set_IgnoreSocketScale(true);
 
     m_pMant = Add_MonsterPart<CBoss_Metaknight_Mant>(
         CBoss_Metaknight_Mant::PROTOTYPE_TAG, CBoss_Metaknight_Mant::PART_TAG);
@@ -419,25 +446,34 @@ void CBoss_Metaknight::Fire_GigaMoonShot()
 void CBoss_Metaknight::Begin_RockDecalSlide()
 {
     Build_RockTilePositions(s_vGigaPoints, m_RockTiles);
+    Select_SafeTiles();
 
     _vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
     const _float sx = XMVectorGetX(vSelf), sz = XMVectorGetZ(vSelf);
 
     for (int i = 0; i < ROCK_TILE_COUNT; ++i)
     {
-        CGameObject* pObj = nullptr;
-        if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
-            m_iPrototypeLevel, CAttackDecal::PROTOTYPE_TAG,
-            m_iPrototypeLevel, TEXT("Layer_Effect"), TEXT("RockDecal"), nullptr)))
+        if (m_bSafeTile[i])
+        {
+            if (m_pRockDecals[i]) m_pRockDecals[i]->Set_Active(false);
             continue;
+        }
 
-        auto* pDecal = dynamic_cast<CAttackDecal*>(pObj);
-        if (!pDecal) continue;
+        if (nullptr == m_pRockDecals[i])
+        {
+            CGameObject* pObj = nullptr;
+            if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+                m_iPrototypeLevel, CAttackDecal::PROTOTYPE_TAG,
+                m_iPrototypeLevel, TEXT("Layer_Effect"), TEXT("RockDecal"), nullptr)))
+                continue;
+            m_pRockDecals[i] = dynamic_cast<CAttackDecal*>(pObj);
+            if (!m_pRockDecals[i]) continue;
+        }
+        else m_pRockDecals[i]->Set_Active(true);
 
         _float3 vStart = { sx, m_RockTiles[i].y, sz };
-        pDecal->Place(vStart, ROCK_DECAL_RADIUS, 9999.f);
-        pDecal->Slide_To(m_RockTiles[i], ROCK_SLIDE_TIME);
-        m_pRockDecals[i] = pDecal;
+        m_pRockDecals[i]->Place(vStart, ROCK_DECAL_RADIUS, 9999.f);
+        m_pRockDecals[i]->Slide_To(m_RockTiles[i], ROCK_SLIDE_TIME);
     }
 }
 
@@ -445,14 +481,37 @@ void CBoss_Metaknight::Drop_Rocks()
 {
     for (int i = 0; i < ROCK_TILE_COUNT; ++i)
     {
+        if (m_bSafeTile[i]) continue;
+
         CProjectile* p = nullptr;
         CProjectile_Manager::GetInstance()->Spawn(
             Get_PrototypeLevelIndex(), Get_LevelIndex(),
             CProjectile_Rock::POOL_KEY, CProjectile_Rock::PROTOTYPE_TAG, &p);
 
         if (auto* pRock = static_cast<CProjectile_Rock*>(p))
-            pRock->Drop(m_RockTiles[i], ROCK_DROP_HEIGHT);
+        {
+            pRock->Set_LinkedDecal(m_pRockDecals[i]);
+            _float fHeight = ROCK_DROP_HEIGHT + m_pGameInstance_Proxy->RandomFloat(0.f, 20.f);
+            pRock->Drop(m_RockTiles[i], fHeight);
+        }
     }
+}
+
+void CBoss_Metaknight::Set_TopViewCam(_bool bOn)
+{
+    BOSSCAM_TOPVIEW_DESC d{};
+    d.bOn = bOn;
+    if (bOn)
+    {
+        _float3 c{ 0.f, 0.f, 0.f };
+        for (int i = 0; i < GIGA_POINT_COUNT; ++i) {
+            c.x += s_vGigaPoints[i].x; c.y += s_vGigaPoints[i].y; c.z += s_vGigaPoints[i].z;
+        }
+        c.x /= GIGA_POINT_COUNT; c.y /= GIGA_POINT_COUNT; c.z /= GIGA_POINT_COUNT;
+        d.vCenter = c;
+        d.fHeight = TOPVIEW_HEIGHT;
+    }
+    m_pGameInstance_Proxy->Publish(EventTag::BossCam_TopView, &d);
 }
 
 void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)
@@ -512,26 +571,65 @@ void CBoss_Metaknight::Build_RockTilePositions(const _float3 fCornersIn[4], _flo
     }
 }
 
-void CBoss_Metaknight::Test_SpawnRockDecals()
+void CBoss_Metaknight::Select_SafeTiles()
 {
-    _float3 tiles[23];
-    Build_RockTilePositions(s_vGigaPoints, tiles);
+    for (int i = 0; i < ROCK_TILE_COUNT; ++i) m_bSafeTile[i] = false;
 
-    const _float fRadius = 5.f;
-
-    for (int i = 0; i < 23; ++i)
+    int count = 0;
+    while (count < ROCK_SAFE_COUNT)
     {
-        CGameObject* pObj = nullptr;
-        if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
-            m_iPrototypeLevel, CAttackDecal::PROTOTYPE_TAG,
-            m_iPrototypeLevel, TEXT("Layer_Effect"), TEXT("RockDecal_Test"),
-            nullptr)))
-            continue;
-
-        if (auto* pDecal = dynamic_cast<CAttackDecal*>(pObj))
-            pDecal->Place(tiles[i], fRadius, 9999.f);   // 오래 유지
+        int r = m_pGameInstance_Proxy->RandomInt(0, ROCK_TILE_COUNT - 1);
+        if (!m_bSafeTile[r]) { m_bSafeTile[r] = true; ++count; }
     }
 }
+
+void CBoss_Metaknight::Update_PhaseTransition(_float fTimeDelta)
+{
+    if (m_ePhaseTrans == EPhaseTrans::HOP)
+    {
+        _vector p = m_pTransformCom->Get_State(STATE::POSITION);
+        m_fPhaseVelY -= PHASE_HOP_GRAVITY * fTimeDelta;
+        _float y = XMVectorGetY(p) + m_fPhaseVelY * fTimeDelta;
+
+        if (m_fPhaseVelY < 0.f && y <= m_fPhaseBaseY)
+        {
+            m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetY(p, m_fPhaseBaseY));
+            m_pMovement->Sync_To_Controller();
+            if (CAnimator* pAnim = Get_BodyAnimator())
+                pAnim->Play("DeathLanding", false, true, 0.1f, s_fDefaultAnimSpeed);
+            m_ePhaseTrans = EPhaseTrans::LANDING;
+            m_pMovement->Set_GravityEnabled(true);
+        }
+        else
+        {
+            m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetY(p, y));
+            m_pMovement->Sync_To_Controller();
+        }
+    }
+    else if (m_ePhaseTrans == EPhaseTrans::LANDING)
+    {
+        CAnimator* pAnim = Get_BodyAnimator();
+        if (pAnim && pAnim->Is_Finished())
+        {
+            pAnim->Play("Wait", false, true, PHASE_WAIT_BLEND, s_fDefaultAnimSpeed);
+            m_ePhaseTrans = EPhaseTrans::WAIT;
+        }
+    }
+    else if (m_ePhaseTrans == EPhaseTrans::WAIT)
+    {
+        CAnimator* pAnim = Get_BodyAnimator();
+        if (!pAnim || !pAnim->Is_Blending())
+            m_ePhaseTrans = EPhaseTrans::DONE;
+    }
+}
+
+#ifdef _DEBUG
+void CBoss_Metaknight::Debug_TriggerPhaseTransition()
+{
+    m_bPhaseTransition = true;
+    Play_PhaseTransition(1);
+}
+#endif // _DEBUG
 
 CBoss_Metaknight* CBoss_Metaknight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

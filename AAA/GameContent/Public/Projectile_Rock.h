@@ -10,6 +10,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CAttackDecal;
+
 class CProjectile_Rock final : public CProjectile
 {
     GENERATED_BODY(CProjectile_Rock)
@@ -36,7 +38,9 @@ public:
     virtual HRESULT Render() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
+public:
     void Drop(const _float3& vTile, _float fSpawnHeight);  
+    void Set_LinkedDecal(CAttackDecal* p) { m_pLinkedDecal = p; }
 
 protected:
     virtual HRESULT Ready_Visual() override;
@@ -48,6 +52,8 @@ private:
     HRESULT Bind_ShaderResources();
 
 private:
+    CAttackDecal* m_pLinkedDecal = { nullptr };
+
     CShader* m_pShaderCom = { nullptr };
     CModel* m_pModelCom = { nullptr };
     CAnimator* m_pAnimatorCom = { nullptr };
@@ -55,6 +61,8 @@ private:
     STATE  m_eState = { STATE::FALLING };
     _float m_fTargetY = { 0.f };
     _float m_fHitTimer = { 0.f };
+
+    _int   m_iBodyMesh = { 0 };
 
 public:
     static CProjectile_Rock* Create(ID3D11Device*, ID3D11DeviceContext*);
