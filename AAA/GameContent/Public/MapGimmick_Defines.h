@@ -228,8 +228,8 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_7.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_7",
 
-		COLLISION_LAYER::PLAYER_BREAKERABLE,
-		0.5f,
+		COLLISION_LAYER::ENV_PROJECTILE,
+		1.0f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -251,8 +251,8 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_8.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_8",
 
-		COLLISION_LAYER::PLAYER_BREAKERABLE,
-		0.5f,
+		COLLISION_LAYER::ENV_PROJECTILE,
+		1.0f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -274,8 +274,8 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_9.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_9",
 
-		COLLISION_LAYER::PLAYER_BREAKERABLE,
-		0.5f,
+		COLLISION_LAYER::ENV_PROJECTILE,
+		1.0f,
 
 		L"Split_Stone_Ultra",
 		1.f,
@@ -297,8 +297,8 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		L"../../Resources/Map/Stage3-1/Section/Land_GsAllBuilding_10.ysh",
 		L"MapGimmickSection_Stage3-1_Land_GsAllBuilding_10",
 
-		COLLISION_LAYER::PLAYER_BREAKERABLE,
-		0.5f,
+		COLLISION_LAYER::ENV_PROJECTILE,
+		1.5f,
 
 		L"Split_Stone_Ultra",
 		1.f,

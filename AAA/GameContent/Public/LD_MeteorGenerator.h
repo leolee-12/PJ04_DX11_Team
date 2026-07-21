@@ -34,6 +34,9 @@ public:
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
     }
 
+protected:
+    virtual void                    On_LDEventReceived(const _wstring& strEventTag) override;
+
 private:
     HRESULT                         Ready_Trigger();
     void                            Fire_Rock();
@@ -41,10 +44,13 @@ private:
 private:
     LD_METEOR_DESC                  m_tMeteorDesc = {};
     CCollider*                      m_pTrigger = { nullptr };
+    _bool                           m_bFired = { false };
+    _float                          m_fFireTimer = { 0.f };
     _bool                           m_bLarge = { false };
     _bool                           m_bHeroInRange = { false };
     _bool                           m_bFiredOnce = { false };
-    _float                          m_fFireTimer = { 0.f };
+    _bool                           m_bEventFired = { false };
+    _bool                           m_bStopped = { false };
 
 public:
     static void                     Register_LevelDesignSpecs();

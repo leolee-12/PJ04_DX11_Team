@@ -29,6 +29,7 @@ public:
 
     void Configure(_float fSpeed, _float fLifeSec, _bool bBreakOnLand, _float fHitRadius);
     void Set_TargetPos(const _float3& vTarget) { m_vTargetPos = vTarget; }
+
 protected:
     virtual HRESULT Ready_Visual() override;
     virtual void On_Activated() override;

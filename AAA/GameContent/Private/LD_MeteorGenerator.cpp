@@ -45,20 +45,30 @@ void CLD_MeteorGenerator::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-    if (!m_tMeteorDesc.bFindHero) return;
+    if (m_bStopped) return;
+
+    const _bool bArmed = (m_tMeteorDesc.bFindHero && m_bHeroInRange) || m_bEventFired;
 
     if (m_tMeteorDesc.bRepeat)
     {
+        if (m_tMeteorDesc.bFindHero && !m_bFired && bArmed)
+        {
+            m_bFired = true;
+            Fire_Rock();
+            m_fFireTimer = m_tMeteorDesc.fInterval;
+            return;
+        }
+
         m_fFireTimer -= fTimeDelta;
+
         if (m_fFireTimer <= 0.f)
         {
-            if (m_bHeroInRange)
+            if (bArmed)
                 Fire_Rock();
-
             m_fFireTimer = m_tMeteorDesc.fInterval;
         }
     }
-    else if (!m_bFiredOnce)
+    else if (bArmed && !m_bFiredOnce)
     {
         Fire_Rock();
         m_bFiredOnce = true;
@@ -76,6 +86,17 @@ void CLD_MeteorGenerator::Late_Update(_float fTimeDelta)
         if (m_pTrigger->Is_Enabled())
             m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
+    }
+}
+
+void CLD_MeteorGenerator::On_LDEventReceived(const _wstring& strEventTag)
+{
+    if (m_tMeteorDesc.bFallEndOnEvent)      m_bStopped = true;   
+    else                                    m_bEventFired = true;
+    
+    if (m_tMeteorDesc.bRepeat && m_tMeteorDesc.fInterval > 0.f)
+    {
+        m_fFireTimer = (static_cast<_float>(rand()) / RAND_MAX) *  m_tMeteorDesc.fInterval;
     }
 }
 
@@ -130,12 +151,16 @@ void CLD_MeteorGenerator::Fire_Rock()
     XMStoreFloat3(&vTarget, vGen);
 
     CMeteorRock* pRock = static_cast<CMeteorRock*>(pProj);
-    pRock->Configure(m_tMeteorDesc.fFallSpeed, fLife, !m_tMeteorDesc.bNoBreakEffect, m_tMeteorDesc.fImpactRadius);
+    pRock->Configure(m_tMeteorDesc.fFallSpeed, fLife, !m_tMeteorDesc.bNoBreakEffect, m_tMeteorDesc.fImpactRadius * 1.25f);
     pRock->Set_TargetPos(vTarget);
 
     _float3 vDir;
     XMStoreFloat3(&vDir, XMVector3Normalize(vDelta));
-    pProj->Launch(m_tMeteorDesc.vFallStart, vDir);
+    pRock->Launch(m_tMeteorDesc.vFallStart, vDir);
+
+    _float3 vScale{};
+    vScale = m_tMeteorDesc.vParsedScale;
+    pRock->Get_Transform()->Set_Scale(vScale.x, vScale.y, vScale.z);
 }
 
 void CLD_MeteorGenerator::Register_LevelDesignSpecs()
