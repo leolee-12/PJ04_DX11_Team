@@ -33,10 +33,27 @@ DEFORM_TYPE CKirby_Deform_RollerCoaster::Get_DeformType()
 
 void CKirby_Deform_RollerCoaster::Enter_Deform(CKirby* pKirby)
 {
+    constexpr _float fRadius = 0.5f;
+    constexpr _float fHeight = 0.1f;
+
+    // Hurt Box
+    CCollider::COLLIDER_DESC tHurtDesc{};
+    tHurtDesc.pOwner = pKirby;
+    tHurtDesc.vCenter = _float3(0.f, 3.7f, 0.f);
+    tHurtDesc.fRadius = fRadius + CKirby::s_fHurtBoxRadiusPadding;
+    tHurtDesc.fHeight = fHeight;
+    pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
 }
 
 void CKirby_Deform_RollerCoaster::Exit_Deform(CKirby* pKirby)
 {
+    // Hurt Box
+    CCollider::COLLIDER_DESC tHurtDesc{};
+    tHurtDesc.pOwner = pKirby;
+    tHurtDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    tHurtDesc.fRadius = CKirby::s_fCCT_Radius + CKirby::s_fHurtBoxRadiusPadding;
+    tHurtDesc.fHeight = CKirby::s_fCCT_Height;
+    pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
 }
 
 void CKirby_Deform_RollerCoaster::Enter_AttackState(CKirby* pKirby, _int iFlag)
@@ -61,9 +78,12 @@ void CKirby_Deform_RollerCoaster::Enter_AttackState(CKirby* pKirby, _int iFlag)
     pMovement->Set_UseGravity(false);
 
     m_bReqEndAttackState = false;
+    m_fAccRailSpeed = { 10.f };
 
     m_fRailLength = m_pRailTrack->Get_Length();
     m_fCurRailDist = 0.f;
+    m_iLeftRight = 0;
+    m_fLeftRightDegree = 0.f;
 
     Set_OnRail(pKirby, m_fCurRailDist);
 
@@ -88,6 +108,26 @@ _bool CKirby_Deform_RollerCoaster::Handle_Command(CKirby* pKirby, CKirby_Command
 
     switch (eCommandType)
     {
+        case KIRBY_COMMAND_TYPE::MOVE_LEFT:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (m_eRollerCoasterState == DEFORM_ROLLERCOASTER_STATE::RUNNING)
+                m_iLeftRight -= 1;
+
+            return true;
+        }
+        case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (m_eRollerCoasterState == DEFORM_ROLLERCOASTER_STATE::RUNNING)
+                m_iLeftRight += 1;
+
+            return true;
+        }
         // Dump
         case KIRBY_COMMAND_TYPE::DUMP:
         {
@@ -157,6 +197,8 @@ void CKirby_Deform_RollerCoaster::Enter_CoasterState(CKirby* pKirby, DEFORM_ROLL
         case DEFORM_ROLLERCOASTER_STATE::RUNNING:
         {
             pAnimator->Play("Running", true, false, 0.1f, 1.5f);
+            m_RunningSound = m_pGameInstance_Proxy->Play_SFX_Section_Loop(L"HeroDeformRollerCoaster_Running.wav", 0.04741f, 0.23682f, 0.05f);
+
             break;
         }
         case DEFORM_ROLLERCOASTER_STATE::WAIT:
@@ -181,6 +223,18 @@ void CKirby_Deform_RollerCoaster::Update_CoasterState(CKirby* pKirby, _float fTi
         {
             Update_OnRail(pKirby, fTimeDelta);
 
+            constexpr _float fVolumeScale = 0.15f;
+            _float fVolume = m_fCurFrameMoveDist * fVolumeScale;
+            Helper::FloatClamp(fVolume, 0.05f, 0.2f);
+            m_RunningSound.Set_Volume(fVolume);
+
+            constexpr _float fAniSpeedScale = 3.f;
+            _float fAniSpeed = powf(m_fCurFrameMoveDist * fAniSpeedScale, 2.f);
+            Helper::FloatClamp(fAniSpeed, 1.5f, 8.f);
+
+            CAnimator* pAnimator = pKirby->Get_CurrentDeformModel()->Get_Animator();
+            pAnimator->Set_PlaySpeed(fAniSpeed);
+
             if (m_fCurRailDist >= m_fRailLength - Helper::fEpsilon)
                 Change_CoasterState(pKirby, DEFORM_ROLLERCOASTER_STATE::WAIT);
             break;
@@ -197,21 +251,44 @@ void CKirby_Deform_RollerCoaster::Exit_CoasterState(CKirby* pKirby, DEFORM_ROLLE
     switch (eState)
     {
         case DEFORM_ROLLERCOASTER_STATE::RUNNING:
+        {
+            if (m_RunningSound.Is_Valid())
+                m_RunningSound.Stop();
+            m_fCurFrameMoveDist = 0.f;
+
+            CTransform* pTransform = pKirby->Get_Transform();
+            _vector vLook = XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f);
+
+            if (XMVectorGetX(XMVector3LengthSq(vLook)) > Helper::fEpsilon)
+                pTransform->LookTo(XMVector3Normalize(vLook), XMVectorSet(0.f, 1.f, 0.f, 0.f));
+
             break;
+        }
         case DEFORM_ROLLERCOASTER_STATE::WAIT:
+        {
             break;
+        }
     }
 }
 
 _bool CKirby_Deform_RollerCoaster::Update_OnRail(CKirby* pKirby, _float fTimeDelta)
 {
-    if (m_fCurRailDist > m_fRailLength)
-    {
+    if (m_fCurRailDist >= m_fRailLength)
         return false;
-    }
 
-    m_fCurRailDist += 600.f * fTimeDelta;
+    constexpr _float fSlopeAcceleration = 80.f;
+    m_fAccRailSpeed += m_fSlopeRatio * fSlopeAcceleration * fTimeDelta;
+
+    constexpr _float fMinSpeed = 20.f;
+    constexpr _float fMaxSpeed = 65.f;
+    Helper::FloatClamp(m_fAccRailSpeed, fMinSpeed, fMaxSpeed);
+
+    m_fCurFrameMoveDist = m_fAccRailSpeed * fTimeDelta;
+
+    m_fCurRailDist += m_fCurFrameMoveDist;
     Helper::FloatClamp(m_fCurRailDist, 0.f, m_fRailLength);
+
+    Set_RotLeftRight(fTimeDelta);
 
     return Set_OnRail(pKirby, m_fCurRailDist);
 }
@@ -224,11 +301,39 @@ _bool CKirby_Deform_RollerCoaster::Set_OnRail(CKirby* pKirby, _float fRailDist)
     if (!m_pRailTrack->Sample(fRailDist, &vPosition, &vTangent))
         return false;
 
+    m_fSlopeRatio = -XMVectorGetY(XMVector3Normalize(XMLoadFloat3(&vTangent)));
+
+    _vector vLook = XMVector3Normalize(XMLoadFloat3(&vTangent));
+    _vector vWorldUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vWorldUp, vLook));
+    _vector vBaseUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+
+    _vector vLeftRightQuaternion = XMQuaternionRotationAxis(vLook, XMConvertToRadians(-m_fLeftRightDegree));
+    _vector vLeftRightUp = XMVector3Rotate(vBaseUp, vLeftRightQuaternion);
+
     CTransform* pTransform = pKirby->Get_Transform();
+    pTransform->LookTo(vLook, vLeftRightUp);
     pTransform->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vPosition), 1.f));
     pKirby->Get_Movement()->Sync_To_Controller();
 
     return true;
+}
+
+void CKirby_Deform_RollerCoaster::Set_RotLeftRight(_float fTimeDelta)
+{
+    constexpr _float fMaxDegree = 55.f;
+
+    Helper::IntClamp(m_iLeftRight, -1, 1);
+    const _float fTargetDegree = static_cast<_float>(m_iLeftRight) * fMaxDegree;
+
+    _float fRotDelta = fTargetDegree - m_fLeftRightDegree;
+
+    constexpr _float fRotSpeed = 500.f;
+    Helper::FloatClamp(fRotDelta, -fRotSpeed * fTimeDelta, fRotSpeed * fTimeDelta);
+    
+    m_fLeftRightDegree += fRotDelta;
+
+    m_iLeftRight = 0;
 }
 
 CKirby_Deform_RollerCoaster* CKirby_Deform_RollerCoaster::Create()
