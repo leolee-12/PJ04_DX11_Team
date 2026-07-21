@@ -46,10 +46,18 @@ void CMonsterPart::Late_Update(_float fTimeDelta)
         return;
 
     _matrix LocalWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-    if (m_pSocketBoneMatrix)                          // 소켓 부착이면 본 행렬 합성
-        LocalWorld = LocalWorld * XMLoadFloat4x4(m_pSocketBoneMatrix);
-
-    Compute_CombinedWorldMatrix(LocalWorld);          // 내부에서 부모행렬까지 곱함
+    if (m_pSocketBoneMatrix)
+    {
+        _matrix boneMat = XMLoadFloat4x4(m_pSocketBoneMatrix);
+        if (m_bIgnoreSocketScale)
+        {
+            boneMat.r[0] = XMVector3Normalize(boneMat.r[0]);
+            boneMat.r[1] = XMVector3Normalize(boneMat.r[1]);
+            boneMat.r[2] = XMVector3Normalize(boneMat.r[2]);
+        }
+        LocalWorld = LocalWorld * boneMat;
+    }
+    Compute_CombinedWorldMatrix(LocalWorld);
 
     if (m_pCullState && m_pCullState->bRenderCull)
         return;

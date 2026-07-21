@@ -57,6 +57,15 @@ void CCamera_Boss::Priority_Update(_float fTimeDelta)
     _vector vAt = XMVectorLerp(P, B, m_fAimBias);
     vAt = XMVectorAdd(vAt, XMVectorScale(vUp, fAimH));
 
+    if (m_bTopView)
+    {
+        const _float fTilt = m_fTopHeight * 0.2f;
+        vEye = XMVectorSet(m_vTopCenter.x,
+            m_vTopCenter.y + m_fTopHeight,
+            m_vTopCenter.z - fTilt, 1.f);
+        vAt = XMLoadFloat3(&m_vTopCenter);
+    }
+
     if (!m_bInit) { XMStoreFloat3(&m_eyeCur, vEye); XMStoreFloat3(&m_atCur, vAt); m_bInit = true; }
 
     _vector eVel = XMLoadFloat3(&m_eyeVel), aVel = XMLoadFloat3(&m_atVel);
@@ -115,6 +124,16 @@ HRESULT CCamera_Boss::Ready_Events()
             m_fSmoothTime = d->fSmoothTime;
             m_fFovDeg = d->fFovDeg;
         }
+        });
+
+    Subscribe_Event(EventTag::BossCam_TopView, [this](void* p) {
+        if (auto* d = static_cast<BOSSCAM_TOPVIEW_DESC*>(p)) {
+            m_bTopView = d->bOn;
+            m_vTopCenter = d->vCenter;
+            m_fTopHeight = d->fHeight;
+        }
+        else 
+            m_bTopView = false;
         });
 
     return Ready_ShakeEvents();

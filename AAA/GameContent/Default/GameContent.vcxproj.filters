@@ -886,6 +886,9 @@
     <Filter Include="00. GameObject\07. Boss">
       <UniqueIdentifier>{ab830d26-cbd1-45f8-8412-afec3357e9e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\AttackDecal">
+      <UniqueIdentifier>{b49a289d-7d74-4e4f-951d-d0c4098643a8}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss">
       <UniqueIdentifier>{ead5f6ed-4edc-4859-815b-6ad28dbe859a}</UniqueIdentifier>
     </Filter>
@@ -1059,6 +1062,12 @@
     </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Projectile">
       <UniqueIdentifier>{3ad7e84a-9b3b-4a0a-946a-8876933bb653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Projectile\Moonshot">
+      <UniqueIdentifier>{b2f2caac-bfa8-4f6c-b12b-29e79c983bbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Projectile\Rock">
+      <UniqueIdentifier>{092a480e-00fd-4ddc-89a6-0884d58d2492}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
@@ -1465,6 +1474,9 @@
     <Filter Include="98. ShaderFiles\Marb1e\Boss">
       <UniqueIdentifier>{422a56fc-373b-4d5f-b1cf-167f581eebb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="98. ShaderFiles\Marb1e\Decal">
+      <UniqueIdentifier>{af233ea9-35af-4aff-9bff-2293515e2885}</UniqueIdentifier>
+    </Filter>
     <Filter Include="98. ShaderFiles\Ring">
       <UniqueIdentifier>{e216c804-3688-4394-920e-d1effa7ea6ce}</UniqueIdentifier>
     </Filter>
@@ -1514,6 +1526,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Assault_Smoke.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AttackDecal.h">
+      <Filter>00. GameObject\07. Boss\AttackDecal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29</Filter>
@@ -2563,7 +2578,7 @@
       <Filter>01. Projectile\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Projectile_MoonShot.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile\Moonshot</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Movement.h">
       <Filter>01. Projectile\Movement</Filter>
@@ -2573,6 +2588,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Partner.h">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Projectile_Rock.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile\Rock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RabbitEnemy.h">
       <Filter>00. GameObject\06. Monster\13. RabbitEnemy</Filter>
@@ -2899,6 +2917,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Assault_Smoke.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Smoke\Assault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AttackDecal.cpp">
+      <Filter>00. GameObject\07. Boss\AttackDecal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight.cpp">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29</Filter>
@@ -3876,7 +3897,7 @@
       <Filter>01. Projectile\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Projectile_MoonShot.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile\Moonshot</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Movement.cpp">
       <Filter>01. Projectile\Movement</Filter>
@@ -3886,6 +3907,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Partner.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile_Rock.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile\Rock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RabbitEnemy.cpp">
       <Filter>00. GameObject\06. Monster\13. RabbitEnemy</Filter>
@@ -4180,6 +4204,9 @@
     <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_Fluid.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
     <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
@@ -4233,8 +4260,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl">
-      <Filter>98. ShaderFiles\Leo</Filter>
+    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Decal</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
