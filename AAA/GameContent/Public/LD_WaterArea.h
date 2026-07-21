@@ -37,6 +37,7 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 	virtual json Serialize() const override;
 	virtual void Deserialize_Internal(const json& j) override;
+	virtual _bool Is_CullingEnabled() const override { return false; }
 
 #pragma region Editable
 public:

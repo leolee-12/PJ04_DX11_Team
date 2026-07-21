@@ -71,6 +71,10 @@ void CPanel_Palette::Render()
 					{
 						pLevel->Begin_PlaceMode(strTag, CLD_DeformObject::LAYER_TAG);
 					}
+					else if (category == L"TEST_OBJECT")
+					{
+						pLevel->Begin_PlaceMode(strTag, L"Layer_LiveObject");
+					}
 
 				}
 			}
