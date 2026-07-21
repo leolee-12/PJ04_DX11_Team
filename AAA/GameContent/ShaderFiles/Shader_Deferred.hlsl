@@ -18,6 +18,7 @@ Texture2D g_EmissiveTexture; // 이미시브
 Texture2D<uint> g_MaterialIDTexture;
 Texture2D       g_ShadowRawTexture;
 Texture2D       g_SkyTexture;
+Texture2D       g_GeoNormalTexture;
 
 vector g_vCamPosition;
 
@@ -302,7 +303,13 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
 
-    float3 wpShadow = wp + N * g_fShadowNormalOffset;
+    float3 Ng = normalize(g_GeoNormalTexture.Sample(LinearSampler, In.vTexcoord).xyz * 2.f - 1.f);
+    float3 Ldir = normalize(-g_vLightDir.xyz);
+    float ndl = saturate(dot(Ng, Ldir));
+
+    // 유계 스케일: grazing서 소폭만 키움(tan 폭주 제거)
+    float k = 1.f - ndl; // 0(정면)~1(스침)
+    float3 wpShadow = wp + Ng * g_fShadowNormalOffset * (1.f + k * 1.5f);
     float4 lc = mul(float4(wpShadow, 1.f), g_ShadowLightViewMatrix);
     lc = mul(lc, g_ShadowLightProjMatrix);
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
@@ -311,7 +318,8 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     if (pz <= 1.f && suv.x >= 0.f && suv.x <= 1.f && suv.y >= 0.f && suv.y <= 1.f)
     {
         float esm = g_LightDepthTexture.Sample(BorderSampler, suv).r;
-        float shadow = saturate(exp(-g_fESMConst * (pz - g_fShadowDepthBias)) * esm);
+        float bias = g_fShadowDepthBias * (1.f + k * 2.f);
+        float shadow = saturate(exp(-g_fESMConst * (pz - bias)) * esm);
         shadow = saturate((shadow - g_fESMBleed) / (1.f - g_fESMBleed));
 
         float2 e = abs(suv - 0.5f) * 2.f;
@@ -321,6 +329,8 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
         float casterClass = g_ShadowRawTexture.Sample(ClampSampler, suv).g;
         if (recvMatID == 0 && casterClass > 0.5f)
             shadow = 1.f;
+
+        shadow = lerp(1.f, shadow, smoothstep(0.f, 0.3f, ndl));
 
         color *= lerp(0.25f, 1.f, shadow);
     }

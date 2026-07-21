@@ -613,6 +613,8 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
     if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_ESM"), m_pShaderDeferred, "g_LightDepthTexture")))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_GeoNormal"), m_pShaderDeferred, "g_GeoNormalTexture")))
+        return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_SSAO_Blur"), m_pShaderDeferred, "g_SSAOTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Emissive"), m_pShaderDeferred, "g_EmissiveTexture")))

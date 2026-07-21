@@ -4231,10 +4231,8 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl">
+    <None Include="..\ShaderFiles\Shader_Fluid.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>

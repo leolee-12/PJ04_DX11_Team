@@ -64,7 +64,7 @@ namespace Engine
 	const unsigned int g_iMaxWidth = 8192;
 	const unsigned int g_iMaxHeight = 4608;
 
-	const unsigned int g_iShadowMapSize = 1024;
+	const unsigned int g_iShadowMapSize = 2048;
 }
 
 #define DIRECTINPUT_VERSION	0x0800
