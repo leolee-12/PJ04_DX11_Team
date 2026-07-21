@@ -13,6 +13,8 @@
 
 #include "Deformable.h"
 
+#include "Kirby_DeformDump.h"
+
 CKirby_Deform_Cylinder::CKirby_Deform_Cylinder()
 {
 }
@@ -199,11 +201,6 @@ void CKirby_Deform_Cylinder::Exit_DeformState_Deform(CKirby* pKirby, const POST_
     pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
 }
 
-void CKirby_Deform_Cylinder::On_DumpSpitDeform(CKirby* pKirby)
-{
-    pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 20.f, 0.f, 0.f));
-}
-
 void CKirby_Deform_Cylinder::Change_DeformCylinderState(CKirby* pKirby, DEFORM_CYLINDER_STATE eNext)
 {
     if (m_eCylinderState == eNext)
@@ -274,7 +271,7 @@ void CKirby_Deform_Cylinder::Enter_DeformCylinderState(CKirby* pKirby, DEFORM_CY
         case DEFORM_CYLINDER_STATE::CYLINDER_STATE_END:
         {
             m_bReqEndAttackState = true;
-            pKirby->Change_State(KIRBY_STATE_TYPE::DEFORM_DUMP);
+            pKirby->Change_State(KIRBY_STATE_TYPE::DEFORM_DUMP, DEFORM_DUMP_STATE_FLAG::SPIT_DEFORM_JUMP);
             break;
         }
     }

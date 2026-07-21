@@ -32,6 +32,7 @@ void CKirby_DeformDump::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
+    m_iDeformDumpFlag = iFlag;
     DEFORM_TYPE eDeformType = {};
 
     if (!pKirby->Has_Deform())
@@ -89,7 +90,13 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
     {
         case DEFORM_DUMP_STATE::SPIT_START:
         {
-            pKirbyDeform->On_DumpSpitStart(pKirby);
+            if(m_iDeformDumpFlag == DEFORM_DUMP_STATE_FLAG::DEFAULT ||
+                m_iDeformDumpFlag == DEFORM_DUMP_STATE_FLAG::SPIT_START_JUMP)
+            {
+                CMovement_Child* pMovement = pKirby->Get_Movement();
+                pMovement->Set_VelocityY(0.f);
+                pMovement->Add_Velocity(XMVectorSet(0.f, 22.f, 0.f, 0.f));
+            }
 
             pKirbyDeform->Play_DeformAni(pKirby, DEFORM_ANI::SPIT_START);
             break;
@@ -98,7 +105,12 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
         {
             m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_SpitStart.wav", 0.2f);
 
-            pKirbyDeform->On_DumpSpitDeform(pKirby);
+            if (m_iDeformDumpFlag == DEFORM_DUMP_STATE_FLAG::SPIT_DEFORM_JUMP)
+            {
+                CMovement_Child* pMovement = pKirby->Get_Movement();
+                pMovement->Set_VelocityY(0.f);
+                pMovement->Add_Velocity(XMVectorSet(0.f, 22.f, 0.f, 0.f));
+            }
 
             // Deform Model
             DEFORM_TYPE eDeformType = pKirbyDeform->Get_DeformType();

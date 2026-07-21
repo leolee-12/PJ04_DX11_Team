@@ -50,9 +50,8 @@ public:
 
 	// DeformDump¿ë ÇÔ¼ö
 	virtual _bool Has_SpitStartAni() { return true; }
-	virtual void On_DumpSpitStart(CKirby* pKirby);
-	virtual void On_DumpSpitDeform(CKirby* pKirby) {}
 
+public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override {};
 
 	void Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni);

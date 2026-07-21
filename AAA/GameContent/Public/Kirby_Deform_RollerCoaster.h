@@ -46,8 +46,6 @@ public:
 
 	// DeformDump¿ë ÇÔ¼ö
 	virtual _bool Has_SpitStartAni() { return false; }
-	virtual void On_DumpSpitStart(CKirby* pKirby) override {};
-	virtual void On_DumpSpitDeform(CKirby* pKirby) override;
 
 public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }
@@ -59,7 +57,7 @@ private:
 	void Exit_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eState);
 
 private:
-	_bool Update_OnRail(CKirby* pKirby, _float fRailDist, _float fTimeDelta);
+	_bool Update_OnRail(CKirby* pKirby, _float fTimeDelta);
 	_bool Set_OnRail(CKirby* pKirby, _float fRailDist);
 
 private:

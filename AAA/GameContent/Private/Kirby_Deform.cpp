@@ -54,11 +54,6 @@ void CKirby_Deform::Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFOR
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
 }
 
-void CKirby_Deform::On_DumpSpitStart(CKirby* pKirby)
-{
-    pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 22.f, 0.f, 0.f));
-}
-
 void CKirby_Deform::Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni)
 {
     CKirby_Deform_Model* pDeformModelMain =
