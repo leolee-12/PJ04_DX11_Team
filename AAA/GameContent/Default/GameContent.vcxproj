@@ -29,6 +29,7 @@
     <ClInclude Include="..\public\Armadillo_SpinWind.h" />
     <ClInclude Include="..\public\Armadillo_WallImpact.h" />
     <ClInclude Include="..\public\Assault_Smoke.h" />
+    <ClInclude Include="..\public\AttackDecal.h" />
     <ClInclude Include="..\public\Boss_GorillaRush.h" />
     <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
@@ -495,6 +496,7 @@
     <ClCompile Include="..\private\Armadillo_SpinWind.cpp" />
     <ClCompile Include="..\private\Armadillo_WallImpact.cpp" />
     <ClCompile Include="..\private\Assault_Smoke.cpp" />
+    <ClCompile Include="..\private\AttackDecal.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
@@ -1009,6 +1011,9 @@
     <None Include="..\ShaderFiles\Shader_Metaknight.hlsl">
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

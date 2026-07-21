@@ -1483,6 +1483,12 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\AttackDecal">
+      <UniqueIdentifier>{b49a289d-7d74-4e4f-951d-d0c4098643a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Marb1e\Decal">
+      <UniqueIdentifier>{af233ea9-35af-4aff-9bff-2293515e2885}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2871,6 +2877,9 @@
     <ClInclude Include="..\Public\Water_RenderBinder.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\AttackDecal.h">
+      <Filter>00. GameObject\07. Boss\AttackDecal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -4163,6 +4172,9 @@
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\AttackDecal.cpp">
+      <Filter>00. GameObject\07. Boss\AttackDecal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
@@ -4234,5 +4246,10 @@
     <None Include="..\ShaderFiles\Shader_Fluid.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Decal</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

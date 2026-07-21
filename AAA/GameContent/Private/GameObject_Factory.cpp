@@ -205,6 +205,7 @@
 #include "Excalibur_Body.h"
 #include "Excalibur_GetIt.h"
 #include "MetaknightNamePlate.h"
+#include "AttackDecal.h"
 
 //Boss Effect
 #include "Armadillo_RutA.h"
@@ -1634,6 +1635,15 @@ void CGameObject_Factory::Register_MainBoss()
                 ));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::PROTOTYPE_TAG,
                 CExcalibur_GetIt::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CAttackDecal::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CAttackDecal),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/RockDecal/Cube.ysh"));
         )
     );
 }
