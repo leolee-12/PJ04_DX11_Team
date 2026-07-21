@@ -56,5 +56,7 @@ namespace Client
         { EANIM_EVENT::OnOffMesh,   "OnOffMesh" },
         { EANIM_EVENT::AbilityFx,   "AbilityFx" },
         { EANIM_EVENT::UI,          "UI"        },
+        { EANIM_EVENT::DropStars,   "DropStars" },
+
     };
 }

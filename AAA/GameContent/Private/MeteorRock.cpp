@@ -38,11 +38,26 @@ HRESULT CMeteorRock::Ready_Visual()
     return S_OK;
 }
 
-void CMeteorRock::Configure(_float fSpeed, _float fLifeSec, _bool bBreakOnLand)
+void CMeteorRock::Configure(_float fSpeed, _float fLifeSec, _bool bBreakOnLand, _float fHitRadius)
 {
     m_fSpeed = fSpeed;
     m_fLifeTime = fLifeSec;
     m_bBreakOnLand = bBreakOnLand;
+
+    if (fHitRadius > 0.f)
+    {
+        m_fHitRadius = fHitRadius;          // Sweep_Sphere
+            if (m_pHitBox)
+            {
+                CCollider::COLLIDER_DESC desc{};
+                desc.pOwner = this;
+                desc.fRadius = m_fHitRadius;
+                desc.fHeight = m_fHitHeight;
+                desc.vCenter = m_vCenterOffset;
+                desc.vRadians = m_vRadians;
+                m_pHitBox->Reset_Bounding(desc);   
+            }
+    }
 }
 
 void CMeteorRock::On_Activated()
@@ -95,25 +110,16 @@ void CMeteorRock::Update(_float fTimeDelta)
         _float3 vNow{};
         XMStoreFloat3(&vNow, m_pTransformCom->Get_State(STATE::POSITION));
 
-        const _vector vDelta = XMLoadFloat3(&vNow) - XMLoadFloat3(&vPrev);
-        const _float fMoved = XMVectorGetX(XMVector3Length(vDelta));
+        const _vector vStart = XMLoadFloat3(&vPrev);
+        const _vector vTarget = XMLoadFloat3(&m_vTargetPos);
 
-        if (fMoved > 1e-6f)
+        const _float fMoved = XMVectorGetX(XMVector3Length(XMLoadFloat3(&vNow) - vStart));
+        const _float fToTarget = XMVectorGetX(XMVector3Length(vTarget - vStart));
+
+        if (fMoved >= fToTarget)
         {
-            _float3 vDir{};
-            XMStoreFloat3(&vDir, XMVector3Normalize(vDelta));
-
-            _float3 vNormal{};
-            _float fHitDist = 0.f;
-
-            if (m_pGameInstance_Proxy->Sweep_Sphere(vPrev, m_fHitRadius, vDir, fMoved, &vNormal, &fHitDist))
-            {
-                const _float fStop = max(0.f, fHitDist - STUCK_PULLBACK);
-
-                m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vPrev) + XMLoadFloat3(&vDir) * fStop, 1.f));
-
-                Enter_Landed();
-            }
+            m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vTarget, 1.f));
+            Enter_Landed();
         }
     }
     else
@@ -122,6 +128,38 @@ void CMeteorRock::Update(_float fTimeDelta)
         if (m_fLingerTimer <= 0.f)
             Kill();
     }
+}
+
+HRESULT CMeteorRock::Ready_HitBox()
+{
+    CCollider::COLLIDER_DESC desc{};
+    desc.pOwner = this;
+    desc.fHeight = m_fHitHeight;
+    desc.fRadius = m_fHitRadius;
+    desc.vCenter = m_vCenterOffset;
+    desc.vRadians = m_vRadians;
+
+    m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_HitBox"), &desc);
+    if (nullptr == m_pHitBox)
+        return E_FAIL;
+
+    m_pHitBox->Set_OnEnter([this](CCollider* pOther) {
+        if (!m_bAlive) return;
+        if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup()) return;
+        if (auto* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner()))
+        {
+            ATTACK_INFO atk{};
+            atk.fDamage = m_fDamage; atk.fKnockback = m_fKnockback;
+            XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+            atk.pAttacker = this;
+            pVictim->Damaged(atk);
+        }
+        On_Impact();
+        });
+
+    m_pHitBox->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::ENV_PROJECTILE));
+    return S_OK;
 }
 
 void CMeteorRock::Enter_Landed()

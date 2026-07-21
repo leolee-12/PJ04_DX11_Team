@@ -27,13 +27,15 @@ public:
     virtual HRESULT Render() override;
     virtual HRESULT Render_Shadow() override;
 
-    void Configure(_float fSpeed, _float fLifeSec, _bool bBreakOnLand);
-
+    void Configure(_float fSpeed, _float fLifeSec, _bool bBreakOnLand, _float fHitRadius);
+    void Set_TargetPos(const _float3& vTarget) { m_vTargetPos = vTarget; }
 protected:
     virtual HRESULT Ready_Visual() override;
     virtual void On_Activated() override;
     virtual void On_Land();
     virtual const _tchar* Get_ModelProtoTag() = 0;
+
+    virtual HRESULT Ready_HitBox() override;
 
     void Enter_Landed();
     HRESULT Bind_ShaderResources();
@@ -43,6 +45,7 @@ protected:
     METEOR_STATE m_eState = { METEOR_STATE::FALLING };
 
     _float m_fLingerTimer = { 0.f };
+    _float3 m_vTargetPos = {};
     _bool m_bBreakOnLand = { false };
 
     CShader* m_pShaderCom = { nullptr };
