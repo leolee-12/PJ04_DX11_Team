@@ -686,15 +686,90 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
         return (*tLand >= 2.5f) ? BT_STATUS::SUCCESS : BT_STATUS::RUNNING;
         }, [tLand] { *tLand = 0.f; });
 
+    auto descOn = make_shared<bool>(false);
+    auto* pDescendToTrack = CBTAction::Create(
+        [this, descOn](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* tf = m_pOwner->Get_Transform();
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*descOn) { Anim()->Play("FlightWait", true, true, 0.2f, SPD); *descOn = true; }
+
+            _vector p = tf->Get_State(STATE::POSITION);
+            _float  y = XMVectorGetY(p);
+            if (y <= ROCK_TRACK_Y) { *descOn = false; return BT_STATUS::SUCCESS; }
+
+            y = max(y - TRACK_DESCEND_SPEED * dt, ROCK_TRACK_Y);
+            tf->Set_State(STATE::POSITION, XMVectorSetY(p, y));
+            mv->Sync_To_Controller();
+            return BT_STATUS::RUNNING;
+        },
+        [descOn] { *descOn = false; });
+
+    auto trackOn = make_shared<bool>(false);
+    auto* pFlyToKirby = CBTAction::Create(
+        [this, trackOn](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* tf = m_pOwner->Get_Transform();
+            if (!*trackOn) { Anim()->Play("FlightWait", true, true, 0.2f, SPD); *trackOn = true; }
+
+            _vector vSelf = tf->Get_State(STATE::POSITION);
+            _vector vKirby = XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos);
+
+            _vector vDir = XMVectorSetY(vKirby - vSelf, 0.f);
+            if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-4f)
+                RotateYawTo(XMVector3Normalize(vDir), 360.f, dt);
+            _vector vGoal = XMVectorSetY(vKirby, XMVectorGetY(vSelf));
+            FlyNoClip(vGoal, ROCK_TRACK_SPEED, dt, 0.05f);
+
+            _float fHoriz = XMVectorGetX(XMVector3Length(XMVectorSetY(vKirby - vSelf, 0.f)));
+            if (fHoriz <= DIVEBOMB_RANGE) { *trackOn = false; return BT_STATUS::SUCCESS; }
+            return BT_STATUS::RUNNING;
+        },
+        [trackOn] { *trackOn = false; });
+
+    auto fallOn = make_shared<bool>(false);
+    auto* pDiveFall = CBTAction::Create(
+        [this, fallOn](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* tf = m_pOwner->Get_Transform();
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*fallOn) {
+                Anim()->Play("DiveBombFall", false, true, 0.1f, SPD);
+                *fallOn = true;
+                return BT_STATUS::RUNNING;
+            }
+            _vector p = tf->Get_State(STATE::POSITION);
+            _float floorY = m_pOwner->Get_BlackBoard().vTargetPos.y;
+            _float y = XMVectorGetY(p) - DIVEBOMB_FALL_SPEED * dt;
+
+            if (y <= floorY) {
+                tf->Set_State(STATE::POSITION, XMVectorSetY(p, floorY));
+                mv->Sync_To_Controller();
+                *fallOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            tf->Set_State(STATE::POSITION, XMVectorSetY(p, y));
+            mv->Sync_To_Controller();
+            return BT_STATUS::RUNNING;
+        },
+        [fallOn] { *fallOn = false; });
+
+    auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
+        m_pOwner->Get_Movement()->Set_GravityEnabled(true);
+        return BT_STATUS::SUCCESS;
+        });
+
     return CBTSequence::Create({
         Make_RockFly(),
         pStartRise,
         pWaitRise,
-        pAttack,          // BurstTornadoAttack + µ•ƒÆ Ωµ
-        pPreDrop,         // 3√ 
-        pDrop,            // µπ 23∞≥ ºˆ¡˜ ≥´«œ
-        pWaitLanded,      // ¬¯¡ˆ ¥Î±‚ (¡¶¿⁄∏Æ)
-        // ¥Ÿ¿Ω: FlightWait √ﬂ¿˚ -> ¥Ÿ¿Ã∫Íπ„
+        pAttack,
+        pPreDrop,
+        pDrop,
+        pWaitLanded,
+        pDescendToTrack,             
+        pFlyToKirby,                 
+        Clip("DiveBombSomersault", SPD, 0.2f),
+        pDiveFall,
+        Clip("DiveBombEnd", SPD, 0.2f),
+        pEnd,
         });
 }
 

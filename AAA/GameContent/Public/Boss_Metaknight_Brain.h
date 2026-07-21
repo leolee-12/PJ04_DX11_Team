@@ -43,6 +43,12 @@ private:
     static constexpr _float ROCK_RISE_SPEED = 2.5f;
     static constexpr _float ROCK_JUMP_SPEED = 1.f;
 
+    static constexpr _float ROCK_TRACK_SPEED = 6.f;    
+    static constexpr _float DIVEBOMB_RANGE = 4.f;
+    static constexpr _float DIVEBOMB_FALL_SPEED = 10.f;
+    static constexpr _float ROCK_TRACK_Y = 13.f;
+    static constexpr _float TRACK_DESCEND_SPEED = 12.f;
+
 private:
     _int m_iLastCombo = { 0 };
 
