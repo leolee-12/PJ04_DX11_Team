@@ -55,10 +55,6 @@ public:
 	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
 	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
 
-	// DeformDump¿ë ÇÔ¼ö
-	virtual void On_DumpSpitStart(CKirby* pKirby) override {};
-	virtual void On_DumpSpitDeform(CKirby* pKirby) override;
-
 public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }
 

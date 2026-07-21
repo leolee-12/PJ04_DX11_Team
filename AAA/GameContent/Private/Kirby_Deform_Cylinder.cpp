@@ -13,6 +13,8 @@
 
 #include "Deformable.h"
 
+#include "Kirby_DeformDump.h"
+
 CKirby_Deform_Cylinder::CKirby_Deform_Cylinder()
 {
 }
@@ -115,25 +117,25 @@ _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     switch (eCommandType)
     {
         // Dump
-    case KIRBY_COMMAND_TYPE::DUMP:
-    {
-        if (!pCommand->IsPress())
-            return false;
-
-        if(m_eCylinderState == DEFORM_CYLINDER_STATE::CLASHED_WAIT)
+        case KIRBY_COMMAND_TYPE::DUMP:
         {
-            if (pKirby->Can_Dump() == true)
+            if (!pCommand->IsPress())
+                return false;
+
+            if(m_eCylinderState == DEFORM_CYLINDER_STATE::CLASHED_WAIT)
             {
-                Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CYLINDER_STATE_END);
-                pKirby->Reset_DumpCool();
-                return true;
+                if (pKirby->Can_Dump() == true)
+                {
+                    Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::CYLINDER_STATE_END);
+                    pKirby->Reset_DumpCool();
+                    return true;
+                }
+
+                pKirby->Req_AbilityDumpCoolDecrease();
             }
 
-            pKirby->Req_AbilityDumpCoolDecrease();
+            return true;
         }
-
-        return true;
-    }
         // Jump Down
         case KIRBY_COMMAND_TYPE::JUMP:
         {
@@ -151,8 +153,6 @@ _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
 
 void CKirby_Deform_Cylinder::Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext)
 {
-    __super::Enter_DeformState_Deform(pKirby, DeformContext);
-
     CMovement_Child* pMovement = pKirby->Get_Movement();
     _float fMaxHorizontalSpeed = 35.f;
     pMovement->Set_MaxHorizontalSpeed(fMaxHorizontalSpeed);
@@ -163,8 +163,6 @@ void CKirby_Deform_Cylinder::Enter_DeformState_Deform(CKirby* pKirby, const POST
 
 _bool CKirby_Deform_Cylinder::Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta)
 {
-    _bool bParentFinished = __super::Update_DeformState_Deform(pKirby, DeformContext, fTimeDelta);
-
     CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::DEMO);
     _float fRatio = pDeformModel->Get_Animator()->Get_Progress();
 
@@ -186,7 +184,7 @@ _bool CKirby_Deform_Cylinder::Update_DeformState_Deform(CKirby* pKirby, const PO
     {
         pTransform->Set_State(STATE::POSITION, vTargetPos);
         pMovement->Sync_To_Controller();
-        return true && bParentFinished;
+        return true;
     }
 
     vMoveDir = XMVector3Normalize(vMoveDir);
@@ -201,11 +199,6 @@ void CKirby_Deform_Cylinder::Exit_DeformState_Deform(CKirby* pKirby, const POST_
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
-}
-
-void CKirby_Deform_Cylinder::On_DumpSpitDeform(CKirby* pKirby)
-{
-    pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 20.f, 0.f, 0.f));
 }
 
 void CKirby_Deform_Cylinder::Change_DeformCylinderState(CKirby* pKirby, DEFORM_CYLINDER_STATE eNext)
@@ -278,7 +271,7 @@ void CKirby_Deform_Cylinder::Enter_DeformCylinderState(CKirby* pKirby, DEFORM_CY
         case DEFORM_CYLINDER_STATE::CYLINDER_STATE_END:
         {
             m_bReqEndAttackState = true;
-            pKirby->Change_State(KIRBY_STATE_TYPE::DEFORM_DUMP);
+            pKirby->Change_State(KIRBY_STATE_TYPE::DEFORM_DUMP, DEFORM_DUMP_STATE_FLAG::SPIT_DEFORM_JUMP);
             break;
         }
     }
