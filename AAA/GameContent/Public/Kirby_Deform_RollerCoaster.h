@@ -9,8 +9,14 @@ NS_BEGIN(Client)
 
 class CKirby;
 
+class CLevelDesign_Rail;
+class CRailTrack;
+
 class CLIENT_DLL CKirby_Deform_RollerCoaster final : public CKirby_Deform
 {
+private:
+	enum DEFORM_ROLLERCOASTER_STATE { RUNNING, WAIT, ROLLERCOASTER_STATE_END };
+
 private:
 	CKirby_Deform_RollerCoaster();
 	virtual ~CKirby_Deform_RollerCoaster() = default;
@@ -25,7 +31,6 @@ public:
 	virtual void Enter_Deform(CKirby* pKirby) override;
 	virtual void Exit_Deform(CKirby* pKirby) override;
 
-	// Get_Deform 변신 추가 로직
 	virtual void Enter_AttackState(CKirby* pKirby, _int iFlag) override;
 	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
 	virtual void Exit_AttackState(CKirby* pKirby) override;
@@ -34,20 +39,42 @@ public:
 
 	virtual _bool HasDemoModel() { return false; }
 
-	// GetDeform
-	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
-	virtual _bool Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
-	virtual void Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
+	// GetDeform 변신 추가 로직
+	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& tDeformContext) override;
+	virtual _bool Update_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& tDeformContext, _float fTimeDelta) override;
+	virtual void Exit_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& tDeformContext) override;
 
 	// DeformDump용 함수
-	virtual void On_DumpSpitStart(CKirby* pKirby) override {};
+	virtual _bool Has_SpitStartAni() { return false; }
 
 public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }
 
+private:
+	void Change_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eNext);
+	void Enter_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eState);
+	void Update_CoasterState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eState);
+
+private:
+	_bool Update_OnRail(CKirby* pKirby, _float fTimeDelta);
+	_bool Set_OnRail(CKirby* pKirby, _float fRailDist);
+
+private:
+	DEFORM_ROLLERCOASTER_STATE m_eRollerCoasterState{};
+
+private:
+	_uint m_iRailUid{};
+	_uint m_iStartNodeIndex{};
+
+	const CLevelDesign_Rail* m_pRail{};
+	const CRailTrack* m_pRailTrack{};
+
+	_float m_fRailLength{};
+	_float m_fCurRailDist{};
+
 public:
 	static CKirby_Deform_RollerCoaster* Create();
-
 private:
 	virtual void Free() override;
 };

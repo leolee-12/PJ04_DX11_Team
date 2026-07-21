@@ -15,6 +15,9 @@ struct POST_DEFORM_END_CONTEXT
 
     _float3 vStartPos{};
     _float3 vStartLook{};
+
+    _uint iRailUid{};
+    _uint iStartNodeIndex{};
 };
 
 NS_END
