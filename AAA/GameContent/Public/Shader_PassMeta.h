@@ -167,6 +167,7 @@ enum class WORLD_PASS : _int
 	DMN_OPAQUE,
 	UKWN_BLACK_OVERLAY,
 	DCUT_UMN,
+	BLEND_DMN, // 17 - BLEND_HDR에서 렌더링하는 포워드 반투명 패스
 
 	COUNT
 };
@@ -197,11 +198,17 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::DMN_OPAQUE,			"DMN_OPAQUE",			DIFF | MRA | NORM },
 	{ WORLD_PASS::UKWN_BLACK_OVERLAY,	"UKWN_BLACK_OVERLAY",	UKWN },
 	{ WORLD_PASS::DCUT_UMN,				"DCUT_UMN",				DIFF | MRA | NORM | UKWN },
+	{ WORLD_PASS::BLEND_DMN,			"BLEND_DMN",			DIFF | MRA | NORM },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
 {
 	return 0 <= iPass && iPass < ETOI(WORLD_PASS::COUNT);
+}
+
+inline _bool Is_WorldBlendPass(_int iPass)
+{
+	return ETOI(WORLD_PASS::BLEND_DMN) == iPass;
 }
 
 inline const WORLD_SHADER_PASS_META* Find_WorldShaderPassMeta(_int iPass)
@@ -240,6 +247,7 @@ inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
 	case WORLD_PASS::DMN_OPAQUE:
 		return SHADOW_ALPHA_SOURCE::NONE;
 
+	case WORLD_PASS::BLEND_DMN:
 	case WORLD_PASS::DISCARD:
 		return SHADOW_ALPHA_SOURCE::DISCARD_ALL;
 

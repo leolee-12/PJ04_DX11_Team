@@ -179,4 +179,14 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DCUT_UMN();
     }
+    pass BLEND_DMN_Pass // 17
+    {
+        SetRasterizerState(RS_Cull_CW);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BLEND_DMN();
+    }
 }

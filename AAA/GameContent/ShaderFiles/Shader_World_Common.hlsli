@@ -40,6 +40,12 @@ uint g_iShadowAlphaSource = 0u;
 #define SHADOW_ALPHA_DIFFUSE_R 4u
 #define SHADOW_ALPHA_UNKNOWN_R 5u
 
+float4 g_vLightDir = float4(0.f, -1.f, 0.f, 0.f);
+float4 g_vLightDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+float4 g_vCamPosition = float4(0.f, 0.f, 0.f, 1.f);
+float g_fBlendOpacity = 1.f;
+float g_fBlendFresnel = 5.f;
+
 Texture2D g_DepthTexture;
 Texture2D<uint> g_MaterialIDTexture;
 
@@ -486,6 +492,34 @@ PS_OUT PS_DCUT_UMN(PS_IN In)
                   vNormal,
                   float4(vMRA, 1.f),
                   float4(g_vEmissiveColor.rgb * fMask, 1.f));
+}
+
+float4 PS_BLEND_DMN(PS_IN In) : SV_TARGET0
+{
+    Apply_DitherFromPixelInput(In);
+
+    float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
+    float fBaseAlpha = saturate(vDiffuse.a * g_vColor.a * g_fBlendOpacity);
+
+    if (fBaseAlpha < 0.001f)
+        discard;
+
+    float3 vNormal = normalize(Get_ShadingNormal(In, Get_NormalUV(In)));
+    float2 vScreenUV = Get_ScreenUV(In.vProjPos);
+    float3 vWorldPos = RecoverWorldPos(vScreenUV, In.vProjPos.z / In.vProjPos.w,
+        g_ProjMatrixInverse, g_ViewMatrixInverse);
+    float3 vViewDir = normalize(g_vCamPosition.xyz - vWorldPos);
+
+    float fNdotL = saturate(dot(vNormal, -normalize(g_vLightDir.xyz)));
+    float3 vLit = vDiffuse.rgb * g_vColor.rgb * (g_vLightDiffuse.rgb * fNdotL + 0.25f);
+
+    float fFresnel = 0.f;
+    [branch]
+    if (g_fBlendFresnel > 0.f)
+        fFresnel = pow(1.f - saturate(dot(vNormal, vViewDir)), g_fBlendFresnel);
+
+    float fAlpha = saturate(fBaseAlpha + fFresnel * (1.f - fBaseAlpha));
+    return float4(vLit + g_vEmissiveColor.rgb, fAlpha);
 }
 
 
