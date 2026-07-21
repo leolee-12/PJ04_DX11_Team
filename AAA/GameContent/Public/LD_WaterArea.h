@@ -35,6 +35,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+	virtual json Serialize() const override;
+	virtual void Deserialize_Internal(const json& j) override;
 
 #pragma region Editable
 public:
@@ -43,6 +45,7 @@ public:
 #pragma endregion
 
 	static void Register_LevelDesignSpecs();
+	static _bool Make_DefaultDesc(const LD_OBJECT_DESC& CommonDesc, _uint iModelProtoLevel, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 

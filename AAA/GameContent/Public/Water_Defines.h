@@ -14,6 +14,7 @@ struct WATER_RENDER_DESC
 	// Color / Depth
 	_float4 vShallowColor = { 0.15f, 0.55f, 0.72f, 1.f };
 	_float4 vDeepColor = { 0.02f, 0.16f, 0.30f, 1.f };
+	_float  fShallowColorStrength = { 0.45f };
 	_float  fOpacity = { 0.65f };
 	_float  fDepthFadeDistance = { 5.f };
 
@@ -31,7 +32,8 @@ struct WATER_RENDER_DESC
 	_float  fReflectionStrength = { 0.8f };
 	_float  fRefractionStrength = { 0.015f };
 
-	// Specular / HDR
+	// Lighting / Specular / HDR
+	_float  fLightReceiveStrength = { 1.f };
 	_float  fSpecularPower = { 64.f };
 	_float  fSpecularStrength = { 1.f };
 
@@ -41,11 +43,14 @@ struct WATER_RENDER_DESC
 	_float2 vFoamNoiseTiling = { 0.35f, 0.35f };
 	_float2 vFoamNoiseSpeed = { 0.03f, -0.02f };
 	_float  fFoamNoiseStrength = { 0.6f };
+	_float  fFoamBlur = { 0.f };
 
 	// Caustic
 	_float2 vCausticTiling = { 0.05f, 0.05f };
 	_float2 vCausticSpeed = { 0.015f, 0.012f };
 	_float  fCausticStrength = { 0.5f };
+	_float  fCausticNoiseStrength = { 0.6f };
+	_float  fCausticBlur = { 0.f };
 
 	// Runtime only; do not serialize.
 	_float  fVisibility = { 1.f };

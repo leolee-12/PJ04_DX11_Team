@@ -162,6 +162,10 @@ namespace
 			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 
+		const _uint iHasNormalTexture = (Ctx.pModel->Get_MeshTextureCount(Ctx.iMesh, MTEX_TYPE::NORMALS) > 0u) ? 1u : 0u;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_iHasNormalTexture", &iHasNormalTexture, sizeof(_uint))))
+			return E_FAIL;
+
 		return S_OK;
 	}
 

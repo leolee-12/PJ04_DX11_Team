@@ -89,7 +89,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_TREESHADOW();
     }
-    pass GRASS_FUR_Pass // 8
+    pass DCUT_COLOR_Pass // 8
     {
         SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Default, 0);
@@ -97,7 +97,7 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_GRASS_FUR();
+        PixelShader = compile ps_5_0 PS_DCUT_COLOR();
     }
     pass COLOR_Pass // 9
     {
@@ -168,5 +168,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_UKWN_BLACK_OVERLAY();
+    }
+    pass DCUT_UMN_Pass // 16
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DCUT_UMN();
     }
 }

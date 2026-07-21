@@ -3,7 +3,7 @@
 #include "EditInstance.h"
 #include "Level_Edit.h"
 #include "GameObject_Factory.h"
-#include "LD_AudioArea.h"
+#include "LevelDesign_Registry.h"
 #include "LD_DeformObject.h"
 
 #include "GameInstance.h"
@@ -41,8 +41,14 @@ void CPanel_Palette::Render()
 		{
 			for (auto& strTag : tags)
 			{
-				if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_DeformObject::PROTOTYPE_TAG)
-					continue;
+				const LD_SPAWN_SPEC* pPlacementSpec = nullptr;
+
+				if (category == L"LEVELDESIGN_OBJECT")
+				{
+					pPlacementSpec = CLevelDesign_Registry::Find_PlacementSpec(strTag);
+					if (nullptr == pPlacementSpec)
+						continue;
+				}
 
 				string strLabel = WstrToStr(strTag);
 				if (ImGui::Button(strLabel.c_str()))
@@ -57,13 +63,9 @@ void CPanel_Palette::Render()
 					{
 						pLevel->Begin_PlaceMode(strTag, L"Layer_EnvEffect");
 					}
-					else if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_AudioArea::PROTOTYPE_TAG)
+					else if (nullptr != pPlacementSpec)
 					{
-						pLevel->Begin_PlaceMode(strTag, CLD_AudioArea::LAYER_TAG);
-					}
-					else if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_AudioArea::PROTOTYPE_TAG)
-					{
-						pLevel->Begin_PlaceMode(strTag, CLD_AudioArea::LAYER_TAG);
+						pLevel->Begin_PlaceMode(strTag, pPlacementSpec->strLayerTag);
 					}
 					else if (category == L"DEFORM_OBJECT")
 					{

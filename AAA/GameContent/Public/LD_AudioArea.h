@@ -7,6 +7,7 @@ class CCollider;
 NS_END
 
 NS_BEGIN(Client)
+struct LD_SPAWN_SPEC;
 
 class CLD_AudioArea final : public CLevelDesignObject
 {
@@ -72,6 +73,7 @@ private:
 
 public:
 	static void Register_LevelDesignSpecs();
+	static _bool Make_DefaultDesc(const LD_OBJECT_DESC& CommonDesc, _uint iModelProtoLevel, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	static CLD_AudioArea* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
