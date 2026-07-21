@@ -11,6 +11,8 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
+enum DEFORM_DUMP_STATE_FLAG : _int { DEFAULT = -1, SPIT_START_JUMP, SPIT_DEFORM_JUMP };
+
 class CLIENT_DLL CKirby_DeformDump final : public CKirby_State
 {
 private:
@@ -44,6 +46,7 @@ private:
 
 private:
 	DEFORM_DUMP_STATE m_eDeformDumpState{};
+	_int m_iDeformDumpFlag{};
 
 public:
 	static CKirby_DeformDump* Create();

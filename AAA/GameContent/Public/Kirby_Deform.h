@@ -23,12 +23,6 @@ enum class DEFORM_ANI
 
 class CLIENT_DLL CKirby_Deform abstract : public CKirby_AttackMode
 {
-public:
-	struct POST_DEFORM_END_INFO
-	{
-		
-	};
-
 protected:
 	CKirby_Deform();
 	virtual ~CKirby_Deform() = default;
@@ -43,9 +37,9 @@ public:
 	virtual void Enter_Deform(CKirby* pKirby) = 0;
 	virtual void Exit_Deform(CKirby* pKirby) = 0;
 
-	// GetDeform
-	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
-	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta);
+	// GetDeform 변신 추가 로직
+	virtual void Enter_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {};
+	virtual _bool Update_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) { return true; }
 	virtual void Exit_DeformState_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) {}
 
 	virtual void Enter_DeformState_Deform_End(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext);
@@ -55,9 +49,9 @@ public:
 	virtual _bool HasDemoModel() { return true; }
 
 	// DeformDump용 함수
-	virtual void On_DumpSpitStart(CKirby* pKirby);
-	virtual void On_DumpSpitDeform(CKirby* pKirby) {}
+	virtual _bool Has_SpitStartAni() { return true; }
 
+public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override {};
 
 	void Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni);
