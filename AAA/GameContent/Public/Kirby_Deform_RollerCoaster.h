@@ -60,10 +60,11 @@ private:
 	_bool Update_OnRail(CKirby* pKirby, _float fTimeDelta);
 	_bool Set_OnRail(CKirby* pKirby, _float fRailDist);
 
+	void Set_RotLeftRight(_float fTimeDelta);
+
 private:
 	DEFORM_ROLLERCOASTER_STATE m_eRollerCoasterState{};
 
-private:
 	_uint m_iRailUid{};
 	_uint m_iStartNodeIndex{};
 
@@ -72,6 +73,16 @@ private:
 
 	_float m_fRailLength{};
 	_float m_fCurRailDist{};
+	_float m_fCurFrameMoveDist{};
+	_float m_fSlopeRatio{};
+
+	_float m_fAccRailSpeed{};
+
+	CSound_Handle m_RunningSound{};
+
+private:
+	_float m_fLeftRightDegree{};
+	_int m_iLeftRight{};
 
 public:
 	static CKirby_Deform_RollerCoaster* Create();
