@@ -2,8 +2,10 @@
 #include "Bounding_AABB.h"
 #include "Bounding_OBB.h"
 #include "Bounding_Sphere.h"
+#include "Bounding_Torus.h"
 #include "DebugDraw.h"
 #include "DebugCapsule.h"
+
 
 // ---- ¼öÇÐ ÇïÆÛ ----
 static _float Clamp01(_float t) { return t < 0.f ? 0.f : (t > 1.f ? 1.f : t); }
@@ -168,6 +170,8 @@ _bool CBounding_Capsule::Intersect(COLLIDER eTargetType, CBounding* pBounding)
             m_isColl = Intersects_Sphere(dynamic_cast<CBounding_Sphere*>(pBounding)->Get_Desc()); break;
         case COLLIDER::CAPSULE:
             m_isColl = Intersects_Capsule(dynamic_cast<CBounding_Capsule*>(pBounding)); break;
+        case COLLIDER::TORUS:
+            m_isColl = dynamic_cast<CBounding_Torus*>(pBounding)->Intersects_Capsule(this); break;
     }
     return m_isColl;
 }

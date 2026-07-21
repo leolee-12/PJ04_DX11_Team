@@ -53,9 +53,6 @@ public:
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
-public:
-	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
-
 private:
 	_float m_fMaxBoostTime{};
 	_float m_fAccBoostTime{};

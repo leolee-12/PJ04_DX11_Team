@@ -49,9 +49,6 @@ protected:
 
 	_float                      m_fLifeTime = { 0.f };
 
-	_float					    s_fSpatDamage = { 50.f };
-	_float					    s_fSpatKnockback = { 10.f };
-
 	static constexpr _float		s_fPullInitSpeed = 0.f;
 	static constexpr _float		s_fPullAccel = 40.f;
 	static constexpr _float		s_fMinScaleRatio = 0.15f;

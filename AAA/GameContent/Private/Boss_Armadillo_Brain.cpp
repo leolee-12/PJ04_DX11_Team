@@ -6,6 +6,7 @@
 #include "MultiHitBoxPart.h"
 #include "Boss_Armadillo.h"
 #include "Boss_Armadillo_Body.h"
+#include "Boss_Metaknight_Brain.h"
 
 CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int)
 {

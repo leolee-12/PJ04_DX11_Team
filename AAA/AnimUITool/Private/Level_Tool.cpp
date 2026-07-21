@@ -7,8 +7,7 @@
 #include "Model.h"
 #include "Preview_Actor.h"
 #include "Preview_Kirby.h"
-#include "Preview_DeformCylinder_Main.h"
-#include "Preview_DeformCylinder_Demo.h"
+#include "Preview_RollerCoaster.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
@@ -1424,7 +1423,7 @@ CGameObject* CLevel_Tool::Load_Kirby()
     return pObj;
 }
 
-CGameObject* CLevel_Tool::Load_DeformCylinder()
+CGameObject* CLevel_Tool::Load_RollerCoaster()
 {
     const _uint iLevel = ETOUI(TOOL_LEVEL::STATIC);
 
@@ -1444,106 +1443,43 @@ CGameObject* CLevel_Tool::Load_DeformCylinder()
             return nullptr;
     }
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCylinder"))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_RollerCoaster"))
     {
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
             iLevel,
-            L"Proto_Model_DeformCylinder",
+            L"Proto_Model_RollerCoaster",
             CModel::Create(
                 m_pDevice,
                 m_pContext,
                 MODEL::ANIM,
-                "../../Resources/YSE/DeformCylinder/Model/Main.ysh",
+                "../../Resources/YSE/RollerCoaster/RollerCoaster.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))))))
             return nullptr;
     }
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCylinder_Main::PROTOTYPE_TAG))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_RollerCoaster::PROTOTYPE_TAG))
     {
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
             iLevel,
-            CPreview_DeformCylinder_Main::PROTOTYPE_TAG,
-            CPreview_DeformCylinder_Main::Create(m_pDevice, m_pContext))))
+            CPreview_RollerCoaster::PROTOTYPE_TAG,
+            CPreview_RollerCoaster::Create(m_pDevice, m_pContext))))
             return nullptr;
     }
 
-    CPreview_DeformCylinder_Main::PREVIEW_DEFORMCYLINDER_DESC Desc{};
+    CPreview_RollerCoaster::PREVIEW_ROLLERCOASTER_DESC Desc{};
     Desc.iProtoLevel = iLevel;
     Desc.szKirbyShaderTag = L"Proto_Shader_Kirby";
     Desc.szPBRShaderTag = L"Proto_Shader_AnimMesh";
-    Desc.szModelTag = L"Proto_Model_DeformCylinder";
+    Desc.szModelTag = L"Proto_Model_RollerCoaster";
 
     CGameObject* pObject = nullptr;
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
         &pObject,
         iLevel,
-        CPreview_DeformCylinder_Main::PROTOTYPE_TAG,
+        CPreview_RollerCoaster::PROTOTYPE_TAG,
         ETOUI(TOOL_LEVEL::EDIT),
         L"Layer_Preview",
-        L"Preview_DeformCylinder",
-        &Desc)))
-        return nullptr;
-
-    m_pPreview = pObject;
-    return pObject;
-}
-
-CGameObject* CLevel_Tool::Load_DeformCylinder_Demo()
-{
-    const _uint iLevel = ETOUI(TOOL_LEVEL::STATIC);
-
-    Clear_Preview();
-
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Shader_Kirby"))
-    {
-        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
-            iLevel,
-            L"Proto_Shader_Kirby",
-            CShader::Create(
-                m_pDevice,
-                m_pContext,
-                Shader_Kirby.szFileTag,
-                VTXANIMMESH::Elements,
-                VTXANIMMESH::iNumElements))))
-            return nullptr;
-    }
-
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCylinder_Demo"))
-    {
-        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
-            iLevel,
-            L"Proto_Model_DeformCylinder_Demo",
-            CModel::Create(
-                m_pDevice,
-                m_pContext,
-                MODEL::ANIM,
-                "../../Resources/YSE/DeformCylinder/Demo/Demo.ysh",
-                XMMatrixRotationY(XMConvertToRadians(180.f))))))
-            return nullptr;
-    }
-
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCylinder_Demo::PROTOTYPE_TAG))
-    {
-        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
-            iLevel,
-            CPreview_DeformCylinder_Demo::PROTOTYPE_TAG,
-            CPreview_DeformCylinder_Demo::Create(m_pDevice, m_pContext))))
-            return nullptr;
-    }
-
-    CPreview_DeformCylinder_Demo::PREVIEW_DEFORMCYLINDER_DEMO_DESC Desc{};
-    Desc.iProtoLevel = iLevel;
-    Desc.szKirbyShaderTag = L"Proto_Shader_Kirby";
-    Desc.szModelTag = L"Proto_Model_DeformCylinder_Demo";
-
-    CGameObject* pObject = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-        &pObject,
-        iLevel,
-        CPreview_DeformCylinder_Demo::PROTOTYPE_TAG,
-        ETOUI(TOOL_LEVEL::EDIT),
-        L"Layer_Preview",
-        L"Preview_DeformCylinder_Demo",
+        L"Preview_RollerCoaster",
         &Desc)))
         return nullptr;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "GameContent_Defines.h"
-
+#include "Water_Defines.h"
 #include <variant>
 
 NS_BEGIN(Engine)
@@ -34,6 +34,7 @@ enum EDITABLE_CAPABILITY : _uint
 	EDIT_CAP_MESH_LAYER			= 1u << 5,
 	EDIT_CAP_DECAL				= 1u << 6,
 	EDIT_CAP_ANIMATION			= 1u << 7,
+	EDIT_CAP_WATER_MATERIAL		= 1u << 8,
 };
 
 struct EDITABLE_MODEL_SLOT
@@ -85,10 +86,9 @@ struct EDIT_LEVELDESIGN_OVERRIDE
 {
 };
 
-struct EDIT_LD_BUSH_OVERRIDE
+struct EDIT_LD_WATER_OVERRIDE
 {
-	_bool bHasGenerateItem = { false };
-	_bool bGenerateItem = { false };
+	WATER_RENDER_DESC RenderDesc = {};
 };
 
 using EDIT_CLASS_OVERRIDE = variant<
@@ -96,7 +96,7 @@ using EDIT_CLASS_OVERRIDE = variant<
 	EDIT_MAPSECTION_OVERRIDE,
 	EDIT_ENVOBJECT_OVERRIDE,
 	EDIT_LEVELDESIGN_OVERRIDE,
-	EDIT_LD_BUSH_OVERRIDE>;
+	EDIT_LD_WATER_OVERRIDE>;
 
 struct EDIT_OBJECT_OVERRIDE_DESC
 {
@@ -107,6 +107,15 @@ struct EDIT_OBJECT_OVERRIDE_DESC
 	EDIT_CLASS_OVERRIDE ClassOverride = monostate{};
 };
 
+struct EDIT_WATER_MATERIAL
+{
+	WATER_RENDER_DESC RenderDesc = {};
+};
+
+using EDIT_CUSTOM_DESC = variant<
+	monostate,
+	EDIT_WATER_MATERIAL>;
+
 struct EDITABLE_DESC
 {
 	EDITABLE_OBJECT_KIND eKind = { EDITABLE_OBJECT_KIND::MAP_SECTION };
@@ -114,6 +123,7 @@ struct EDITABLE_DESC
 	_uint iCapabilities = { 0u };
 	EDIT_OBJECT_POLICY Policy = {};
 	vector<EDITABLE_MODEL_SLOT> ModelSlots;
+	EDIT_CUSTOM_DESC CustomDesc = monostate{};
 };
 
 class CLIENT_DLL IEditable
@@ -124,6 +134,7 @@ public:
 	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const = 0;
 	virtual HRESULT Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy) = 0;
 	virtual HRESULT On_EditTransformChanged() = 0;
+	virtual HRESULT Apply_EditCustomDesc(const EDIT_CUSTOM_DESC& Desc) = 0;
 
 	virtual const MESH_LAYER_IDX* Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const = 0;
 	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) = 0;

@@ -28,7 +28,7 @@ namespace
 		MODEL			eCutModelType;
 	};
 
-	static const LD_BUSH_CATALOG g_EventObjectCatalog[] =
+	static const LD_BUSH_CATALOG g_BushCatalog[] =
 	{
 		{ L"Bush2BasicS", CLevelDesign_Bush::BUSH_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushS.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutS.ysh", MODEL::NONANIM },
 		{ L"Bush2BasicM", CLevelDesign_Bush::BUSH_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushM.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutM.ysh", MODEL::NONANIM },
@@ -37,7 +37,7 @@ namespace
 
 	static const LD_BUSH_CATALOG* Find_BushCatalog(const _wstring& wstrObjName)
 	{
-		for (const LD_BUSH_CATALOG& Entry : g_EventObjectCatalog)
+		for (const LD_BUSH_CATALOG& Entry : g_BushCatalog)
 		{
 			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
 				return &Entry;
@@ -263,11 +263,9 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 
 	CEffect_Loader::GetInstance()->Spawn(L"Split_Bush", Get_LevelIndex(), vPos);
 
-	_int			iIdx = m_pGameInstance_Proxy->RandomInt(1, 4);
-	_tchar			szSoundKey[MAX_PATH] = {};
+	_int	iIdx = m_pGameInstance_Proxy->RandomInt(1, 4);
+	_tchar	szSoundKey[MAX_PATH] = {};
 
-	// RandomInt 0 Clamp
-	iIdx =	min(iIdx, 1);
 	swprintf_s(szSoundKey, L"GimmickBush_Cut%d.wav", iIdx);
 	m_pGameInstance_Proxy->Play_SFX(szSoundKey, 0.3f);
 
@@ -278,7 +276,7 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 
 void CLevelDesign_Bush::Register_LevelDesignSpecs()
 {
-	for (const LD_BUSH_CATALOG& Entry : g_EventObjectCatalog)
+	for (const LD_BUSH_CATALOG& Entry : g_BushCatalog)
 	{
 		LD_SPAWN_SPEC Spec{};
 		Spec.strObjectName = Entry.pObjectName;
@@ -299,6 +297,8 @@ void CLevelDesign_Bush::Register_LevelDesignSpecs()
 
 _bool CLevelDesign_Bush::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
 {
+	UNREFERENCED_PARAMETER(jEntry);
+
 	if (nullptr == pOutEntry)
 		return false;
 
@@ -313,7 +313,6 @@ _bool CLevelDesign_Bush::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json
 	Desc.wstrCutProtoTag = pCatalog->pCutModelProtoTag;
 	Desc.eBasicType = pCatalog->eBasicModelType;
 	Desc.eCutType = pCatalog->eCutModelType;
-	JsonUtils::Try_ReadBoolFromNumeric(jEntry, "Gimmick.Bush2.MainComponent.IsGenerateItem", &Desc.bGenerateItem);
 
 	*pOutEntry = Desc;
 	return true;

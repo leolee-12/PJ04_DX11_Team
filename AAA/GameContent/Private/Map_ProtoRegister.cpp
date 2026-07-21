@@ -2,6 +2,7 @@
 #include "GameContent_Log.h"
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
+#include "EnvInteract_KickProp.h"
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
@@ -228,6 +229,12 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 
 	if (FAILED(EnsurePrototype(CEnvObject_Interact::PROTOTYPE_TAG,
 		[&]() -> CGameObject* { return CEnvObject_Interact::Create(m_pDevice, m_pContext); })))
+	{
+		return E_FAIL;
+	}
+
+	if (FAILED(EnsurePrototype(CEnvInteract_KickProp::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CEnvInteract_KickProp::Create(m_pDevice, m_pContext); })))
 	{
 		return E_FAIL;
 	}

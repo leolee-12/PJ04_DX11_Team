@@ -258,7 +258,6 @@ void CLD_AudioArea::SetUp_Collider_Callback()
 		return;
 
 	m_pTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_TriggerEnter(pOther); });
-	m_pTrigger->Set_OnStay([this](CCollider* pOther) { Handle_TriggerStay(pOther); });
 	m_pTrigger->Set_OnExit([this](CCollider* pOther) { Handle_TriggerExit(pOther); });
 }
 
@@ -274,12 +273,6 @@ void CLD_AudioArea::Handle_TriggerEnter(CCollider* pOther)
 	const _wstring strMessage =	L"[CLD_AudioArea] Enter: " + Make_LevelDesignObjectKey() + L"\n";
 	OutputDebugStringW(strMessage.c_str());
 #endif
-}
-
-void CLD_AudioArea::Handle_TriggerStay(CCollider* pOther)
-{
-	if (!Is_TriggerActivator(pOther))
-		return;
 }
 
 void CLD_AudioArea::Handle_TriggerExit(CCollider* pOther)
@@ -468,6 +461,7 @@ CLD_AudioArea::MODE CLD_AudioArea::Resolve_Mode() const
 		case AUDIO_AREA_PLAY_TYPE::BGM_FADE:
 			return MODE::BGM_REQUEST;
 		case AUDIO_AREA_PLAY_TYPE::SFX_LOOP:
+		case AUDIO_AREA_PLAY_TYPE::AMBIENT:
 			return MODE::AMBIENT_LOOP;
 		default:
 			break;

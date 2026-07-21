@@ -23,6 +23,7 @@
 #include "Kirby_DeformCar_Main.h"
 #include "Kirby_DeformCylinder_Demo.h"
 #include "Kirby_DeformCylinder_Main.h"
+#include "Kirby_DeformRollerCoaster_Main.h"
 
 #include "Kirby_InputManager.h"
 #include "Kirby_Controller.h"
@@ -39,6 +40,7 @@
 // Deform
 #include "Kirby_Deform_Car.h"
 #include "Kirby_Deform_Cylinder.h"
+#include "Kirby_Deform_RollerCoaster.h"
 
 // Ladder
 #include "LevelDesign_Ladder.h"
@@ -298,6 +300,11 @@ CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY
                 return Find_DeformModel(CKirby_DeformCylinder_Main::Kirby_PartTag);
             }
             break;
+
+        case DEFORM_TYPE::COASTER:
+            if (eDeformModelType == KIRBY_DEFORM_MODEL_TYPE::MAIN)
+                return Find_DeformModel(CKirby_DeformRollerCoaster_Main::Kirby_PartTag);
+            break;
     }
 
     return nullptr;
@@ -537,6 +544,8 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::LD_ITEM));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::EXCALIBUR));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_INTERACT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_PROJECTILE));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
@@ -617,6 +626,15 @@ HRESULT CKirby::Ready_PartObjects()
         CKirby_DeformCylinder_Main::Kirby_PartTag, &DeformCylinder_Main_Desc)))
         return E_FAIL;
 
+    // DeformRollerCoaster_Main
+    CKirby_DeformRollerCoaster_Main::KIRBY_DEFORMROLLERCOASTER_MAIN_DESC DeformRollerCoaster_Main_Desc{};
+    DeformRollerCoaster_Main_Desc.pParentMatrix = &m_RenderWorldMatrix;
+    DeformRollerCoaster_Main_Desc.pHitFlashIntensity = Get_HitFlashPtr();
+    DeformRollerCoaster_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformRollerCoaster_Main::PROTOTYPE_TAG,
+        CKirby_DeformRollerCoaster_Main::Kirby_PartTag, &DeformRollerCoaster_Main_Desc)))
+        return E_FAIL;
 
     // Sword
     CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
@@ -727,8 +745,9 @@ HRESULT CKirby::Ready_Deform()
             return S_OK;
         };
 
-    if (FAILED(Register_Deform(DEFORM_TYPE::CAR, CKirby_Deform_Car::Create())))             return E_FAIL;
-    if (FAILED(Register_Deform(DEFORM_TYPE::CYLINDER, CKirby_Deform_Cylinder::Create())))   return E_FAIL;
+    if (FAILED(Register_Deform(DEFORM_TYPE::CAR, CKirby_Deform_Car::Create())))                         return E_FAIL;
+    if (FAILED(Register_Deform(DEFORM_TYPE::CYLINDER, CKirby_Deform_Cylinder::Create())))               return E_FAIL;
+    if (FAILED(Register_Deform(DEFORM_TYPE::COASTER, CKirby_Deform_RollerCoaster::Create())))           return E_FAIL;
 
     return S_OK;
 }
@@ -879,6 +898,9 @@ HRESULT CKirby::Ready_AnimEvents()
     if (FAILED(Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::MAIN)->Ready_AnimEvents(this)))
         return E_FAIL;
 
+    if (FAILED(Get_DeformPart_Model(DEFORM_TYPE::COASTER, KIRBY_DEFORM_MODEL_TYPE::MAIN)->Ready_AnimEvents(this)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -924,6 +946,14 @@ HRESULT CKirby::SetUp_Collider_Callback()
             else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA))
             {
                 Set_DeformEndTrigger(true);
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::EXCALIBUR))
+            {
+                IInhalable* pExcalibur = dynamic_cast<IInhalable*>(pGameObject);
+                if (pExcalibur == nullptr)
+                    return;
+
+                m_pKirby_StateMachine->Get_EssenceBubble(pExcalibur->Get_CopyAbility());
             }
         }
     );

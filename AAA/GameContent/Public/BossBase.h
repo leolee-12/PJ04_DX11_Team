@@ -37,6 +37,7 @@ protected:
     // ø¨√‚ »≈
     virtual void   Play_Intro() = 0;
     virtual _bool  Is_Intro_Finished() const = 0;
+    virtual void   On_Intro_End() {}
     virtual void   Play_Death() = 0;
     virtual void   Play_DeathLoop() {}
     virtual _bool  Is_Death_Finished() const = 0;

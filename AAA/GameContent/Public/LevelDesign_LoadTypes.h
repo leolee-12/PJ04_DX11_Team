@@ -1,5 +1,6 @@
 #pragma once
 #include "LevelDesign_Defines.h"
+#include "Water_Defines.h"
 
 #include "GameObject.h"
 
@@ -147,7 +148,6 @@ struct LD_BUSH_DESC : public LD_OBJECT_DESC
 	_wstring wstrCutProtoTag;
 	MODEL eBasicType = { MODEL::ANIM };
 	MODEL eCutType = { MODEL::NONANIM };
-	_bool bGenerateItem = { false };
 };
 #pragma endregion
 
@@ -168,9 +168,10 @@ struct LD_AUDIO_AREA_DESC
 #pragma region SurfaceArea
 struct LD_SURFACE_AREA_DESC : public LD_OBJECT_DESC
 {
-	_uint           iModelProtoLevel = {};
-	MODEL           eModelType = MODEL::NONANIM;
-	_wstring        wstrModelProtoTag;
+	_uint				iModelProtoLevel = {};
+	MODEL				eModelType = MODEL::NONANIM;
+	_wstring			wstrModelProtoTag;
+	WATER_RENDER_DESC	tWaterRenderDesc = {};
 };
 #pragma endregion
 

@@ -358,6 +358,7 @@ _bool CEnvObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 	pOutDesc->Policy.bUseCollMesh = m_tDesc.tCollision.bHasCollMesh && m_bUseCollMesh;
 	pOutDesc->Policy.bUseShadow = m_tDesc.tRender.bHasShadow && m_bCastShadow;
 	pOutDesc->ModelSlots.clear();
+	pOutDesc->CustomDesc = monostate{};
 
 	if (nullptr != m_pModelCom)
 	{

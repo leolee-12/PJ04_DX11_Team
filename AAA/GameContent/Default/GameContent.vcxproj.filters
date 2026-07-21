@@ -49,6 +49,9 @@
     <Filter Include="00. GameObject\02. EnvObject\Instance">
       <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\Interact">
+      <UniqueIdentifier>{5fc8b917-0701-419f-8990-fff829de29f0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\02. EnvObject\SpotLight">
       <UniqueIdentifier>{e2a9ab56-0259-439a-9340-671198eb11ea}</UniqueIdentifier>
     </Filter>
@@ -436,7 +439,10 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab">
       <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter">
+      <UniqueIdentifier>{33020856-964e-4101-8c62-ae1ac0a1eb1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\QTE">
       <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock">
@@ -490,6 +496,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\01. Deform_Cylinder">
       <UniqueIdentifier>{d7c7228e-2d75-4e9c-8e42-b4fd9a76a101}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\02. Deform_RollerCoaster">
+      <UniqueIdentifier>{889a7c35-46f3-49b8-b6dc-41648bea021d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts">
       <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
     </Filter>
@@ -510,6 +519,9 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\03. DeformCylinder_Main">
       <UniqueIdentifier>{ee54d883-8d4f-4a92-9b53-3c45a377fe02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\04. DeformRollerCoaster_Main">
+      <UniqueIdentifier>{016e2a1b-7c2c-4585-b57e-cdb01d394ada}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts">
       <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
@@ -982,9 +994,6 @@
     <Filter Include="00. GameObject\07. Boss\Boss\GorillaRush\Brain">
       <UniqueIdentifier>{796d5a2f-5b3d-4591-9fbc-3f40e5a1fe5d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\GorillaRush\Part">
-      <UniqueIdentifier>{fc7a7cdb-d3e7-4154-a5a7-88ce5f8ffd21}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard">
       <UniqueIdentifier>{746fae67-6a99-4b4e-bef8-b91f1b3b2cd5}</UniqueIdentifier>
     </Filter>
@@ -1054,6 +1063,45 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Spot">
       <UniqueIdentifier>{5b5a61aa-7a1c-4825-b04a-0f34417aca22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight">
+      <UniqueIdentifier>{d512be1a-ab54-4143-8de1-61129c4437e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Brain">
+      <UniqueIdentifier>{97870331-6bd9-4123-bc30-69a39f54fa88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Excalibur">
+      <UniqueIdentifier>{b67a9060-0fc8-470b-a905-12bee6759a64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part">
+      <UniqueIdentifier>{e396bec5-8446-453a-9ca8-2d91585c8a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\Body">
+      <UniqueIdentifier>{6ab0bd5d-1b3d-4d92-b3aa-3bcc0f372b07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\GetIt">
+      <UniqueIdentifier>{f7042761-4753-4dc0-abd9-f175731354d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part">
+      <UniqueIdentifier>{2fc9d6b6-bb9a-4b3e-a015-0ccf6886121e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Body">
+      <UniqueIdentifier>{54e1e543-6811-480e-a352-c6dde5d95142}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant">
+      <UniqueIdentifier>{8889da8d-8df3-4363-a83d-d90d79299ddf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\NamePlate">
+      <UniqueIdentifier>{0897852f-355c-48a5-ab53-ba14325ed1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword">
+      <UniqueIdentifier>{cc608e8c-af5c-4970-b6ba-68aa9a8e8fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword">
+      <UniqueIdentifier>{20c04250-f71a-4340-862a-327e21b6b2d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Projectile">
+      <UniqueIdentifier>{3ad7e84a-9b3b-4a0a-946a-8876933bb653}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
     </Filter>
@@ -1071,6 +1119,9 @@
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossNamePlate\Gorilla">
       <UniqueIdentifier>{4640c1d8-ee75-4758-a51f-cd0fd9fb282d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossNamePlate\MetaKnight">
+      <UniqueIdentifier>{798c026e-5966-4cbc-a415-8acb101f9e17}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\MiniBoss">
       <UniqueIdentifier>{fcb754da-89ef-4c38-87c3-bb9cc19f1998}</UniqueIdentifier>
@@ -1608,6 +1659,24 @@
     <ClInclude Include="..\public\Boss_Leopard_Brain.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Brain</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Body.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Brain.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Mant.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Metaknight_Sword.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\BossBase.h">
       <Filter>00. GameObject\07. Boss</Filter>
     </ClInclude>
@@ -1830,6 +1899,12 @@
     <ClInclude Include="..\Public\Env_SpotLight.h">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EnvInteract_KickProp.h">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvInteract_PresetCatalog.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\EnvObject.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
@@ -1837,7 +1912,7 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Interact.h">
-      <Filter>00. GameObject\02. EnvObject</Filter>
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Static.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
@@ -1871,6 +1946,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\EssenceCrown.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\18. EssenceCrown</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Excalibur.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Excalibur_Body.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Excalibur_GetIt.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\GetIt</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FlowerPetals.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
@@ -2052,6 +2136,9 @@
     <ClInclude Include="..\Public\Kirby_Deform_Model.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Deform_RollerCoaster.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\02. Deform_RollerCoaster</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClInclude>
@@ -2072,6 +2159,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformRollerCoaster_Main.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\04. DeformRollerCoaster_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Dialogue.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue</Filter>
@@ -2106,11 +2196,14 @@
     <ClInclude Include="..\Public\Kirby_Ladder.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_OnOffPart.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\QTE</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Run.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
@@ -2376,6 +2469,9 @@
     <ClInclude Include="..\Public\MeshParticleCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MetaknightNamePlate.h">
+      <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\MeteorRock.h">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
     </ClInclude>
@@ -2567,6 +2663,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Manager.h">
       <Filter>01. Projectile\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Projectile_MoonShot.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Movement.h">
       <Filter>01. Projectile\Movement</Filter>
@@ -2886,6 +2985,12 @@
     <ClInclude Include="..\Public\WarpOutEffect.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Water_Defines.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Water_RenderBinder.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3001,6 +3106,24 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Body.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Brain.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Mant.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Part\Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BossBase.cpp">
       <Filter>00. GameObject\07. Boss</Filter>
@@ -3209,11 +3332,17 @@
     <ClCompile Include="..\Private\Env_SpotLight.cpp">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\EnvInteract_KickProp.cpp">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\EnvObject.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Interact.cpp">
-      <Filter>00. GameObject\02. EnvObject</Filter>
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Static.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
@@ -3247,6 +3376,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\EssenceCrown.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\18. EssenceCrown</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Excalibur.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Excalibur_Body.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Excalibur_GetIt.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\GetIt</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FlowerPetals.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
@@ -3404,6 +3542,9 @@
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Deform_RollerCoaster.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\02. Deform_RollerCoaster</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClCompile>
@@ -3421,6 +3562,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformRollerCoaster_Main.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\04. DeformRollerCoaster_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Dialogue.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue</Filter>
@@ -3455,11 +3599,14 @@
     <ClCompile Include="..\Private\Kirby_Ladder.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\QTE</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Run.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
@@ -3704,6 +3851,9 @@
     <ClCompile Include="..\Private\MeshParticleCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\MetaknightNamePlate.cpp">
+      <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\MeteorRock.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
     </ClCompile>
@@ -3889,6 +4039,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Manager.cpp">
       <Filter>01. Projectile\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile_MoonShot.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Projectile</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Movement.cpp">
       <Filter>01. Projectile\Movement</Filter>
@@ -4187,6 +4340,9 @@
     <ClCompile Include="..\Private\WarpOutEffect.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Water_RenderBinder.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
@@ -4222,6 +4378,9 @@
     <None Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_MetaKnight.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
+    </None>
     <None Include="..\ShaderFiles\Shader_Monster.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
@@ -4255,5 +4414,10 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

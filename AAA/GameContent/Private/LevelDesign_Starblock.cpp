@@ -401,8 +401,7 @@ void CLevelDesign_Starblock::SetUp_Collider_Callback()
 				m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &PlayerQuery);
 
 				ATTACK_INFO AttackInfo{};
-				if (!Try_ResolveContactHit(pOther->Get_RegisteredGroup(), pOther->Get_Owner(),
-					PlayerQuery.pPlayer, &AttackInfo))
+				if (!Try_ResolveContactHit(pOther->Get_RegisteredGroup(), pOther->Get_Owner(), PlayerQuery.pPlayer, &AttackInfo))
 					return;
 
 				Damaged(AttackInfo);
@@ -485,6 +484,17 @@ CGameObject* CLevelDesign_Starblock::Clone(void* pArg)
 
 void CLevelDesign_Starblock::Free()
 {
+	if (nullptr != m_pHurtBox)
+	{
+		m_pHurtBox->Set_Enabled(false);
+		m_pHurtBox->Clear_Callbacks();
+
+		if (nullptr != m_pGameInstance_Proxy)
+			m_pGameInstance_Proxy->Immediate_Unregister(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_HURT));
+
+		m_pHurtBox->Mark_Unregistered();
+	}
+
 	Release_RigidStatic();
 
 	__super::Free();

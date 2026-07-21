@@ -4,7 +4,7 @@
 #include "GameContent_const.h"
 #include "GameContent_Events.h"
 #include "MeshLayer_Binder.h"
-#include "Kirby.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 
@@ -21,9 +21,7 @@ namespace
 	inline constexpr const _char* POPFLOWER_BLOOM_MESH_NAME = "Flower__PopFlowerC";
 	inline constexpr const _char* POPFLOWER_BUD_MESH_NAME = "Tsubomi__PopFlowerC";
 
-	inline constexpr _float POPFLOWER_FOOD_CHANCE_PERCENT = 20.f;
 	inline constexpr _uint POPFLOWER_POINT_AMOUNT = 1u;
-	inline constexpr _float POPFLOWER_HEAL_AMOUNT = 10.f;
 }
 
 NS_BEGIN(Client)
@@ -417,10 +415,17 @@ void CLD_PopFlower::SetUp_Collider_Callback()
 
 void CLD_PopFlower::Handle_TriggerEnter(CCollider* pOther)
 {
-	if (!Is_PlayerCollider(pOther))
+	if (nullptr == pOther)
 		return;
 
-	m_bPlayerOverlapping = true;
+	const _uint iGroup = pOther->Get_RegisteredGroup();
+	const _bool bPlayerCollision = ETOUI(COLLISION_LAYER::PLAYER_HURT) == iGroup;
+	const _bool bProjectileCollision = ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE) == iGroup;
+	if (!bPlayerCollision && !bProjectileCollision)
+		return;
+
+	if (bPlayerCollision)
+		m_bPlayerOverlapping = true;
 
 	if (STATE::IDLE != m_eState || Is_Dead())
 		return;
@@ -429,12 +434,12 @@ void CLD_PopFlower::Handle_TriggerEnter(CCollider* pOther)
 		return;
 
 	m_eState = STATE::BLOOMING;
-	Grant_Reward(pOther);
+	Grant_Reward();
 }
 
 void CLD_PopFlower::Handle_TriggerStay(CCollider* pOther)
 {
-	if (!Is_PlayerCollider(pOther))
+	if (nullptr == pOther || ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
 		return;
 
 	m_bPlayerOverlapping = true;
@@ -442,27 +447,24 @@ void CLD_PopFlower::Handle_TriggerStay(CCollider* pOther)
 
 void CLD_PopFlower::Handle_TriggerExit(CCollider* pOther)
 {
-	if (!Is_PlayerCollider(pOther))
+	if (nullptr == pOther || ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
 		return;
 
 	m_bPlayerOverlapping = false;
 }
 
-void CLD_PopFlower::Grant_Reward(CCollider* pOther)
+void CLD_PopFlower::Grant_Reward()
 {
-	if (nullptr == pOther)
-		return;
+	_float3 vEffectPosition{};
+	if (!Compute_EffectSpawnPosition(m_pModelCom, 1.f, &vEffectPosition))
+		XMStoreFloat3(&vEffectPosition, m_pTransformCom->Get_State(Engine::STATE::POSITION));
 
-	CKirby* pKirby = dynamic_cast<CKirby*>(pOther->Get_Owner());
-	if (nullptr == pKirby)
-		return;
+	const HRESULT hrEffect = CEffect_Loader::GetInstance()->Spawn(TEXT("PickUpEffect"), Get_LevelIndex(), vEffectPosition);
 
-	const _float fRewardRoll = m_pGameInstance_Proxy->RandomFloat(0.f, 100.f);
-	if (fRewardRoll < POPFLOWER_FOOD_CHANCE_PERCENT)
-	{
-		pKirby->Add_HP(POPFLOWER_HEAL_AMOUNT);
-		return;
-	}
+#ifdef _DEBUG
+	if (FAILED(hrEffect))
+		OutputDebugStringW(L"[LD_PopFlower] PickUpEffect spawn failed.\n");
+#endif
 
 	KIRBY_POINTSTAR_GAINED_DESC Desc{};
 	Desc.iAmount = POPFLOWER_POINT_AMOUNT;
@@ -479,17 +481,6 @@ _bool CLD_PopFlower::Play_Animation(const _char* pAnimName, _bool bLoop)
 	Update_AnimationSpeed();
 
 	return true;
-}
-
-_bool CLD_PopFlower::Is_PlayerCollider(CCollider* pOther) const
-{
-	if (nullptr == pOther)
-		return false;
-
-	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
-		return false;
-
-	return nullptr != dynamic_cast<CKirby*>(pOther->Get_Owner());
 }
 
 void CLD_PopFlower::Update_AnimationSpeed()

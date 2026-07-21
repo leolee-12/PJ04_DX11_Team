@@ -54,6 +54,26 @@ namespace GeometryUtils
 		return { vAbsSize.x * 0.5f, vAbsSize.y * 0.5f, vAbsSize.z * 0.5f };
 	}
 
+	inline _bool Try_Make_YAxisCapsuleFromSize(const _float3& vSize, _float* pOutRadius, _float* pOutHalfHeight)
+	{
+		if (nullptr == pOutRadius || nullptr == pOutHalfHeight || !Has_UsableSize(vSize))
+			return false;
+
+		const _float3 vAbsSize = Make_AbsSize(vSize);
+		const _float fRadius = max(vAbsSize.x, vAbsSize.z) * 0.5f;
+		const _float fHalfHeight = max(vAbsSize.y * 0.5f - fRadius, 0.f);
+
+		if (!MathUtils::Is_FiniteFloat(fRadius) || fRadius <= 0.f)
+			return false;
+
+		if (!MathUtils::Is_FiniteFloat(fHalfHeight) || fHalfHeight < 0.f)
+			return false;
+
+		*pOutRadius = fRadius;
+		*pOutHalfHeight = fHalfHeight;
+		return true;
+	}
+
 	inline BoundingBox Make_AABB_FromMinMax(const _float3& vMin, const _float3& vMax)
 	{
 		BoundingBox Bounds{};

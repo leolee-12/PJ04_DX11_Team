@@ -1,0 +1,165 @@
+#include "Kirby_DeformRollerCoaster_Main.h"
+
+#include "GameInstance.h"
+
+CKirby_DeformRollerCoaster_Main::CKirby_DeformRollerCoaster_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CKirby_Deform_Model(pDevice, pContext)
+{
+}
+
+CKirby_DeformRollerCoaster_Main::CKirby_DeformRollerCoaster_Main(const CKirby_DeformRollerCoaster_Main& Prototype)
+    : CKirby_Deform_Model(Prototype)
+{
+}
+
+HRESULT CKirby_DeformRollerCoaster_Main::Initialize_Prototype()
+{
+    m_eProjType = PROJ_TYPE::PERSPEC;
+
+    return S_OK;
+}
+
+HRESULT CKirby_DeformRollerCoaster_Main::Initialize(void* pArg)
+{
+    if (FAILED(__super::Initialize(pArg)))
+        return E_FAIL;
+
+    if (FAILED(Ready_Components()))
+        return E_FAIL;
+
+    m_bActive = false;
+
+    return S_OK;
+}
+
+HRESULT CKirby_DeformRollerCoaster_Main::Render()
+{
+    if (m_pModelCom->Get_NumMeshes() < MESH_END)
+        return E_FAIL;
+
+    if (FAILED(Bind_CommonShaderResources(m_pKirbyShaderCom)))
+        return E_FAIL;
+
+    const auto RenderPartMesh = [this](_uint iMeshIndex) -> HRESULT
+        {
+            if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_DiffuseTexture", iMeshIndex, MTEX_TYPE::DIFFUSE, 0)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_NormalTexture", iMeshIndex, MTEX_TYPE::NORMALS, 0)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_MRATexture", iMeshIndex, MTEX_TYPE::METALNESS, 0)))
+                return E_FAIL;
+
+            if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", iMeshIndex)))
+                return E_FAIL;
+
+            if (FAILED(m_pKirbyShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::ANIM_TEXTURED_PBR))))
+                return E_FAIL;
+
+            return m_pModelCom->Render(iMeshIndex);
+        };
+
+    if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
+        return E_FAIL;
+    if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeMaskTexture", ETOUI(m_eEye))))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_SkinTexture", MESH_KIRBY, MTEX_TYPE::UNKNOWN, 1)))
+        return E_FAIL;
+    if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_MouthTexture", MESH_KIRBY, MTEX_TYPE::UNKNOWN, 2)))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", MESH_KIRBY)))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBodyColor", &s_vBodyColor, sizeof(s_vBodyColor))))
+        return E_FAIL;
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vFootColor", &s_vFootColor, sizeof(s_vFootColor))))
+        return E_FAIL;
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBlushColor", &s_vBlushColor, sizeof(s_vBlushColor))))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::KIRBY))))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Render(MESH_KIRBY)))
+        return E_FAIL;
+
+    if (FAILED(RenderPartMesh(MESH_ROLLERCOASTER)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CKirby_DeformRollerCoaster_Main::Ready_AnimEvents(CKirby* pKirby)
+{
+    m_pAnimatorCom->Set_EventCallback(
+        [this, pKirby](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            if (Handle_AnimEventParent(pKirby, e, ePhase))
+                return;
+        }
+    );
+
+    return S_OK;
+}
+
+HRESULT CKirby_DeformRollerCoaster_Main::Ready_Components()
+{
+    m_pKirbyShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader_Kirby"));
+    if (m_pKirbyShaderCom == nullptr)
+        return E_FAIL;
+
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Kirby_DeformRollerCoaster_Main"), TEXT("Com_Model"));
+    if (m_pModelCom == nullptr)
+        return E_FAIL;
+
+    m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"),
+        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/YSE/RollerCoaster/KirbyEye.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
+    if (m_pEyeTextureCom == nullptr)
+        return E_FAIL;
+
+    m_pEyeMaskTextureCom = Add_Component<CTexture>(TEXT("Com_EyeMaskTexture"),
+        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/YSE/RollerCoaster/KirbyEyeMask.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
+    if (m_pEyeMaskTextureCom == nullptr)
+        return E_FAIL;
+
+    CAnimator::ANIMATOR_DESC tAnimDesc{};
+    tAnimDesc.pModel = m_pModelCom;
+
+    m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
+    if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&tAnimDesc)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+CKirby_DeformRollerCoaster_Main* CKirby_DeformRollerCoaster_Main::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+    CKirby_DeformRollerCoaster_Main* pInstance = new CKirby_DeformRollerCoaster_Main(pDevice, pContext);
+
+    if (FAILED(pInstance->Initialize_Prototype()))
+    {
+        MSG_BOX("Failed to Created: CKirby_DeformRollerCoaster_Main");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+CGameObject* CKirby_DeformRollerCoaster_Main::Clone(void* pArg)
+{
+    CKirby_DeformRollerCoaster_Main* pInstance = new CKirby_DeformRollerCoaster_Main(*this);
+
+    if (FAILED(pInstance->Initialize(pArg)))
+    {
+        MSG_BOX("Failed to Cloned: CKirby_DeformRollerCoaster_Main");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+void CKirby_DeformRollerCoaster_Main::Free()
+{
+    __super::Free();
+}

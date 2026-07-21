@@ -313,6 +313,8 @@ HRESULT CLevelDesign_Point::Render_Model()
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 			return E_FAIL;
+		if (Result.bSkipMesh)
+			continue;
 		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
@@ -420,7 +422,6 @@ void CLevelDesign_Point::Begin_Pickup(const _float3& vPickupStartPos)
 	m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
 
 	m_fPickupElapsed = 0.f;
-	m_bPickingUp = true;
 }
 
 void CLevelDesign_Point::Update_Pickup(_float fTimeDelta)

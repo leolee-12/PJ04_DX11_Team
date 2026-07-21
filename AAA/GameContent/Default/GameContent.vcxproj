@@ -40,6 +40,11 @@
     <ClInclude Include="..\Public\Bouncy_State_Fall.h" />
     <ClInclude Include="..\Public\Bouncy_State_Idle.h" />
     <ClInclude Include="..\Public\BrontoBurt_State_Chase.h" />
+    <ClInclude Include="..\public\Boss_Metaknight.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Brain.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Mant.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
@@ -48,6 +53,11 @@
     <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
+    <ClInclude Include="..\public\Excalibur.h" />
+    <ClInclude Include="..\public\Excalibur_Body.h" />
+    <ClInclude Include="..\public\Excalibur_GetIt.h" />
+    <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
+    <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
     <ClInclude Include="..\Public\MeteorRock.h" />
     <ClInclude Include="..\Public\MeteorRock_Large.h" />
@@ -55,6 +65,8 @@
     <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
+    <ClInclude Include="..\Public\EnvInteract_KickProp.h" />
+    <ClInclude Include="..\Public\EnvInteract_PresetCatalog.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
     <ClInclude Include="..\Public\Gigatzo.h" />
     <ClInclude Include="..\Public\GigatzoBullet.h" />
@@ -78,6 +90,7 @@
     <ClInclude Include="..\public\Leopard_Impact.h" />
     <ClInclude Include="..\public\Leopard_Meteo.h" />
     <ClInclude Include="..\public\Leopard_Slash.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_Body.h" />
     <ClInclude Include="..\public\Nail_Smoke.h" />
     <ClInclude Include="..\public\Nail_Trail.h" />
     <ClInclude Include="..\Public\LD_LensFlare.h" />
@@ -100,6 +113,7 @@
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
+    <ClInclude Include="..\public\Projectile_MoonShot.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
     <ClInclude Include="..\Public\RabbitEnemy.h" />
@@ -245,6 +259,8 @@
     <ClInclude Include="..\Public\Kirby_DeformCylinder_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCylinder_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Cylinder.h" />
+    <ClInclude Include="..\Public\Kirby_DeformRollerCoaster_Main.h" />
+    <ClInclude Include="..\Public\Kirby_Deform_RollerCoaster.h" />
     <ClInclude Include="..\Public\Kirby_Deform.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
     <ClInclude Include="..\Public\Kirby_DeformCarBridge.h" />
@@ -487,6 +503,8 @@
     <ClInclude Include="..\Public\WalkSmoke.h" />
     <ClInclude Include="..\Public\WarpInEffect.h" />
     <ClInclude Include="..\Public\WarpOutEffect.h" />
+    <ClInclude Include="..\Public\Water_Defines.h" />
+    <ClInclude Include="..\Public\Water_RenderBinder.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
@@ -509,7 +527,17 @@
     <ClCompile Include="..\Private\Bouncy_State_Fall.cpp" />
     <ClCompile Include="..\Private\Bouncy_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Chase.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Mant.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
+    <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
+    <ClCompile Include="..\private\Excalibur.cpp" />
+    <ClCompile Include="..\private\Excalibur_Body.cpp" />
+    <ClCompile Include="..\private\Excalibur_GetIt.cpp" />
     <ClCompile Include="..\Private\Gigatzo.cpp" />
     <ClCompile Include="..\Private\GigatzoBullet.cpp" />
     <ClCompile Include="..\Private\Gigatzo_Body.cpp" />
@@ -523,6 +551,8 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
+    <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
     <ClCompile Include="..\Private\MeteorRock.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
@@ -546,6 +576,7 @@
     <ClCompile Include="..\private\Leopard_Impact.cpp" />
     <ClCompile Include="..\private\Leopard_Meteo.cpp" />
     <ClCompile Include="..\private\Leopard_Slash.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_Body.cpp" />
     <ClCompile Include="..\private\Nail_Smoke.cpp" />
     <ClCompile Include="..\private\Nail_Trail.cpp" />
     <ClCompile Include="..\Private\LD_LensFlare.cpp" />
@@ -567,6 +598,7 @@
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
+    <ClCompile Include="..\private\Projectile_MoonShot.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy.cpp" />
@@ -711,6 +743,8 @@
     <ClCompile Include="..\Private\Kirby_DeformCylinder_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCylinder_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Cylinder.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformRollerCoaster_Main.cpp" />
+    <ClCompile Include="..\Private\Kirby_Deform_RollerCoaster.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp" />
@@ -928,6 +962,7 @@
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
     <ClCompile Include="..\Private\WarpInEffect.cpp" />
     <ClCompile Include="..\Private\WarpOutEffect.cpp" />
+    <ClCompile Include="..\Private\Water_RenderBinder.cpp" />
     <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1004,6 +1039,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_Metaknight.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

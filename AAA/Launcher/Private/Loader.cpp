@@ -240,6 +240,10 @@ HRESULT CLoader::Ready_WorkQueue()
         if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE1_STEP3, LEVEL::STAGE1_STEP3)))
             return E_FAIL;
         break;
+    case LEVEL::ARENA:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_ARENA, LEVEL::ARENA)))
+            return E_FAIL;
+        break;
     case LEVEL::END:
         break;
     default:

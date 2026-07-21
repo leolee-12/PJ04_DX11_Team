@@ -26,6 +26,7 @@
 #include "Kirby_QTE_Grabbed.h"
 #include "Kirby_CarFirstBreakWall.h"
 #include "Kirby_DeformCarBridge.h"
+#include "Kirby_MetaKnightEncounter.h"
 #include "Kirby_Clear.h"
 #include "Kirby_Dialogue.h"
 #include "Kirby_SequenceLock.h"
@@ -80,6 +81,9 @@ void CKirby_StateMachine::Update_StateMachine(const _float fTimeDelta)
 {
     if (m_pCurState == nullptr)
         return;
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_5))
+        Change_State(KIRBY_STATE_TYPE::METAKNIGHT_ENCOUNTER);
 
     m_pCurState->Update(m_pKirby, fTimeDelta);
 }
@@ -150,6 +154,12 @@ void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION
         case KIRBY_POSITION_SYNC_CONTEXT::CAR_BRIDGE:
         {
             Change_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE);
+            break;
+        }
+        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOOKAROUND:
+        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_INTRO:
+        {
+            Change_State(KIRBY_STATE_TYPE::METAKNIGHT_ENCOUNTER);
             break;
         }
         case KIRBY_POSITION_SYNC_CONTEXT::_COUNT:
@@ -244,32 +254,35 @@ HRESULT CKirby_StateMachine::Init_State()
             return S_OK;
         };
 
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::WAIT, CKirby_Wait::Create())))                              return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::RUN, CKirby_Run::Create())))                                return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::JUMP, CKirby_Jump::Create())))                              return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::FALL, CKirby_Fall::Create())))                              return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::ATTACK, CKirby_Attack::Create())))                          return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::HOVERING, CKirby_Hovering::Create())))                      return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                        return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                            return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::SLIDE, CKirby_Slide::Create())))                            return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::DODGE, CKirby_Dodge::Create())))                            return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::LADDER, CKirby_Ladder::Create())))                          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::WAIT, CKirby_Wait::Create())))                                  return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::RUN, CKirby_Run::Create())))                                    return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::JUMP, CKirby_Jump::Create())))                                  return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::FALL, CKirby_Fall::Create())))                                  return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::ATTACK, CKirby_Attack::Create())))                              return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::HOVERING, CKirby_Hovering::Create())))                          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                            return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                                return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::SLIDE, CKirby_Slide::Create())))                                return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DODGE, CKirby_Dodge::Create())))                                return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::LADDER, CKirby_Ladder::Create())))                              return E_FAIL;
 
 
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))                 return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))               return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                   return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_DUMP, CKirby_DeformDump::Create())))                 return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))                     return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))                   return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                       return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_DUMP, CKirby_DeformDump::Create())))                     return E_FAIL;
 
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))                    return E_FAIL;
 
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))       return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))                return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL, CKirby_CarFirstBreakWall::Create()))) return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE, CKirby_DeformCarBridge::Create())))      return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::STAGE_CLEAR, CKirby_Clear::Create())))                      return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::DIALOGUE, CKirby_Dialogue::Create())))                      return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::SEQUENCE_LOCK, CKirby_SequenceLock::Create())))             return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))           return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL, CKirby_CarFirstBreakWall::Create())))     return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE, CKirby_DeformCarBridge::Create())))          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::METAKNIGHT_ENCOUNTER, CKirby_MetaKnightEncounter::Create())))   return E_FAIL;
+
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::STAGE_CLEAR, CKirby_Clear::Create())))                          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DIALOGUE, CKirby_Dialogue::Create())))                          return E_FAIL;
+
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::SEQUENCE_LOCK, CKirby_SequenceLock::Create())))                 return E_FAIL;
 
     return S_OK;
 }

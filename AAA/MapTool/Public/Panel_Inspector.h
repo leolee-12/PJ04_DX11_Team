@@ -29,6 +29,7 @@ private:
 	_bool   Draw_Properties(IReflectable* pHolder);
 	_bool   Draw_Transform(CGameObject* pObject, const string & strSuffix = "");
 	void    Draw_EditableObjectPolicyPanel(CGameObject* pObject);
+	void    Draw_EditableCustomPanel(CGameObject* pObject);
 	void    Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CGameObject* pObject);
 	void    Draw_LevelDesignEventPanel(CLevel_Edit* pLevel, CGameObject* pObject);
@@ -47,6 +48,7 @@ private:
 	unordered_map<_wstring, _int> m_SelectedMeshByEditableSlotKey;
 	unordered_map<_wstring, EDIT_OBJECT_POLICY> m_EditablePolicyDrafts;
 	unordered_map<_wstring, pair<string, string>> m_LevelDesignEventDrafts;
+	EDIT_CUSTOM_DESC m_EditCustomClipboard = monostate{};
 
 	CMapSection* m_pFocusedMapSection = { nullptr };
 

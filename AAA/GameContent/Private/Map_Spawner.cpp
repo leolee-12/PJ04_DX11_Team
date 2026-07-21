@@ -3,6 +3,7 @@
 #include "MapGimmickSection.h"
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
+#include "EnvInteract_KickProp.h"
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
@@ -417,6 +418,12 @@ const MAP_SPAWN_ROUTE* CMap_Spawner::Resolve_EnvRoute(const MAP_SPAWN_TARGETS& T
 
 const _tchar* CMap_Spawner::Get_EnvObjectProtoTag(const ENV_OBJECT_DESC& Desc) const
 {
+	if (ENV_OBJECT_KIND::INTERACT == Desc.eKind
+		&& ENV_INTERACT_TYPE::PHYSICS_PROP == Desc.eInteractType)
+	{
+		return CEnvInteract_KickProp::PROTOTYPE_TAG;
+	}
+
 	if (Desc.eKind != ENV_OBJECT_KIND::EFFECT)
 		return Get_EnvObjectProtoTag(Desc.eKind);
 

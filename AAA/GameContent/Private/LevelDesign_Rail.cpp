@@ -252,7 +252,6 @@ HRESULT CLevelDesign_Rail::Ready_InstanceData()
 
 	constexpr _float fOverlap = 0.05f;
 	const _float fStep = max(fPieceLength - fOverlap, 0.01f);
-	const _vector vRight = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 
 	m_Instances.reserve(static_cast<size_t>(ceilf(fRailLength / fStep)));
 
@@ -288,7 +287,13 @@ HRESULT CLevelDesign_Rail::Ready_InstanceData()
 
 		const _float fScaleZ = fActualLength / fPieceLength;
 		const _vector vLook = XMVector3Normalize(vTangentVector);
-		const _vector vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+		_vector vReferenceRight = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+
+		if (fabsf(XMVectorGetX(XMVector3Dot(vLook, vReferenceRight))) > 0.999f)
+			vReferenceRight = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+
+		const _vector vUp = XMVector3Normalize(XMVector3Cross(vLook, vReferenceRight));
+		const _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
 		const _matrix World = XMMATRIX(vRight, vUp, vLook * fScaleZ, XMVectorSet(vMiddle.x, vMiddle.y, vMiddle.z, 1.f));
 
 		COASTER_RAIL_INSTANCE_DATA InstanceData{};
