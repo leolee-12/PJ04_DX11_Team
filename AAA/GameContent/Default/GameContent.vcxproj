@@ -59,6 +59,7 @@
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
+    <ClInclude Include="..\Public\MeteorBurst.h" />
     <ClInclude Include="..\Public\MeteorRock.h" />
     <ClInclude Include="..\Public\MeteorRock_Large.h" />
     <ClInclude Include="..\Public\MeteorRock_Small.h" />
@@ -554,6 +555,7 @@
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
+    <ClCompile Include="..\Private\MeteorBurst.cpp" />
     <ClCompile Include="..\Private\MeteorRock.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Small.cpp" />

@@ -46,13 +46,14 @@ public:
 	// 캡슐 크기 보고 수정
 	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
 	virtual _float				Get_CapsuleHeight() const override { return 0.75f; }
-	virtual _float				Get_InteractRadius() const override { return 20.f; }		// 맵 데이터에서 보고 설정	
+	virtual _float				Get_InteractRadius() const override { return 22.f; }
 
 	virtual _bool				Block_Hit(const ATTACK_INFO& tInfo) override { return true; }
 	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override { return false; }
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
 
+	_bool						Is_InCameraFront() const;
 	CGigatzo_Body*				Get_Body() { return m_pBody; }
 	_float						Get_InitWaitDelay() const { return m_fInitWaitDelay; }
 

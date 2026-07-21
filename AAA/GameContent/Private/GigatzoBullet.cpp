@@ -60,6 +60,29 @@ HRESULT CGigatzoBullet::Render()
     return S_OK;
 }
 
+HRESULT CGigatzoBullet::Render_Shadow()
+{
+    if (!m_bAlive)
+        return S_OK;
+    if (nullptr == m_pModelCom || nullptr == m_pShaderCom)
+        return S_OK;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", 0)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Begin(7)))     
+        return E_FAIL;
+    if (FAILED(m_pModelCom->Render(0)))
+        return E_FAIL;
+    return S_OK;
+}
+
 void CGigatzoBullet::Launch(const _float3& vPos, const _float3& vDir)
 {
     __super::Launch(vPos, vDir);   

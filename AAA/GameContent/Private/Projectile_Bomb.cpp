@@ -62,8 +62,6 @@ void CProjectile_Bomb::Late_Update(_float fTimeDelta)
         Update_Socket();
 
     __super::Late_Update(fTimeDelta);
-
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CProjectile_Bomb::Render()

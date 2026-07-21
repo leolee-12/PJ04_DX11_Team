@@ -25,7 +25,7 @@ void CGigatzo_State_Attack::Enter(MONSTER_STATE_TYPE ePrevState)
 	ANI_PLAY_INFO Info{};
 	Info.strAniName = "Attack";
 	Info.bLoop = false;
-	Info.fSpeed = 1.0f;
+	Info.fSpeed = 1.f;
 	m_pAnimator->Play(&Info);
 }
 

@@ -140,6 +140,36 @@ HRESULT CProjectile_Boulder::Render()
     return S_OK;
 }
 
+HRESULT CProjectile_Boulder::Render_Shadow()
+{
+    if (!m_bAlive) return S_OK;
+    if (nullptr == m_pModelCom || nullptr == m_pShaderCom) 
+        return S_OK;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr()))) 
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+        return E_FAIL;
+
+    const _bool bBreaking = (m_eState == STATE::BREAKING);
+    const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        const _bool bThisMesh = bBreaking ? (i != 0) : (i == 0);
+        if (!bThisMesh) continue;
+
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i))) 
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Begin(7))) 
+            return E_FAIL;   
+        if (FAILED(m_pModelCom->Render(i))) 
+            return E_FAIL;
+    }
+    return S_OK;
+}
+
 CProjectile_Boulder* CProjectile_Boulder::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CProjectile_Boulder* p = new CProjectile_Boulder(pDevice, pContext);

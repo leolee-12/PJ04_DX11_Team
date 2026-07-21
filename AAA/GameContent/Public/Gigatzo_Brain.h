@@ -17,9 +17,9 @@ public:
     static  CGigatzo_Brain*         Create(CMonster* pOwner);
 
 private:
-    _bool  m_bInit = { true };
-    _float m_fFireTimer = { 0.f };
-    static constexpr const _float s_fFireInterval = { 2.f };   // 발사 주기(데이터에 없음, 튜닝 상수)
+    _bool   m_bArmed = { false };
+    _float  m_fFireTimer = { 0.f };
+    static constexpr const _float s_fFireInterval = { 1.f };   
 
 protected:
     virtual void                    Free() override;

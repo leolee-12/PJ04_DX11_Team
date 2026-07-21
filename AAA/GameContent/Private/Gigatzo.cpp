@@ -68,6 +68,24 @@ CAnimator* CGigatzo::Get_BodyAnimator() const
 	return m_pBody ? m_pBody->Get_Animator() : nullptr ;
 }
 
+_bool CGigatzo::Is_InCameraFront() const
+{
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+		return true;
+
+	const _float4* pCamPos = m_pGameInstance_Proxy->Get_CamPosition();
+	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+	if (nullptr == pCamPos || nullptr == pCamLook)
+		return true;
+
+	_vector vCamPos = XMLoadFloat4(pCamPos);
+	_vector vCamLook = XMLoadFloat4(pCamLook);
+	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+	_float  fDot = XMVectorGetX(XMVector3Dot(vPos - vCamPos, vCamLook));
+
+	return fDot > 0.f;
+}
+
 CMonsterBrain* CGigatzo::Create_Brain()
 {
 	return CGigatzo_Brain::Create(this);

@@ -25,6 +25,7 @@ private:
 public:
     virtual void            Update(_float fTimeDelta) override;
     virtual HRESULT         Render() override;
+    virtual HRESULT		    Render_Shadow() override;
     virtual void            Launch(const _float3& vPos, const _float3& vDir) override;
     virtual void            Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
     {
