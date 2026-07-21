@@ -11,6 +11,7 @@
 
 #include "Projectile_Manager.h"
 #include "Projectile_MoonShot.h"
+#include "Projectile_Rock.h"
 
 const _float3 CBoss_Metaknight::s_vGigaPoints[CBoss_Metaknight::GIGA_POINT_COUNT] = {
     { 20.5f, 7.23f, 15.f },
@@ -437,6 +438,20 @@ void CBoss_Metaknight::Begin_RockDecalSlide()
         pDecal->Place(vStart, ROCK_DECAL_RADIUS, 9999.f);
         pDecal->Slide_To(m_RockTiles[i], ROCK_SLIDE_TIME);
         m_pRockDecals[i] = pDecal;
+    }
+}
+
+void CBoss_Metaknight::Drop_Rocks()
+{
+    for (int i = 0; i < ROCK_TILE_COUNT; ++i)
+    {
+        CProjectile* p = nullptr;
+        CProjectile_Manager::GetInstance()->Spawn(
+            Get_PrototypeLevelIndex(), Get_LevelIndex(),
+            CProjectile_Rock::POOL_KEY, CProjectile_Rock::PROTOTYPE_TAG, &p);
+
+        if (auto* pRock = static_cast<CProjectile_Rock*>(p))
+            pRock->Drop(m_RockTiles[i], ROCK_DROP_HEIGHT);
     }
 }
 

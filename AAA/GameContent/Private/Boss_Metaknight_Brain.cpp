@@ -669,12 +669,32 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
         },
         [this, atkOn] { *atkOn = false; });
 
+    auto tPre = make_shared<_float>(0.f);
+    auto* pPreDrop = CBTAction::Create([tPre](CBlackboard*, _float dt) -> BT_STATUS {
+        *tPre += dt;
+        return (*tPre >= 3.f) ? BT_STATUS::SUCCESS : BT_STATUS::RUNNING;
+        }, [tPre] { *tPre = 0.f; });
+
+    auto* pDrop = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Drop_Rocks();
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto tLand = make_shared<_float>(0.f);
+    auto* pWaitLanded = CBTAction::Create([tLand](CBlackboard*, _float dt) -> BT_STATUS {
+        *tLand += dt;
+        return (*tLand >= 2.5f) ? BT_STATUS::SUCCESS : BT_STATUS::RUNNING;
+        }, [tLand] { *tLand = 0.f; });
+
     return CBTSequence::Create({
         Make_RockFly(),
         pStartRise,
         pWaitRise,
-        pAttack,                          
-        // TODO: 3초 후 실제 돌 낙하
+        pAttack,          // BurstTornadoAttack + 데칼 슉
+        pPreDrop,         // 3초
+        pDrop,            // 돌 23개 수직 낙하
+        pWaitLanded,      // 착지 대기 (제자리)
+        // 다음: FlightWait 추적 -> 다이브밤
         });
 }
 

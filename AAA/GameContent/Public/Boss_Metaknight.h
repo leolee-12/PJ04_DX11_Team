@@ -36,6 +36,8 @@ public:
     static constexpr _float ROCK_DECAL_RADIUS = 5.f;
     static constexpr _float ROCK_SLIDE_TIME = 1.f;
 
+    static constexpr _float ROCK_DROP_HEIGHT = 20.f;
+
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
 
 private:
@@ -104,6 +106,8 @@ public:
     void  Begin_RockDecalSlide();
     void  Request_RockDrop() { m_bRockRequested = true; }
     _bool Consume_RockDropRequest() { if (!m_bRockRequested) return false; m_bRockRequested = false; return true; }
+
+    void  Drop_Rocks();
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };

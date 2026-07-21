@@ -206,6 +206,7 @@
 #include "Excalibur_GetIt.h"
 #include "MetaknightNamePlate.h"
 #include "AttackDecal.h"
+#include "Projectile_Rock.h"
 
 //Boss Effect
 #include "Armadillo_RutA.h"
@@ -1638,6 +1639,12 @@ void CGameObject_Factory::Register_MainBoss()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/RockDecal/Cube.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::PROTOTYPE_TAG, CAttackDecal::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::MODEL_PROTO_TAG_A,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Rock/BurstTornadoDebris_Anim.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::MODEL_PROTO_TAG_B,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Rock/BurstTornadoDebrisB_Anim.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::PROTOTYPE_TAG, CProjectile_Rock::Create(pDevice, pContext));
         )
     );
 

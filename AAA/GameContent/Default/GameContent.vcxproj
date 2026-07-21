@@ -96,6 +96,7 @@
     <ClInclude Include="..\public\Projectile_MoonShot.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
+    <ClInclude Include="..\public\Projectile_Rock.h" />
     <ClInclude Include="..\Public\RabbitEnemy.h" />
     <ClInclude Include="..\Public\RabbitEnemy_Body.h" />
     <ClInclude Include="..\Public\RabbitEnemy_Brain.h" />
@@ -561,6 +562,7 @@
     <ClCompile Include="..\private\Projectile_MoonShot.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
+    <ClCompile Include="..\private\Projectile_Rock.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_Body.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_Brain.cpp" />
