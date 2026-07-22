@@ -101,6 +101,9 @@ namespace Client
 
         // 케이지
         inline constexpr const _tchar* Cage_Descend = L"Cage.Descend";
+        
+        // 메따나이트
+        inline constexpr const _tchar* Metaknight_ParryBegin = L"Metaknight.Parry.Begin";
     }
 
 
@@ -287,7 +290,7 @@ namespace Client
         METAKNIGHT_LOOKAROUND,
         METAKNIGHT_INTRO,
         METAKNIGHT_UPPERCALIBUR,
-        METAKNIGHT_LOCKING,
+        METAKNIGHT_LOCKING_WIN,
         _COUNT
     };
 
@@ -305,7 +308,7 @@ namespace Client
         METAKNIGHT_ENCOUNTER_END,
         METAKNIGHT_INTRO_END,
         METAKNIGHT_UPPERCALIBUR_END,
-        METAKNIGHT_LOCKING_END,
+        METAKNIGHT_LOCKING_WIN_END,
         _COUNT
     };
 

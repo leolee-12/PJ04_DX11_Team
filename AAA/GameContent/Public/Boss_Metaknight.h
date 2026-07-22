@@ -22,22 +22,20 @@ public:
 
     static constexpr _float s_fCCT_Radius = 0.75f;
     static constexpr _float s_fCCT_Height = 0.1f;
-    static constexpr _float s_fDefaultAnimSpeed = 1.5f;
+    static constexpr _float PARRY_HURT_RADIUS = 2.2f;
 
-    static constexpr _float s_fDodgeCooldown = 2.f;
+    static constexpr _float s_fDefaultAnimSpeed = 1.5f;
 
     static constexpr const _char* WEAPON_BONE = "RHaveL";
 
     static constexpr _uint  GIGA_POINT_COUNT = 4;
     static const _float3    s_vGigaPoints[GIGA_POINT_COUNT];
-    static constexpr _float s_fGigaCooldown = 12.f;
 
     static constexpr int    ROCK_SAFE_COUNT = 5;
     static constexpr int    ROCK_TILE_COUNT = 23;
     static constexpr _float ROCK_DECAL_RADIUS = 5.f;
     static constexpr _float ROCK_SLIDE_TIME = 1.f;
     static constexpr _float ROCK_DROP_HEIGHT = 20.f;
-    static constexpr _float s_fRockCooldown = 60.f;
 
     static constexpr _float TOPVIEW_HEIGHT = 40.f;
 
@@ -45,8 +43,24 @@ public:
     static constexpr _float PHASE_HOP_GRAVITY = 9.f;
     static constexpr _float PHASE_WAIT_BLEND = 0.4f;
 
+    static constexpr _float s_fDodgeCooldown = 4.f;
+    static constexpr _float s_fGigaCooldown = 30.f;
+    static constexpr _float s_fRockCooldown = 60.f;
+    //static constexpr _float s_fUpperCooldown = 90.f;
+    static constexpr _float s_fUpperCooldown = 3.f;
+
+    static constexpr _float LOCK_TIMEOUT = 10.f;
+    static constexpr _float ATTACH_YAW_OFFSET = 180.f;
+
+    static constexpr _float LOCK_CAM_DELAY = 0.5f;
+    static constexpr const _tchar* LOCK_CAM_TRACK = TEXT("Metaknight_LockingSword");
+
+    static constexpr _float LOCK_GAUGE_START = 0.2f;
+    static constexpr _float LOCK_GAUGE_WIN = 0.9f;
+    static constexpr _float LOCK_GAUGE_LOSE = 0.005f;
 
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
+    enum class ELockOutcome { NONE, MK_WIN, MK_LOSE };
 
 private:
     CBoss_Metaknight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -91,6 +105,7 @@ protected:
     virtual const _float4x4* Get_FxParentMatrix(const _wstring& strFx) const override;
 
     virtual void Damaged(const ATTACK_INFO& tInfo) override;
+    virtual void Update_AI(_float fTimeDelta) override;
 
 public:
     void      Set_ActiveSword(EMK_SWORD eSword);
@@ -121,6 +136,30 @@ public:
 
     void Start_PatternCooldowns(_float fUsedCooldown);
 
+    void  Enable_CatchBox(_bool bOn);
+    void  Reset_CatchHit() { m_bCatchHit = false; }
+    _bool Is_CatchHit() const { return m_bCatchHit; }
+    _bool Is_UpperReady() const { return m_fUpperCooldown <= 0.f; }
+
+    void Begin_UpperCaliburDemo();
+    void End_UpperCaliburDemo();
+
+    void Begin_LockLoseDemo();
+    void End_LockLoseDemo();
+
+    void  Set_ParryWindow(_bool bOn);
+
+    void Begin_LockingSync();
+    void Sync_LockingProgress(_float fProgress01);
+    void End_LockingSync();
+
+    ELockOutcome Consume_LockOutcome()
+    {
+        ELockOutcome e = m_eLockOutcome;
+        m_eLockOutcome = ELockOutcome::NONE;
+        return e;
+    }
+
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
@@ -128,25 +167,44 @@ private:
     CBoss_Metaknight_Sword* m_pSword = { nullptr };          
     CBoss_Metaknight_ReplicaSword* m_pReplica = { nullptr }; 
     CBoss_Metaknight_Mant* m_pMant = { nullptr };
+
+    const _float4x4* m_pAttachBone = { nullptr };
+    const _float4x4* m_pAttachAnchor = { nullptr };
+    _bool            m_bAttached = { false };
+    _float3          m_vAttachSaveScale = { 1.f, 1.f, 1.f };
+
     EMK_SWORD m_eActiveSword = { EMK_SWORD::GALAXIA };
 
     _bool      m_bDodgeInvuln = { false };
 
     _bool  m_bDodgeRequested = { false };
     _bool  m_bAttackBusy = { false };    
-    _float m_fDodgeCooldown = { 0.f };
-
-    _float m_fGigaCooldown = { s_fGigaCooldown };
 
     _bool  m_bAppearPending = { false };
     _float m_fAppearTimer = { 0.f };
     _float m_fIntroHoldTimer = { 0.f };
 
-    _float3       m_RockTiles[ROCK_TILE_COUNT];
+    _float3       m_RockTiles[ROCK_TILE_COUNT] = {};
     CAttackDecal* m_pRockDecals[ROCK_TILE_COUNT] = {};
     _bool         m_bSafeTile[ROCK_TILE_COUNT] = {};
-    _float        m_fRockCooldown = { 0.f };
+    
+    _bool  m_bCatchHit = { false };
+    _bool m_bParryWindow = { false };
+    _bool  m_bLockingQTE = { false };
+    _float m_fLockTimer = { 0.f };
+    _bool m_bLockSyncing = { false };
+    _bool m_bLockCamFired = { false };
+    _float m_fLockGauge = { 0.f };
+    _bool  m_bLockJudged = { false };
+    ELockOutcome m_eLockOutcome = { ELockOutcome::NONE };
 
+    // ÄðÅ¸ÀÓ
+    _float        m_fDodgeCooldown = { 0.f };
+    _float        m_fGigaCooldown = { s_fGigaCooldown };
+    _float        m_fRockCooldown = { 0.f };
+    _float        m_fUpperCooldown = { 0.f };
+    
+    
     enum class EPhaseTrans { NONE, HOP, LANDING, WAIT, DONE };
     EPhaseTrans m_ePhaseTrans = { EPhaseTrans::NONE };
     _float m_fPhaseBaseY = { 0.f };
@@ -156,11 +214,17 @@ private:
     static constexpr _bool s_bSkipIntro = true;
 
 private:
+    HRESULT Ready_MetaEvents();
     void Fire_CutsceneCamera(const _tchar* szTrack);
     void Hide_AllParts();
     void Build_RockTilePositions(const _float3 fCornersIn[4], _float3 fOutPos[23]);
     void Select_SafeTiles();
     void Update_PhaseTransition(_float fTimeDelta);
+    void Update_Attachment();
+    void Enter_Locking();
+    void Exit_Locking();
+    void Detach_FromKirby();
+    void Judge_Locking(_bool bPlayerWin);
 
 #ifdef _DEBUG
     void Debug_TriggerPhaseTransition();

@@ -1079,7 +1079,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl" />
+    <None Include="..\ShaderFiles\Shader_AttackDecal.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

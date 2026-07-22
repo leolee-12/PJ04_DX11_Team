@@ -170,11 +170,11 @@ void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION
             Change_State(KIRBY_STATE_TYPE::METAKNIGHT_UPPERCALIBUR);
             break;
         }
-        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING:
-        {
-            Change_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE);
-            break;
-        }
+        //case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN:
+        //{
+        //    Change_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE);
+        //    break;
+        //}
         case KIRBY_POSITION_SYNC_CONTEXT::_COUNT:
         {
             break;
