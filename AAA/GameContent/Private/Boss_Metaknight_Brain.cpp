@@ -25,9 +25,11 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     //    Make_UpperBranch(),
     //    Loop("Wait", 0.5f, SPD),
     //    });
-    //return CBTReactiveSelector::Create({
-    //    Clip("Wait", SPD, 0.f),
-    //    });
+    
+    // 에디터 애니매이션 편집용
+    return CBTReactiveSelector::Create({
+        Clip("Wait", SPD, 0.f),
+        });
 
     CBTNode* pCombat = CBTSequence::Create({
         Make_GigaBranch(),

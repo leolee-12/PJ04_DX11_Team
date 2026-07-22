@@ -33,6 +33,9 @@ HRESULT CBoss_Metaknight_Body::Render()
     const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        if (m_bOffMask && i >= 4)
+            continue;
+
         _uint iPass = 0;
         switch (i)
         {

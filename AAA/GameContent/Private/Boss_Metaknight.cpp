@@ -6,6 +6,7 @@
 #include "Boss_Metaknight_ReplicaSword.h"
 #include "Boss_Metaknight_Sword.h"
 #include "Boss_Metaknight_Mant.h"
+#include "Boss_Metaknight_EscapeMant.h"
 
 #include "AttackDecal.h"
 
@@ -241,15 +242,13 @@ void CBoss_Metaknight::Play_Death()
 
     m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
 
-    m_bDeathSeq = true;
     m_eDeathStep = EDEATH::POSE_WAIT;
     m_iDeathPoseDelay = 2;
 }
 
 _bool CBoss_Metaknight::Is_Death_Finished() const
 {
-    CAnimator* pAnim = Get_BodyAnimator();
-    return pAnim ? pAnim->Is_Finished() : true;
+    return m_eDeathStep == EDEATH::DONE;
 }
 
 void CBoss_Metaknight::On_Enter_Corpse()
@@ -340,6 +339,32 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
                 m_pGameInstance_Proxy->Publish(w.c_str(), pPayload);
                 break;
             }
+
+            case EANIM_EVENT::OnOffPart:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                switch (e.iIntParam)
+                {
+                    case 0:
+                        Hide_Sword(m_eActiveSword);
+                        break;
+                    case 1:
+                        Show_Mant(false);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+
+            case EANIM_EVENT::OnOffMesh:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+                
+                m_pBody->OffMask();
+                break;
+            }
         }
 
         });
@@ -368,11 +393,16 @@ HRESULT CBoss_Metaknight::Ready_PartObjects()
         CBoss_Metaknight_Mant::PROTOTYPE_TAG, CBoss_Metaknight_Mant::PART_TAG);
     if (!m_pMant) return E_FAIL;
 
+    m_pEscapeMant = Add_MonsterPart<CBoss_Metaknight_EscapeMant>(
+        CBoss_Metaknight_EscapeMant::PROTOTYPE_TAG, CBoss_Metaknight_EscapeMant::PART_TAG);
+    if (!m_pEscapeMant) return E_FAIL;
+
     constexpr _float fMantBakedScale = 1.f / 1.3f;
     m_pMant->Get_Transform()->Set_Scale(fMantBakedScale, fMantBakedScale, fMantBakedScale);
+    m_pEscapeMant->Get_Transform()->Set_Scale(fMantBakedScale, fMantBakedScale, fMantBakedScale);
+    m_pEscapeMant->Set_Active(false);
 
     Set_ActiveSword(EMK_SWORD::GALAXIA);
-
 
     m_pBody->Set_HitBox_OnEnter(CBoss_Metaknight_Body::MKHB_CATCH,
         [this](CCollider* pOther)
@@ -447,6 +477,23 @@ void CBoss_Metaknight::Enable_SwordHit(_bool bOn)
     }
 }
 
+void CBoss_Metaknight::Hide_Sword(EMK_SWORD eSword)
+{
+    switch (eSword)
+    {
+        case EMK_SWORD::GALAXIA:
+            if (m_pSword)
+                m_pSword->Set_Drawn(false);
+            break;
+        case EMK_SWORD::REPLICA:
+            if (m_pReplica)
+                m_pReplica->Set_Drawn(false);
+            break;
+        default:
+            break;
+    }
+}
+
 void CBoss_Metaknight::Show_Mant(_bool bOn)
 {
     if (m_pMant)
@@ -457,6 +504,32 @@ void CBoss_Metaknight::Play_MantSync(const _char* szClip, _bool bLoop, _float fB
 {
     if (m_pMant && m_pMant->Is_Active())
         m_pMant->Get_Animator()->Play(szClip, bLoop, true, fBland, fSpeed);
+}
+
+void CBoss_Metaknight::Show_EscapeMant(_bool bOn)
+{
+    if (m_pEscapeMant)
+        m_pEscapeMant->Set_Active(bOn);
+}
+
+void CBoss_Metaknight::Play_EscapeMantSequence()
+{
+    if (nullptr == m_pEscapeMant || !m_pEscapeMant->Is_Active())
+        return;
+
+    CAnimator* pAnim = m_pEscapeMant->Get_Animator();
+    if (nullptr == pAnim)
+        return;
+
+    pAnim->Play("EscapeStart", false, true, 0.f, s_fDefaultAnimSpeed);
+
+    CAnimator::ANI_PLAY_INFO tInfo{};
+    tInfo.strAniName = "Escape";
+    tInfo.bLoop = false;
+    tInfo.bRestart = true;
+    tInfo.fBlend = 0.f;
+    tInfo.fSpeed = s_fDefaultAnimSpeed;
+    pAnim->Enqueue(tInfo);
 }
 
 void CBoss_Metaknight::Fire_GigaMoonShot()
@@ -871,13 +944,13 @@ void CBoss_Metaknight::Tick_Appear(_float fTimeDelta)
 
 void CBoss_Metaknight::Tick_DeathSequence(_float fTimeDelta)
 {
-    if (!m_bDeathSeq)
+    if (m_eDeathStep == EDEATH::NONE || m_eDeathStep == EDEATH::DONE)
         return;
 
     CAnimator* pAnim = Get_BodyAnimator();
     if (nullptr == pAnim)
     {
-        m_bDeathSeq = false;
+        m_eDeathStep = EDEATH::DONE;
         return;
     }
 
@@ -887,7 +960,7 @@ void CBoss_Metaknight::Tick_DeathSequence(_float fTimeDelta)
             if (--m_iDeathPoseDelay <= 0)
             {
                 pAnim->Pause();
-                m_fDeathPauseTimer = DEATH_PAUSE_SEC;
+                m_fDeathTimer = DEATH_PAUSE_SEC;
 
                 Play_OneShotSFX(TEXT("CharaBasic_DeadBigEnemy.wav"));
 
@@ -899,14 +972,58 @@ void CBoss_Metaknight::Tick_DeathSequence(_float fTimeDelta)
             break;
 
         case EDEATH::PAUSING:
-            m_fDeathPauseTimer -= fTimeDelta;
-            if (m_fDeathPauseTimer <= 0.f)
+            m_fDeathTimer -= fTimeDelta;
+            if (m_fDeathTimer <= 0.f)
             {
                 pAnim->Resume();
-                Queue_DeathClips();
-                m_eDeathStep = EDEATH::PLAYING;
-                m_bDeathSeq = false;
+
+                pAnim->Play("DeathLanding", false, true, 0.f, s_fDefaultAnimSpeed);
+
+                CAnimator::ANI_PLAY_INFO tInfo{};
+                tInfo.strAniName = "DeathMaskBreak";
+                tInfo.bLoop = false;
+                tInfo.bRestart = true;
+                tInfo.fBlend = 0.f;
+                tInfo.fSpeed = s_fDefaultAnimSpeed;
+                pAnim->Enqueue(tInfo);
+
+                m_eDeathStep = EDEATH::MASK;
             }
+            break;
+
+        case EDEATH::MASK:
+            if (pAnim->Is_Finished())
+            {
+                m_fDeathTimer = DEATH_MASK_HOLD;
+                m_eDeathStep = EDEATH::MASK_HOLD;
+            }
+            break;
+
+        case EDEATH::MASK_HOLD:
+            m_fDeathTimer -= fTimeDelta;
+            if (m_fDeathTimer <= 0.f)
+            {
+                Show_Mant(true);
+                Play_MantSync("EscapeStart", false, 0.f, s_fDefaultAnimSpeed);
+                Show_EscapeMant(true);
+                Play_EscapeMantSequence();
+                pAnim->Play("EscapeStart", false, true, 0.f, s_fDefaultAnimSpeed);
+
+                CAnimator::ANI_PLAY_INFO tInfo{};
+                tInfo.strAniName = "Escape";
+                tInfo.bLoop = false;
+                tInfo.bRestart = true;
+                tInfo.fBlend = 0.f;
+                tInfo.fSpeed = s_fDefaultAnimSpeed;
+                pAnim->Enqueue(tInfo);
+
+                m_eDeathStep = EDEATH::ESCAPE;
+            }
+            break;
+
+        case EDEATH::ESCAPE:
+            if (pAnim->Is_Finished())
+                m_eDeathStep = EDEATH::DONE;
             break;
 
         default:

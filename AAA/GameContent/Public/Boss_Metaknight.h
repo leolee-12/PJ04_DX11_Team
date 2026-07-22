@@ -7,6 +7,7 @@ class CBoss_Metaknight_Body;
 class CBoss_Metaknight_Sword;
 class CBoss_Metaknight_ReplicaSword;
 class CBoss_Metaknight_Mant;
+class CBoss_Metaknight_EscapeMant;
 class CAttackDecal;
 
 class CBoss_Metaknight final : public CBoss
@@ -33,7 +34,7 @@ public:
     static constexpr _float LOCK_TIMEOUT = 10.f;
     static constexpr _float LOCK_GAUGE_START = 0.2f;
     static constexpr _float LOCK_GAUGE_WIN = 0.9f;
-    static constexpr _float LOCK_GAUGE_LOSE = 0.f;
+    static constexpr _float LOCK_GAUGE_LOSE = 0.005f;
     static constexpr _float ATTACH_YAW_OFFSET = 180.f;
     static constexpr const _tchar* LOCK_CAM_TRACK = TEXT("Metaknight_LockingSword");
 
@@ -70,6 +71,7 @@ public:
     // »ç¸Á
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;
     static constexpr _float DEATH_SHAKE_SEC = 0.7f;
+    static constexpr _float DEATH_MASK_HOLD = 0.5f;
 
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
     enum class ELockOutcome { NONE, MK_WIN, MK_LOSE };
@@ -124,9 +126,12 @@ public:
     void      Set_ActiveSword(EMK_SWORD eSword);
     EMK_SWORD Get_ActiveSword() const { return m_eActiveSword; }
     void      Enable_SwordHit(_bool bOn);
+    void      Hide_Sword(EMK_SWORD eSword);
 
     void      Show_Mant(_bool bOn);
     void      Play_MantSync(const _char* szClip, _bool bLoop, _float fBland = 0.2f, _float fSpeed = 1.5f);
+    void      Show_EscapeMant(_bool bOn);
+    void      Play_EscapeMantSequence();
 
     void    Set_DodgeInvincible(_bool bOn) { m_bDodgeInvuln = bOn; }
     void    Set_AttackBusy(_bool bOn) { m_bAttackBusy = bOn; }
@@ -218,7 +223,7 @@ private:
     };
 
     enum class EPhaseTrans { NONE, HOP, LANDING, WAIT, DONE };
-    enum class EDEATH { POSE_WAIT, PAUSING, PLAYING };
+    enum class EDEATH { NONE, POSE_WAIT, PAUSING, MASK, MASK_HOLD, ESCAPE, DONE };
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
@@ -227,6 +232,7 @@ private:
     CBoss_Metaknight_Sword* m_pSword = { nullptr };          
     CBoss_Metaknight_ReplicaSword* m_pReplica = { nullptr }; 
     CBoss_Metaknight_Mant* m_pMant = { nullptr };
+    CBoss_Metaknight_EscapeMant* m_pEscapeMant = { nullptr };
 
     EMK_SWORD m_eActiveSword = { EMK_SWORD::GALAXIA };
 
@@ -256,9 +262,9 @@ private:
     _float m_fPhaseVelY = { 0.f };
 
     _bool  m_bDeathSeq = { false };
-    EDEATH m_eDeathStep = { EDEATH::POSE_WAIT };
+    EDEATH m_eDeathStep = { EDEATH::NONE };
     _int   m_iDeathPoseDelay = { 0 };
-    _float m_fDeathPauseTimer = { 0.f };
+    _float m_fDeathTimer = { 0.f };
 
     // µð¹ö±×
     static constexpr _bool s_bSkipIntro = true;
