@@ -48,6 +48,8 @@ private:
 
 	_float m_fLadderSpeed{};
 
+	_float m_fLadderAnimProgress{};
+
 private:
 	void Change_LadderState(CKirby* pKirby, LADDER_STATE eNext);
 	void Enter_LadderState(CKirby* pKirby, LADDER_STATE eState);

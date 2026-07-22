@@ -37,6 +37,9 @@
     <Filter Include="00. GameObject\02. EnvObject">
       <UniqueIdentifier>{ce9ba11f-9390-48f8-9a7f-e24b38b55608}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\BlendCollector">
+      <UniqueIdentifier>{9bdd24d6-a54e-4a25-b9ab-a89027989589}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\02. EnvObject\EnvTrigger">
       <UniqueIdentifier>{f61d97f4-06b5-4b44-8a89-c4328f90ddfb}</UniqueIdentifier>
     </Filter>
@@ -126,6 +129,9 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. BombAimDot">
       <UniqueIdentifier>{4d6324c8-1634-4bd9-9325-d8d4db88a743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas">
+      <UniqueIdentifier>{153a0fc3-3a45-4226-a92e-f8805cd20075}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\23. OnLadderEffect">
       <UniqueIdentifier>{4b622f74-20a8-4a20-bef5-f729f8d7191f}</UniqueIdentifier>
@@ -496,6 +502,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep">
       <UniqueIdentifier>{b5c6a7d8-e9f0-4a1b-8c2d-3e4f5a6b7c8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\05. Kirby_Ability_ToyHammer">
+      <UniqueIdentifier>{e1d72b0f-6ab1-4eb5-aab7-4e8860d63f25}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform">
       <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
     </Filter>
@@ -549,6 +558,12 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\04. SleepHat">
       <UniqueIdentifier>{c6d7e8f9-a0b1-4c2d-9e3f-4a5b6c7d8e9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\05. ToyHammer">
+      <UniqueIdentifier>{4b8424ef-c570-4dc9-b767-b4e89bf65a31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\06. ToyHat">
+      <UniqueIdentifier>{7af620b6-9bf2-4179-85f8-9ceec58c5594}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
@@ -1623,6 +1638,9 @@
     <ClInclude Include="..\Public\BladeKnight_Sword.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BlendRenderable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BombAimDot.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. BombAimDot</Filter>
     </ClInclude>
@@ -1817,6 +1835,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\CarLanding.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. CarLanding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CarThinGas.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -2118,6 +2139,9 @@
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_ToyHammer.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\05. Kirby_Ability_ToyHammer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_AbilityDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
     </ClInclude>
@@ -2261,6 +2285,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_ToyHammer.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\05. ToyHammer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_ToyHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\06. ToyHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordTrail.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
@@ -3030,6 +3060,9 @@
     <ClInclude Include="..\Public\Water_RenderBinder.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\World_BlendCollector.h">
+      <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3277,6 +3310,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarLanding.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. CarLanding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CarThinGas.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -3539,6 +3575,9 @@
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_ToyHammer.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\05. Kirby_Ability_ToyHammer</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
     </ClCompile>
@@ -3673,6 +3712,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_ToyHammer.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\05. ToyHammer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_ToyHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\06. ToyHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
@@ -4393,6 +4438,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Water_RenderBinder.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\World_BlendCollector.cpp">
+      <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>

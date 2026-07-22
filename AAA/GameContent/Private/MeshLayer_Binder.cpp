@@ -72,7 +72,7 @@ HRESULT MeshLayerBinder::Bind_TextureSafe(CShader* pShader, CModel* pModel, CGam
 
 _uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_RENDER_KIND eKind, const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
 {
-	if (MESH_LAYER_RENDER_KIND::MAIN != eKind)
+	if (MESH_LAYER_RENDER_KIND::MAIN != eKind && MESH_LAYER_RENDER_KIND::MAIN_BLEND != eKind)
 		return iFallbackPass;
 
 	switch (eProfile)
@@ -113,11 +113,15 @@ namespace
 	HRESULT Bind_World(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
 	{
 		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
-		pOutResult->bSkipMesh = ETOI(WORLD_PASS::DISCARD) == Layer.iPass;
+		const _bool bBlendMesh = Is_WorldBlendPass(Layer.iPass);
+		const _bool bBlendKind = MESH_LAYER_RENDER_KIND::MAIN_BLEND == Ctx.eKind;
+
+		pOutResult->bSkipMesh = ETOI(WORLD_PASS::DISCARD) == Layer.iPass || bBlendMesh != bBlendKind;
 
 		switch (Ctx.eKind)
 		{
 		case MESH_LAYER_RENDER_KIND::MAIN:
+		case MESH_LAYER_RENDER_KIND::MAIN_BLEND:
 		{
 			if (FAILED(Bind_WorldMainTextures(Ctx)))
 				return E_FAIL;
@@ -128,6 +132,20 @@ namespace
 				return E_FAIL;
 			if (FAILED(Ctx.pShader->Bind_RawValue("g_vMRA", &Layer.vMRA, sizeof(_float3))))
 				return E_FAIL;
+
+			if (MESH_LAYER_RENDER_KIND::MAIN_BLEND == Ctx.eKind)
+			{
+				if (FAILED(Ctx.pGI_Proxy->Bind_ShaderGlobals(Ctx.pShader, { "g_vLightDir", "g_vLightDiffuse" })))
+					return E_FAIL;
+				if (FAILED(Ctx.pShader->Bind_RawValue("g_vCamPosition", Ctx.pGI_Proxy->Get_CamPosition(), sizeof(_float4))))
+					return E_FAIL;
+				if (FAILED(Ctx.pShader->Bind_Matrix("g_ViewMatrixInverse",
+					Ctx.pGI_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))
+					return E_FAIL;
+				if (FAILED(Ctx.pShader->Bind_Matrix("g_ProjMatrixInverse",
+					Ctx.pGI_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
+					return E_FAIL;
+			}
 
 			const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DMN);
 			pOutResult->iPass = MeshLayerBinder::Resolve_Pass(Ctx.eProfile, Ctx.eKind, Layer, iFallbackPass);
@@ -160,6 +178,10 @@ namespace
 			return E_FAIL;
 		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
 			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
+			return E_FAIL;
+
+		const _uint iHasNormalTexture = (Ctx.pModel->Get_MeshTextureCount(Ctx.iMesh, MTEX_TYPE::NORMALS) > 0u) ? 1u : 0u;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_iHasNormalTexture", &iHasNormalTexture, sizeof(_uint))))
 			return E_FAIL;
 
 		return S_OK;
@@ -200,7 +222,9 @@ namespace
 		_float fDissolve = Ctx.fDissolve;
 
 		if (nullptr != Ctx.pCullingState &&
-			(MESH_LAYER_RENDER_KIND::MAIN == Ctx.eKind || MESH_LAYER_RENDER_KIND::SHADOW == Ctx.eKind))
+			(MESH_LAYER_RENDER_KIND::MAIN == Ctx.eKind
+				|| MESH_LAYER_RENDER_KIND::MAIN_BLEND == Ctx.eKind
+				|| MESH_LAYER_RENDER_KIND::SHADOW == Ctx.eKind))
 		{
 			const CCullingState::CHANNEL eCullChannel =
 				(MESH_LAYER_RENDER_KIND::SHADOW == Ctx.eKind)

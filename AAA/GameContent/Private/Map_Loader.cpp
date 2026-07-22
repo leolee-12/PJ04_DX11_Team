@@ -12,7 +12,6 @@
 #include "GameInstance.h"
 #include "DataLoader.h"
 #include "Texture_Hub.h"
-#include "GameObject_Factory.h"
 
 #include <mutex>
 #include <filesystem>
@@ -124,7 +123,7 @@ namespace
 		MAP_EDIT_APPLY_OPTIONS ApplyOptions{};
 		ApplyOptions.bApplyStage = Options.bLoadStage;
 		ApplyOptions.bApplyEnv = Options.bLoadEnv;
-		ApplyOptions.bApplyAddedObjects = Options.bLoadEnv;
+		ApplyOptions.bApplyAddedObjects = Options.bLoadEnv || Options.bLoadLevelDesign;
 		return ApplyOptions;
 	}
 
@@ -344,9 +343,11 @@ HRESULT CMap_Loader::Load_FromManifest(
 	Request.Targets = Targets;
 	Request.Options.bSpawnStage = Options.bLoadStage;
 	Request.Options.bSpawnEnv = Options.bLoadEnv;
+	Request.Options.bSpawnAddedEnv = Options.bLoadEnv;
+	Request.Options.bSpawnAddedLevelDesign = Options.bLoadLevelDesign;
 	Request.ppOutStage = ppOutStage;
 
-	if (Options.bLoadStage || Options.bLoadEnv)
+	if (Options.bLoadStage || Options.bLoadEnv || Options.bLoadLevelDesign)
 	{
 		hr = Spawn(Package, Request, pOutReport);
 		if (FAILED(hr))
@@ -523,10 +524,8 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 		Levels.bEnableEnvObjectPicking =
 			Options.bEnableEnvObjectPicking;
 
-		if (Options.bLoadStage || Options.bLoadEnv)
-		{
+		if (Options.bLoadStage || Options.bLoadEnv || !Package.AddedObjectDescs.empty())
 			hr = pMapLoader->Ready_Prototypes(Levels, Package);
-		}
 
 		if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
 		{
@@ -586,10 +585,8 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 		Levels.bEnableEnvObjectPicking = Options.bEnableEnvObjectPicking;
 
-		if (Options.bLoadStage || Options.bLoadEnv)
-		{
+		if (Options.bLoadStage || Options.bLoadEnv || !PreloadPackage.AddedObjectDescs.empty())
 			hr = pMapLoader->Ready_Prototypes(Levels, PreloadPackage);
-		}
 
 		if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
 		{
@@ -671,11 +668,14 @@ HRESULT CMap_Loader::Spawn_Map(
 	Request.Targets = Targets;
 	Request.Options.bSpawnStage = Options.bLoadStage;
 	Request.Options.bSpawnEnv = Options.bLoadEnv;
+	Request.Options.bSpawnAddedEnv = Options.bLoadEnv;
+	Request.Options.bSpawnAddedLevelDesign = Options.bLoadLevelDesign;
 	Request.ppOutStage = ppOutStage;
 
 	HRESULT hr = S_OK;
 
-	if (nullptr != pMapOverrideDesc && (Options.bLoadStage || Options.bLoadEnv))
+	if (nullptr != pMapOverrideDesc
+		&& (Options.bLoadStage || Options.bLoadEnv || !pSpawnPackage->AddedObjectDescs.empty()))
 	{
 		hr = pMapLoader->Ready_Prototypes(Levels, *pSpawnPackage);
 		if (FAILED(hr))
@@ -685,7 +685,7 @@ HRESULT CMap_Loader::Spawn_Map(
 		}
 	}
 
-	if (Options.bLoadStage || Options.bLoadEnv)
+	if (Options.bLoadStage || Options.bLoadEnv || Options.bLoadLevelDesign)
 		hr = pMapLoader->Spawn(*pSpawnPackage, Request, pOutReport);
 
 	if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
@@ -880,6 +880,8 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 			Build_DefaultRuntimeTargets(Context.iPlaceLevel, &Request.Targets);
 			Request.Options.bSpawnStage = true;
 			Request.Options.bSpawnEnv = false;
+			Request.Options.bSpawnAddedEnv = false;
+			Request.Options.bSpawnAddedLevelDesign = false;
 			Request.pCreatedCallback = Context.pCreatedCallback;
 			Request.pCallbackContext = Context.pCallbackContext;
 			Request.ppOutStage = ppStageForSpawn;
@@ -977,6 +979,8 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 				Build_DefaultRuntimeTargets(Context.iPlaceLevel, &Request.Targets);
 				Request.Options.bSpawnStage = false;
 				Request.Options.bSpawnEnv = true;
+				Request.Options.bSpawnAddedEnv = true;
+				Request.Options.bSpawnAddedLevelDesign = false;
 				Request.pCreatedCallback = Context.pCreatedCallback;
 				Request.pCallbackContext = Context.pCallbackContext;
 				Request.ppOutEnvInstanceController = Context.ppOutEnvInstanceController;
@@ -990,16 +994,14 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 	return hr;
 }
 
-HRESULT CMap_Loader::Load_LevelDesign_Runtime(const MAP_RUNTIME_LOAD_CONTEXT& Context, const _wstring& strMapManifestPath, MAP_LOAD_RESULT* pOutReport, const MAP_EDIT_CHANGE* pOverrideDesc)
+HRESULT CMap_Loader::Load_LevelDesign_Runtime(const MAP_RUNTIME_LOAD_CONTEXT& Context, const _wstring& strMapManifestPath, MAP_LOAD_RESULT*
+	pOutReport, const MAP_EDIT_CHANGE* pOverrideDesc)
 {
 	if (nullptr != pOutReport)
 		*pOutReport = {};
 
-	if (!Is_RuntimeLoadContextValid(Context)
-		|| strMapManifestPath.empty())
-	{
+	if (!Is_RuntimeLoadContextValid(Context) || strMapManifestPath.empty())
 		return E_FAIL;
-	}
 
 	MAP_EDIT_DATA LoadedMapContentDesc{};
 	const MAP_EDIT_CHANGE* pResolvedOverrideDesc = pOverrideDesc;
@@ -1015,7 +1017,6 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(const MAP_RUNTIME_LOAD_CONTEXT& Co
 	}
 
 	CMap_Loader* pMapLoader = Create(Context.pDevice, Context.pContext);
-
 	if (nullptr == pMapLoader)
 		return E_FAIL;
 
@@ -1026,19 +1027,43 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(const MAP_RUNTIME_LOAD_CONTEXT& Co
 	BuildOptions.bApplyDelta = false;
 
 	MAP_PACKAGE Package{};
-	HRESULT hr =
-		pMapLoader->Build_Package(strMapManifestPath, BuildOptions, &Package);
+	HRESULT hr = pMapLoader->Build_Package(strMapManifestPath, BuildOptions, &Package);
+
+	if (SUCCEEDED(hr) && nullptr != pResolvedOverrideDesc)
+	{
+		MAP_EDIT_APPLY_OPTIONS ApplyOptions{};
+		ApplyOptions.bApplyStage = false;
+		ApplyOptions.bApplyEnv = false;
+		ApplyOptions.bApplyAddedObjects = true;
+		hr = CMap_EditFile::Apply_Change(&Package, *pResolvedOverrideDesc, ApplyOptions);
+	}
 
 	if (SUCCEEDED(hr))
 	{
+		MAP_RUNTIME_LEVELS Levels{};
+		Levels.iObjectLevel = ETOUI(LEVEL::STATIC);
+		Levels.iStageModelLevel = ETOUI(LEVEL::STATIC);
+		Levels.iEnvModelLevel = ETOUI(LEVEL::STATIC);
+		Levels.iLevelDesignObjectLevel = Context.iPlaceLevel;
+		Levels.iLevelDesignPrototypeLevel = Context.iPlaceLevel;
+		Levels.iLevelDesignModelPrototypeLevel = Context.iModelLevel;
+
 		MAP_SPAWN_REQUEST Request{};
-		Request.Levels.iLevelDesignObjectLevel = Context.iPlaceLevel;
-		Request.Levels.iLevelDesignPrototypeLevel = Context.iPlaceLevel;
-		Request.Levels.iLevelDesignModelPrototypeLevel = Context.iModelLevel;
+		Request.Levels = Levels;
+		Request.Options.bSpawnStage = false;
+		Request.Options.bSpawnEnv = false;
+		Request.Options.bSpawnAddedEnv = false;
+		Request.Options.bSpawnAddedLevelDesign = true;
 		Request.pCreatedCallback = Context.pCreatedCallback;
 		Request.pCallbackContext = Context.pCallbackContext;
 
-		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport, pResolvedOverrideDesc);
+		hr = pMapLoader->Ready_Prototypes(Levels, Package);
+
+		if (SUCCEEDED(hr))
+			hr = pMapLoader->Spawn(Package, Request, pOutReport);
+
+		if (SUCCEEDED(hr))
+			hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport, pResolvedOverrideDesc);
 	}
 
 	Safe_Release(pMapLoader);
@@ -1351,37 +1376,26 @@ void CMap_Loader::Build_DefaultRuntimeTargets(_uint iRuntimeLevel, MAP_SPAWN_TAR
 	pOutTargets->pStageObjectTag = L"MapStage";
 }
 
-HRESULT CMap_Loader::Preload_SharedObjects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const vector<MAP_ADD_OBJECT>& AddedDescs, const MAP_RUNTIME_LEVELS& Levels)
+HRESULT CMap_Loader::Preload_SharedObjects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
+	const vector<MAP_ADD_OBJECT>& AddedDescs, const MAP_RUNTIME_LEVELS& Levels)
 {
+	CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
+	const HRESULT hrHub = Ready_TexHub(pProxy);
+	Safe_Release(pProxy);
+
+	if (FAILED(hrHub))
+		return E_FAIL;
+
 	CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(pDevice, pContext);
 	if (nullptr == pRegister)
 		return E_FAIL;
 
 	HRESULT hr = pRegister->Ready_ObjectPrototypes(Levels.iObjectLevel);
 
-	CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
 	if (SUCCEEDED(hr))
-	{
-		for (const MAP_ADD_OBJECT& Added : AddedDescs)
-		{
-			if (pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
-				continue;
-
-			auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(Added.strPrototypeTag);
-			if (nullptr == pReg) { hr = E_FAIL; break; }
-
-			pReg->ResourceLoader(pProxy, pDevice, pContext, Levels.iObjectLevel);
-			if (FAILED(pProxy->Add_Prototype(Levels.iObjectLevel, Added.strPrototypeTag.c_str(),
-				static_cast<CGameObject*>(pReg->CreatorFunc(pDevice, pContext)))))
-			{
-				hr = E_FAIL;
-				break;
-			}
-		}
-	}
+		hr = pRegister->Ready_AddedObjectPrototypes(Levels, AddedDescs);
 
 	Safe_Release(pRegister);
-	Safe_Release(pProxy);
 	return hr;
 }
 

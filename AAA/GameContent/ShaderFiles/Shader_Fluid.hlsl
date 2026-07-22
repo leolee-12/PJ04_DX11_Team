@@ -25,6 +25,7 @@ float g_fIBLIntensity = 1.f;
 
 float4 g_vShallowColor = float4(0.15f, 0.55f, 0.72f, 1.f);
 float4 g_vDeepColor = float4(0.02f, 0.16f, 0.30f, 1.f);
+float g_fShallowColorStrength = 0.45f;
 float g_fOpacity = 0.65f;
 float g_fDepthFadeDistance = 5.f;
 
@@ -38,6 +39,7 @@ float g_fFresnelPower = 5.f;
 float g_fReflectionStrength = 0.8f;
 float g_fRefractionStrength = 0.015f;
 
+float g_fLightReceiveStrength = 1.f;
 float g_fSpecularPower = 64.f;
 float g_fSpecularStrength = 1.f;
 
@@ -46,10 +48,13 @@ float g_fFoamStrength = 0.7f;
 float2 g_vFoamNoiseTiling = float2(0.35f, 0.35f);
 float2 g_vFoamNoiseSpeed = float2(0.03f, -0.02f);
 float g_fFoamNoiseStrength = 0.6f;
+float g_fFoamBlur = 0.f;
 
 float2 g_vCausticTiling = float2(0.05f, 0.05f);
 float2 g_vCausticSpeed = float2(0.015f, 0.012f);
 float g_fCausticStrength = 0.5f;
+float g_fCausticNoiseStrength = 0.6f;
+float g_fCausticBlur = 0.f;
 
 float g_fVisibility = 1.f;
 float g_fGameTime = 0.f;
@@ -165,7 +170,8 @@ float4 PS_MAIN(PS_IN In, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
     float fDepthRatio = saturate(fDepthDifference / max(g_fDepthFadeDistance, 0.001f));
     float3 vWaterAlbedo = saturate(lerp(g_vShallowColor.rgb, g_vDeepColor.rgb, fDepthRatio));
     float3 vIrradiance = g_IrradianceCube.Sample(LinearSampler, vGeometryNormal).rgb;
-    float3 vWaterColor = saturate(vWaterAlbedo * vIrradiance * g_fIBLIntensity);
+    float3 vLitWaterColor = saturate(vWaterAlbedo * vIrradiance * g_fIBLIntensity);
+    float3 vWaterColor = lerp(vWaterAlbedo, vLitWaterColor, saturate(g_fLightReceiveStrength));
 
     // ±¼Àý
     float3 vViewNormalDelta = mul(float4(vWaterNormal - vGeometryNormal, 0.f), g_ViewMatrix).xyz;
@@ -199,24 +205,30 @@ float4 PS_MAIN(PS_IN In, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
     if (fRefractionDepth > 0.f)
     {
         float3 vFloorPosition = RecoverWorldPos(
-              vRefractionUV, fRefractionDepth, g_ProjMatrixInverse, g_ViewMatrixInverse);
+                vRefractionUV, fRefractionDepth, g_ProjMatrixInverse, g_ViewMatrixInverse);
         float2 vCausticUV = vFloorPosition.xz * g_vCausticTiling + g_fGameTime * g_vCausticSpeed;
 
         float fCaustic = min(
-              g_WaterCausticTexture.Sample(LinearSampler, vCausticUV).r,
-              g_WaterCausticTexture.Sample(LinearSampler, vCausticUV * 0.73f + 0.37f).r);
+                g_WaterCausticTexture.SampleBias(LinearSampler, vCausticUV, g_fCausticBlur).r,
+                g_WaterCausticTexture.SampleBias(LinearSampler, vCausticUV * 0.73f + 0.37f, g_fCausticBlur).r);
+
+        float2 vCausticNoiseUV = vFloorPosition.xz * g_vFoamNoiseTiling + g_fGameTime * g_vFoamNoiseSpeed;
+        float fCausticNoise = g_WaterNoiseTexture.SampleBias(LinearSampler, vCausticNoiseUV, g_fCausticBlur).r;
+        fCaustic *= lerp(1.f, fCausticNoise, saturate(g_fCausticNoiseStrength));
 
         vRefractedColor += g_vLightSpecular.rgb * fCaustic * g_fCausticStrength;
     }
 
-    float3 vBaseColor = lerp(vRefractedColor, vWaterColor, fDepthRatio);
+    // Water Color ÇÕ¼º
+    float fWaterColorWeight = lerp(saturate(g_fShallowColorStrength), 1.f, fDepthRatio);
+    float3 vBaseColor = lerp(vRefractedColor, vWaterColor, fWaterColorWeight);
     float3 vFinalColor = vBaseColor;
     vFinalColor += vReflectionColor * fFresnel * g_fReflectionStrength;
     vFinalColor += g_vLightSpecular.rgb * fSpecular;
 
     // Foam
     float2 vFoamUV = In.vWorldPosition.xz * g_vFoamNoiseTiling + g_fGameTime * g_vFoamNoiseSpeed;
-    float fFoamNoise = g_WaterNoiseTexture.Sample(LinearSampler, vFoamUV).r;
+    float fFoamNoise = g_WaterNoiseTexture.SampleBias(LinearSampler, vFoamUV, g_fFoamBlur).r;
     float fFoamEdge = max(g_fFoamWidth, 0.001f);
     float fFoam = 1.f - smoothstep(0.f, fFoamEdge,
             fDepthDifference + (fFoamNoise - 0.5f) * fFoamEdge * g_fFoamNoiseStrength);

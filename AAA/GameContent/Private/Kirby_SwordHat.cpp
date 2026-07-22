@@ -67,7 +67,7 @@ HRESULT CKirby_SwordHat::Render()
 
 HRESULT CKirby_SwordHat::Ready_Components()
 {
-    KIRBY_PART_COMPONENT_DESC°¡ tDesc{};
+    KIRBY_PART_COMPONENT_DESC tDesc{};
     tDesc.tShaderDesc = Shader_Kirby;
     tDesc.szModelProtoTag = TEXT("Prototype_Component_Model_SwordHat");
     tDesc.bCreateAnimator = true;

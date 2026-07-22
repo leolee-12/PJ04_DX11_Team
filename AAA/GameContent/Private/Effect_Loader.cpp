@@ -18,11 +18,10 @@ namespace
 {
     struct EFFECT_DB_ENTRY
     {
-        const _tchar* szEffectId;    // ?§Ìè∞ ??
-        const _tchar* szConfigPath;  // ?úÎãù json (?∞Ïù¥?∞Î°ú ?†Ï?)
+        const _tchar* szEffectId;  
+        const _tchar* szConfigPath;
     };
 
-    // === ?¥Ìéô??DB : ???¥Ìéô?∏Îäî ?¨Í∏∞????Ï§?Ï∂îÍ? ===
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
         { TEXT("WalkSmoke"),              TEXT("../../Resources/EffectContainerJSON/YSE/WalkSmoke_7_01.json") },
@@ -42,12 +41,12 @@ namespace
         { TEXT("SwordChargeEffect"),      TEXT("../../Resources/EffectContainerJSON/YSE/SwordChargeEffect.json") },
         { TEXT("SwordSuperChargeEffect"), TEXT("../../Resources/EffectContainerJSON/YSE/SwordSuperChargeEffect.json") },
         {TEXT("UpwardsSlash"),            TEXT("../../Resources/EffectContainerJSON/YSE/UpwardsSlash.JSON")},
-
         { TEXT("RockFloor"),              TEXT("../../Resources/EffectContainerJSON/YSH/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/BoostGas.json") },
         { TEXT("MoveGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/MoveGas.json") },
         { TEXT("CylinderRollGas"),        TEXT("../../Resources/EffectContainerJSON/YSE/CylinderRollGas.JSON") },
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/EffectContainerJSON/YSE/CarMilkyWay_Final2.json") },
+        { TEXT("CarThinGas"),             TEXT("../../Resources/YSE/EffectContainer/CarThinGas.JSON") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/EffectContainerJSON/YSE/GetAbilityEffect.JSON") },
         { TEXT("GetDeformEffect"),        TEXT("../../Resources/EffectContainerJSON/YSE/GetDeformEffect .JSON") },

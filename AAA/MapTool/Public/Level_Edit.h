@@ -92,6 +92,8 @@ public:
 
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
 	HRESULT Restore_AllDeletedMapPreviewEnv();
+	HRESULT Restore_DeletedMapPreviewLevelDesign(const _wstring& strStableKey);
+	HRESULT Restore_AllDeletedMapPreviewLevelDesign();
 	HRESULT Save_PlaceEdit();
 	HRESULT Save_MapOverride();
 

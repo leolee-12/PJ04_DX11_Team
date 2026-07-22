@@ -6,6 +6,7 @@ struct LD_SPAWN_SPEC;
 
 using LD_OBJECT_PROTO_FACTORY = CGameObject* (*)(ID3D11Device*, ID3D11DeviceContext*);
 using LD_DESC_BUILD_FUNC = _bool (*)(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
+using LD_MAKE_DEFAULT_DESC_FUNC = _bool(*)(const LD_OBJECT_DESC& CommonDesc, _uint iModelProtoLevel, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 
 struct LD_MODEL_REQUIREMENT
 {
@@ -28,6 +29,7 @@ struct LD_SPAWN_SPEC
 
 	LD_OBJECT_PROTO_FACTORY pPrototypeFactory = { nullptr };
 	LD_DESC_BUILD_FUNC pBuildDesc = { nullptr };
+	LD_MAKE_DEFAULT_DESC_FUNC pMakeDefaultDesc = { nullptr };
 	_bool bUseFactoryResourceLoader = { false };
 	vector<LD_MODEL_REQUIREMENT> ModelRequirements;
 };
@@ -61,6 +63,9 @@ private:
 public:
 	static void Initialize();
 	static const LD_SPAWN_SPEC* Find(const _wstring& strObjectName);
+	static const LD_SPAWN_SPEC* Find_PlacementSpec(const _wstring& strPrototypeTag);
+	static _bool Make_DefaultDesc(const _wstring& strPrototypeTag, _uint iModelProtoLevel,
+		const _wstring& strObjectTag, const _float3& vPosition, LD_OBJECT_ENTRY* pOutEntry);
 	static const LD_SPAWN_SPEC& Get_FallbackSpec();
 	static _bool Is_LevelDesignLayer(const _wstring& strLayerTag);
 	static _bool Register(const _wstring& strObjectName, const LD_SPAWN_SPEC& Spec);
