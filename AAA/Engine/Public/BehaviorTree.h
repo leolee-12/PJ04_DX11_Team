@@ -15,6 +15,7 @@ private:
 
 public:
 	BT_STATUS    Tick(_float fTimeDelta);
+	void		 Reset();
 	CBlackboard* Get_Blackboard() const { return m_pBB; }
 
 

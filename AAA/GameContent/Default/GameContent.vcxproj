@@ -59,9 +59,11 @@
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
+    <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h" />
     <ClInclude Include="..\Public\LightShaft.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
+    <ClInclude Include="..\Public\Kirby_UpperCalibur.h" />
     <ClInclude Include="..\Public\MeteorBurst.h" />
     <ClInclude Include="..\Public\MeteorRock.h" />
     <ClInclude Include="..\Public\MeteorRock_Large.h" />
@@ -237,6 +239,7 @@
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
     <ClInclude Include="..\Public\SmokeCollection.h" />
     <ClInclude Include="..\Public\CarLanding.h" />
+    <ClInclude Include="..\Public\CarThinGas.h" />
     <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
@@ -402,6 +405,7 @@
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
     <ClInclude Include="..\Public\Kirby_OnOffPart.h" />
@@ -437,6 +441,8 @@
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
+    <ClInclude Include="..\Public\Kirby_ToyHammer.h" />
+    <ClInclude Include="..\Public\Kirby_ToyHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
     <ClInclude Include="..\Public\Kirby_IceHat.h" />
     <ClInclude Include="..\Public\Kirby_SleepHat.h" />
@@ -559,9 +565,11 @@
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp" />
     <ClCompile Include="..\Private\LightShaft.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
+    <ClCompile Include="..\Private\Kirby_UpperCalibur.cpp" />
     <ClCompile Include="..\Private\MeteorBurst.cpp" />
     <ClCompile Include="..\Private\MeteorRock.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
@@ -728,6 +736,7 @@
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp" />
     <ClCompile Include="..\Private\SmokeCollection.cpp" />
     <ClCompile Include="..\Private\CarLanding.cpp" />
+    <ClCompile Include="..\Private\CarThinGas.cpp" />
     <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
@@ -842,6 +851,7 @@
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
@@ -916,6 +926,8 @@
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\Kirby_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_ToyHammer.cpp" />
+    <ClCompile Include="..\Private\Kirby_ToyHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
     <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
     <ClCompile Include="..\Private\Kirby_SleepHat.cpp" />
@@ -1067,7 +1079,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl" />
+    <None Include="..\ShaderFiles\Shader_AttackDecal.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

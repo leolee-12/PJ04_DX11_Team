@@ -39,6 +39,8 @@ HRESULT CEffect_Part::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    Apply_PropertyScale();
+
     return S_OK;
 }
 
@@ -62,6 +64,12 @@ HRESULT CEffect_Part::Render()
     return S_OK;
 }
 
+void CEffect_Part::On_Deserialized()
+{
+    __super::On_Deserialized();
+    Apply_PropertyScale();
+}
+
 void CEffect_Part::Effect_Start()
 {
     m_bIsPlay = true;
@@ -73,6 +81,8 @@ void CEffect_Part::Effect_Start()
     m_fFadeOutDuration = 0.3f;
     m_fAccFadeOutTime = 0.f;
     m_fFadeOutAlpha = 1.f;
+
+    Apply_PropertyScale();
 }
 
 void CEffect_Part::Start_FadeOut(_float fFadeOutDuration)
@@ -122,6 +132,33 @@ void CEffect_Part::Compute_CombinedWorldMatrix()
 void CEffect_Part::Set_LocalPositionFromProperty()
 {
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&m_vLocalPos), 1.f));
+}
+
+void CEffect_Part::Apply_PropertyScale(_float fUniformScale, _float fRatio)
+{
+    _float3 vScale = Evaluate_Float3Curve(
+        fRatio, m_vScale, m_bScaleChange,
+        m_vScaleStartValue, m_vScaleEndValue,
+        m_bActive_Scale_Ratio_0, m_fScale_Ratio_0, m_vScale_Value_0,
+        m_bActive_Scale_Ratio_1, m_fScale_Ratio_1, m_vScale_Value_1,
+        false);
+
+    if (vScale.x < Helper::fEpsilon)
+        vScale.x = Helper::fEpsilon;
+    if (vScale.y < Helper::fEpsilon)
+        vScale.y = Helper::fEpsilon;
+    if (vScale.z < Helper::fEpsilon)
+        vScale.z = Helper::fEpsilon;
+    if (fUniformScale < Helper::fEpsilon)
+        fUniformScale = Helper::fEpsilon;
+
+    if (m_bScaleChange == false)
+        m_vScale = vScale;
+
+    m_pTransformCom->Set_Scale(
+        vScale.x * fUniformScale,
+        vScale.y * fUniformScale,
+        vScale.z * fUniformScale);
 }
 
 void CEffect_Part::Update_Orbit(const _float fRatio)
@@ -519,6 +556,16 @@ void CEffect_Part::Init_PropertyValue()
     m_vEmissive_Value_2 = { 0.f, 0.f, 0.f, 0.f };
 
     m_vLocalPos = { 0.f, 0.f, 0.f };
+    m_vScale = { 1.f, 1.f, 1.f };
+    m_bScaleChange = false;
+    m_vScaleStartValue = { 1.f, 1.f, 1.f };
+    m_vScaleEndValue = { 1.f, 1.f, 1.f };
+    m_bActive_Scale_Ratio_0 = false;
+    m_fScale_Ratio_0 = 0.5f;
+    m_vScale_Value_0 = { 1.f, 1.f, 1.f };
+    m_bActive_Scale_Ratio_1 = false;
+    m_fScale_Ratio_1 = 0.75f;
+    m_vScale_Value_1 = { 1.f, 1.f, 1.f };
 
     m_bOrbitChange = false;
     m_vOrbitPivot = { 0.f, 0.f, 0.f };
@@ -634,6 +681,8 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
 
 void CEffect_Part::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
+    Apply_PropertyScale(1.f, fRatio);
+
     if (m_bEmissiveChange == true)
     {
         m_vEmissiveColor = Evaluate_Float4Curve(

@@ -50,7 +50,7 @@ public:
 	virtual void Put_OnBack(CKirby* pKirby, _bool bOn);
 
 protected:
-	struct KIRBY_PART_COMPONENT_DESC°¡
+	struct KIRBY_PART_COMPONENT_DESC
 	{
 		SHADER_DESC   tShaderDesc{};
 		const _tchar* szModelProtoTag{};
@@ -70,7 +70,7 @@ protected:
 	_bool m_bOn{};
 
 protected:
-	HRESULT Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC°¡& tDesc);
+	HRESULT Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC& tDesc);
 	HRESULT Bind_ShaderResources();
 
 protected:
