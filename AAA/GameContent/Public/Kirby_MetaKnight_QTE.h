@@ -52,6 +52,8 @@ private:
 	void Exit_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eState);
 
 private:
+	METAKNIGHT_QTE_STATE m_eMetaKnightQTEState{};
+
 	_uint m_iQTE_InputCount{};
 	METAKNIGHT_QTE_STATE m_eMetaKnightQTEState{};
 
