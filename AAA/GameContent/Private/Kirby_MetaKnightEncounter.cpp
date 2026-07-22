@@ -69,7 +69,7 @@ void CKirby_MetaKnightEncounter::Request_PositionSync(CKirby* pKirby, const KIRB
             tInfo.bLoop = true;
             tInfo.bRestart = true;
             tInfo.fBlend = 0.1f;
-            tInfo.fSpeed = 1.5f;
+            tInfo.fSpeed = 1.f;
 
             tInfo.strAniName = "LookAround";
             pAnimator->Play(&tInfo);

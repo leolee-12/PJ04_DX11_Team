@@ -454,9 +454,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab">
       <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter">
-      <UniqueIdentifier>{33020856-964e-4101-8c62-ae1ac0a1eb1a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\QTE">
       <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
     </Filter>
@@ -1582,6 +1579,18 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight">
+      <UniqueIdentifier>{214b11c1-771e-4020-8ec5-f099665e5154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_UpperCalibur">
+      <UniqueIdentifier>{5324c53d-e5a2-4ce1-aaaf-848967137c15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter">
+      <UniqueIdentifier>{33020856-964e-4101-8c62-ae1ac0a1eb1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE">
+      <UniqueIdentifier>{5739041f-3609-4363-996a-8f573294ddfa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2251,7 +2260,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_OnOffPart.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
@@ -3063,6 +3072,12 @@
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_UpperCalibur.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_UpperCalibur</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3681,7 +3696,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnightEncounter</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
@@ -4444,6 +4459,12 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_UpperCalibur.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_UpperCalibur</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
