@@ -1056,7 +1056,6 @@
     <None Include="..\ShaderFiles\Shader_Fluid.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl" />
     <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
       <FileType>Document</FileType>
     </None>
