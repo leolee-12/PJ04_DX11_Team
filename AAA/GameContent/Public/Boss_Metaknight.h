@@ -22,6 +22,8 @@ public:
 
     static constexpr _float s_fCCT_Radius = 0.75f;
     static constexpr _float s_fCCT_Height = 0.1f;
+    static constexpr _float PARRY_HURT_RADIUS = 2.2f;
+
     static constexpr _float s_fDefaultAnimSpeed = 1.5f;
 
     static constexpr const _char* WEAPON_BONE = "RHaveL";
@@ -127,7 +129,16 @@ public:
     _bool Is_CatchHit() const { return m_bCatchHit; }
     _bool Is_UpperReady() const { return m_fUpperCooldown <= 0.f; }
 
-    void  Begin_UpperCaliburDemo();
+    void Begin_UpperCaliburDemo();
+    void End_UpperCaliburDemo();
+
+    void  Set_ParryWindow(_bool bOn);
+    _bool Consume_ParryRequest()
+    {
+        if (!m_bParryRequested) return false;
+        m_bParryRequested = false;
+        return true;
+    }
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
@@ -147,11 +158,13 @@ private:
     _float m_fAppearTimer = { 0.f };
     _float m_fIntroHoldTimer = { 0.f };
 
-    _float3       m_RockTiles[ROCK_TILE_COUNT];
+    _float3       m_RockTiles[ROCK_TILE_COUNT] = {};
     CAttackDecal* m_pRockDecals[ROCK_TILE_COUNT] = {};
     _bool         m_bSafeTile[ROCK_TILE_COUNT] = {};
     
     _bool  m_bCatchHit = { false };
+    _bool m_bParryWindow = { false };
+    _bool m_bParryRequested = { false };
 
     // ÄðÅ¸ÀÓ
     _float        m_fDodgeCooldown = { 0.f };

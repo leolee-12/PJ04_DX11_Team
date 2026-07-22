@@ -55,9 +55,12 @@ private:
     static constexpr _float UC_CHARGE_TIME = 1.5f;     // Charge 유지 시간
     static constexpr _float UC_RUSH_SPEED = 40.f;      // 돌진 속도
     static constexpr _float UC_RUSH_MAX_DIST = 20.f;   // 이만큼 달리면 실패 판정 -> 브레이크
-    static constexpr _float UC_RUSH_TIMEOUT = 1.5f;     // 벽에 막혔을 때 안전장치
-    static constexpr _float UC_BRAKE_DIST = 2.f;       // 발 끌면서 미끄러지는 거리
-    static constexpr _float UC_BRAKE_TURN_DEG = 300.f; // 미끄러지며 커비 쪽으로 도는 속도
+    static constexpr _float UC_RUSH_TIMEOUT = 1.5f;    // 벽에 막혔을 때 안전장치
+    static constexpr _float UC_BRAKE_ENTRY_SPEED = 22.f;  // 브레이크 진입 속도. 돌진속도와 같으면 이음매 없음
+    static constexpr _float UC_BRAKE_DECAY_POW = 3.f;     // 감속 곡선. 클수록 초반에 훅 줄고 오래 질질 끔
+    static constexpr _float UC_BRAKE_TURN_DEG = 360.f;
+    static constexpr _float UC_FALL_MIN_TIME = 0.15f;
+    static constexpr _float UC_FALL_TIMEOUT = 5.f;
 
 private:
     _int m_iLastCombo = { 0 };
@@ -96,7 +99,7 @@ private:
     CBTNode* Make_UC_Rush(shared_ptr<bool> bCaught, shared_ptr<_float3> vDir);
     CBTNode* Make_UC_Brake(shared_ptr<_float3> vDir);
     CBTNode* Make_UC_CatchSuccess();
-    CBTNode* Make_UpperBranch();
+    CBTNode* Make_UC_Fall();
 
 
     // 트리 조립 유틸
@@ -108,6 +111,7 @@ private:
     CBTNode* Make_GigaBranch();
     CBTNode* Make_ComboBranch();
     CBTNode* Make_RockBranch();
+    CBTNode* Make_UpperBranch();
 
 
 public:
