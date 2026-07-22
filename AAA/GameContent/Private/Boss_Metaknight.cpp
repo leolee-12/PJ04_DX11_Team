@@ -673,7 +673,7 @@ void CBoss_Metaknight::Begin_LockLoseDemo()
         m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
 
     KIRBY_POSITION_SYNC_BEGIN_DESC Sync{};
-    Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_UPPERCALIBUR;
+    Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN;
     XMStoreFloat4x4(&Sync.AnchorWorld,
         Strip_Scale(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
     Sync.fAnimSpeed = s_fDefaultAnimSpeed;
@@ -685,17 +685,6 @@ void CBoss_Metaknight::Begin_LockLoseDemo()
         return;
 
     pAnim->Play(CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
-
-    for (_uint i = 1; i < _countof(CUTS); ++i)
-    {
-        CAnimator::ANI_PLAY_INFO tInfo{};
-        tInfo.strAniName = CUTS[i];
-        tInfo.bLoop = false;
-        tInfo.bRestart = true;
-        tInfo.fBlend = 0.f;
-        tInfo.fSpeed = s_fDefaultAnimSpeed;
-        pAnim->Enqueue(tInfo);
-    }
 }
 
 void CBoss_Metaknight::End_LockLoseDemo()
@@ -721,7 +710,7 @@ void CBoss_Metaknight::End_LockLoseDemo()
 
     m_pMovement->Set_GravityEnabled(true);
 
-    KIRBY_POSITION_SYNC_END_DESC SyncEnd{ KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_UPPERCALIBUR_END };
+    KIRBY_POSITION_SYNC_END_DESC SyncEnd{ KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_LOCKING_WIN_END };
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &SyncEnd);
 
     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
