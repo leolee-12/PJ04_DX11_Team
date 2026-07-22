@@ -906,6 +906,13 @@ HRESULT CKirby::Ready_Events()
     );
 #pragma endregion
 
+    // MetaKnight
+    Subscribe_Event(EventTag::Metaknight_ParryBegin,
+        [this](void*)
+        {
+            m_pKirby_StateMachine->Request_MetaKnight_ParryBegin_StateMachine();
+        }
+    );
     return S_OK;
 }
 

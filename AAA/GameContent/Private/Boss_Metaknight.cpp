@@ -426,10 +426,7 @@ void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
 {
     if (m_bParryWindow && Is_SwordHit(tInfo.eHitType))
     {
-        /*METAKNIGHT_PARRY_DESC tParry{};
-        tParry.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
-        tParry.fAnimSpeed = s_fDefaultAnimSpeed;
-        m_pGameInstance_Proxy->Publish(EventTag::Metaknight_ParryBegin, &tParry);*/
+        m_pGameInstance_Proxy->Publish(EventTag::Metaknight_ParryBegin, nullptr);
 
         Enter_Locking();
         return;

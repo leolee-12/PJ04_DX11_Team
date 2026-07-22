@@ -231,6 +231,10 @@ void CKirby_StateMachine::Request_SequenceLock_End_StateMachine(const KIRBY_LEVE
     m_pCurState->Request_SequenceLock_End(m_pKirby, pDesc);
 }
 
+void CKirby_StateMachine::Request_MetaKnight_ParryBegin_StateMachine()
+{
+    Change_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE);
+}
 void CKirby_StateMachine::Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility)
 {
     if (m_pKirby->Has_Deform())
