@@ -46,7 +46,7 @@ public:
 	// Ä¸½¶ Å©±â º¸°í ¼öÁ¤
 	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
 	virtual _float				Get_CapsuleHeight() const override { return 0.75f; }
-	virtual _float				Get_InteractRadius() const override { return 22.f; }
+	virtual _float				Get_InteractRadius() const override { return 20.f; }
 
 	virtual _bool				Block_Hit(const ATTACK_INFO& tInfo) override { return true; }
 	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override { return false; }

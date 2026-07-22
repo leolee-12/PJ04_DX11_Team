@@ -7,7 +7,6 @@
 #include "Projectile_Manager.h"
 #include "MeteorRock_Large.h"
 #include "MeteorRock_Small.h"
-#include "LightShaft.h"
 
 CLD_MeteorGenerator::CLD_MeteorGenerator(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevelDesignObject(pDevice, pContext)
@@ -75,22 +74,6 @@ void CLD_MeteorGenerator::Update(_float fTimeDelta)
             m_bFiredOnce = true;
         }
     }
-
-    // LightShaft progress uses the generator's own timing, not rock ownership.
-    if (m_bFalling)
-    {
-        m_fShaftTimer += fTimeDelta;
-        const _float fProg = (m_fShaftDur > 1e-3f) ? (m_fShaftTimer / m_fShaftDur) : 1.f;
-        if (m_pLightShaft)
-            m_pLightShaft->Set_Progress(fProg);
-        if (m_fShaftTimer >= m_fShaftDur)
-            m_bFalling = false;
-    }
-    else
-    {
-        if (m_pLightShaft)
-            m_pLightShaft->Set_Progress(0.f);
-    }
 }
 
 void CLD_MeteorGenerator::Late_Update(_float fTimeDelta)
@@ -149,9 +132,6 @@ HRESULT CLD_MeteorGenerator::Ready_Trigger()
 
 void CLD_MeteorGenerator::Fire_Rock()
 {
-    if (m_bFalling)
-        return;
-
     _vector vGen = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vStart = XMLoadFloat3(&m_tMeteorDesc.vFallStart);
     _vector vDelta = vGen - vStart;
@@ -183,43 +163,6 @@ void CLD_MeteorGenerator::Fire_Rock()
     _float3 vScale{};
     vScale = m_tMeteorDesc.vParsedScale;
     pRock->Get_Transform()->Set_Scale(vScale.x, vScale.y, vScale.z);
-
-    m_fShaftDur = (m_tMeteorDesc.fFallSpeed > 0.f) ? (fDist / m_tMeteorDesc.fFallSpeed) : 12.f;
-    m_fShaftTimer = 0.f;
-    m_bFalling = true;
-
-    if (nullptr == m_pLightShaft)
-        Ensure_LightShaft();
-
-    if (m_pLightShaft)
-    {
-        m_pLightShaft->Set_Position(vGen);
-        m_pLightShaft->Align_Up(vStart - vGen);
-        m_pLightShaft->Set_Progress(0.f);
-    }
-}
-
-void CLD_MeteorGenerator::Ensure_LightShaft()
-{
-    CLightShaft::LIGHTSHAFT_DESC Desc{};
-    Desc.iModelLevel = Get_PrototypeLevelIndex();
-    Desc.pModelProtoTag = TEXT("Proto_Model_VolcanoRock_SpotLight");
-    Desc.vColor = { 1.f, 0.5f, 0.15f };
-    Desc.fIntensity = 1.f;
-    Desc.fMaxAlpha = 0.6f;
-    Desc.eEase = CLightShaft::EASE_SMOOTH;
-
-    const _float fRadius = m_tMeteorDesc.fImpactRadius;
-    Desc.vScaleMin = { fRadius * 3.f, fRadius * 3.f, fRadius * 3.f };
-    Desc.vScaleMax = { fRadius * 60.f, fRadius * 60.f, fRadius * 60.f };
-
-    CGameObject* pObj = nullptr;
-    if (SUCCEEDED(m_pGameInstance_Proxy->Add_GameObject_Return(
-        &pObj, Get_PrototypeLevelIndex(), CLightShaft::PROTOTYPE_TAG,
-        Get_LevelIndex(), L"Layer_LightShaft", Get_ObjectTag() + L"_LightShaft", &Desc)))
-    {
-        m_pLightShaft = dynamic_cast<CLightShaft*>(pObj);
-    }
 }
 
 void CLD_MeteorGenerator::Register_LevelDesignSpecs()
@@ -308,6 +251,5 @@ CGameObject* CLD_MeteorGenerator::Clone(void* pArg)
 
 void CLD_MeteorGenerator::Free()
 {
-    m_pLightShaft = nullptr;
     __super::Free();
 }

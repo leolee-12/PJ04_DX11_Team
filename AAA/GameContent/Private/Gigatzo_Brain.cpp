@@ -31,7 +31,7 @@ void CGigatzo_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDe
 
     if (!m_bArmed)                 // 방금 진입 = 무장 (위상 = 접근 기준)
         {
-            m_fFireTimer = pGig->Get_InitWaitDelay();
+            m_fFireTimer = fmodf(pGig->Get_InitWaitDelay(), s_fFireInterval);
             m_bArmed = true;
       }
 

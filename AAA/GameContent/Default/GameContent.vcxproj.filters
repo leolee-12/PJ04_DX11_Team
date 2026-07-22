@@ -1204,12 +1204,6 @@
     <Filter Include="00. GameObject\11. WaddleDee">
       <UniqueIdentifier>{28f1e19d-7639-4e84-b992-8ed2dceda685}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\12. LightShaft">
-      <UniqueIdentifier>{31c36387-052b-4427-a9ec-951e46335daa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\12. LightShaft\LightShaft">
-      <UniqueIdentifier>{4349424d-523c-4239-8713-006d1270e465}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
@@ -2429,9 +2423,6 @@
     </ClInclude>
     <ClInclude Include="..\public\LevelLight_DB.h">
       <Filter>97. DataSystem\LevelLight</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LightShaft.h">
-      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
@@ -3833,9 +3824,6 @@
     <ClCompile Include="..\private\LevelLight_DB.cpp">
       <Filter>97. DataSystem\LevelLight</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LightShaft.cpp">
-      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClCompile>
@@ -4425,9 +4413,6 @@
     </None>
     <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>

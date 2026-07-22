@@ -149,10 +149,6 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
         CShader::Create(pDevice, pContext, Shader_NonAnimMesh_PBR.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
         return E_FAIL;
 
-    if (FAILED(pProxy->Add_Prototype(Shader_LightShaft.iLevelID, Shader_LightShaft.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_LightShaft.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
-        return E_FAIL;
-
     if (FAILED(pProxy->Add_Prototype(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_AnimMesh_PBR.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
         return E_FAIL;

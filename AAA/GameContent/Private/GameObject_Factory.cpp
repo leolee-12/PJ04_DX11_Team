@@ -253,7 +253,6 @@
 #include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
 #include "LD_MeteorGenerator.h"
-#include "LightShaft.h"
 
 // EnvObject
 #include "EnvTrigger_Generic.h"
@@ -840,11 +839,6 @@ void CGameObject_Factory::Register_NonAnimObject()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorRock_Small::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Small/VolcanoRock_S.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Model_VolcanoRock_SpotLight"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/SpotLight/VolcanoRock_SpotLight.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CLightShaft::PROTOTYPE_TAG, CLightShaft::Create(pDevice, pContext));
         )
     );
 }

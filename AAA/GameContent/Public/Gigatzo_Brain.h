@@ -19,7 +19,7 @@ public:
 private:
     _bool   m_bArmed = { false };
     _float  m_fFireTimer = { 0.f };
-    static constexpr const _float s_fFireInterval = { 1.f };   
+    static constexpr const _float s_fFireInterval = { 0.83f };   
 
 protected:
     virtual void                    Free() override;
