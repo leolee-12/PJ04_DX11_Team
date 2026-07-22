@@ -30,6 +30,7 @@
     <ClInclude Include="..\public\Armadillo_WallImpact.h" />
     <ClInclude Include="..\public\Assault_Smoke.h" />
     <ClInclude Include="..\public\AttackDecal.h" />
+    <ClInclude Include="..\Public\BlendRenderable.h" />
     <ClInclude Include="..\public\Boss_GorillaRush.h" />
     <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
@@ -235,6 +236,7 @@
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
     <ClInclude Include="..\Public\SmokeCollection.h" />
     <ClInclude Include="..\Public\CarLanding.h" />
+    <ClInclude Include="..\Public\CarThinGas.h" />
     <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
@@ -400,6 +402,7 @@
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
     <ClInclude Include="..\Public\Kirby_OnOffPart.h" />
@@ -435,6 +438,8 @@
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
+    <ClInclude Include="..\Public\Kirby_ToyHammer.h" />
+    <ClInclude Include="..\Public\Kirby_ToyHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
     <ClInclude Include="..\Public\Kirby_IceHat.h" />
     <ClInclude Include="..\Public\Kirby_SleepHat.h" />
@@ -508,6 +513,7 @@
     <ClInclude Include="..\Public\WarpOutEffect.h" />
     <ClInclude Include="..\Public\Water_Defines.h" />
     <ClInclude Include="..\Public\Water_RenderBinder.h" />
+    <ClInclude Include="..\Public\World_BlendCollector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
@@ -724,6 +730,7 @@
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp" />
     <ClCompile Include="..\Private\SmokeCollection.cpp" />
     <ClCompile Include="..\Private\CarLanding.cpp" />
+    <ClCompile Include="..\Private\CarThinGas.cpp" />
     <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
@@ -838,6 +845,7 @@
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
@@ -912,6 +920,8 @@
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\Kirby_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_ToyHammer.cpp" />
+    <ClCompile Include="..\Private\Kirby_ToyHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
     <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
     <ClCompile Include="..\Private\Kirby_SleepHat.cpp" />
@@ -969,6 +979,7 @@
     <ClCompile Include="..\Private\WarpInEffect.cpp" />
     <ClCompile Include="..\Private\WarpOutEffect.cpp" />
     <ClCompile Include="..\Private\Water_RenderBinder.cpp" />
+    <ClCompile Include="..\Private\World_BlendCollector.cpp" />
     <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>
   <ItemGroup>

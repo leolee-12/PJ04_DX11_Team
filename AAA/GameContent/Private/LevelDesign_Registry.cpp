@@ -40,6 +40,7 @@ namespace
 {
 	std::once_flag g_LevelDesignRegistryInitOnce;
 	unordered_map<_wstring, LD_SPAWN_SPEC> g_Specs;
+	unordered_map<_wstring, _wstring> g_PlacementSpecKeys;
 	LD_SPAWN_SPEC g_FallbackSpec = {};
 
 	_bool Build_WaddleDeeDesc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
@@ -136,6 +137,7 @@ void CLevelDesign_Registry::Initialize()
 	std::call_once(g_LevelDesignRegistryInitOnce, []()
 		{
 			g_Specs.clear();
+			g_PlacementSpecKeys.clear();
 
 			g_FallbackSpec = {};
 			g_FallbackSpec.strObjectName = L"Unsupported";
@@ -166,18 +168,40 @@ _bool CLevelDesign_Registry::Register(const _wstring& strObjectName, const LD_SP
 	if (SafeSpec.strObjectName.empty())
 		SafeSpec.strObjectName = strObjectName;
 
-	const auto [Iter, Inserted] = g_Specs.try_emplace(Make_Key(strObjectName), SafeSpec);
+	const _wstring strObjectKey = Make_Key(strObjectName);
+	const auto [Iter, Inserted] = g_Specs.try_emplace(strObjectKey, SafeSpec);
 
-#ifdef _DEBUG
 	if (!Inserted)
 	{
+#ifdef _DEBUG
 		const _wstring strMessage =
 			L"[LevelDesign_Registry] duplicate object name: " + strObjectName + L"\n";
 		OutputDebugStringW(strMessage.c_str());
-	}
 #endif
+		return false;
+	}
 
-	return Inserted;
+	if (nullptr != SafeSpec.pMakeDefaultDesc)
+	{
+		const _wstring strPrototypeKey = Make_Key(SafeSpec.strPrototypeTag);
+		const _bool bPlacementInserted =
+			g_PlacementSpecKeys.try_emplace(strPrototypeKey, strObjectKey).second;
+
+		if (!bPlacementInserted)
+		{
+			g_Specs.erase(Iter);
+
+#ifdef _DEBUG
+			const _wstring strMessage =
+				L"[LevelDesign_Registry] duplicate placement prototype: "
+				+ SafeSpec.strPrototypeTag + L"\n";
+			OutputDebugStringW(strMessage.c_str());
+#endif
+			return false;
+		}
+	}
+
+	return true;
 }
 
 _bool CLevelDesign_Registry::Build_Entry(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, LD_OBJECT_ENTRY* pOutEntry)
@@ -229,6 +253,48 @@ const LD_SPAWN_SPEC* CLevelDesign_Registry::Find(const _wstring& strObjectName)
 		return nullptr;
 
 	return &Iter->second;
+}
+
+const LD_SPAWN_SPEC* CLevelDesign_Registry::Find_PlacementSpec(const _wstring& strPrototypeTag)
+{
+	Initialize();
+
+	if (strPrototypeTag.empty())
+		return nullptr;
+
+	const auto PlacementIter = g_PlacementSpecKeys.find(Make_Key(strPrototypeTag));
+	if (PlacementIter == g_PlacementSpecKeys.end())
+		return nullptr;
+
+	const auto SpecIter = g_Specs.find(PlacementIter->second);
+	if (SpecIter == g_Specs.end() || nullptr == SpecIter->second.pMakeDefaultDesc)
+		return nullptr;
+
+	return &SpecIter->second;
+}
+
+_bool CLevelDesign_Registry::Make_DefaultDesc(const _wstring& strPrototypeTag, _uint iModelProtoLevel,
+	const _wstring& strObjectTag, const _float3& vPosition, LD_OBJECT_ENTRY* pOutEntry)
+{
+	if (nullptr == pOutEntry || strPrototypeTag.empty() || strObjectTag.empty())
+		return false;
+
+	const LD_SPAWN_SPEC* pSpec = Find_PlacementSpec(strPrototypeTag);
+	if (nullptr == pSpec || nullptr == pSpec->pMakeDefaultDesc)
+		return false;
+
+	LD_OBJECT_DESC CommonDesc{};
+	CommonDesc.wstrSourcePath = L"MapOverride";
+	CommonDesc.strSourceFile = L"AddedMapObjects";
+	CommonDesc.strSection = L"AddedMapObjects";
+	CommonDesc.strEntryKey = strObjectTag;
+	CommonDesc.strObjectName = pSpec->strObjectName;
+	CommonDesc.strKind = L"MapOverride";
+	CommonDesc.vPosition = { vPosition.x, vPosition.y, vPosition.z, 1.f };
+	CommonDesc.vParsedPosition = vPosition;
+	CommonDesc.eCategory = pSpec->eCategory;
+
+	return pSpec->pMakeDefaultDesc(CommonDesc, iModelProtoLevel, *pSpec, pOutEntry);
 }
 
 const LD_SPAWN_SPEC& CLevelDesign_Registry::Get_FallbackSpec()

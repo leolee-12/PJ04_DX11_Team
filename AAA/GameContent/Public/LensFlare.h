@@ -10,11 +10,10 @@ class CLensFlare final : public CEffect_Container
 	GENERATED_BODY(CLensFlare)
 
 	PROPERTY(_bool, m_bUseScreenAxis, L"Use Screen Axis", L"LensFlare");
-	PROPERTY(_float, m_fAxisSourceZ, L"Axis Source Z", L"LensFlare");
-	PROPERTY(_float, m_fAxisOppositeZ, L"Axis Opposite Z", L"LensFlare");
 	PROPERTY(_float, m_fAxisExtent, L"Axis Extent", L"LensFlare");
-	PROPERTY(_float, m_fViewDepthScale, L"View Depth Scale", L"LensFlare");
-	PROPERTY(_float, m_fScreenCullMargin, L"Screen Cull Margin", L"LensFlare");
+	PROPERTY(_float, m_fGhostViewDepth, L"Ghost View Depth", L"LensFlare");
+	PROPERTY(_float, m_fScreenShowMargin, L"Screen Show Margin", L"LensFlare");
+	PROPERTY(_float, m_fScreenHideMargin, L"Screen Hide Margin", L"LensFlare");
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LensFlare";
@@ -38,28 +37,39 @@ public:
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 	_bool Is_Playing() const { return m_bIsPlay; }
+	void Reset_LensRuntimeState();
 
 private:
 	struct LENS_ELEMENT
 	{
 		CEffect_Part* pPart = nullptr;
 		_float3 vAuthorLocalPosition{};
+		_float fAxisPosition = 0.f;
+	};
+
+	struct PENDING_LENS_POSITION
+	{
+		CTransform* pTransform = nullptr;
+		_float3 vLocalPosition{};
 	};
 
 	unordered_map<_wstring, LENS_ELEMENT> m_LensElements;
 	_bool m_bLensElementCacheReady = false;
 	_bool m_bLensElementCacheWarningLogged = false;
 	_bool m_bAuthorPlacementRestored = false;
+	_bool m_bScreenVisible = false;
 
 private:
-	HRESULT	Ready_EffectPartObjects();
-	void	Cache_LensElements();
-	_bool	Project_SourceToNDC(_float2* pOutSourceNDC) const;
-	_float	Calculate_AxisRatio(_float fAuthorZ) const;
-	_float2	Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisRatio) const;
-	_bool	Unproject_AtViewDepth(const _float2& vNDC, _float fViewDepth, _float3* pOutWorldPosition) const;
-	_bool	Update_LensFlarePlacement();
-	void	Restore_AuthorPlacement();
+	HRESULT Ready_EffectPartObjects();
+	void    Cache_LensElements();
+	_float  Resolve_DefaultAxisPosition(const _wstring& strTag) const;
+	_bool   Validate_LensProperties();
+	_bool   Project_SourceToNDC(_float2* pOutSourceNDC) const;
+	_float2 Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisPosition) const;
+	_bool   Unproject_AtViewDepth(const _float2& vNDC, _float fViewDepth, _float3* pOutWorldPosition) const;
+	_bool   Update_ScreenVisibility(const _float2& vSourceNDC);
+	_bool   Update_LensFlarePlacement();
+	void    Restore_AuthorPlacement();
 
 public:
 	static CLensFlare* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

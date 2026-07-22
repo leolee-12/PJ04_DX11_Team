@@ -299,6 +299,7 @@ void CLD_LensFlare::Start_LensFlare()
 
 		if (nullptr != pLensFlare && pLensFlare->Is_Playing())
 		{
+			pLensFlare->Reset_LensRuntimeState();
 			pLensFlare->EffectContainer_Start(_float3{}, _float3{}, &m_matEffectAnchorWorld);
 			return;
 		}
@@ -320,7 +321,13 @@ void CLD_LensFlare::Start_LensFlare()
 		&m_LensFlareHandle)))
 	{
 		m_LensFlareHandle.Clear();
+		return;
 	}
+
+	CLensFlare* pLensFlare = dynamic_cast<CLensFlare*>(m_LensFlareHandle.p);
+
+	if (nullptr != pLensFlare)
+		pLensFlare->Reset_LensRuntimeState();
 }
 
 void CLD_LensFlare::Stop_LensFlare()

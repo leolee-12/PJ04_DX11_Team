@@ -29,7 +29,7 @@ private:
 	_bool   Draw_Properties(IReflectable* pHolder);
 	_bool   Draw_Transform(CGameObject* pObject, const string & strSuffix = "");
 	void    Draw_EditableObjectPolicyPanel(CGameObject* pObject);
-	void    Draw_EditableCustomPanel(CGameObject* pObject);
+	void    Draw_EditableCustomPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CGameObject* pObject);
 	void    Draw_LevelDesignEventPanel(CLevel_Edit* pLevel, CGameObject* pObject);

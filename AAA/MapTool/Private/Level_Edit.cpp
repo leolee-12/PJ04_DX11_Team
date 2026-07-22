@@ -21,6 +21,7 @@
 #include "Env_InstanceController.h"
 #include "LevelDesign_Registry.h"
 #include "LD_LensFlare.h"
+#include "LD_WaterArea.h"
 
 #include "GameInstance.h"
 
@@ -250,6 +251,25 @@ namespace
 		Common.Policy.bUseCollMesh = Policy.bUseCollMesh;
 	}
 
+	_bool Update_LevelDesignClassOverrideFromCurrent(CLevelDesignObject* pLDObject, EDIT_OBJECT_OVERRIDE_DESC* pInOutEdit)
+	{
+		if (nullptr == pLDObject || nullptr == pInOutEdit)
+			return false;
+
+		EDITABLE_DESC EditDesc{};
+		if (!pLDObject->Get_EditDesc(&EditDesc))
+			return false;
+
+		if (const EDIT_WATER_MATERIAL* pWaterMaterial = get_if<EDIT_WATER_MATERIAL>(&EditDesc.CustomDesc))
+		{
+			EDIT_LD_WATER_OVERRIDE WaterOverride{};
+			WaterOverride.RenderDesc = pWaterMaterial->RenderDesc;
+			pInOutEdit->ClassOverride = WaterOverride;
+		}
+
+		return true;
+	}
+
 	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, EDIT_OBJECT_OVERRIDE_DESC* pInOutEdit)
 	{
 		if (nullptr == pInOutEdit)
@@ -417,9 +437,15 @@ CGameObject* CLevel_Edit::Spawn_Object(const _wstring& strProtoTag, const _wstri
 	auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
 	if (!pReg) return nullptr;
 
+	const _bool bLevelDesignObject = pReg->strCategory == L"LEVELDESIGN_OBJECT";
+
+	if (bLevelDesignObject)
+		pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(LEVEL::STATIC));
+
 	if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(TOOL_LEVEL::EDIT), strProtoTag))
 	{
-		pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(TOOL_LEVEL::EDIT));
+		if (!bLevelDesignObject)
+			pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(TOOL_LEVEL::EDIT));
 
 		m_pGameInstance_Proxy->Add_Prototype(ETOUI(TOOL_LEVEL::EDIT), strProtoTag.c_str(),
 			pReg->CreatorFunc(m_pDevice, m_pContext));
@@ -572,6 +598,7 @@ void CLevel_Edit::Place_Object_At(const _float3& vPos)
 	wstring strName = m_strPendingProto + L"_" + to_wstring(m_iPlaceCount++);
 
 	ENV_OBJECT_DESC EnvRuntimeDesc{};
+	LD_OBJECT_ENTRY LevelDesignRuntimeEntry{};
 	void* pArg = nullptr;
 
 	auto* pRegistration = CGameObject_Factory::GetInstance()->Get_Registration(m_strPendingProto);
@@ -579,6 +606,28 @@ void CLevel_Edit::Place_Object_At(const _float3& vPos)
 	{
 		EnvRuntimeDesc = Make_DefaultEnvRuntimeDesc(m_strPendingProto, strName, vPos);
 		pArg = &EnvRuntimeDesc;
+	}
+	else if (nullptr != pRegistration && pRegistration->strCategory == L"LEVELDESIGN_OBJECT")
+	{
+		if (!CLevelDesign_Registry::Make_DefaultDesc(
+			m_strPendingProto,
+			ETOUI(LEVEL::STATIC),
+			strName,
+			vPos,
+			&LevelDesignRuntimeEntry))
+		{
+			MapTool::Log_Error(
+				"Failed to build LevelDesign default descriptor: "
+				+ WstrToStr(m_strPendingProto));
+			return;
+		}
+
+		pArg = std::visit(
+			[](auto& Desc) -> void*
+			{
+				return static_cast<void*>(&Desc);
+			},
+			LevelDesignRuntimeEntry);
 	}
 
 	CGameObject* pObj = Spawn_Object(m_strPendingProto, m_strPendingLayer, strName, pArg);
@@ -590,10 +639,9 @@ void CLevel_Edit::Place_Object_At(const _float3& vPos)
 
 	pObj->Get_Transform()->Set_State(
 		STATE::POSITION,
-		XMVectorSet(vPos.x, vPos.y, vPos.z, 1.f)
-	);
-	pObj->Initialize_NaviPlacement();
+		XMVectorSet(vPos.x, vPos.y, vPos.z, 1.f));
 
+	pObj->Initialize_NaviPlacement();
 	Try_RegisterAddedMapOverridePlacement(pObj, strName);
 }
 
@@ -758,6 +806,9 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 		Edit.eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
 		Try_GetMapPreviewLevelDesignEdit(pObject, &Edit);
 
+		if (!Update_LevelDesignClassOverrideFromCurrent(pLDObject, &Edit))
+			return false;
+
 		const _float4x4& CurrentWorld = *pLDObject->Get_Transform()->Get_WorldMatrixPtr();
 		Update_WorldMatrixEdit(CurrentWorld, Build_LevelDesignBaseWorldMatrix(pLDObject->Get_LevelDesignDesc()), &Edit);
 		return Track_EditedMapPreviewLevelDesignObject(pObject, Edit);
@@ -796,6 +847,36 @@ HRESULT CLevel_Edit::Restore_AllDeletedMapPreviewEnv()
 
 	m_pMapPreviewSession->Restore_AllDeletedEnvItems();
 	return Load_MapPreviewEnv(static_cast<_uint>(MapContentDesc.iPresetIndex));
+}
+
+HRESULT CLevel_Edit::Restore_DeletedMapPreviewLevelDesign(const _wstring& strStableKey)
+{
+	if (nullptr == m_pMapPreviewSession)
+		return E_FAIL;
+
+	const MAP_EDIT_DATA MapContentDesc = m_pMapPreviewSession->Get_EditData();
+
+	if (0 > MapContentDesc.iPresetIndex)
+		return E_FAIL;
+
+	if (!m_pMapPreviewSession->Restore_DeletedLevelDesignItem(strStableKey))
+		return E_FAIL;
+
+	return Load_LDPreview(static_cast<_uint>(MapContentDesc.iPresetIndex));
+}
+
+HRESULT CLevel_Edit::Restore_AllDeletedMapPreviewLevelDesign()
+{
+	if (nullptr == m_pMapPreviewSession)
+		return E_FAIL;
+
+	const MAP_EDIT_DATA MapContentDesc = m_pMapPreviewSession->Get_EditData();
+
+	if (0 > MapContentDesc.iPresetIndex)
+		return E_FAIL;
+
+	m_pMapPreviewSession->Restore_AllDeletedLevelDesignItems();
+	return Load_LDPreview(static_cast<_uint>(MapContentDesc.iPresetIndex));
 }
 
 HRESULT CLevel_Edit::Save_PlaceEdit()

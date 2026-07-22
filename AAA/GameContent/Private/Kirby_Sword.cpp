@@ -153,7 +153,7 @@ void CKirby_Sword::Set_HitBox(_bool bOn)
 
 HRESULT CKirby_Sword::Ready_Components()
 {
-    KIRBY_PART_COMPONENT_DESC°¡ tDesc{};
+    KIRBY_PART_COMPONENT_DESC tDesc{};
     tDesc.tShaderDesc = Shader_Kirby;
     tDesc.szModelProtoTag = TEXT("Prototype_Component_Model_Sword");
     tDesc.bCreateAnimator = true;

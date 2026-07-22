@@ -64,7 +64,7 @@ HRESULT CKirby_SleepHat::Render()
 
 HRESULT CKirby_SleepHat::Ready_Components()
 {
-    KIRBY_PART_COMPONENT_DESC\uAC00 tDesc{};
+    KIRBY_PART_COMPONENT_DESC tDesc{};
     tDesc.tShaderDesc = Shader_Kirby;
     tDesc.szModelProtoTag = TEXT("Prototype_Component_Model_SleepHat");
     tDesc.bCreateAnimator = true;

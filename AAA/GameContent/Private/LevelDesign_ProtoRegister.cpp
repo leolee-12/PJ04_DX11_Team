@@ -37,6 +37,18 @@ HRESULT CLevelDesign_ProtoRegister::Ready_Prototypes(const LD_RUNTIME_LEVELS& Le
 	return S_OK;
 }
 
+HRESULT CLevelDesign_ProtoRegister::Ready_PlacementPrototype(const LD_RUNTIME_LEVELS& Levels, const _wstring& strPrototypeTag)
+{
+	if (nullptr == m_pProxy)
+		return E_FAIL;
+
+	const LD_SPAWN_SPEC* pSpec = CLevelDesign_Registry::Find_PlacementSpec(strPrototypeTag);
+	if (nullptr == pSpec)
+		return S_FALSE;
+
+	return Ensure_Resources(Levels, *pSpec);
+}
+
 HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(const LD_RUNTIME_LEVELS& Levels, const LD_SPAWN_SPEC& Spec)
 {
 	if (nullptr == m_pProxy

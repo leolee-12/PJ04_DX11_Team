@@ -18,15 +18,7 @@ namespace
 	
 	inline constexpr const _char* STAGE1_BOSS_DEMO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_APPEAR, ANIM_AFTERWAIT, ANIM_BEFOREWAIT, "" };
 
-	inline constexpr _uint EVENTOBJECT_ANIM_DEFAULT_PASS = 1u;
-	inline constexpr _uint STAGE1_BOSS_DEMO_GLASS_PASS = 0u;
-	inline constexpr _bool ENABLE_STAGE1_BOSS_DEMO_GLASS_PASS = false;
 	inline constexpr _uint STAGE1_BOSS_DEMO_REQUIRED_MESH_COUNT = 49u;
-
-	_bool Is_Stage1BossDemoGlassMesh(const _string& strMeshName)
-	{
-		return "GlassSideM__MlBossGlassC" == strMeshName || "GlassM__MlBossGlassC" == strMeshName;
-	}
 }
 
 NS_BEGIN(Client)
@@ -224,28 +216,6 @@ void CLD_Stage1BossDemo::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PH
 	default:
 		break;
 	}
-}
-
-_bool CLD_Stage1BossDemo::Should_RenderMesh(_uint iMeshIndex) const
-{
-	if (!__super::Should_RenderMesh(iMeshIndex))
-		return false;
-
-	if (Is_Stage1BossDemoGlassMesh(m_pModelCom->Get_MeshName(iMeshIndex))
-		&& !ENABLE_STAGE1_BOSS_DEMO_GLASS_PASS)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-_uint CLD_Stage1BossDemo::Resolve_RenderPass(_uint iMeshIndex) const
-{
-	if (Is_Stage1BossDemoGlassMesh(m_pModelCom->Get_MeshName(iMeshIndex)))
-		return STAGE1_BOSS_DEMO_GLASS_PASS;
-
-	return EVENTOBJECT_ANIM_DEFAULT_PASS;
 }
 
 CLD_Stage1BossDemo* CLD_Stage1BossDemo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

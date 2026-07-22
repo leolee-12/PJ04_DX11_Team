@@ -50,6 +50,8 @@
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
+#include "Kirby_ToyHammer.h"
+#include "Kirby_ToyHat.h"
 
 // Effect_Container
 #include "WalkSmoke.h"
@@ -92,6 +94,7 @@
 #include "LandingSmoke.h"
 #include "MoveSmoke.h"
 #include "CarLanding.h"
+#include "CarThinGas.h"
 #include "PickUpEffect.h"
 #include "DropStarEffect.h"
 #include "OnLadderEffect.h"
@@ -244,6 +247,7 @@
 #include "LevelDesign_Rail.h"
 #include "LD_AudioArea.h"
 #include "LD_LensFlare.h"
+#include "LD_WaterArea.h"
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardB.h"
@@ -474,6 +478,18 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
+
+            // Toy Hammer
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_ToyHammer::PROTOTYPE_TAG,
+                CKirby_ToyHammer::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_ToyHammer"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Hammer/ToyHammer/ToyHammer.ysh"));
+
+            // Toy Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_ToyHat::PROTOTYPE_TAG,
+                CKirby_ToyHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_ToyHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Hammer/ToyHat/ToyHat.ysh"));
 
             // Bomb Hat
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG, CKirby_BombHat::Create(pDevice, pContext));
@@ -824,6 +840,11 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
     Register(CLD_AudioArea::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_AudioArea), LOADER());
     Register(CLD_LensFlare::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_LensFlare), LOADER());
+
+    Register(CLD_WaterArea::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_WaterArea),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_WaterArea::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Water/Water.ysh", false));));
+
     Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
             CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
@@ -1187,6 +1208,18 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    // CarThinGas
+    Register(CCarThinGas::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CCarThinGas),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG,
+                CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCarThinGas::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/CarThinGas/Common_00_PuncSub.ysh"));
         ));
 
     // SmokeSphereOriginalEmitter

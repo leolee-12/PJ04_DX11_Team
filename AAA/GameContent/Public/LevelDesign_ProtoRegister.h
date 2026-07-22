@@ -13,6 +13,7 @@ private:
 
 public:
 	HRESULT Ready_Prototypes(const LD_RUNTIME_LEVELS& Levels, const LD_PACKAGE& Package);
+	HRESULT Ready_PlacementPrototype(const LD_RUNTIME_LEVELS& Levels, const _wstring& strPrototypeTag);
 
 private:
 	ID3D11Device* m_pDevice = nullptr;
