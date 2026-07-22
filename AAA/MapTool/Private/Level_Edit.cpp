@@ -238,12 +238,6 @@ namespace
 			Common.iPolicyMask &= ~EDIT_CAP_RENDERABLE;
 		Common.Policy.bRenderable = Policy.bRenderable;
 
-		if ((Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM) || Policy.bUseCullFrustum != Desc.bEnableCulling)
-			Common.iPolicyMask |= EDIT_CAP_CULL_FRUSTUM;
-		else
-			Common.iPolicyMask &= ~EDIT_CAP_CULL_FRUSTUM;
-		Common.Policy.bUseCullFrustum = Policy.bUseCullFrustum;
-
 		if (pSection->Has_CollMesh() && ((Common.iPolicyMask & EDIT_CAP_COLLISION_MESH) || Policy.bUseCollMesh != Desc.bUseCollMesh))
 			Common.iPolicyMask |= EDIT_CAP_COLLISION_MESH;
 		else

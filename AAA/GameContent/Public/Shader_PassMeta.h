@@ -169,6 +169,7 @@ enum class WORLD_PASS : _int
 	DCUT_UMN,
 	BLEND_DMN, // 17 - BLEND_HDR에서 렌더링하는 포워드 반투명 패스
 	BLEND_UKWN_LIGHT, // 18 - UNKNOWN 밝기를 마스크로 사용하는 빛줄기 패스
+	BLEND_UKWN2_LIGHT, // 19 - 두 UNKNOWN 텍스처를 조합하는 빛줄기 패스
 
 	COUNT
 };
@@ -201,6 +202,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::DCUT_UMN,				"DCUT_UMN",				DIFF | MRA | NORM | UKWN },
 	{ WORLD_PASS::BLEND_DMN,			"BLEND_DMN",			DIFF | MRA | NORM },
 	{ WORLD_PASS::BLEND_UKWN_LIGHT,		"BLEND_UKWN_LIGHT",		UKWN },
+	{ WORLD_PASS::BLEND_UKWN2_LIGHT,	"BLEND_UKWN2_LIGHT",	UKWN },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -215,6 +217,7 @@ inline _bool Is_WorldBlendPass(_int iPass)
 	case WORLD_PASS::BLEND_UKWN_OVERLAY:
 	case WORLD_PASS::BLEND_DMN:
 	case WORLD_PASS::BLEND_UKWN_LIGHT:
+	case WORLD_PASS::BLEND_UKWN2_LIGHT:
 		return true;
 
 	default:
@@ -261,6 +264,7 @@ inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
 	case WORLD_PASS::BLEND_UKWN_OVERLAY:
 	case WORLD_PASS::BLEND_DMN:
 	case WORLD_PASS::BLEND_UKWN_LIGHT:
+	case WORLD_PASS::BLEND_UKWN2_LIGHT:
 		return SHADOW_ALPHA_SOURCE::DISCARD_ALL;
 
 	default:
