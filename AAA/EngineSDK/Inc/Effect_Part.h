@@ -17,6 +17,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_int, m_iDepthIgnore,      L"Depth Ignore", L"Effect");
     PROPERTY(_float, m_fEffectIntensity, L"Effect Intensity_E", L"Effect");
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
+    PROPERTY(_float3, m_vScale,         L"Scale",       L"Effect");
     PROPERTY(_float, m_fStartRatio,     L"Start Ratio",  L"Effect");
     PROPERTY(_float, m_fEndRatio,       L"End Ratio",    L"Effect");
 
@@ -173,6 +174,8 @@ public:
     _bool Get_IsPlay() { return m_bIsPlay; }
 
 protected:
+    virtual void On_Deserialized() override;
+
     _bool m_bCustomShader{};
     _bool m_bUseGBufferOutput{};
     CShader* m_pShaderCom{};
@@ -205,6 +208,7 @@ protected:
     void Compute_CombinedWorldMatrix();
     _float4x4 Make_BillboardWorldMatrix(const _float4x4& WorldMatrix) const;
     void Set_LocalPositionFromProperty();
+    void Apply_PropertyScale(_float fUniformScale = 1.f);
     void Update_Orbit(const _float fRatio);
     void Set_UseGBufferOutput(_bool bUseGBufferOutput) { m_bUseGBufferOutput = bUseGBufferOutput; }
     _bool Get_UseGBufferOutput() const { return m_bUseGBufferOutput; }

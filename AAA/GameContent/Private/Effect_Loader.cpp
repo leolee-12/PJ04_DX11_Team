@@ -46,7 +46,7 @@ namespace
         { TEXT("MoveGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/MoveGas.json") },
         { TEXT("CylinderRollGas"),        TEXT("../../Resources/EffectContainerJSON/YSE/CylinderRollGas.JSON") },
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/EffectContainerJSON/YSE/CarMilkyWay_Final2.json") },
-        { TEXT("CarThinGas"),             TEXT("../../Resources/YSE/EffectContainer/CarThinGas.JSON") },
+        { TEXT("CarThinGas"),             TEXT("../../Resources/EffectContainerJSON/YSE/CarThinGas.JSON") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/EffectContainerJSON/YSE/GetAbilityEffect.JSON") },
         { TEXT("GetDeformEffect"),        TEXT("../../Resources/EffectContainerJSON/YSE/GetDeformEffect .JSON") },

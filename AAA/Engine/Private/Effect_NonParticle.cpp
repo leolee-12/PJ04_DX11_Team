@@ -34,12 +34,14 @@ void CEffect_NonParticle::Effect_Start()
 {
     __super::Effect_Start();
     Resolve_BaseRotation();
+    Update_Size(0.f, 0.f);
 }
 
 void CEffect_NonParticle::On_Deserialized()
 {
     __super::On_Deserialized();
     Resolve_BaseRotation();
+    Update_Size(0.f, 0.f);
 }
 
 void CEffect_NonParticle::Init_PropertyValue()
@@ -148,21 +150,20 @@ void CEffect_NonParticle::Update_Alpha(const _float fTimeDelta, const _float fRa
 
 void CEffect_NonParticle::Update_Size(const _float fTimeDelta, const _float fRatio)
 {
-    if (m_bSizeChange == true)
-    {
-        m_fSize = Evaluate_FloatCurve(
-            fRatio, m_fSize, true,
-            m_fSizeStartValue, m_fSizeEndValue,
-            m_bActive_Size_Ratio_0, m_fSize_Ratio_0, m_fSize_Value_0,
-            m_bActive_Size_Ratio_1, m_fSize_Ratio_1, m_fSize_Value_1,
-            false);
+    _float fSize = Evaluate_FloatCurve(
+        fRatio, m_fSize, m_bSizeChange,
+        m_fSizeStartValue, m_fSizeEndValue,
+        m_bActive_Size_Ratio_0, m_fSize_Ratio_0, m_fSize_Value_0,
+        m_bActive_Size_Ratio_1, m_fSize_Ratio_1, m_fSize_Value_1,
+        false);
 
-        if (m_fSize < Helper::fEpsilon)
-            m_fSize = Helper::fEpsilon;
+    if (fSize < Helper::fEpsilon)
+        fSize = Helper::fEpsilon;
 
-        m_pTransformCom->Set_Scale(m_fSize, m_fSize, m_fSize);
-    }
+    if (m_bSizeChange == false)
+        m_fSize = fSize;
 
+    Apply_PropertyScale(fSize);
 }
 
 void CEffect_NonParticle::Update_Color(const _float fTimeDelta, const _float fRatio)
