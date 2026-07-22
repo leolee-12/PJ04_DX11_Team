@@ -109,6 +109,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\07. BoostGas">
       <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind">
+      <UniqueIdentifier>{0c876f5f-219a-4b8c-9c29-6065f339a1cf}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. Env">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
     </Filter>
@@ -1659,6 +1662,9 @@
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CoasterWind.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Boss.h">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
     </ClInclude>
@@ -3136,6 +3142,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CoasterWind.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Boss.cpp">
       <Filter>00. GameObject\07. Boss\Boss</Filter>

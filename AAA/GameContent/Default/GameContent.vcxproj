@@ -138,6 +138,7 @@
     <ClInclude Include="..\Public\BombExplosion.h" />
     <ClInclude Include="..\Public\BombFuseEffect.h" />
     <ClInclude Include="..\Public\BoostGas.h" />
+    <ClInclude Include="..\Public\CoasterWind.h" />
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
@@ -633,6 +634,7 @@
     <ClCompile Include="..\Private\BombExplosion.cpp" />
     <ClCompile Include="..\Private\BombFuseEffect.cpp" />
     <ClCompile Include="..\Private\BoostGas.cpp" />
+    <ClCompile Include="..\Private\CoasterWind.cpp" />
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />

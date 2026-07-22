@@ -72,6 +72,7 @@
 #include "SwordChargeEffect.h"
 #include "BombExplosion.h"
 #include "BoostGas.h"
+#include "CoasterWind.h"
 #include "CarMilkyWay.h"
 #include "CommonHit.h"
 #include "SpitObject.h"
@@ -940,6 +941,15 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
+    Register(CCoasterWind::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCoasterWind),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_CoasterWind.iLevelID, Texture_CoasterWind.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CoasterWind.szFileTag, Texture_CoasterWind.iNumTex));
+        )
+    );
+
     // BoostGas
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
