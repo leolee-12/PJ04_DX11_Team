@@ -17,10 +17,20 @@ public:
 	static constexpr const _tchar* DROPSTAR_LAYER_TAG = L"Layer_DropStar";
 
     enum class STAR_SPAWN_TYPE { SWEEP, CIRCLE };
+    enum class STAR_SPAWN_PRESET 
+    { 
+        // GORILLA 
+        GORILLA_ARM_SWEEP_RIGHT, 
+        GORILLA_ARM_SWEEP_LEFT,
+        AFTER_GORILLA_ARM_SPIN,
+        ROCK_IMPACT,
+        PRESET_END
+    };
 
     struct STAR_SPAWN_DESC {
         STAR_SPAWN_TYPE     eType = STAR_SPAWN_TYPE::SWEEP;
         _uint               iCount = { 6 };
+        _float              fLifeTime = { 3.f };         //  별들 수명시간 
         _float              fDelayStart = { 0.f };
         _float              fDelayStep = { 0.08f };      // SWEEP 개당 램프
         _float              fJitter = { 0.5f };
@@ -55,14 +65,17 @@ public:
     HRESULT                 Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     HRESULT                 Register_At_Static(const _tchar* szProtoTag, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
-    HRESULT                 Spawn(_uint iTargetLevel, const _float3& vPos, const _float3& vLook = { 0.f, 0.f, 0.f }, const _float3& vDir = { 0.f, 0.f, 0.f }, _float fDelay = 0.f, CDropStar * *ppOut = nullptr);
+    HRESULT                 Spawn(_uint iTargetLevel, const _float3& vPos, const _float3& vLook = { 0.f, 0.f, 0.f }, const _float3& vDir = { 0.f, 0.f, 0.f }, _float fDelay = 0.f, _float fLife = 3.f, CDropStar * *ppOut = nullptr);
     HRESULT                 Spawn_Pattern(_uint iLayerLevel, _fmatrix matCaster, const STAR_SPAWN_DESC& Desc);
+    HRESULT                 Spawn_Preset(_uint iLayerLevel, _fmatrix matCaster, const _wstring& strPreset, const _float3& vOffset = {});
 
+    STAR_SPAWN_DESC         Get_Preset(STAR_SPAWN_PRESET ePreset) const;
     void                    Return(_uint iLevel, const _wstring& strKey, CDropStar* pStar);
     void                    Clear_Level(_uint iLevel);
 
 private:
     _vector                 Compute_StarPos(_fvector vCenter, _fvector vLook, const CDropStar_Manager::STAR_SPAWN_DESC& Desc, _uint iIndex);
+    STAR_SPAWN_PRESET       Name_To_Preset(const _wstring& strName) const;
 
 private:
     CGameInstance_Proxy*    m_pGameInstance_Proxy = { nullptr };

@@ -34,7 +34,7 @@ HRESULT CDropStar_Manager::Register_At_Static(const _tchar* szProtoTag, ID3D11De
 	return m_pGameInstance_Proxy->Add_Prototype(iStatic, szProtoTag, pReg->CreatorFunc(pDevice, pContext));
 }
 
-HRESULT CDropStar_Manager::Spawn(_uint iTargetLevel, const _float3& vPos, const _float3& vLook, const _float3& vDir, _float fDelay , CDropStar** ppOut)
+HRESULT CDropStar_Manager::Spawn(_uint iTargetLevel, const _float3& vPos, const _float3& vLook, const _float3& vDir, _float fDelay, _float fLife, CDropStar** ppOut)
 {
     const _wstring strKey = CDropStar::PROTOTYPE_TAG;
 
@@ -43,7 +43,7 @@ HRESULT CDropStar_Manager::Spawn(_uint iTargetLevel, const _float3& vPos, const 
     {
         CDropStar* p = it->second.back();
         it->second.pop_back();
-        p->Activate(vPos, vLook, vDir, fDelay);
+        p->Activate(vPos, vLook, vDir, fDelay, fLife);
         if (ppOut) *ppOut = p;
         return S_OK;
     }
@@ -65,7 +65,7 @@ HRESULT CDropStar_Manager::Spawn(_uint iTargetLevel, const _float3& vPos, const 
     }
 
     pStar->Set_Pool(this, iTargetLevel, strKey);
-    pStar->Activate(vPos, vLook, vDir, fDelay);
+    pStar->Activate(vPos, vLook, vDir, fDelay, fLife);
     if (ppOut)
         *ppOut = pStar;
 
@@ -112,10 +112,100 @@ HRESULT CDropStar_Manager::Spawn_Pattern(_uint iLayerLevel, _fmatrix matCaster, 
             }
         }
 
-        Spawn(iLayerLevel, vPos3, vFace, vLaunch, fDelay);
+        Spawn(iLayerLevel, vPos3, vFace, vLaunch, fDelay, Desc.fLifeTime);
     }
 
     return S_OK;
+}
+
+HRESULT CDropStar_Manager::Spawn_Preset(_uint iLayerLevel, _fmatrix matCaster, const _wstring& strPreset, const _float3& vOffset)
+{
+    STAR_SPAWN_PRESET ePreset = Name_To_Preset(strPreset);
+    if (ePreset == STAR_SPAWN_PRESET::PRESET_END)
+    {
+#ifdef _DEBUG
+        OutputDebugStringW((L"[CDropStar_Manager] Unknown preset: " + strPreset  + L"\n").c_str());
+#endif
+        return E_FAIL;
+    }
+
+    STAR_SPAWN_DESC Desc = Get_Preset(static_cast<STAR_SPAWN_PRESET>(ePreset));
+    Desc.vLocalOffset.x += vOffset.x;
+    Desc.vLocalOffset.y += vOffset.y;
+    Desc.vLocalOffset.z += vOffset.z;
+
+    return Spawn_Pattern(iLayerLevel, matCaster, Desc);
+}
+
+CDropStar_Manager::STAR_SPAWN_DESC CDropStar_Manager::Get_Preset(STAR_SPAWN_PRESET ePreset) const
+{
+    STAR_SPAWN_DESC tSpawnDesc{};
+
+    switch (ePreset)
+    {
+#pragma region 보스 - 고릴라
+        case STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_RIGHT:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 8;
+            tSpawnDesc.fRange = 15.f;
+            tSpawnDesc.fStartDeg = 90.f;
+            tSpawnDesc.fSweepDeg = -160.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.25f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 0.5f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_LEFT:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 8;
+            tSpawnDesc.fRange = 15.f;
+            tSpawnDesc.fStartDeg = -90.f;
+            tSpawnDesc.fSweepDeg = 160.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.25f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 0.5f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::AFTER_GORILLA_ARM_SPIN:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 4;
+            tSpawnDesc.fRange = 5.f;
+            tSpawnDesc.fStartDeg = 0.f;
+            tSpawnDesc.fSweepDeg = 270.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 3.f;
+            tSpawnDesc.fJitter = 0.f;
+            tSpawnDesc.fLifeTime = 3.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::ROCK_IMPACT:
+        {
+            // 고릴라 돌 낙하시 효과
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 4;
+            tSpawnDesc.fRange = 3.f;
+            tSpawnDesc.fStartDeg = 120.f;
+            tSpawnDesc.fSweepDeg = -240.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.05f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 0.75f;            
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+#pragma endregion
+    }
+
+    return tSpawnDesc;
 }
 
 void CDropStar_Manager::Return(_uint iLevel, const _wstring& strKey, CDropStar* pStar)
@@ -156,6 +246,20 @@ _vector CDropStar_Manager::Compute_StarPos(_fvector vCenter, _fvector vLook, con
         -Desc.fJitter, Desc.fJitter);
 
     return vCenter + vDir * (Desc.fRange + fJitter);
+}
+
+CDropStar_Manager::STAR_SPAWN_PRESET CDropStar_Manager::Name_To_Preset(const _wstring& strName) const
+{
+    static const unordered_map<_wstring, STAR_SPAWN_PRESET> s_Table
+    {
+        { L"GorillaArmSweepRight",      STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_RIGHT },
+        { L"GorillaArmSweepLeft",       STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_LEFT  },
+        { L"AfterGorillaArmSpin",       STAR_SPAWN_PRESET::AFTER_GORILLA_ARM_SPIN  },
+        { L"RockImpact",                STAR_SPAWN_PRESET::ROCK_IMPACT             },
+    };
+
+    auto it = s_Table.find(strName);
+    return (it != s_Table.end()) ? it->second : STAR_SPAWN_PRESET::PRESET_END;
 }
 
 void CDropStar_Manager::Free()

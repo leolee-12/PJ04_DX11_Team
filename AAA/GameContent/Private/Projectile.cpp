@@ -130,7 +130,8 @@ void CProjectile::Late_Update(_float fTimeDelta)
 #endif
 
     // 불투명 메시 기본 등록. concrete 가 모델 들고 Render() 처리.
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);    
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 void CProjectile::Attach_To_Socket(const _float4x4* pBone, const _float4x4* pOwnerWorld, _fmatrix matOffset)

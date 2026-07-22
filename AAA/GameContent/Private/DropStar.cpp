@@ -62,7 +62,8 @@ void CDropStar::Update(_float fTimeDelta)
         return;
     }
 
-    if (m_eState == DROPSTAR_STATE::LIVE)
+    if (m_eState == DROPSTAR_STATE::LIVE || 
+        m_eState == DROPSTAR_STATE::VANISH)
         Apply_Roll(fTimeDelta);
 
     __super::Update(fTimeDelta);
@@ -80,14 +81,21 @@ void CDropStar::Update(_float fTimeDelta)
         return;                             // Spit Projectile°¡ Transform °ü¸®
     }
 
+    if (m_eState == DROPSTAR_STATE::VANISH)
+    {
+        Update_Vanish(fTimeDelta);
+        Update_HaloSocket();
+        return;
+    }
+
     if (m_pMovement)
         m_pMovement->Tick(fTimeDelta);
 
     m_fTimer += fTimeDelta;
 
-    if (m_fTimer >= s_fDeSpawnTime)
+    if (m_fTimer >= m_fDeSpawnTime)
     {
-        Despawn();
+        Begin_Vanish();
         return;
     }
 
@@ -117,7 +125,7 @@ void CDropStar::Set_Pool(CDropStar_Manager* pPool, _uint iLevel, const _wstring&
 	m_strPoolKey	= strKey;
 }
 
-void CDropStar::Activate(const _float3& vPos, const _float3& vLook, const _float3& vDir, _float fDelay)
+void CDropStar::Activate(const _float3& vPos, const _float3& vLook, const _float3& vDir, _float fDelay, _float fLife)
 {
     Stop_HaloFx();
 
@@ -131,6 +139,7 @@ void CDropStar::Activate(const _float3& vPos, const _float3& vLook, const _float
 
     m_fDelay = fDelay;
     m_fTimer = 0.f;
+    m_fDeSpawnTime = fLife;
     m_fPullSpeed = 0.f;
     m_fScaleRatio = 1.f;
     m_fRollAngle = 0.f;
@@ -153,7 +162,7 @@ void CDropStar::Activate(const _float3& vPos, const _float3& vLook, const _float
         m_pCollider->Set_Enabled(false);
 
     Update_HaloSocket();
-    Start_HaloFx();
+    //Start_HaloFx();
 }
 
 _bool CDropStar::Can_BeInhaled(const INHALE_QUERY& q) const
@@ -176,6 +185,7 @@ void CDropStar::Be_Captured(CGameObject* pInhaler)
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(false);
 
+    Stop_HaloFx();
 	m_fPullSpeed = 0.f;
 	m_fScaleRatio = 1.f;
 }
@@ -199,7 +209,7 @@ void CDropStar::On_SpatBegin()
     m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 
     Update_HaloSocket();
-    Start_HaloFx();
+    //Start_HaloFx();
 }
 
 void CDropStar::On_SpatEnd()
@@ -214,7 +224,7 @@ void CDropStar::On_SpatEnd()
     if (m_pCollider)
         m_pCollider->Set_Enabled(false);
 
-    Stop_HaloFx();
+    //Stop_HaloFx();
 
     Set_Active(false);
     Return_ToPool();
@@ -415,6 +425,39 @@ void CDropStar::On_Swallowed()
     Stop_HaloFx();
 
     Set_Active(false);
+}
+
+void CDropStar::Begin_Vanish()
+{
+    m_eState = DROPSTAR_STATE::VANISH;
+    m_bAvailable = false;
+    m_fTimer = 0.f;
+
+    Stop_HaloFx();
+
+    if (m_pMovement)
+        m_pMovement->Stop();
+    if (m_pController)
+        m_pController->Set_Enabled(false);
+    if (m_pCollider)
+        m_pCollider->Set_Enabled(false);
+}
+
+void CDropStar::Update_Vanish(_float fTimeDelta)
+{
+    m_fTimer += fTimeDelta;
+
+    _float fTime = m_fTimer / s_fVanishTime;
+    if (fTime >= 1.f)
+    {
+        Despawn();
+        return;
+    }
+
+    _float fRatio = 1.f - fTime;
+    m_pTransformCom->Set_Scale(m_vBaseScale.x * fRatio,
+                               m_vBaseScale.y * fRatio,
+                               m_vBaseScale.z * fRatio);
 }
 
 void CDropStar::Despawn()
