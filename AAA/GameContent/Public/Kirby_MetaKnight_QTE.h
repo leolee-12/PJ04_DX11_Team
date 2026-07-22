@@ -37,14 +37,14 @@ public:
     virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc) override;
     virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc) override;
 
+    // MetaKnight
+    virtual void Request_MetaKnight_ParryBegin(CKirby* pKirby) override;
+
 private:
     void Change_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eNext);
     void Enter_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eState);
     void Update_MetaKnightState(CKirby* pKirby, _float fTimeDelta);
     void Exit_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eState);
-
-    // MetaKnight
-    virtual void Request_MetaKnight_ParryBegin(CKirby* pKirby) override;
 
 private:
     METAKNIGHT_QTE_STATE m_eMetaKnightQTEState{ METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END };
