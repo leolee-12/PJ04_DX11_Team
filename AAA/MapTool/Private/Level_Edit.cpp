@@ -595,8 +595,7 @@ void CLevel_Edit::Pick_And_SelectEnvObject(_fvector vOrigin, _fvector vDir)
 
 void CLevel_Edit::Place_Object_At(const _float3& vPos)
 {
-	wstring strName = m_strPendingProto + L"_" + to_wstring(m_iPlaceCount++);
-
+	wstring strName = Make_UniqueAddedObjectTag(m_strPendingProto);
 	ENV_OBJECT_DESC EnvRuntimeDesc{};
 	LD_OBJECT_ENTRY LevelDesignRuntimeEntry{};
 	void* pArg = nullptr;
@@ -2179,8 +2178,7 @@ _bool CLevel_Edit::Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, c
 	return true;
 }
 
-void CLevel_Edit::Try_RegisterLoadedAddedMapObject(CGameObject* pObject, const _wstring& strPrototypeTag,
-	const _wstring& strLayerTag, const _wstring& strObjectTag)
+void CLevel_Edit::Try_RegisterLoadedAddedMapObject(CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag)
 {
 	if (nullptr == pObject || nullptr == m_pMapPreviewSession)
 		return;
@@ -2206,6 +2204,35 @@ void CLevel_Edit::Try_RegisterLoadedAddedMapObject(CGameObject* pObject, const _
 			strDisplayName);
 		break;
 	}
+}
+
+_wstring CLevel_Edit::Make_UniqueAddedObjectTag(const _wstring& strProtoTag) const
+{
+	unordered_set<_wstring> UsedTags;
+
+	if (nullptr != m_pMapPreviewSession)
+	{
+		// (1) 이미 파일에 저장/로드된 추가 오브젝트 태그
+		for (const MAP_ADD_OBJECT& Added : m_pMapPreviewSession->Get_EditData().OverrideDesc.AddedMapObjects)
+			UsedTags.insert(Added.strObjectTag);
+
+		// (2) 이번 세션에서 배치되어 런타임 추적 중인 태그
+		for (CGameObject* pAdded : m_pMapPreviewSession->Get_AddedObjectOrder())
+		{
+			CMap_EditSession::MAP_EDIT_ADDED_ITEM Item{};
+			if (m_pMapPreviewSession->Try_GetAddedObjectItem(pAdded, &Item))
+				UsedTags.insert(Item.strObjectTag);
+		}
+	}
+
+	const _wstring strPrefix = strProtoTag + L"_";
+
+	_uint iIndex = 0;
+	_wstring strCandidate = strPrefix + to_wstring(iIndex);
+	while (UsedTags.find(strCandidate) != UsedTags.end())
+		strCandidate = strPrefix + to_wstring(++iIndex);
+
+	return strCandidate;
 }
 
 CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

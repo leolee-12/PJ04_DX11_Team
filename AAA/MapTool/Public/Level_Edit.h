@@ -127,7 +127,6 @@ private:
 	PLACE_MODE m_ePlaceMode = { PLACE_MODE::NONE };
 	wstring m_strPendingProto = {};
 	wstring m_strPendingLayer = {};
-	_uint	m_iPlaceCount = {};
 
 	// Map
 	unordered_set<CGameObject*> m_MapPreviewObjects;
@@ -168,11 +167,9 @@ private:
 	_bool   Handle_MapSpecificDeletion(CGameObject* pObject);
 	_bool	Promote_MapPreviewEnvObjectToAdded(CGameObject* pObject);
 	_bool   Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, const _wstring& strObjectTag);
-	void    Try_RegisterLoadedAddedMapObject(
-		CGameObject* pObject,
-		const _wstring& strPrototypeTag,
-		const _wstring& strLayerTag,
-		const _wstring& strObjectTag);
+	void    Try_RegisterLoadedAddedMapObject(CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
+
+	_wstring Make_UniqueAddedObjectTag(const _wstring& strProtoTag) const;
 
   private:	// Hierarchy
 		void Mark_HierarchyDirty() { ++m_iHierarchyRevision; }
