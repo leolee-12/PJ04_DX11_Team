@@ -50,6 +50,8 @@
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
+#include "Kirby_ToyHammer.h"
+#include "Kirby_ToyHat.h"
 
 // Effect_Container
 #include "WalkSmoke.h"
@@ -476,6 +478,18 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
+
+            // Toy Hammer
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_ToyHammer::PROTOTYPE_TAG,
+                CKirby_ToyHammer::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_ToyHammer"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Hammer/ToyHammer/ToyHammer.ysh"));
+
+            // Toy Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_ToyHat::PROTOTYPE_TAG,
+                CKirby_ToyHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_ToyHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Hammer/ToyHat/ToyHat.ysh"));
 
             // Bomb Hat
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG, CKirby_BombHat::Create(pDevice, pContext));

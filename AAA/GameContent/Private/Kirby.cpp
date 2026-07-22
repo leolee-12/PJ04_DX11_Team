@@ -18,6 +18,8 @@
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
+#include "Kirby_ToyHammer.h"
+#include "Kirby_ToyHat.h"
 
 #include "Kirby_DeformCar_Demo.h"
 #include "Kirby_DeformCar_Main.h"
@@ -36,6 +38,7 @@
 #include "Kirby_Ability_Bomb.h"
 #include "Kirby_Ability_Ice.h"
 #include "Kirby_Ability_Sleep.h"
+#include "Kirby_Ability_ToyHammer.h"
 
 // Deform
 #include "Kirby_Deform_Car.h"
@@ -239,6 +242,8 @@ CKirby_OnOffPart* CKirby::Find_WeaponPart(COPY_ABILITY_TYPE eType)
     {
         case COPY_ABILITY_TYPE::SWORD:
             return Find_OnOffPart(CKirby_Sword::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::TOY_HAMMER:
+            return Find_OnOffPart(CKirby_ToyHammer::Kirby_PartTag);
     }
 
     return nullptr;
@@ -256,6 +261,8 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
             return Find_OnOffPart(CKirby_SleepHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::SWORD:
             return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::TOY_HAMMER:
+            return Find_OnOffPart(CKirby_ToyHat::Kirby_PartTag);
     }
 
     return nullptr;
@@ -656,6 +663,26 @@ HRESULT CKirby::Ready_PartObjects()
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
         return E_FAIL;
 
+    // ToyHammer
+    CKirby_ToyHammer::KIRBY_TOYHAMMER_DESC ToyHammerDesc{};
+    ToyHammerDesc.pParentMatrix = &m_RenderWorldMatrix;
+    ToyHammerDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
+    ToyHammerDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    ToyHammerDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_ToyHammer::PROTOTYPE_TAG, CKirby_ToyHammer::Kirby_PartTag, &ToyHammerDesc)))
+        return E_FAIL;
+
+    // ToyHat
+    CKirby_ToyHat::KIRBY_TOYHAT_DESC ToyHatDesc{};
+    ToyHatDesc.pParentMatrix = &m_RenderWorldMatrix;
+    ToyHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    ToyHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    ToyHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_ToyHat::PROTOTYPE_TAG, CKirby_ToyHat::Kirby_PartTag, &ToyHatDesc)))
+        return E_FAIL;
+
     // BombHat
     CKirby_BombHat::KIRBY_BOMB_HAT_DESC BombHatDesc{};
     BombHatDesc.pParentMatrix = &m_RenderWorldMatrix;
@@ -723,6 +750,7 @@ HRESULT CKirby::Ready_Ability()
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::BOMB, CKirby_Ability_Bomb::Create())))     return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::ICE, CKirby_Ability_Ice::Create())))       return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SLEEP, CKirby_Ability_Sleep::Create())))   return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::TOY_HAMMER, CKirby_Ability_ToyHammer::Create()))) return E_FAIL;
 
     auto iter = m_Abilities.find(COPY_ABILITY_TYPE::NORMAL);
     if (iter == m_Abilities.end())
