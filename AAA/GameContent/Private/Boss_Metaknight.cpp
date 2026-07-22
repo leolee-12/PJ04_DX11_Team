@@ -78,6 +78,50 @@ HRESULT CBoss_Metaknight::Initialize(void* pArg)
         Hide_AllParts();
         });
 
+    Subscribe_Event(EventTag::Enemy_AttachmentBegin, [this](void* pData) {
+        const auto* pDesc = static_cast<ENEMY_ATTACHMENT_BEGIN_DESC*>(pData);
+        if (nullptr == pDesc || pDesc->eContext != ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE)
+            return;
+        if (m_bAttached)
+            return;
+        if (nullptr == pDesc->pBoneMatrix || nullptr == pDesc->pAnchorWorld)
+            return;
+
+        m_bAttached = true;
+        m_vAttachSaveScale = m_pTransformCom->Get_Scaled();
+
+        _matrix matAttach = XMLoadFloat4x4(pDesc->pBoneMatrix)
+            * XMLoadFloat4x4(pDesc->pAnchorWorld);
+        matAttach = XMMatrixRotationY(XMConvertToRadians(ATTACH_YAW_OFFSET)) * matAttach;
+        m_pTransformCom->Set_WorldMatrix(matAttach);
+        m_pTransformCom->Set_Scale(m_vAttachSaveScale.x, m_vAttachSaveScale.y, m_vAttachSaveScale.z);
+
+        if (m_pController)
+            m_pController->Set_Enabled(false);
+
+        m_pMovement->Set_GravityEnabled(false);
+
+        Enter_Locking();
+        });
+
+    Subscribe_Event(EventTag::Enemy_AttachmentEnd, [this](void* pData) {
+        const auto* pDesc = static_cast<ENEMY_ATTACHMENT_END_DESC*>(pData);
+        if (nullptr == pDesc || pDesc->eContext != ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE)
+            return;
+
+        m_bAttached = false;
+
+        m_pTransformCom->Set_Scale(m_vAttachSaveScale.x, m_vAttachSaveScale.y, m_vAttachSaveScale.z);
+
+        if (m_pController)
+            m_pController->Set_Enabled(true);
+
+        m_pMovement->Sync_To_Controller();
+        m_pMovement->Set_GravityEnabled(true);
+
+        Exit_Locking();
+        });
+
     m_strBossName = L"메타나이트";
     m_fMaxHP = 100.f;
     m_fCurHP = m_fMaxHP;
@@ -114,6 +158,13 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
         m_fRockCooldown -= fTimeDelta;
     if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fUpperCooldown > 0.f)
         m_fUpperCooldown -= fTimeDelta;
+
+    if (m_bLockingQTE)
+    {
+        m_fLockTimer += fTimeDelta;
+        if (m_fLockTimer >= LOCK_TIMEOUT)
+            Exit_Locking();
+    }
 
     if (m_bAppearPending)
     {
@@ -405,10 +456,12 @@ void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
 {
     if (m_bParryWindow && Is_SwordHit(tInfo.eHitType))
     {
-        m_bParryWindow = false;         // 1회만
-        m_bParryRequested = true;
+        /*METAKNIGHT_PARRY_DESC tParry{};
+        tParry.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
+        tParry.fAnimSpeed = s_fDefaultAnimSpeed;
+        m_pGameInstance_Proxy->Publish(EventTag::Metaknight_ParryBegin, &tParry);*/
 
-        //이벤트 쏘기
+        Enter_Locking();
         return;
     }
 
@@ -422,6 +475,17 @@ void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
     }
 
     __super::Damaged(tInfo);
+}
+
+void CBoss_Metaknight::Update_AI(_float fTimeDelta)
+{
+    if (m_bLockingQTE || m_bAttached)
+    {
+        Clear_MoveDir();
+        return;
+    }
+
+    __super::Update_AI(fTimeDelta);
 }
 
 void CBoss_Metaknight::Set_ActiveSword(EMK_SWORD eSword)
@@ -631,9 +695,6 @@ void CBoss_Metaknight::Set_ParryWindow(_bool bOn)
 {
     m_bParryWindow = bOn;
 
-    if (!bOn)
-        m_bParryRequested = false;
-
     if (nullptr == m_pHurtBox)
         return;
 
@@ -758,6 +819,32 @@ void CBoss_Metaknight::Update_PhaseTransition(_float fTimeDelta)
         if (!pAnim || !pAnim->Is_Blending())
             m_ePhaseTrans = EPhaseTrans::DONE;
     }
+}
+
+void CBoss_Metaknight::Enter_Locking()
+{
+    if (m_bLockingQTE)
+        return;
+
+    m_bLockingQTE = true;
+    m_fLockTimer = 0.f;
+
+    Enable_CatchBox(false);
+    Set_ParryWindow(false);
+
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Play("LockingSword", false, true, 0.1f, s_fDefaultAnimSpeed);
+}
+
+void CBoss_Metaknight::Exit_Locking()
+{
+    if (!m_bLockingQTE)
+        return;
+
+    m_bLockingQTE = false;
+
+    if (auto* pBrain = static_cast<CBoss_Brain*>(m_pBrain))
+        pBrain->Reset_Tree();
 }
 
 #ifdef _DEBUG

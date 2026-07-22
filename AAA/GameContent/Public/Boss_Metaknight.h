@@ -49,6 +49,9 @@ public:
     //static constexpr _float s_fUpperCooldown = 90.f;
     static constexpr _float s_fUpperCooldown = 3.f;
 
+    static constexpr _float LOCK_TIMEOUT = 10.f;
+    static constexpr _float ATTACH_YAW_OFFSET = 180.f;
+
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
 
 private:
@@ -94,6 +97,7 @@ protected:
     virtual const _float4x4* Get_FxParentMatrix(const _wstring& strFx) const override;
 
     virtual void Damaged(const ATTACK_INFO& tInfo) override;
+    virtual void Update_AI(_float fTimeDelta) override;
 
 public:
     void      Set_ActiveSword(EMK_SWORD eSword);
@@ -133,12 +137,6 @@ public:
     void End_UpperCaliburDemo();
 
     void  Set_ParryWindow(_bool bOn);
-    _bool Consume_ParryRequest()
-    {
-        if (!m_bParryRequested) return false;
-        m_bParryRequested = false;
-        return true;
-    }
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
@@ -147,6 +145,10 @@ private:
     CBoss_Metaknight_Sword* m_pSword = { nullptr };          
     CBoss_Metaknight_ReplicaSword* m_pReplica = { nullptr }; 
     CBoss_Metaknight_Mant* m_pMant = { nullptr };
+
+    _bool            m_bAttached = { false };
+    _float3          m_vAttachSaveScale = { 1.f, 1.f, 1.f };
+
     EMK_SWORD m_eActiveSword = { EMK_SWORD::GALAXIA };
 
     _bool      m_bDodgeInvuln = { false };
@@ -164,7 +166,8 @@ private:
     
     _bool  m_bCatchHit = { false };
     _bool m_bParryWindow = { false };
-    _bool m_bParryRequested = { false };
+    _bool  m_bLockingQTE = { false };
+    _float m_fLockTimer = { 0.f };
 
     // ÄðÅ¸ÀÓ
     _float        m_fDodgeCooldown = { 0.f };
@@ -186,6 +189,8 @@ private:
     void Build_RockTilePositions(const _float3 fCornersIn[4], _float3 fOutPos[23]);
     void Select_SafeTiles();
     void Update_PhaseTransition(_float fTimeDelta);
+    void Enter_Locking();
+    void Exit_Locking();
 
 #ifdef _DEBUG
     void Debug_TriggerPhaseTransition();

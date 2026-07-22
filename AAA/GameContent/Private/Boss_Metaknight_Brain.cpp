@@ -918,7 +918,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
 
             if (!*bOn)
             {
-                // 돌진 시작 순간의 방향을 고정 (이후엔 커비를 추적하지 않음)
                 mv->Face_Instant(XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos));
                 mv->Set_LockFacing(true);
 
@@ -951,7 +950,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
             const _float fRun = XMVectorGetX(XMVector3Length(
                 XMVectorSetY(tf->Get_State(STATE::POSITION) - XMLoadFloat3(vStart.get()), 0.f)));
 
-            // 일정 거리 이상 달렸거나 벽에 막혀 시간만 흐르면 실패
             if (fRun >= UC_RUSH_MAX_DIST || *fT >= UC_RUSH_TIMEOUT)
             {
                 pMeta->Enable_CatchBox(false);
