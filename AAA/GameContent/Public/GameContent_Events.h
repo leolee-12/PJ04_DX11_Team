@@ -51,6 +51,9 @@ namespace Client
         inline constexpr const _tchar* QTE_Show = L"QTE.Show";
         inline constexpr const _tchar* QTE_Hide = L"QTE.Hide";
 
+        inline constexpr const _tchar* Enemy_AttachmentBegin = L"Enemy.Attachment.Begin";
+        inline constexpr const _tchar* Enemy_AttachmentEnd = L"Enemy.Attachment.End";
+
         // Ä«¸Þ¶ó
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
@@ -126,6 +129,26 @@ namespace Client
     struct KIRBY_ATTACHMENT_END_DESC
     {
         KIRBY_ATTACHMENT_END_REASON eType = { KIRBY_ATTACHMENT_END_REASON::_COUNT };
+    };
+#pragma endregion
+
+#pragma region Enemy ºÎÂø
+    enum class ENEMY_ATTACHMENT_CONTEXT
+    {
+        METAKNIGHT_QTE,
+        _COUNT
+    };
+
+    struct ENEMY_ATTACHMENT_BEGIN_DESC
+    {
+        const _float4x4* pBoneMatrix{};
+        const _float4x4* pAnchorWorld{};
+        ENEMY_ATTACHMENT_CONTEXT eContext{ ENEMY_ATTACHMENT_CONTEXT::_COUNT };      
+    };
+
+    struct ENEMY_ATTACHMENT_END_DESC
+    {
+        ENEMY_ATTACHMENT_CONTEXT eContext{ ENEMY_ATTACHMENT_CONTEXT::_COUNT };
     };
 #pragma endregion
 
@@ -263,6 +286,8 @@ namespace Client
         CAR_BRIDGE,
         METAKNIGHT_LOOKAROUND,
         METAKNIGHT_INTRO,
+        METAKNIGHT_UPPERCALIBUR,
+        METAKNIGHT_LOCKING,
         _COUNT
     };
 
@@ -279,6 +304,8 @@ namespace Client
         CAR_BRIDGE_END,
         METAKNIGHT_ENCOUNTER_END,
         METAKNIGHT_INTRO_END,
+        METAKNIGHT_UPPERCALIBUR_END,
+        METAKNIGHT_LOCKING_END,
         _COUNT
     };
 
