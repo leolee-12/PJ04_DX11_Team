@@ -1,6 +1,7 @@
 #pragma once
 #include "EnvObject_Defines.h"
 #include "Editable.h"
+#include "MeshLayer_Profile.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -83,6 +84,7 @@ protected:
 	void    Refresh_WorldBounds();
 	void    Check_Visible();
 	_bool	Has_RenderModel() const { return nullptr != m_pModelCom; }
+	HRESULT Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind);
 
 protected:
 	ENV_OBJECT_DESC	m_tDesc = {};

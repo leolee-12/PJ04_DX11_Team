@@ -25,8 +25,8 @@ namespace
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX = 10u;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_CRUCK_SHADE_MESH_INDEX = 2u;
 
-	inline constexpr const _uint DISABLE_MESH_INDICES[] = { 1 };
-	inline constexpr const _uint ON_TO_OFF_MESH_INDICES[] = { 0,2 };
+	//inline constexpr const _uint DISABLE_MESH_INDICES[] = { 1 };
+	inline constexpr const _uint ON_TO_OFF_MESH_INDICES[] = { 0,1,2 };
 	inline constexpr const _uint OFF_TO_ON_MESH_INDICES[] = { 3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 };
 	
 	inline constexpr const _uint ON_TO_OFF_AT_FRAME_MESH_INDICES[] = { 9,10 };
@@ -277,8 +277,8 @@ HRESULT CLD_DeformCarBreakWall::Ready_RenderComponent()
 	if (DEFORM_CAR_BREAK_WALL_MESH_COUNT != static_cast<_uint>(m_pModelCom->Get_NumMeshes()))
 		return E_FAIL;
 
-	for (_uint iMeshIndex : DISABLE_MESH_INDICES)
-		Set_MeshVisible(iMeshIndex, false);
+	//for (_uint iMeshIndex : DISABLE_MESH_INDICES)
+	//	Set_MeshVisible(iMeshIndex, false);
 
 	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, true);

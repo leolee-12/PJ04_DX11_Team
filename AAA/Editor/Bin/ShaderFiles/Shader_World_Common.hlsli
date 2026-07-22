@@ -471,7 +471,7 @@ PS_OUT PS_DMN_OPAQUE(PS_IN In)
                     float4(g_vEmissiveColor.rgb, 1.f));
 }
 
-float4 PS_UKWN_BLACK_OVERLAY(PS_IN In) : SV_TARGET0
+float4 PS_BLEND_UKWN_OVERLAY(PS_IN In) : SV_TARGET0
 {
     Apply_DitherFromPixelInput(In);
 
@@ -507,16 +507,34 @@ float4 PS_BLEND_DMN(PS_IN In) : SV_TARGET0
     Apply_DitherFromPixelInput(In);
 
     float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
-    float fAlpha = saturate(vDiffuse.a);
+    float4 vBaseColor = vDiffuse * g_vColor;
+    float fAlpha = saturate(vBaseColor.a * g_fBlendOpacity);
 
     if (fAlpha < 0.001f)
         discard;
 
     float3 vNormal = normalize(Get_ShadingNormal(In, Get_NormalUV(In)));
     float fNdotL = saturate(dot(vNormal, -normalize(g_vLightDir.xyz)));
-    float3 vLit = vDiffuse.rgb * (g_vLightDiffuse.rgb * fNdotL + 0.25f);
+    float3 vLit = vBaseColor.rgb * (g_vLightDiffuse.rgb * fNdotL + 0.25f);
 
     return float4(vLit + g_vEmissiveColor.rgb, fAlpha);
+}
+
+float4 PS_BLEND_UKWN_LIGHT(PS_IN In) : SV_TARGET0
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vMeshUV = Select_UV_PS(In, g_iUnknownUVIndex);
+    float3 vUnknown = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).rgb;
+
+    float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));
+    float fEndFade = smoothstep(0.05f, 0.35f, vMeshUV.y);
+    float fAlpha = saturate(fBrightness * fEndFade * max(g_MaskStrength, 0.f) * g_vColor.a);
+
+    if (fAlpha < 0.001f)
+        discard;
+
+    return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
 }
 
 
