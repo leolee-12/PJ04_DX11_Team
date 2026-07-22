@@ -7,6 +7,7 @@ class CBoss_Metaknight_Body;
 class CBoss_Metaknight_Sword;
 class CBoss_Metaknight_ReplicaSword;
 class CBoss_Metaknight_Mant;
+class CAttackDecal;
 
 class CBoss_Metaknight final : public CBoss
 {
@@ -30,6 +31,20 @@ public:
     static constexpr _uint  GIGA_POINT_COUNT = 4;
     static const _float3    s_vGigaPoints[GIGA_POINT_COUNT];
     static constexpr _float s_fGigaCooldown = 12.f;
+
+    static constexpr int    ROCK_SAFE_COUNT = 5;
+    static constexpr int    ROCK_TILE_COUNT = 23;
+    static constexpr _float ROCK_DECAL_RADIUS = 5.f;
+    static constexpr _float ROCK_SLIDE_TIME = 1.f;
+    static constexpr _float ROCK_DROP_HEIGHT = 20.f;
+    static constexpr _float s_fRockCooldown = 60.f;
+
+    static constexpr _float TOPVIEW_HEIGHT = 40.f;
+
+    static constexpr _float PHASE_HOP_HEIGHT = 2.f;
+    static constexpr _float PHASE_HOP_GRAVITY = 9.f;
+    static constexpr _float PHASE_WAIT_BLEND = 0.4f;
+
 
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
 
@@ -58,6 +73,9 @@ protected:
     virtual _bool          Is_Death_Finished() const override;
     virtual void           On_Enter_Corpse() override;
     virtual _float         Get_CorpseLinger() const override { return 0.f; }
+    virtual void           Play_PhaseTransition(_int iNewPhase) override;
+    virtual _bool          Is_PhaseTransition_Finished() const override;
+    virtual void           On_PhaseChanged(_int iOldPhase, _int iNewPhase) override;
 
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }
     virtual const _tchar* Get_AppearEventTag() const override { return nullptr; }
@@ -93,8 +111,15 @@ public:
     }
 
     _bool Is_GigaReady() const { return m_fGigaCooldown <= 0.f; }
-    void  Start_GigaCooldown() { m_fGigaCooldown = s_fGigaCooldown; }
     void  Fire_GigaMoonShot();
+
+    void  Begin_RockDecalSlide();
+    void  Drop_Rocks();
+    _bool Is_RockReady() const { return m_fRockCooldown <= 0.f; }
+
+    void  Set_TopViewCam(_bool bOn);
+
+    void Start_PatternCooldowns(_float fUsedCooldown);
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
@@ -117,12 +142,29 @@ private:
     _float m_fAppearTimer = { 0.f };
     _float m_fIntroHoldTimer = { 0.f };
 
+    _float3       m_RockTiles[ROCK_TILE_COUNT];
+    CAttackDecal* m_pRockDecals[ROCK_TILE_COUNT] = {};
+    _bool         m_bSafeTile[ROCK_TILE_COUNT] = {};
+    _float        m_fRockCooldown = { 0.f };
+
+    enum class EPhaseTrans { NONE, HOP, LANDING, WAIT, DONE };
+    EPhaseTrans m_ePhaseTrans = { EPhaseTrans::NONE };
+    _float m_fPhaseBaseY = { 0.f };
+    _float m_fPhaseVelY = { 0.f };
+
     // µð¹ö±×
-    static constexpr _bool s_bSkipIntro = false;
+    static constexpr _bool s_bSkipIntro = true;
 
 private:
     void Fire_CutsceneCamera(const _tchar* szTrack);
     void Hide_AllParts();
+    void Build_RockTilePositions(const _float3 fCornersIn[4], _float3 fOutPos[23]);
+    void Select_SafeTiles();
+    void Update_PhaseTransition(_float fTimeDelta);
+
+#ifdef _DEBUG
+    void Debug_TriggerPhaseTransition();
+#endif
 
 public:
     static CBoss_Metaknight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

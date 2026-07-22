@@ -29,6 +29,7 @@
     <ClInclude Include="..\public\Armadillo_SpinWind.h" />
     <ClInclude Include="..\public\Armadillo_WallImpact.h" />
     <ClInclude Include="..\public\Assault_Smoke.h" />
+    <ClInclude Include="..\public\AttackDecal.h" />
     <ClInclude Include="..\public\Boss_GorillaRush.h" />
     <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="..\public\Projectile_MoonShot.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
+    <ClInclude Include="..\public\Projectile_Rock.h" />
     <ClInclude Include="..\Public\RabbitEnemy.h" />
     <ClInclude Include="..\Public\RabbitEnemy_Body.h" />
     <ClInclude Include="..\Public\RabbitEnemy_Brain.h" />
@@ -518,6 +520,7 @@
     <ClCompile Include="..\private\Armadillo_SpinWind.cpp" />
     <ClCompile Include="..\private\Armadillo_WallImpact.cpp" />
     <ClCompile Include="..\private\Assault_Smoke.cpp" />
+    <ClCompile Include="..\private\AttackDecal.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
@@ -605,6 +608,7 @@
     <ClCompile Include="..\private\Projectile_MoonShot.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
+    <ClCompile Include="..\private\Projectile_Rock.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_Body.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_Brain.cpp" />
@@ -1047,6 +1051,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_Fluid.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl" />
     <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
       <FileType>Document</FileType>
@@ -1056,6 +1063,9 @@
     <None Include="..\ShaderFiles\Shader_Metaknight.hlsl">
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

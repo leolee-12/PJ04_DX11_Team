@@ -11,7 +11,7 @@ private:
     virtual ~CBoss_Metaknight_Brain() = default;
 
 protected:
-    virtual _int     Get_PhaseCount() const override { return 1; }
+    virtual _int     Get_PhaseCount() const override { return 2; }
     virtual CBTNode* Build_PhaseTree(_int iPhase) override;
 
 private:
@@ -39,6 +39,16 @@ private:
     static constexpr _float GIGA_RISE_SPEED = 12.f;
     static constexpr _float GIGA_ARRIVE = 0.6f;
 
+    static constexpr _float ROCK_RISE_HEIGHT = 10.f;
+    static constexpr _float ROCK_RISE_SPEED = 2.5f;
+    static constexpr _float ROCK_JUMP_SPEED = 1.f;
+
+    static constexpr _float ROCK_TRACK_SPEED = 12.f;    
+    static constexpr _float DIVEBOMB_RANGE = 4.f;
+    static constexpr _float DIVEBOMB_FALL_SPEED = 20.f;
+    static constexpr _float ROCK_TRACK_Y = 13.f;
+    static constexpr _float TRACK_DESCEND_SPEED = 12.f;
+
 private:
     _int m_iLastCombo = { 0 };
 
@@ -63,6 +73,13 @@ private:
     CBTNode* Make_GigaFly();
     CBTNode* Make_GigaMoonShot();
 
+    //낙석패턴
+    _bool    FlyNoClip(_fvector vGoal, _float fSpeed, _float dt, _float fArrive);
+    void     RiseToward(_float fTargetY, _float dt);
+    CBTNode* Make_RockFly();
+    CBTNode* Make_RockDrop(); 
+
+
     // 트리 조립 유틸
     CBTNode* Make_Optional(CBTNode* pCond, CBTNode* pBody);
     CBTNode* Make_UnlessInRange(CBTNode* pNode);
@@ -71,6 +88,7 @@ private:
     CBTNode* Make_DodgeBranch();
     CBTNode* Make_GigaBranch();
     CBTNode* Make_ComboBranch();
+    CBTNode* Make_RockBranch();
 
 
 public:

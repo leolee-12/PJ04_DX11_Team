@@ -55,6 +55,7 @@ public:
     CAnimator*          Get_Animator() const { return m_pAnimatorCom; }
     CModel*             Get_Model()    const { return m_pModelCom; }
     const _float4x4*    Get_BoneMatrixPtr(const _char* pBoneName) const;
+    void                Set_IgnoreSocketScale(_bool b) { m_bIgnoreSocketScale = b; }
 
 protected:
     HRESULT         Ready_MeshPart(const PART_SETUP& tSetup);
@@ -72,6 +73,8 @@ protected:
     const MONSTER_CULL_STATE* m_pCullState = { nullptr };
 
     _int m_iShadowPassIdx = { -1 };
+
+    _bool m_bIgnoreSocketScale = { false };
 
 protected:
     virtual void Free() override;

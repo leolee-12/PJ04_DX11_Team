@@ -36,11 +36,18 @@ protected:
     virtual void  On_Enter_Corpse() override;     // ∫∏Ω∫ ªÁ∏¡(»Ì¿‘»≠ X) + Boss_Died
     void          Publish_Boss_Died();
 
+#ifdef _DEBUG
+protected:
+    _bool m_bPhaseTransition = { false };
+#else
+private:
+    _bool m_bPhaseTransition = { false };
+#endif
+
 private:
     void Check_PhaseTransition();
 
     _int  m_iPhase = { 0 };
-    _bool m_bPhaseTransition = { false };
 
 protected:
     virtual void Free() override;

@@ -237,7 +237,9 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
         CShader::Create(pDevice, pContext, Shader_Metaknight.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
         return E_FAIL;
 
-    
+    if (FAILED(pProxy->Add_Prototype(Shader_AttackDecal.iLevelID, Shader_AttackDecal.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_AttackDecal.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
+        return E_FAIL;
 
     return S_OK;
 }
