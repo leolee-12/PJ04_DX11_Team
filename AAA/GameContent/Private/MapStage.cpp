@@ -1,5 +1,6 @@
 #include "MapStage.h"
 #include "MapGimmick_Defines.h"
+#include "GameContent_Log.h"
 
 #include "GameInstance_Proxy.h"
 #include "Math_Utils.h"
@@ -71,7 +72,10 @@ HRESULT CMapStage::Validate_Initialized()
 			}
 
 			if (!bHasShellSection)
+			{
+				Log_GameContentWarning("MapStage gimmick shell missing: " + WstrToStr(m_strStageName) + "/" + WstrToStr(Entry.pShellSectionName));
 				bHasAllGimmickShellSections = false;
+			}
 		});
 
 	if (!bHasAllGimmickShellSections)
@@ -114,6 +118,7 @@ _bool CMapStage::Should_RenderSection(const CMapSection* pSection) const
 
 	return pSection == m_pEditorSoloSection;
 }
+
 void CMapStage::Clear_EditorSoloMeshAllSections()
 {
 	for (CMapSection* pSection : m_Sections)
@@ -213,6 +218,8 @@ HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 		CMapSection* pSection = dynamic_cast<CMapSection*>(pBase);
 		if (nullptr == pSection)
 		{
+			Log_GameContentWarning("MapStage section clone failed: " + WstrToStr(m_strStageName)
+				+ "/" + WstrToStr(SectionDesc.strSectionName));
 			Safe_Release(pBase);
 			return E_FAIL;
 		}
@@ -251,7 +258,7 @@ void CMapStage::Submit_VisibleSections()
 		if (!pSection->Is_Renderable())
 			continue;
 
-		m_pGameInstance_Proxy->Add_RenderGroup(pSection->Get_RenderID(), pSection);
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, pSection);
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
 	}
 }
