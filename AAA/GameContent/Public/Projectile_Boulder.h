@@ -22,6 +22,7 @@ private:
 
 public:
     virtual HRESULT Render() override;
+    virtual HRESULT Render_Shadow() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
 
 protected:

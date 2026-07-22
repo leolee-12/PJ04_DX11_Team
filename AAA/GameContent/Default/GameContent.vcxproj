@@ -58,13 +58,24 @@
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
+    <ClInclude Include="..\Public\LightShaft.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
+    <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
+    <ClInclude Include="..\Public\MeteorBurst.h" />
+    <ClInclude Include="..\Public\MeteorRock.h" />
+    <ClInclude Include="..\Public\MeteorRock_Large.h" />
+    <ClInclude Include="..\Public\MeteorRock_Small.h" />
     <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EnvInteract_KickProp.h" />
     <ClInclude Include="..\Public\EnvInteract_PresetCatalog.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
+    <ClInclude Include="..\Public\Gigatzo.h" />
+    <ClInclude Include="..\Public\GigatzoBullet.h" />
+    <ClInclude Include="..\Public\Gigatzo_Body.h" />
+    <ClInclude Include="..\Public\Gigatzo_Brain.h" />
+    <ClInclude Include="..\Public\Gigatzo_State_Attack.h" />
     <ClInclude Include="..\Public\KasaCatchEffect.h" />
     <ClInclude Include="..\Public\KasaUpEffect.h" />
     <ClInclude Include="..\Public\Kirby_DeformContext.h" />
@@ -90,6 +101,18 @@
     <ClInclude Include="..\Public\LaunchSmoke.h" />
     <ClInclude Include="..\Public\MoveSmoke.h" />
     <ClInclude Include="..\Public\MapGimmick_Defines.h" />
+    <ClInclude Include="..\Public\Noddy.h" />
+    <ClInclude Include="..\Public\Noddy_Body.h" />
+    <ClInclude Include="..\Public\Noddy_Brain.h" />
+    <ClInclude Include="..\Public\RangerEnemy.h" />
+    <ClInclude Include="..\Public\RangerEnemy_Body.h" />
+    <ClInclude Include="..\Public\RangerEnemy_Brain.h" />
+    <ClInclude Include="..\Public\SirKibble.h" />
+    <ClInclude Include="..\Public\SirKibble_Body.h" />
+    <ClInclude Include="..\Public\SirKibble_Brain.h" />
+    <ClInclude Include="..\Public\Noddy_State_Chase.h" />
+    <ClInclude Include="..\Public\Noddy_State_Find.h" />
+    <ClInclude Include="..\Public\Noddy_State_SleepStart.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
@@ -520,6 +543,11 @@
     <ClCompile Include="..\private\Excalibur.cpp" />
     <ClCompile Include="..\private\Excalibur_Body.cpp" />
     <ClCompile Include="..\private\Excalibur_GetIt.cpp" />
+    <ClCompile Include="..\Private\Gigatzo.cpp" />
+    <ClCompile Include="..\Private\GigatzoBullet.cpp" />
+    <ClCompile Include="..\Private\Gigatzo_Body.cpp" />
+    <ClCompile Include="..\Private\Gigatzo_Brain.cpp" />
+    <ClCompile Include="..\Private\Gigatzo_State_Attack.cpp" />
     <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />
@@ -529,7 +557,13 @@
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
+    <ClCompile Include="..\Private\LightShaft.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
+    <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
+    <ClCompile Include="..\Private\MeteorBurst.cpp" />
+    <ClCompile Include="..\Private\MeteorRock.cpp" />
+    <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
+    <ClCompile Include="..\Private\MeteorRock_Small.cpp" />
     <ClCompile Include="..\Private\OnLadderEffect.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
@@ -556,6 +590,18 @@
     <ClCompile Include="..\Private\LD_SlopeBoardB.cpp" />
     <ClCompile Include="..\Private\LaunchSmoke.cpp" />
     <ClCompile Include="..\Private\MoveSmoke.cpp" />
+    <ClCompile Include="..\Private\Noddy.cpp" />
+    <ClCompile Include="..\Private\Noddy_Body.cpp" />
+    <ClCompile Include="..\Private\Noddy_Brain.cpp" />
+    <ClCompile Include="..\Private\RangerEnemy.cpp" />
+    <ClCompile Include="..\Private\RangerEnemy_Body.cpp" />
+    <ClCompile Include="..\Private\RangerEnemy_Brain.cpp" />
+    <ClCompile Include="..\Private\SirKibble.cpp" />
+    <ClCompile Include="..\Private\SirKibble_Body.cpp" />
+    <ClCompile Include="..\Private\SirKibble_Brain.cpp" />
+    <ClCompile Include="..\Private\Noddy_State_Chase.cpp" />
+    <ClCompile Include="..\Private\Noddy_State_Find.cpp" />
+    <ClCompile Include="..\Private\Noddy_State_SleepStart.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
@@ -1006,6 +1052,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Fluid.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl" />
+    <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

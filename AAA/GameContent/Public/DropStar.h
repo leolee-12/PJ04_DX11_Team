@@ -39,7 +39,7 @@ public:
     }
 
     void                        Set_Pool(CDropStar_Manager* pPool, _uint iLevel, const _wstring& strKey);
-    void                        Activate(const _float3& vPos, const _float3& vLook = { 0.f, 0.f, 0.f }, const _float3& vDir = { 0.f, 0.f, 0.f }, _float fDelay = 0.f);
+    void                        Activate(const _float3& vPos, const _float3& vLook = { 0.f, 0.f, 0.f }, const _float3& vDir = { 0.f, 0.f, 0.f }, _float fDelay = 0.f, _float fLife = 3.f);
 
     // Inhalable 
     virtual _bool               Can_BeInhaled(const INHALE_QUERY& q) const override;
@@ -51,7 +51,7 @@ public:
     virtual void                On_SpatEnd() override;
 
 private:
-    enum class DROPSTAR_STATE { DELAY, LIVE, CAPTURED, SPAT };
+    enum class DROPSTAR_STATE { DELAY, LIVE, CAPTURED, SPAT, VANISH };
 
     HRESULT                     Ready_Collider();
     HRESULT                     Ready_Movement();
@@ -64,6 +64,9 @@ private:
     void                        Update_Captured(_float fTimeDelta);
     void                        Update_SpatPivot_FromBone();
     void                        On_Swallowed();
+
+    void                        Begin_Vanish();
+    void                        Update_Vanish(_float fTimeDelta); 
     void                        Despawn();
     void                        Return_ToPool();
 
@@ -95,6 +98,7 @@ private:
     _float3                     m_vLaunchDir = { 0.f, 0.f, 0.f };
     _float                      m_fDelay = { 0.f };     
     _float                      m_fTimer = { 0.f };
+    _float                      m_fDeSpawnTime = { 3.f };
     _float                      m_fPullSpeed = { 0.f };
     _float                      m_fScaleRatio = { 1.f };
     _bool                       m_bAvailable = { true };
@@ -104,7 +108,7 @@ private:
     static constexpr _float     s_fPullAccel = { 40.f };
     static constexpr _float     s_fMinScaleRatio = { 0.45f };
     static constexpr _float     s_fShrinkLerp = { 2.f };
-    static constexpr _float     s_fDeSpawnTime = { 10.f };
+    static constexpr _float     s_fVanishTime = { 0.35f };
 
     static constexpr _float     s_fGravity = { -12.f };
     static constexpr _float     s_fRestitution = { 0.8f };

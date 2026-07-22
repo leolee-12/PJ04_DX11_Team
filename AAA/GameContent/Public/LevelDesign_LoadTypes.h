@@ -227,6 +227,21 @@ struct LD_PARSED_OBJECT : public LD_OBJECT_DESC
 	LD_EFFECT_AREA_DESC EffectArea;
 };
 
+struct LD_METEOR_DESC : public LD_OBJECT_DESC
+{
+	_float3 vFallStart = {};
+	_float  fFallSpeed = 10.f;
+	_float  fImpactRadius = 2.f;
+	_bool   bFindHero = false;
+	_bool   bRepeat = false;
+	_float  fInterval = 0.f;
+	_bool   bNoBreakEffect = false;
+	_bool   bFallEndOnEvent = false;
+	_float  fSearchRadius = 0.f;
+	_float  fSearchHeight = 0.f;
+	_float  fSearchHeightOffset = 0.f;
+};
+
 using LD_OBJECT_ENTRY = variant<
 	LD_PARSED_OBJECT
 	, LD_BREAKABLE_DESC
@@ -237,6 +252,7 @@ using LD_OBJECT_ENTRY = variant<
 	, LD_BUSH_DESC
 	, LD_DEFORMOBJECT_DESC
 	, LD_SURFACE_AREA_DESC
+	, LD_METEOR_DESC
 >;
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)

@@ -59,6 +59,7 @@ protected:
 	virtual HRESULT				Initialize(void* pArg) override;
 	virtual void				Update(_float fTimeDelta) override;
 	virtual HRESULT				Render() override;
+	virtual HRESULT				Render_Shadow() override;
 	virtual HRESULT				Ready_Visual() override;
 
 	virtual	void				On_Launched() override;
