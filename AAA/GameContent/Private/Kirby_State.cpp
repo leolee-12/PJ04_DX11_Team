@@ -68,46 +68,6 @@ void CKirby_State::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInf
     pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }
 
-void CKirby_State::Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc)
-{
-}
-
-void CKirby_State::Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc)
-{
-}
-
-void CKirby_State::Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc)
-{
-}
-
-void CKirby_State::Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc)
-{
-}
-
-void CKirby_State::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc)
-{
-}
-
-void CKirby_State::Request_Dialogue(CKirby* pKirby, const SEQUENCE_KIRBY_WARP_DESC* pDesc)
-{
-}
-
-void CKirby_State::Request_DialogueAnim(CKirby* pKirby, const SEQUENCE_KIRBY_ANIM_DESC* pDesc)
-{
-}
-
-void CKirby_State::Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc)
-{
-}
-
-void CKirby_State::Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc)
-{
-}
-
-void CKirby_State::Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc)
-{
-}
-
 _bool CKirby_State::Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand)
 {
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();

@@ -43,7 +43,7 @@ namespace
         {TEXT("UpwardsSlash"),            TEXT("../../Resources/EffectContainerJSON/YSE/UpwardsSlash.JSON")},
         { TEXT("RockFloor"),              TEXT("../../Resources/EffectContainerJSON/YSH/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/BoostGas.json") },
-        { TEXT("MoveGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/MoveGas.json") },
+        { TEXT("MoveGas"),                TEXT("../../Resources/EffectContainerJSON/YSE/MoveGas.json") },
         { TEXT("CylinderRollGas"),        TEXT("../../Resources/EffectContainerJSON/YSE/CylinderRollGas.JSON") },
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/EffectContainerJSON/YSE/CarMilkyWay_Final2.json") },
         { TEXT("CarThinGas"),             TEXT("../../Resources/EffectContainerJSON/YSE/CarThinGas.JSON") },
