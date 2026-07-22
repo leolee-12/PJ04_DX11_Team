@@ -1830,11 +1830,11 @@
     <ClInclude Include="..\Public\CarLanding.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. CarLanding</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\CarThinGas.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CarThinGas.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Character.h">
       <Filter>00. GameObject\04. Character</Filter>
@@ -2280,14 +2280,14 @@
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SwordTrail.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_ToyHammer.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\05. ToyHammer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_ToyHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\06. ToyHat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_SwordTrail.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -3302,11 +3302,11 @@
     <ClCompile Include="..\Private\CarLanding.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. CarLanding</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\CarThinGas.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CarThinGas.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Character.cpp">
       <Filter>00. GameObject\04. Character</Filter>
@@ -3704,14 +3704,14 @@
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_ToyHammer.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\05. ToyHammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_ToyHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\06. ToyHat</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
