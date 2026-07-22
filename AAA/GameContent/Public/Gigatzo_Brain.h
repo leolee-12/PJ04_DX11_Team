@@ -17,9 +17,10 @@ public:
     static  CGigatzo_Brain*         Create(CMonster* pOwner);
 
 private:
-    _bool   m_bArmed = { false };
-    _float  m_fFireTimer = { 0.f };
-    static constexpr const _float s_fFireInterval = { 0.83f };   
+    _bool                           m_bArmed = { false };
+    _float m_fFireTimer = { 0.f };
+
+    static constexpr const _float   s_fFireInterval = { 0.85f };
 
 protected:
     virtual void                    Free() override;
