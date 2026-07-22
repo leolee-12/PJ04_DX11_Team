@@ -104,7 +104,7 @@ void CKirby_OnOffPart::Put_OnBack(CKirby* pKirby, _bool bOn)
 {
 }
 
-HRESULT CKirby_OnOffPart::Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC°¡& tDesc)
+HRESULT CKirby_OnOffPart::Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC& tDesc)
 {
     m_pShaderCom = Add_Component<CShader>(tDesc.tShaderDesc.iLevelID, tDesc.tShaderDesc.szProtoTag, TEXT("Com_Shader"));
     if (m_pShaderCom == nullptr)

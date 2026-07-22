@@ -126,7 +126,7 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, const 
 		MAP_EDIT_APPLY_OPTIONS ApplyOptions{};
 		ApplyOptions.bApplyStage = Options.bBuildStage;
 		ApplyOptions.bApplyEnv = Options.bBuildEnv;
-		ApplyOptions.bApplyAddedObjects = Options.bBuildEnv;
+		ApplyOptions.bApplyAddedObjects = Options.bBuildEnv || Options.bBuildLevelDesignPaths;
 
 		if (FAILED(CMap_EditFile::Apply_Change(pOutPackage, OverrideDesc, ApplyOptions)))
 			return E_FAIL;

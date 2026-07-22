@@ -1,5 +1,7 @@
 #pragma once
 #include "LevelDesignObject.h"
+#include "BlendRenderable.h"
+#include "MeshLayer_Profile.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -12,8 +14,11 @@ class PxRigidStatic;
 NS_END
 
 NS_BEGIN(Client)
+class CWorld_BlendCollector;
 
-class CLD_EventObject abstract : public CLevelDesignObject
+class CLD_EventObject abstract
+	: public CLevelDesignObject
+	, public IBlendRenderable
 {
 	GENERATED_BODY_ABSTRACT(CLD_EventObject)
 
@@ -31,7 +36,8 @@ public:
 	virtual void    Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
-
+	virtual HRESULT Render_BlendMesh(_uint iMeshIndex) override;
+	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
 	virtual _bool Is_CullingEnabled() const override { return false; }
 
 protected:
@@ -53,6 +59,9 @@ protected:
 	};
 
 	vector<LD_ANIM_PLAY_DESC> m_AnimPlayDescs;
+
+	vector<_uint> m_BlendMeshIndices;
+	CWorld_BlendCollector* m_pBlendCollector = { nullptr };
 
 protected:
 	virtual HRESULT Ready_Components();
@@ -80,7 +89,10 @@ protected:
 
 	HRESULT Bind_ShaderResources();
 	HRESULT Render_Mesh(_uint iMeshIndex);
-	HRESULT Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex);
+	HRESULT Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex, MESH_LAYER_RENDER_KIND eKind = MESH_LAYER_RENDER_KIND::MAIN);
+
+	void Cache_BlendMeshIndices();
+	void Submit_BlendMeshes();
 
 protected:
 	virtual void Free() override;

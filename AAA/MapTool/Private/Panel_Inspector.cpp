@@ -145,6 +145,7 @@ namespace
 		ImGui::TextUnformatted("Color / Depth");
 		bChanged |= ImGui::ColorEdit4("Shallow Color##WaterMaterial", (float*)&Desc.vShallowColor);
 		bChanged |= ImGui::ColorEdit4("Deep Color##WaterMaterial", (float*)&Desc.vDeepColor);
+		bChanged |= ImGui::DragFloat("Shallow Color Strength##WaterMaterial", &Desc.fShallowColorStrength, 0.01f, 0.f, 1.f);
 		bChanged |= ImGui::DragFloat("Opacity##WaterMaterial", &Desc.fOpacity, 0.005f, 0.f, 1.f);
 		bChanged |= ImGui::DragFloat("Depth Fade Distance##WaterMaterial", &Desc.fDepthFadeDistance, 0.01f);
 
@@ -164,6 +165,7 @@ namespace
 		bChanged |= ImGui::DragFloat("Fresnel Power##WaterMaterial", &Desc.fFresnelPower, 0.02f, 0.1f, 16.f);
 		bChanged |= ImGui::DragFloat("Reflection Strength##WaterMaterial", &Desc.fReflectionStrength, 0.01f, 0.f, 4.f);
 		bChanged |= ImGui::DragFloat("Refraction Strength##WaterMaterial", &Desc.fRefractionStrength, 0.0001f, 0.f, 0.1f, "%.4f");
+		bChanged |= ImGui::DragFloat("Light Receive Strength##WaterMaterial", &Desc.fLightReceiveStrength, 0.01f, 0.f, 1.f);
 		bChanged |= ImGui::DragFloat("Specular Power##WaterMaterial", &Desc.fSpecularPower, 0.5f, 1.f, 256.f);
 		bChanged |= ImGui::DragFloat("Specular Strength##WaterMaterial", &Desc.fSpecularStrength, 0.01f, 0.f, 8.f);
 
@@ -174,12 +176,15 @@ namespace
 		bChanged |= ImGui::DragFloat2("Foam Noise Tiling##WaterMaterial", (float*)&Desc.vFoamNoiseTiling, 0.001f, 0.f, 0.f, "%.4f");
 		bChanged |= ImGui::DragFloat2("Foam Noise Speed##WaterMaterial", (float*)&Desc.vFoamNoiseSpeed, 0.0005f, 0.f, 0.f, "%.4f");
 		bChanged |= ImGui::DragFloat("Foam Noise Strength##WaterMaterial", &Desc.fFoamNoiseStrength, 0.01f, 0.f, 1.f);
+		bChanged |= ImGui::DragFloat("Foam Blur##WaterMaterial", &Desc.fFoamBlur, 0.05f, 0.f, 8.f, "%.2f");
 
 		ImGui::Separator();
 		ImGui::TextUnformatted("Caustic");
 		bChanged |= ImGui::DragFloat2("Caustic Tiling##WaterMaterial", (float*)&Desc.vCausticTiling, 0.001f, 0.f, 0.f, "%.4f");
 		bChanged |= ImGui::DragFloat2("Caustic Speed##WaterMaterial", (float*)&Desc.vCausticSpeed, 0.0005f, 0.f, 0.f, "%.4f");
 		bChanged |= ImGui::DragFloat("Caustic Strength##WaterMaterial", &Desc.fCausticStrength, 0.01f, 0.f, 4.f);
+		bChanged |= ImGui::DragFloat("Caustic Noise Strength##WaterMaterial", &Desc.fCausticNoiseStrength, 0.01f, 0.f, 1.f);
+		bChanged |= ImGui::DragFloat("Caustic Blur##WaterMaterial", &Desc.fCausticBlur, 0.05f, 0.f, 8.f, "%.2f");
 
 		return bChanged;
 	}
@@ -439,7 +444,7 @@ void CPanel_Inspector::Render()
 
 	ImGui::Separator();
 	Draw_EditableObjectPolicyPanel(pSelected);
-	Draw_EditableCustomPanel(pSelected);
+	Draw_EditableCustomPanel(pLevel, pSelected);
 
 	if (dynamic_cast<CEnvObject*>(pSelected))
 	{
@@ -891,8 +896,11 @@ void CPanel_Inspector::Draw_EditableObjectPolicyPanel(CGameObject* pObject)
 	}
 }
 
-void CPanel_Inspector::Draw_EditableCustomPanel(CGameObject* pObject)
+void CPanel_Inspector::Draw_EditableCustomPanel(CLevel_Edit* pLevel, CGameObject* pObject)
 {
+	if (nullptr == pLevel)
+		return;
+
 	IEditable* pEditable = dynamic_cast<IEditable*>(pObject);
 	if (nullptr == pEditable)
 		return;
@@ -963,10 +971,22 @@ void CPanel_Inspector::Draw_EditableCustomPanel(CGameObject* pObject)
 	}
 	ImGui::EndDisabled();
 
-	ImGui::TextDisabled("Live preview only. Persistence is added in the class override step.");
+	const _bool bCanPersist = pLevel->Is_MapPreviewObject(pObject);
+	ImGui::TextDisabled(bCanPersist
+		? "Changes are stored in the current map override session."
+		: "Live preview only outside a map preview session.");
 
-	if (bChanged && FAILED(pEditable->Apply_EditCustomDesc(EditedDesc)))
+	if (!bChanged)
+		return;
+
+	if (FAILED(pEditable->Apply_EditCustomDesc(EditedDesc)))
+	{
 		MSG_BOX("EDITABLE CUSTOM DESC APPLY FAILED");
+		return;
+	}
+
+	if (bCanPersist && !pLevel->Commit_MapEditObjectFromCurrentState(pObject))
+		MSG_BOX("EDITABLE CUSTOM DESC TRACK FAILED");
 }
 
 void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject)

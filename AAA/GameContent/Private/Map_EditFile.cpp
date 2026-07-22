@@ -106,6 +106,16 @@ namespace
 		return CMap_PresetCatalog::Get_ManifestPath(iPresetIndex, pOutManifestPath);
 	}
 
+	json Save_Float2(const _float2& Value)
+	{
+		return json::array({ Value.x, Value.y });
+	}
+
+	json Save_Float4(const _float4& Value)
+	{
+		return json::array({ Value.x, Value.y, Value.z, Value.w });
+	}
+
 	json Save_Float4x4(const _float4x4& Mat)
 	{
 		json j = json::array();
@@ -119,6 +129,62 @@ namespace
 				}));
 		}
 		return j;
+	}
+
+	HRESULT Load_OptionalFloat(const json& jObject, const char* pName, _float* pOutValue)
+	{
+		if (nullptr == pOutValue || !jObject.is_object())
+			return E_FAIL;
+
+		const auto Iter = jObject.find(pName);
+		if (Iter == jObject.end())
+			return S_OK;
+
+		if (!Iter->is_number())
+			return E_FAIL;
+
+		*pOutValue = Iter->get<_float>();
+		return S_OK;
+	}
+
+	HRESULT Load_OptionalFloat2(const json& jObject, const char* pName, _float2* pOutValue)
+	{
+		if (nullptr == pOutValue || !jObject.is_object())
+			return E_FAIL;
+
+		const auto Iter = jObject.find(pName);
+		if (Iter == jObject.end())
+			return S_OK;
+
+		const json& jValue = *Iter;
+		if (!jValue.is_array() || 2 != jValue.size())
+			return E_FAIL;
+
+		if (!jValue[0].is_number() || !jValue[1].is_number())
+			return E_FAIL;
+
+		*pOutValue = _float2(jValue[0].get<_float>(), jValue[1].get<_float>());
+		return S_OK;
+	}
+
+	HRESULT Load_OptionalFloat4(const json& jObject, const char* pName, _float4* pOutValue)
+	{
+		if (nullptr == pOutValue || !jObject.is_object())
+			return E_FAIL;
+
+		const auto Iter = jObject.find(pName);
+		if (Iter == jObject.end())
+			return S_OK;
+
+		const json& jValue = *Iter;
+		if (!jValue.is_array() || 4 != jValue.size())
+			return E_FAIL;
+
+		if (!jValue[0].is_number() || !jValue[1].is_number() || !jValue[2].is_number() || !jValue[3].is_number())
+			return E_FAIL;
+
+		*pOutValue = _float4(jValue[0].get<_float>(), jValue[1].get<_float>(), jValue[2].get<_float>(), jValue[3].get<_float>());
+		return S_OK;
 	}
 
 	HRESULT Load_Float4x4(const json& jValue, _float4x4* pOutMat)
@@ -626,9 +692,10 @@ namespace
 
 	const char* Get_ClassOverrideName(const EDIT_CLASS_OVERRIDE& ClassOverride)
 	{
-		if (holds_alternative<EDIT_ENVOBJECT_OVERRIDE>(ClassOverride))		return "EnvObject";
-		if (holds_alternative<EDIT_MAPSECTION_OVERRIDE>(ClassOverride))		return "MapSection";
-		if (holds_alternative<EDIT_LEVELDESIGN_OVERRIDE>(ClassOverride))	return "LevelDesignObject";
+		if (holds_alternative<EDIT_ENVOBJECT_OVERRIDE>(ClassOverride))          return "EnvObject";
+		if (holds_alternative<EDIT_MAPSECTION_OVERRIDE>(ClassOverride))         return "MapSection";
+		if (holds_alternative<EDIT_LEVELDESIGN_OVERRIDE>(ClassOverride))        return "LevelDesignObject";
+		if (holds_alternative<EDIT_LD_WATER_OVERRIDE>(ClassOverride))           return "Water";
 
 		return "";
 	}
@@ -641,6 +708,42 @@ namespace
 		{
 			if (pEnvOverride->bHasNearDistAlpha)	jClassOverride["UseNearDistAlpha"] = static_cast<bool>(pEnvOverride->bUseNearDistAlpha);
 			if (pEnvOverride->bHasDecalAlpha)		jClassOverride["DecalAlpha"] = pEnvOverride->fDecalAlpha;
+		}
+		else if (const EDIT_LD_WATER_OVERRIDE* pWaterOverride = get_if<EDIT_LD_WATER_OVERRIDE>(&ClassOverride))
+		{
+			const WATER_RENDER_DESC& Desc = pWaterOverride->RenderDesc;
+
+			jClassOverride["ShallowColor"] = Save_Float4(Desc.vShallowColor);
+			jClassOverride["DeepColor"] = Save_Float4(Desc.vDeepColor);
+			jClassOverride["ShallowColorStrength"] = Desc.fShallowColorStrength;
+			jClassOverride["Opacity"] = Desc.fOpacity;
+			jClassOverride["DepthFadeDistance"] = Desc.fDepthFadeDistance;
+
+			jClassOverride["NormalTiling0"] = Save_Float2(Desc.vNormalTiling0);
+			jClassOverride["NormalSpeed0"] = Save_Float2(Desc.vNormalSpeed0);
+			jClassOverride["NormalTiling1"] = Save_Float2(Desc.vNormalTiling1);
+			jClassOverride["NormalSpeed1"] = Save_Float2(Desc.vNormalSpeed1);
+			jClassOverride["NormalStrength"] = Desc.fNormalStrength;
+
+			jClassOverride["FresnelPower"] = Desc.fFresnelPower;
+			jClassOverride["ReflectionStrength"] = Desc.fReflectionStrength;
+			jClassOverride["RefractionStrength"] = Desc.fRefractionStrength;
+			jClassOverride["LightReceiveStrength"] = Desc.fLightReceiveStrength;
+			jClassOverride["SpecularPower"] = Desc.fSpecularPower;
+			jClassOverride["SpecularStrength"] = Desc.fSpecularStrength;
+
+			jClassOverride["FoamWidth"] = Desc.fFoamWidth;
+			jClassOverride["FoamStrength"] = Desc.fFoamStrength;
+			jClassOverride["FoamNoiseTiling"] = Save_Float2(Desc.vFoamNoiseTiling);
+			jClassOverride["FoamNoiseSpeed"] = Save_Float2(Desc.vFoamNoiseSpeed);
+			jClassOverride["FoamNoiseStrength"] = Desc.fFoamNoiseStrength;
+			jClassOverride["FoamBlur"] = Desc.fFoamBlur;
+
+			jClassOverride["CausticTiling"] = Save_Float2(Desc.vCausticTiling);
+			jClassOverride["CausticSpeed"] = Save_Float2(Desc.vCausticSpeed);
+			jClassOverride["CausticStrength"] = Desc.fCausticStrength;
+			jClassOverride["CausticNoiseStrength"] = Desc.fCausticNoiseStrength;
+			jClassOverride["CausticBlur"] = Desc.fCausticBlur;
 		}
 
 		return jClassOverride;
@@ -687,6 +790,74 @@ namespace
 		if ("Bush" == strClassName)
 		{
 			// Legacy GenerateItem override: keep old edit files loadable, but discard the removed value.
+			return S_OK;
+		}
+
+		if ("Water" == strClassName)
+		{
+			EDIT_LD_WATER_OVERRIDE WaterOverride{};
+			WATER_RENDER_DESC& Desc = WaterOverride.RenderDesc;
+
+			if (FAILED(Load_OptionalFloat4(jClassOverride, "ShallowColor", &Desc.vShallowColor)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat4(jClassOverride, "DeepColor", &Desc.vDeepColor)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "ShallowColorStrength", &Desc.fShallowColorStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "Opacity", &Desc.fOpacity)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "DepthFadeDistance", &Desc.fDepthFadeDistance)))
+				return E_FAIL;
+
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "NormalTiling0", &Desc.vNormalTiling0)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "NormalSpeed0", &Desc.vNormalSpeed0)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "NormalTiling1", &Desc.vNormalTiling1)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "NormalSpeed1", &Desc.vNormalSpeed1)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "NormalStrength", &Desc.fNormalStrength)))
+				return E_FAIL;
+
+			if (FAILED(Load_OptionalFloat(jClassOverride, "FresnelPower", &Desc.fFresnelPower)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "ReflectionStrength", &Desc.fReflectionStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "RefractionStrength", &Desc.fRefractionStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "LightReceiveStrength", &Desc.fLightReceiveStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "SpecularPower", &Desc.fSpecularPower)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "SpecularStrength", &Desc.fSpecularStrength)))
+				return E_FAIL;
+
+			if (FAILED(Load_OptionalFloat(jClassOverride, "FoamWidth", &Desc.fFoamWidth)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "FoamStrength", &Desc.fFoamStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "FoamNoiseTiling", &Desc.vFoamNoiseTiling)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "FoamNoiseSpeed", &Desc.vFoamNoiseSpeed)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "FoamNoiseStrength", &Desc.fFoamNoiseStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "FoamBlur", &Desc.fFoamBlur)))
+				return E_FAIL;
+
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "CausticTiling", &Desc.vCausticTiling)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat2(jClassOverride, "CausticSpeed", &Desc.vCausticSpeed)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "CausticStrength", &Desc.fCausticStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "CausticNoiseStrength", &Desc.fCausticNoiseStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "CausticBlur", &Desc.fCausticBlur)))
+				return E_FAIL;
+
+			*pOutClassOverride = WaterOverride;
 			return S_OK;
 		}
 

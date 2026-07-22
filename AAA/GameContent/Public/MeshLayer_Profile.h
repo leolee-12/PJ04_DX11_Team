@@ -17,7 +17,8 @@ enum class MESH_LAYER_RENDER_KIND : _uint
 {
 	MAIN,
 	SHADOW,
-	DECAL
+	DECAL,
+	MAIN_BLEND // 포워드 반투명 렌더 경로
 };
 
 namespace MeshLayerProfile

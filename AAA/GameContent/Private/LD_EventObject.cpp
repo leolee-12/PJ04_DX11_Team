@@ -1,6 +1,7 @@
 #include "LD_EventObject.h"
 #include "GameContent_const.h"
 #include "MeshLayer_Binder.h"
+#include "World_BlendCollector.h"
 
 #include "GameInstance.h"
 
@@ -52,6 +53,8 @@ HRESULT CLD_EventObject::Initialize(void* pArg)
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
+
+	Cache_BlendMeshIndices();
 
 	return S_OK;
 }
@@ -117,6 +120,7 @@ void CLD_EventObject::Late_Update(_float fTimeDelta)
 
 	Check_Visible();
 	Submit_RenderGroups();
+	Submit_BlendMeshes();
 }
 
 HRESULT CLD_EventObject::Render()
@@ -166,6 +170,30 @@ HRESULT CLD_EventObject::Render_Shadow()
 		if (FAILED(Render_ShadowMesh(m_pShaderCom, m_pModelCom, i, eProfile)))
 			return E_FAIL;
 	}
+
+	return S_OK;
+}
+
+HRESULT CLD_EventObject::Render_BlendMesh(_uint iMeshIndex)
+{
+	if (!m_bActive || Is_Dead())
+		return S_OK;
+
+	if (!m_MeshVisible[iMeshIndex])
+		return S_OK;
+
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	return Render_Mesh(iMeshIndex, EVENTOBJECT_ANIM_DEFAULT_PASS, MESH_LAYER_RENDER_KIND::MAIN_BLEND);
+}
+
+HRESULT CLD_EventObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	if (FAILED(__super::Apply_EditMeshLayer(iModelSlot, iMesh, Layer)))
+		return E_FAIL;
+
+	Cache_BlendMeshIndices();
 
 	return S_OK;
 }
@@ -426,10 +454,10 @@ HRESULT CLD_EventObject::Bind_ShaderResources()
 
 HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex)
 {
-	return Render_Mesh(iMeshIndex, EVENTOBJECT_ANIM_DEFAULT_PASS);
+	return Render_Mesh(iMeshIndex, EVENTOBJECT_ANIM_DEFAULT_PASS, MESH_LAYER_RENDER_KIND::MAIN);
 }
 
-HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex)
+HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex, MESH_LAYER_RENDER_KIND eKind)
 {
 	const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(iMeshIndex);
 
@@ -446,7 +474,7 @@ HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex)
 		Ctx.iMesh = iMeshIndex;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.eKind = eKind;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
 		MESH_LAYER_BIND_RESULT Result{};
@@ -472,7 +500,7 @@ HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex)
 		Ctx.iMesh = iMeshIndex;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.eKind = eKind;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
 		MESH_LAYER_BIND_RESULT Result{};
@@ -492,9 +520,50 @@ HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex)
 	return S_OK;
 }
 
+void CLD_EventObject::Cache_BlendMeshIndices()
+{
+	m_BlendMeshIndices.clear();
+
+	if (nullptr == m_pModelCom)
+		return;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (Is_WorldBlendPass(m_pModelCom->Get_MeshLayer(i).iPass))
+			m_BlendMeshIndices.push_back(i);
+	}
+}
+
+void CLD_EventObject::Submit_BlendMeshes()
+{
+	if (!m_bVisible || m_BlendMeshIndices.empty() || nullptr == m_pModelCom)
+		return;
+
+	if (nullptr == m_pBlendCollector)
+		m_pBlendCollector = CWorld_BlendCollector::Find(m_pGameInstance_Proxy);
+
+	if (nullptr == m_pBlendCollector)
+		return;
+
+	const _float4x4* pWorld = m_pTransformCom->Get_WorldMatrixPtr();
+
+	for (_uint iMeshIndex : m_BlendMeshIndices)
+	{
+		if (iMeshIndex >= m_MeshVisible.size() || !m_MeshVisible[iMeshIndex])
+			continue;
+
+		m_pBlendCollector->Submit(this, this, m_pModelCom, pWorld, iMeshIndex);
+	}
+}
+
 void CLD_EventObject::Free()
 {
 	Release_RigidStatic();
+
+	m_pBlendCollector = nullptr;
+	m_BlendMeshIndices.clear();
 
 	__super::Free();
 }

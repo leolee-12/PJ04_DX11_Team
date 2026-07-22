@@ -121,6 +121,8 @@ struct MAP_SPAWN_OPTIONS
 {
 	_bool bSpawnStage = true;
 	_bool bSpawnEnv = true;
+	_bool bSpawnAddedEnv = true;
+	_bool bSpawnAddedLevelDesign = true;
 };
 
 using MAP_OBJECT_CREATED_CALLBACK = void(*)(void* pContext, CGameObject* pObject,

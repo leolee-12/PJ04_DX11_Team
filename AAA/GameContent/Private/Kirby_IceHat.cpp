@@ -91,7 +91,7 @@ HRESULT CKirby_IceHat::Render()
 
 HRESULT CKirby_IceHat::Ready_Components()
 {
-    KIRBY_PART_COMPONENT_DESC°¡ tDesc{};
+    KIRBY_PART_COMPONENT_DESC tDesc{};
     tDesc.tShaderDesc = Shader_Kirby;
     tDesc.szModelProtoTag = TEXT("Prototype_Component_Model_IceHat");
     tDesc.bCreateAnimator = true;
