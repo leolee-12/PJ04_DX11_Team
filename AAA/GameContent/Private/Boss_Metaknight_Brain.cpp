@@ -21,12 +21,13 @@ namespace
 CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
 {
     // Æ©´×¿ë
-    return CBTReactiveSelector::Create({
-        Make_UpperBranch(),
-        Loop("Wait", 0.5f, SPD),
-        });
+    //return CBTReactiveSelector::Create({
+    //    Make_UpperBranch(),
+    //    Loop("Wait", 0.5f, SPD),
+    //    });
 
     CBTNode* pCombat = CBTSequence::Create({
+        Make_LockOutcomeBranch(),
         Make_GigaBranch(),
         Make_StepApproach(),
         Make_UnlessInRange(Make_DashIn()),
@@ -1077,6 +1078,36 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Fall()
         [bOn, fT] { *bOn = false; *fT = 0.f; });
 }
 
+CBTNode* CBoss_Metaknight_Brain::Make_LockLose()
+{
+    auto bOn = make_shared<bool>(false);
+
+    auto* pDemo = CBTAction::Create(
+        [this, bOn](CBlackboard*, _float) -> BT_STATUS {
+            if (!*bOn)
+            {
+                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_LockLoseDemo();
+                *bOn = true;
+                return BT_STATUS::RUNNING;
+            }
+            if (Anim()->Is_Finished()) { *bOn = false; return BT_STATUS::SUCCESS; }
+            return BT_STATUS::RUNNING;
+        },
+        [bOn] { *bOn = false; });
+
+    auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->End_LockLoseDemo();
+        return BT_STATUS::SUCCESS;
+        });
+
+    return CBTSequence::Create({
+        pDemo,
+        pEnd,
+        Clip("LockingSwordLoseWait", SPD, 0.1f),
+        Clip("Wait", SPD, 0.2f),
+        });
+}
+
 CBTNode* CBoss_Metaknight_Brain::Make_DodgeBranch()
 {
     return CBTSequence::Create({
@@ -1112,6 +1143,33 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperBranch()
                 && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
         Make_UpperCalibur(),
         Clip("Wait", SPD, 0.2f),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_LockOutcomeBranch()
+{
+    auto iOut = make_shared<_int>(0);
+
+    auto* pRoll = CBTAction::Create([this, iOut](CBlackboard*, _float) {
+        auto e = static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_LockOutcome();
+        *iOut = (e == CBoss_Metaknight::ELockOutcome::MK_WIN) ? 1
+            : (e == CBoss_Metaknight::ELockOutcome::MK_LOSE) ? 2 : 0;
+        return (*iOut != 0) ? BT_STATUS::SUCCESS : BT_STATUS::FAILURE;
+        });
+
+    auto Branch = [](shared_ptr<_int> r, _int want, CBTNode* pBody) -> CBTNode* {
+        return CBTSequence::Create({
+            CBTCondition::Create([r, want](CBlackboard*) { return *r == want; }),
+            pBody,
+            });
+        };
+
+    return CBTSequence::Create({
+        pRoll,
+        CBTSelector::Create({
+            Branch(iOut, 1, Make_UC_CatchSuccess()),
+            Branch(iOut, 2, Make_LockLose()),       
+        }),
         });
 }
 

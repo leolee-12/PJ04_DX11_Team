@@ -52,7 +52,15 @@ public:
     static constexpr _float LOCK_TIMEOUT = 10.f;
     static constexpr _float ATTACH_YAW_OFFSET = 180.f;
 
+    static constexpr _float LOCK_CAM_DELAY = 0.5f;
+    static constexpr const _tchar* LOCK_CAM_TRACK = TEXT("Metaknight_LockingSword");
+
+    static constexpr _float LOCK_GAUGE_START = 0.2f;
+    static constexpr _float LOCK_GAUGE_WIN = 0.9f;
+    static constexpr _float LOCK_GAUGE_LOSE = 0.005f;
+
     enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
+    enum class ELockOutcome { NONE, MK_WIN, MK_LOSE };
 
 private:
     CBoss_Metaknight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -136,7 +144,21 @@ public:
     void Begin_UpperCaliburDemo();
     void End_UpperCaliburDemo();
 
+    void Begin_LockLoseDemo();
+    void End_LockLoseDemo();
+
     void  Set_ParryWindow(_bool bOn);
+
+    void Begin_LockingSync();
+    void Sync_LockingProgress(_float fProgress01);
+    void End_LockingSync();
+
+    ELockOutcome Consume_LockOutcome()
+    {
+        ELockOutcome e = m_eLockOutcome;
+        m_eLockOutcome = ELockOutcome::NONE;
+        return e;
+    }
 
 private:
     CBoss_Metaknight_Body* m_pBody = { nullptr };
@@ -146,6 +168,8 @@ private:
     CBoss_Metaknight_ReplicaSword* m_pReplica = { nullptr }; 
     CBoss_Metaknight_Mant* m_pMant = { nullptr };
 
+    const _float4x4* m_pAttachBone = { nullptr };
+    const _float4x4* m_pAttachAnchor = { nullptr };
     _bool            m_bAttached = { false };
     _float3          m_vAttachSaveScale = { 1.f, 1.f, 1.f };
 
@@ -168,12 +192,18 @@ private:
     _bool m_bParryWindow = { false };
     _bool  m_bLockingQTE = { false };
     _float m_fLockTimer = { 0.f };
+    _bool m_bLockSyncing = { false };
+    _bool m_bLockCamFired = { false };
+    _float m_fLockGauge = { 0.f };
+    _bool  m_bLockJudged = { false };
+    ELockOutcome m_eLockOutcome = { ELockOutcome::NONE };
 
     // ÄðÅ¸ÀÓ
     _float        m_fDodgeCooldown = { 0.f };
     _float        m_fGigaCooldown = { s_fGigaCooldown };
     _float        m_fRockCooldown = { 0.f };
     _float        m_fUpperCooldown = { 0.f };
+    
     
     enum class EPhaseTrans { NONE, HOP, LANDING, WAIT, DONE };
     EPhaseTrans m_ePhaseTrans = { EPhaseTrans::NONE };
@@ -184,13 +214,17 @@ private:
     static constexpr _bool s_bSkipIntro = true;
 
 private:
+    HRESULT Ready_MetaEvents();
     void Fire_CutsceneCamera(const _tchar* szTrack);
     void Hide_AllParts();
     void Build_RockTilePositions(const _float3 fCornersIn[4], _float3 fOutPos[23]);
     void Select_SafeTiles();
     void Update_PhaseTransition(_float fTimeDelta);
+    void Update_Attachment();
     void Enter_Locking();
     void Exit_Locking();
+    void Detach_FromKirby();
+    void Judge_Locking(_bool bPlayerWin);
 
 #ifdef _DEBUG
     void Debug_TriggerPhaseTransition();

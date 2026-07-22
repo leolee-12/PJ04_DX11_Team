@@ -100,6 +100,7 @@ private:
     CBTNode* Make_UC_Brake(shared_ptr<_float3> vDir);
     CBTNode* Make_UC_CatchSuccess();
     CBTNode* Make_UC_Fall();
+    CBTNode* Make_LockLose();
 
 
     // 트리 조립 유틸
@@ -112,6 +113,7 @@ private:
     CBTNode* Make_ComboBranch();
     CBTNode* Make_RockBranch();
     CBTNode* Make_UpperBranch();
+    CBTNode* Make_LockOutcomeBranch();
 
 
 public:

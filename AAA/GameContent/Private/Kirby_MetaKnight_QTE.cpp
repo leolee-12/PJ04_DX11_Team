@@ -6,6 +6,8 @@
 
 #include "Movement_Child.h"
 
+#include "Boss_Metaknight.h"
+
 CKirby_MetaKnight_QTE::CKirby_MetaKnight_QTE()
 {
 }
@@ -28,6 +30,25 @@ void CKirby_MetaKnight_QTE::Enter(CKirby* pKirby, _int iFlag)
     __super::Enter(pKirby, iFlag);
 
     m_iQTE_InputCount = 0;
+    m_bQTEStart = false;
+
+    m_tShowHandle = m_pGameInstance_Proxy->Subscribe(EventTag::QTE_Show,
+        [this, pKirby](void*) {
+            m_fGauge = 0.2f;
+            m_fSeek = 0.2f;
+            m_bQTEStart = true;
+
+            BOSS_QUERY q{};
+            m_pGameInstance_Proxy->Publish(EventTag::Query_Boss, &q);
+            m_pMeta = dynamic_cast<CBoss_Metaknight*>(q.pBoss);
+
+            pKirby->Get_Body()->Get_Animator()->Pause();
+        });
+
+    m_tHideHandle = m_pGameInstance_Proxy->Subscribe(EventTag::QTE_Hide,
+        [this](void*) {
+            m_bQTEStart = false;
+        });
 
     // 메타나이트 부착 이벤트
     ENEMY_ATTACHMENT_BEGIN_DESC tDesc{};
@@ -56,6 +77,17 @@ void CKirby_MetaKnight_QTE::Update(CKirby* pKirby, const _float fTimeDelta)
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
+    if (m_bQTEStart)
+    {
+        m_fGauge = max(0.f, m_fGauge - QTE_DECAY * fTimeDelta);
+        m_fSeek += (m_fGauge - m_fSeek) * min(1.f, QTE_FOLLOW * fTimeDelta);
+
+        pKirby->Get_Body()->Get_Animator()->Seek(m_fSeek);
+
+        if (m_pMeta)
+            m_pMeta->Sync_LockingProgress(m_fSeek);
+    }
+
     //if (pAnimator->Get_CurrentAnimName() == "Metaknight_DemoUpperCaliburCut7" && pAnimator->Is_Finished())
     //{
     //    Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
@@ -65,6 +97,11 @@ void CKirby_MetaKnight_QTE::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_MetaKnight_QTE::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
+
+    m_pGameInstance_Proxy->UnSubscribe(m_tShowHandle);
+    m_pGameInstance_Proxy->UnSubscribe(m_tHideHandle);
+
+    m_bQTEStart = false;
 }
 
 _bool CKirby_MetaKnight_QTE::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -82,7 +119,11 @@ _bool CKirby_MetaKnight_QTE::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
             if (!pCommand->IsDown())
                 return false;
 
+            if (!m_bQTEStart)
+                return true;
+
             ++m_iQTE_InputCount;
+            m_fGauge = min(1.f, m_fGauge + QTE_GAIN_PER_HIT);
 
             return true;
         }
@@ -95,7 +136,7 @@ void CKirby_MetaKnight_QTE::Request_PositionSync(CKirby* pKirby, const KIRBY_POS
 {
     switch (pDesc->eType)
     {
-        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING:
+        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN:
         {
             // 위치
             CTransform* pTransform = pKirby->Get_Transform();
@@ -129,7 +170,7 @@ void CKirby_MetaKnight_QTE::Request_PositionSync_End(CKirby* pKirby, const KIRBY
 {
     switch (pDesc->eType)
     {
-    case KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_LOCKING_END:
+    case KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_LOCKING_WIN_END:
     {
         // Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
         break;
