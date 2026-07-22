@@ -31,7 +31,7 @@ enum class KIRBY_STATE_TYPE
 
 
 	CUTSCENE_GRABBED, CAR_FIRST_BREAK_WALL, DEFORM_CAR_BRIDGE,
-	METAKNIGHT_ENCOUNTER, METAKNIGHT_UPPERCALIBUR, METAKNIGHT_QTE,
+	METAKNIGHT_ENCOUNTER, METAKNIGHT_QTE,
 	QTE_GRABBED,
 	STAGE_CLEAR,
 	SEQUENCE_LOCK,
@@ -68,23 +68,26 @@ public:
 public:
 	virtual _bool Ignore_TimeScale() { return false; }
 
-	virtual void Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc);
-	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc);
+	virtual void Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc) {}
+	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc) {}
 
-	virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc);
-	virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc);
+	virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc) {}
+	virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc) {}
 
-	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc);
+	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc) {}
 
 	// Dialogue
-	virtual void Request_Dialogue(CKirby* pKirby, const SEQUENCE_KIRBY_WARP_DESC* pDesc);
-	virtual void Request_DialogueAnim(CKirby* pKirby, const SEQUENCE_KIRBY_ANIM_DESC* pDesc);
+	virtual void Request_Dialogue(CKirby* pKirby, const SEQUENCE_KIRBY_WARP_DESC* pDesc) {}
+	virtual void Request_DialogueAnim(CKirby* pKirby, const SEQUENCE_KIRBY_ANIM_DESC* pDesc) {}
 
 	// SequenceLock
-	virtual void Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc);
-	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc);
+	virtual void Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc) {}
+	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc) {}
 
-	virtual void Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc);
+	virtual void Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc) {}
+
+	// MetaKnight
+	virtual void Request_MetaKnight_ParryBegin(CKirby* pKirby) {};
 
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);

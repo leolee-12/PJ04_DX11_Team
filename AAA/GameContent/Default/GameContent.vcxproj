@@ -36,6 +36,7 @@
     <ClInclude Include="..\public\Boss_Leopard.h" />
     <ClInclude Include="..\public\Boss_Leopard_Body.h" />
     <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_EscapeMant.h" />
     <ClInclude Include="..\Public\Bouncy.h" />
     <ClInclude Include="..\Public\Bouncy_Body.h" />
     <ClInclude Include="..\Public\Bouncy_Brain.h" />
@@ -63,7 +64,6 @@
     <ClInclude Include="..\Public\LightShaft.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
-    <ClInclude Include="..\Public\Kirby_UpperCalibur.h" />
     <ClInclude Include="..\Public\MeteorBurst.h" />
     <ClInclude Include="..\Public\MeteorRock.h" />
     <ClInclude Include="..\Public\MeteorRock_Large.h" />
@@ -534,6 +534,7 @@
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_EscapeMant.cpp" />
     <ClCompile Include="..\Private\Bouncy.cpp" />
     <ClCompile Include="..\Private\Bouncy_Body.cpp" />
     <ClCompile Include="..\Private\Bouncy_Brain.cpp" />
@@ -569,7 +570,6 @@
     <ClCompile Include="..\Private\LightShaft.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
-    <ClCompile Include="..\Private\Kirby_UpperCalibur.cpp" />
     <ClCompile Include="..\Private\MeteorBurst.cpp" />
     <ClCompile Include="..\Private\MeteorRock.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Large.cpp" />

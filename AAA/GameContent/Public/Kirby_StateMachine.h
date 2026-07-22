@@ -63,6 +63,9 @@ public:
 	void Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SLEEP_DESC* pDesc);
 	void Request_SequenceLock_End_StateMachine(const KIRBY_LEVEL_SPAWN_DESC* pDesc);
 
+	// MetaKnight
+	void Request_MetaKnight_ParryBegin_StateMachine();
+
 public:
 	void Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility);
 

@@ -6,6 +6,7 @@
 #include "Boss_Metaknight_ReplicaSword.h"
 #include "Boss_Metaknight_Sword.h"
 #include "Boss_Metaknight_Mant.h"
+#include "Boss_Metaknight_EscapeMant.h"
 
 #include "AttackDecal.h"
 
@@ -97,60 +98,13 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
     }
     if (m_pGameInstance_Proxy->Key_Down(DIK_0))
         Appear();
-    if (m_pGameInstance_Proxy->Key_Down(DIK_P))
-        Debug_TriggerPhaseTransition();
+    if (m_pGameInstance_Proxy->Key_Down(DIK_9))
+        Die();
 #endif
-    if (m_fDodgeCooldown > 0.f)
-        m_fDodgeCooldown -= fTimeDelta;
-    if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fGigaCooldown > 0.f)
-        m_fGigaCooldown -= fTimeDelta;
-    if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fRockCooldown > 0.f)
-        m_fRockCooldown -= fTimeDelta;
-    if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fUpperCooldown > 0.f)
-        m_fUpperCooldown -= fTimeDelta;
-
-    if (m_bLockingQTE)
-    {
-        m_fLockTimer += fTimeDelta;
-
-        if (!m_bLockCamFired && m_fLockTimer >= LOCK_CAM_DELAY)
-        {
-            m_bLockCamFired = true;
-            Fire_CutsceneCamera(LOCK_CAM_TRACK);
-            m_pGameInstance_Proxy->Publish(EventTag::QTE_Show, nullptr);
-        }
-
-        if (m_bLockCamFired && !m_bLockJudged)
-        {
-            if (m_fLockGauge >= LOCK_GAUGE_WIN)
-                Judge_Locking(true);
-            else if (m_fLockGauge <= LOCK_GAUGE_LOSE)
-                Judge_Locking(false);
-        }
-
-        if (!m_bLockJudged && m_fLockTimer >= LOCK_TIMEOUT)
-        {
-            Detach_FromKirby();
-            Exit_Locking();
-        }
-    }
-
-    if (m_bAppearPending)
-    {
-        m_fAppearTimer += fTimeDelta;
-        if (m_fAppearTimer >= APPEAR_DELAY)
-        {
-            m_bAppearPending = false;
-            Appear();
-        }
-    }
-
-    if (Get_Life() == EBOSS_LIFE::INTRO && !s_bSkipIntro)
-    {
-        CAnimator* pAnim = Get_BodyAnimator();
-        if (pAnim && pAnim->Is_Finished())
-            m_fIntroHoldTimer += fTimeDelta;
-    }
+    Tick_Cooldowns(fTimeDelta);
+    Tick_Locking(fTimeDelta);
+    Tick_Appear(fTimeDelta);
+    Tick_DeathSequence(fTimeDelta);
 
     __super::Update(fTimeDelta);
 
@@ -270,14 +224,31 @@ void CBoss_Metaknight::Play_Death()
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
 
-    if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("DeathLanding", false, true, 0.f, 1.f);
+    Detach_FromKirby();
+    Set_ParryWindow(false);
+    Enable_CatchBox(false);
+    End_LockingSync();
+
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (nullptr == pAnim)
+        return;
+
+    pAnim->Play("Damage", false, true, 0.f, s_fDefaultAnimSpeed);
+
+    _vector vDir = XMVectorSetY(
+        XMLoadFloat3(&Get_BlackBoard().vTargetPos) - m_pTransformCom->Get_State(STATE::POSITION), 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-6f)
+        m_pTransformCom->LookTo(XMVector3Normalize(vDir));
+
+    m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
+
+    m_eDeathStep = EDEATH::POSE_WAIT;
+    m_iDeathPoseDelay = 2;
 }
 
 _bool CBoss_Metaknight::Is_Death_Finished() const
 {
-    CAnimator* pAnim = Get_BodyAnimator();
-    return pAnim ? pAnim->Is_Finished() : true;
+    return m_eDeathStep == EDEATH::DONE;
 }
 
 void CBoss_Metaknight::On_Enter_Corpse()
@@ -368,6 +339,32 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
                 m_pGameInstance_Proxy->Publish(w.c_str(), pPayload);
                 break;
             }
+
+            case EANIM_EVENT::OnOffPart:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                switch (e.iIntParam)
+                {
+                    case 0:
+                        Hide_Sword(m_eActiveSword);
+                        break;
+                    case 1:
+                        Show_Mant(false);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+
+            case EANIM_EVENT::OnOffMesh:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+                
+                m_pBody->OffMask();
+                break;
+            }
         }
 
         });
@@ -396,11 +393,16 @@ HRESULT CBoss_Metaknight::Ready_PartObjects()
         CBoss_Metaknight_Mant::PROTOTYPE_TAG, CBoss_Metaknight_Mant::PART_TAG);
     if (!m_pMant) return E_FAIL;
 
+    m_pEscapeMant = Add_MonsterPart<CBoss_Metaknight_EscapeMant>(
+        CBoss_Metaknight_EscapeMant::PROTOTYPE_TAG, CBoss_Metaknight_EscapeMant::PART_TAG);
+    if (!m_pEscapeMant) return E_FAIL;
+
     constexpr _float fMantBakedScale = 1.f / 1.3f;
     m_pMant->Get_Transform()->Set_Scale(fMantBakedScale, fMantBakedScale, fMantBakedScale);
+    m_pEscapeMant->Get_Transform()->Set_Scale(fMantBakedScale, fMantBakedScale, fMantBakedScale);
+    m_pEscapeMant->Set_Active(false);
 
     Set_ActiveSword(EMK_SWORD::GALAXIA);
-
 
     m_pBody->Set_HitBox_OnEnter(CBoss_Metaknight_Body::MKHB_CATCH,
         [this](CCollider* pOther)
@@ -424,12 +426,9 @@ const _float4x4* CBoss_Metaknight::Get_FxParentMatrix(const _wstring& strFx) con
 
 void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
 {
-    if (m_bParryWindow && Is_SwordHit(tInfo.eHitType))
+    if (m_Lock.bParryWindow && Is_SwordHit(tInfo.eHitType))
     {
-        /*METAKNIGHT_PARRY_DESC tParry{};
-        tParry.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
-        tParry.fAnimSpeed = s_fDefaultAnimSpeed;
-        m_pGameInstance_Proxy->Publish(EventTag::Metaknight_ParryBegin, &tParry);*/
+        m_pGameInstance_Proxy->Publish(EventTag::Metaknight_ParryBegin, nullptr);
 
         Enter_Locking();
         return;
@@ -449,7 +448,7 @@ void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
 
 void CBoss_Metaknight::Update_AI(_float fTimeDelta)
 {
-    if (m_bLockingQTE || m_bAttached)
+    if (m_Lock.bActive || m_Lock.bAttached)
     {
         Clear_MoveDir();
         return;
@@ -478,6 +477,23 @@ void CBoss_Metaknight::Enable_SwordHit(_bool bOn)
     }
 }
 
+void CBoss_Metaknight::Hide_Sword(EMK_SWORD eSword)
+{
+    switch (eSword)
+    {
+        case EMK_SWORD::GALAXIA:
+            if (m_pSword)
+                m_pSword->Set_Drawn(false);
+            break;
+        case EMK_SWORD::REPLICA:
+            if (m_pReplica)
+                m_pReplica->Set_Drawn(false);
+            break;
+        default:
+            break;
+    }
+}
+
 void CBoss_Metaknight::Show_Mant(_bool bOn)
 {
     if (m_pMant)
@@ -488,6 +504,32 @@ void CBoss_Metaknight::Play_MantSync(const _char* szClip, _bool bLoop, _float fB
 {
     if (m_pMant && m_pMant->Is_Active())
         m_pMant->Get_Animator()->Play(szClip, bLoop, true, fBland, fSpeed);
+}
+
+void CBoss_Metaknight::Show_EscapeMant(_bool bOn)
+{
+    if (m_pEscapeMant)
+        m_pEscapeMant->Set_Active(bOn);
+}
+
+void CBoss_Metaknight::Play_EscapeMantSequence()
+{
+    if (nullptr == m_pEscapeMant || !m_pEscapeMant->Is_Active())
+        return;
+
+    CAnimator* pAnim = m_pEscapeMant->Get_Animator();
+    if (nullptr == pAnim)
+        return;
+
+    pAnim->Play("EscapeStart", false, true, 0.f, s_fDefaultAnimSpeed);
+
+    CAnimator::ANI_PLAY_INFO tInfo{};
+    tInfo.strAniName = "Escape";
+    tInfo.bLoop = false;
+    tInfo.bRestart = true;
+    tInfo.fBlend = 0.f;
+    tInfo.fSpeed = s_fDefaultAnimSpeed;
+    pAnim->Enqueue(tInfo);
 }
 
 void CBoss_Metaknight::Fire_GigaMoonShot()
@@ -510,43 +552,44 @@ void CBoss_Metaknight::Fire_GigaMoonShot()
 
 void CBoss_Metaknight::Begin_RockDecalSlide()
 {
-    Build_RockTilePositions(s_vGigaPoints, m_RockTiles);
-    Select_SafeTiles();
+    m_Rock.Build(s_vGigaPoints);
+    m_Rock.Select_Safe(m_pGameInstance_Proxy);
 
     _vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
     const _float sx = XMVectorGetX(vSelf), sz = XMVectorGetZ(vSelf);
 
-    for (int i = 0; i < ROCK_TILE_COUNT; ++i)
+    for (int i = 0; i < ROCK_FIELD::TILE_COUNT; ++i)
     {
-        if (m_bSafeTile[i])
+        if (m_Rock.bSafe[i])
         {
-            if (m_pRockDecals[i]) m_pRockDecals[i]->Set_Active(false);
+            if (m_Rock.pDecals[i]) m_Rock.pDecals[i]->Set_Active(false);
             continue;
         }
 
-        if (nullptr == m_pRockDecals[i])
+        if (nullptr == m_Rock.pDecals[i])
         {
             CGameObject* pObj = nullptr;
             if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
                 m_iPrototypeLevel, CAttackDecal::PROTOTYPE_TAG,
                 m_iPrototypeLevel, TEXT("Layer_Effect"), TEXT("RockDecal"), nullptr)))
                 continue;
-            m_pRockDecals[i] = dynamic_cast<CAttackDecal*>(pObj);
-            if (!m_pRockDecals[i]) continue;
-        }
-        else m_pRockDecals[i]->Set_Active(true);
 
-        _float3 vStart = { sx, m_RockTiles[i].y, sz };
-        m_pRockDecals[i]->Place(vStart, ROCK_DECAL_RADIUS, 9999.f);
-        m_pRockDecals[i]->Slide_To(m_RockTiles[i], ROCK_SLIDE_TIME);
+            m_Rock.pDecals[i] = dynamic_cast<CAttackDecal*>(pObj);
+            if (nullptr == m_Rock.pDecals[i]) continue;
+        }
+        else m_Rock.pDecals[i]->Set_Active(true);
+
+        _float3 vStart = { sx, m_Rock.vTiles[i].y, sz };
+        m_Rock.pDecals[i]->Place(vStart, ROCK_DECAL_RADIUS, 9999.f);
+        m_Rock.pDecals[i]->Slide_To(m_Rock.vTiles[i], ROCK_SLIDE_TIME);
     }
 }
 
 void CBoss_Metaknight::Drop_Rocks()
 {
-    for (int i = 0; i < ROCK_TILE_COUNT; ++i)
+    for (int i = 0; i < ROCK_FIELD::TILE_COUNT; ++i)
     {
-        if (m_bSafeTile[i]) continue;
+        if (m_Rock.bSafe[i]) continue;
 
         CProjectile* p = nullptr;
         CProjectile_Manager::GetInstance()->Spawn(
@@ -555,9 +598,9 @@ void CBoss_Metaknight::Drop_Rocks()
 
         if (auto* pRock = static_cast<CProjectile_Rock*>(p))
         {
-            pRock->Set_LinkedDecal(m_pRockDecals[i]);
-            _float fHeight = ROCK_DROP_HEIGHT + m_pGameInstance_Proxy->RandomFloat(0.f, 20.f);
-            pRock->Drop(m_RockTiles[i], fHeight);
+            pRock->Set_LinkedDecal(m_Rock.pDecals[i]);
+            const _float fHeight = ROCK_DROP_HEIGHT + m_pGameInstance_Proxy->RandomFloat(0.f, 20.f);
+            pRock->Drop(m_Rock.vTiles[i], fHeight);
         }
     }
 }
@@ -592,21 +635,14 @@ void CBoss_Metaknight::Enable_CatchBox(_bool bOn)
         m_pBody->Enable_HitBox(CBoss_Metaknight_Body::MKHB_CATCH, bOn);
 }
 
-void CBoss_Metaknight::Begin_UpperCaliburDemo()
+void CBoss_Metaknight::Begin_Demo(EDemo eDemo)
 {
-    static constexpr const _char* CUTS[] = {
-        "DemoUpperCaliburCut1", "DemoUpperCaliburCut2", "DemoUpperCaliburCut3",
-        "DemoUpperCaliburCut4", "DemoUpperCaliburCut5", "DemoUpperCaliburCut6",
-        "DemoUpperCaliburCut7",
-    };
+    const DEMO_DESC& tDesc = Get_DemoDesc(eDemo);
 
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 7.f, 0.f, 1.f));
-    m_pTransformCom->LookTo(XMVectorSet(0.f, 0.f, -1.f, 0.f));
-    if (m_pController)
-        m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
+    Snap_ToDemoOrigin();
 
     KIRBY_POSITION_SYNC_BEGIN_DESC Sync{};
-    Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_UPPERCALIBUR;
+    Sync.eType = tDesc.eSyncContext;
     XMStoreFloat4x4(&Sync.AnchorWorld,
         Strip_Scale(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
     Sync.fAnimSpeed = s_fDefaultAnimSpeed;
@@ -617,12 +653,12 @@ void CBoss_Metaknight::Begin_UpperCaliburDemo()
     if (nullptr == pAnim)
         return;
 
-    pAnim->Play(CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
+    pAnim->Play(tDesc.pClips[0], false, true, 0.f, s_fDefaultAnimSpeed);
 
-    for (_uint i = 1; i < _countof(CUTS); ++i)
+    for (_uint i = 1; i < tDesc.iClipCount; ++i)
     {
         CAnimator::ANI_PLAY_INFO tInfo{};
-        tInfo.strAniName = CUTS[i];
+        tInfo.strAniName = tDesc.pClips[i];
         tInfo.bLoop = false;
         tInfo.bRestart = true;
         tInfo.fBlend = 0.f;
@@ -631,86 +667,13 @@ void CBoss_Metaknight::Begin_UpperCaliburDemo()
     }
 }
 
-void CBoss_Metaknight::End_UpperCaliburDemo()
+void CBoss_Metaknight::End_Demo(EDemo eDemo)
 {
-    if (m_pBody)
-    {
-        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("TopL");
-        if (pBone)
-        {
-            _matrix matBoneWorld = XMLoadFloat4x4(pBone)
-                * XMLoadFloat4x4(m_pBody->Get_CombinedWorldMatrixPtr());
-
-            _vector vNew = XMVectorSetW(matBoneWorld.r[3], 1.f);
-            m_pTransformCom->Set_State(STATE::POSITION, vNew);
-            if (m_pController)
-                m_pController->Set_FootPosition(vNew);
-
-            _vector vBoneLook = XMVectorSetY(XMVectorNegate(matBoneWorld.r[2]), 0.f);
-            if (XMVectorGetX(XMVector3LengthSq(vBoneLook)) > 1e-4f)
-                m_pTransformCom->LookTo(XMVector3Normalize(vBoneLook));
-        }
-    }
+    Reanchor_FromRootBone();
 
     m_pMovement->Set_GravityEnabled(true);
 
-    KIRBY_POSITION_SYNC_END_DESC SyncEnd{ KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_UPPERCALIBUR_END };
-    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &SyncEnd);
-
-    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
-}
-
-void CBoss_Metaknight::Begin_LockLoseDemo()
-{
-    static constexpr const _char* CUTS[] = {
-        "DemoLockingSwordWinCut1"
-    };
-
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 7.f, 0.f, 1.f));
-    m_pTransformCom->LookTo(XMVectorSet(0.f, 0.f, -1.f, 0.f));
-    if (m_pController)
-        m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
-
-    KIRBY_POSITION_SYNC_BEGIN_DESC Sync{};
-    Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN;
-    XMStoreFloat4x4(&Sync.AnchorWorld,
-        Strip_Scale(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
-    Sync.fAnimSpeed = s_fDefaultAnimSpeed;
-    Sync.fBlendDuration = 0.f;
-    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Sync);
-
-    CAnimator* pAnim = Get_BodyAnimator();
-    if (nullptr == pAnim)
-        return;
-
-    pAnim->Play(CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
-}
-
-void CBoss_Metaknight::End_LockLoseDemo()
-{
-    if (m_pBody)
-    {
-        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("TopL");
-        if (pBone)
-        {
-            _matrix matBoneWorld = XMLoadFloat4x4(pBone)
-                * XMLoadFloat4x4(m_pBody->Get_CombinedWorldMatrixPtr());
-
-            _vector vNew = XMVectorSetW(matBoneWorld.r[3], 1.f);
-            m_pTransformCom->Set_State(STATE::POSITION, vNew);
-            if (m_pController)
-                m_pController->Set_FootPosition(vNew);
-
-            _vector vBoneLook = XMVectorSetY(XMVectorNegate(matBoneWorld.r[2]), 0.f);
-            if (XMVectorGetX(XMVector3LengthSq(vBoneLook)) > 1e-4f)
-                m_pTransformCom->LookTo(XMVector3Normalize(vBoneLook));
-        }
-    }
-
-    m_pMovement->Set_GravityEnabled(true);
-
-    KIRBY_POSITION_SYNC_END_DESC SyncEnd{ KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_LOCKING_WIN_END };
+    KIRBY_POSITION_SYNC_END_DESC SyncEnd{ Get_DemoDesc(eDemo).eEndReason };
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &SyncEnd);
 
     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
@@ -719,7 +682,7 @@ void CBoss_Metaknight::End_LockLoseDemo()
 
 void CBoss_Metaknight::Set_ParryWindow(_bool bOn)
 {
-    m_bParryWindow = bOn;
+    m_Lock.bParryWindow = bOn;
 
     if (nullptr == m_pHurtBox)
         return;
@@ -746,16 +709,16 @@ void CBoss_Metaknight::Begin_LockingSync()
 
     pAnim->Pause();
     pAnim->Seek(LOCK_GAUGE_START);
-    m_bLockSyncing = true;
+    m_Lock.bSyncing = true;
 }
 
 void CBoss_Metaknight::Sync_LockingProgress(_float fProgress01)
 {
-    if (!m_bLockSyncing)
+    if (!m_Lock.bSyncing)
         return;
 
     fProgress01 = fProgress01 < 0.f ? 0.f : (fProgress01 > 1.f ? 1.f : fProgress01);
-    m_fLockGauge = fProgress01;
+    m_Lock.fGauge = fProgress01;
 
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Seek(fProgress01);
@@ -763,10 +726,10 @@ void CBoss_Metaknight::Sync_LockingProgress(_float fProgress01)
 
 void CBoss_Metaknight::End_LockingSync()
 {
-    if (!m_bLockSyncing)
+    if (!m_Lock.bSyncing)
         return;
 
-    m_bLockSyncing = false;
+    m_Lock.bSyncing = false;
 
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Resume();
@@ -788,57 +751,6 @@ void CBoss_Metaknight::Hide_AllParts()
     if (m_pMant)    m_pMant->Set_Active(false);
     if (m_pSword)   m_pSword->Set_Active(false);
     if (m_pReplica) m_pReplica->Set_Active(false);
-}
-
-void CBoss_Metaknight::Build_RockTilePositions(const _float3 fCornersIn[4], _float3 fOutPos[23])
-{
-    _float3 c[4] = { fCornersIn[0], fCornersIn[1], fCornersIn[2], fCornersIn[3] };
-    Sort_CornersPerimeter(c);
-
-    XMVECTOR c0 = XMLoadFloat3(&c[0]);
-    XMVECTOR c1 = XMLoadFloat3(&c[1]);
-    XMVECTOR c2 = XMLoadFloat3(&c[2]);
-    XMVECTOR c3 = XMLoadFloat3(&c[3]);
-
-    float lenA = XMVectorGetX(XMVector3Length(c1 - c0));
-    float lenB = XMVectorGetX(XMVector3Length(c3 - c0));
-
-    bool bLongIsU = (lenA >= lenB);
-    bool bTileAlongU = bLongIsU;
-
-    const int rowCounts[5] = { 5, 4, 5, 4, 5 };
-    int idx = 0;
-    for (int r = 0; r < 5; ++r)
-    {
-        float rowT = r / 4.f;
-        int   n = rowCounts[r];
-        for (int t = 0; t < n; ++t)
-        {
-            float tileT = (n == 5) ? (t / 4.f)
-                : ((t + 0.5f) / 4.f);
-
-            float u = bTileAlongU ? tileT : rowT;
-            float v = bTileAlongU ? rowT : tileT;
-
-            XMVECTOR bottom = XMVectorLerp(c0, c1, u);
-            XMVECTOR top = XMVectorLerp(c3, c2, u);
-            XMVECTOR p = XMVectorLerp(bottom, top, v);
-
-            XMStoreFloat3(&fOutPos[idx++], p);
-        }
-    }
-}
-
-void CBoss_Metaknight::Select_SafeTiles()
-{
-    for (int i = 0; i < ROCK_TILE_COUNT; ++i) m_bSafeTile[i] = false;
-
-    int count = 0;
-    while (count < ROCK_SAFE_COUNT)
-    {
-        int r = m_pGameInstance_Proxy->RandomInt(0, ROCK_TILE_COUNT - 1);
-        if (!m_bSafeTile[r]) { m_bSafeTile[r] = true; ++count; }
-    }
 }
 
 void CBoss_Metaknight::Update_PhaseTransition(_float fTimeDelta)
@@ -883,49 +795,49 @@ void CBoss_Metaknight::Update_PhaseTransition(_float fTimeDelta)
 
 void CBoss_Metaknight::Update_Attachment()
 {
-    if (nullptr == m_pAttachBone || nullptr == m_pAttachAnchor)
+    if (nullptr == m_Lock.pAttachBone || nullptr == m_Lock.pAttachAnchor)
         return;
 
-    _matrix matAttach = XMLoadFloat4x4(m_pAttachBone) * XMLoadFloat4x4(m_pAttachAnchor);
+    _matrix matAttach = XMLoadFloat4x4(m_Lock.pAttachBone) * XMLoadFloat4x4(m_Lock.pAttachAnchor);
 
     matAttach = XMMatrixRotationY(XMConvertToRadians(ATTACH_YAW_OFFSET)) * matAttach;
 
     matAttach = Strip_Scale(matAttach);
-    matAttach.r[0] *= m_vAttachSaveScale.x;
-    matAttach.r[1] *= m_vAttachSaveScale.y;
-    matAttach.r[2] *= m_vAttachSaveScale.z;
+    matAttach.r[0] *= m_Lock.vSaveScale.x;
+    matAttach.r[1] *= m_Lock.vSaveScale.y;
+    matAttach.r[2] *= m_Lock.vSaveScale.z;
 
     m_pTransformCom->Set_WorldMatrix(matAttach);
 }
 
 void CBoss_Metaknight::Enter_Locking()
 {
-    if (m_bLockingQTE)
+    if (m_Lock.bActive)
         return;
 
-    m_bLockingQTE = true;
-    m_fLockTimer = 0.f;
-    m_bLockCamFired = false;
-    m_bLockJudged = false;
-    m_fLockGauge = LOCK_GAUGE_START;
+    m_Lock.bActive = true;
+    m_Lock.fTimer = 0.f;
+    m_Lock.bCamFired = false;
+    m_Lock.bJudged = false;
+    m_Lock.fGauge = LOCK_GAUGE_START;
 
     Enable_CatchBox(false);
     Set_ParryWindow(false);
 
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("LockingSword", false, true, 0.f, s_fDefaultAnimSpeed);
+        pAnim->Play("LockingSword", false, true, 0.1f, s_fDefaultAnimSpeed);
 
     Begin_LockingSync();
 }
 
 void CBoss_Metaknight::Exit_Locking()
 {
-    if (!m_bLockingQTE)
+    if (!m_Lock.bActive)
         return;
 
-    if (m_bLockCamFired)
+    if (m_Lock.bCamFired)
     {
-        m_bLockCamFired = false;
+        m_Lock.bCamFired = false;
 
         m_pGameInstance_Proxy->Publish(EventTag::QTE_Hide, nullptr);
 
@@ -933,7 +845,7 @@ void CBoss_Metaknight::Exit_Locking()
         m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
     }
 
-    m_bLockingQTE = false;
+    m_Lock.bActive = false;
 
     if (auto* pBrain = static_cast<CBoss_Brain*>(m_pBrain))
         pBrain->Reset_Tree();
@@ -941,12 +853,12 @@ void CBoss_Metaknight::Exit_Locking()
 
 void CBoss_Metaknight::Detach_FromKirby()
 {
-    if (!m_bAttached)
+    if (!m_Lock.bAttached)
         return;
 
-    m_bAttached = false;
-    m_pAttachBone = nullptr;
-    m_pAttachAnchor = nullptr;
+    m_Lock.bAttached = false;
+    m_Lock.pAttachBone = nullptr;
+    m_Lock.pAttachAnchor = nullptr;
 
     if (m_pController)
         m_pController->Set_Enabled(true);
@@ -957,16 +869,243 @@ void CBoss_Metaknight::Detach_FromKirby()
 
 void CBoss_Metaknight::Judge_Locking(_bool bPlayerWin)
 {
-    m_bLockJudged = true;
+    m_Lock.bJudged = true;
 
     m_pGameInstance_Proxy->Publish(EventTag::QTE_Hide, nullptr);
 
     End_LockingSync();
 
-    m_eLockOutcome = bPlayerWin ? ELockOutcome::MK_LOSE : ELockOutcome::MK_WIN;
+    m_Lock.eOutcome = bPlayerWin ? ELockOutcome::MK_LOSE : ELockOutcome::MK_WIN;
 
     Detach_FromKirby();
     Exit_Locking();
+}
+
+void CBoss_Metaknight::Tick_Cooldowns(_float fTimeDelta)
+{
+    if (m_fDodgeCooldown > 0.f)
+        m_fDodgeCooldown -= fTimeDelta;
+
+    if (Get_Life() != EBOSS_LIFE::ACTIVE)
+        return;
+
+    _float* const pCooldowns[] = { &m_fGigaCooldown, &m_fRockCooldown, &m_fUpperCooldown };
+    for (_float* pCool : pCooldowns)
+        if (*pCool > 0.f)
+            *pCool -= fTimeDelta;
+}
+
+void CBoss_Metaknight::Tick_Locking(_float fTimeDelta)
+{
+    if (!m_Lock.bActive)
+        return;
+
+    m_Lock.fTimer += fTimeDelta;
+
+    if (!m_Lock.bCamFired && m_Lock.fTimer >= LOCK_CAM_DELAY)
+    {
+        m_Lock.bCamFired = true;
+        Fire_CutsceneCamera(LOCK_CAM_TRACK);
+        m_pGameInstance_Proxy->Publish(EventTag::QTE_Show, nullptr);
+    }
+
+    if (m_Lock.bCamFired && !m_Lock.bJudged)
+    {
+        if (m_Lock.fGauge >= LOCK_GAUGE_WIN)       Judge_Locking(true);
+        else if (m_Lock.fGauge <= LOCK_GAUGE_LOSE) Judge_Locking(false);
+    }
+
+    if (!m_Lock.bJudged && m_Lock.fTimer >= LOCK_TIMEOUT)
+    {
+        Detach_FromKirby();
+        Exit_Locking();
+    }
+}
+
+void CBoss_Metaknight::Tick_Appear(_float fTimeDelta)
+{
+    if (m_bAppearPending)
+    {
+        m_fAppearTimer += fTimeDelta;
+        if (m_fAppearTimer >= APPEAR_DELAY)
+        {
+            m_bAppearPending = false;
+            Appear();
+        }
+    }
+
+    if (Get_Life() == EBOSS_LIFE::INTRO && !s_bSkipIntro)
+    {
+        CAnimator* pAnim = Get_BodyAnimator();
+        if (pAnim && pAnim->Is_Finished())
+            m_fIntroHoldTimer += fTimeDelta;
+    }
+}
+
+void CBoss_Metaknight::Tick_DeathSequence(_float fTimeDelta)
+{
+    if (m_eDeathStep == EDEATH::NONE || m_eDeathStep == EDEATH::DONE)
+        return;
+
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (nullptr == pAnim)
+    {
+        m_eDeathStep = EDEATH::DONE;
+        return;
+    }
+
+    switch (m_eDeathStep)
+    {
+        case EDEATH::POSE_WAIT:
+            if (--m_iDeathPoseDelay <= 0)
+            {
+                pAnim->Pause();
+                m_fDeathTimer = DEATH_PAUSE_SEC;
+
+                Play_OneShotSFX(TEXT("CharaBasic_DeadBigEnemy.wav"));
+
+                CAMERA_SHAKE_DESC shake{ 0.8f, DEATH_SHAKE_SEC };
+                m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
+
+                m_eDeathStep = EDEATH::PAUSING;
+            }
+            break;
+
+        case EDEATH::PAUSING:
+            m_fDeathTimer -= fTimeDelta;
+            if (m_fDeathTimer <= 0.f)
+            {
+                pAnim->Resume();
+
+                pAnim->Play("DeathLanding", false, true, 0.f, s_fDefaultAnimSpeed);
+
+                CAnimator::ANI_PLAY_INFO tInfo{};
+                tInfo.strAniName = "DeathMaskBreak";
+                tInfo.bLoop = false;
+                tInfo.bRestart = true;
+                tInfo.fBlend = 0.f;
+                tInfo.fSpeed = s_fDefaultAnimSpeed;
+                pAnim->Enqueue(tInfo);
+
+                m_eDeathStep = EDEATH::MASK;
+            }
+            break;
+
+        case EDEATH::MASK:
+            if (pAnim->Is_Finished())
+            {
+                m_fDeathTimer = DEATH_MASK_HOLD;
+                m_eDeathStep = EDEATH::MASK_HOLD;
+            }
+            break;
+
+        case EDEATH::MASK_HOLD:
+            m_fDeathTimer -= fTimeDelta;
+            if (m_fDeathTimer <= 0.f)
+            {
+                Show_Mant(true);
+                Play_MantSync("EscapeStart", false, 0.f, s_fDefaultAnimSpeed);
+                Show_EscapeMant(true);
+                Play_EscapeMantSequence();
+                pAnim->Play("EscapeStart", false, true, 0.f, s_fDefaultAnimSpeed);
+
+                CAnimator::ANI_PLAY_INFO tInfo{};
+                tInfo.strAniName = "Escape";
+                tInfo.bLoop = false;
+                tInfo.bRestart = true;
+                tInfo.fBlend = 0.f;
+                tInfo.fSpeed = s_fDefaultAnimSpeed;
+                pAnim->Enqueue(tInfo);
+
+                m_eDeathStep = EDEATH::ESCAPE;
+            }
+            break;
+
+        case EDEATH::ESCAPE:
+            if (pAnim->Is_Finished())
+                m_eDeathStep = EDEATH::DONE;
+            break;
+
+        default:
+            break;
+    }
+}
+
+void CBoss_Metaknight::Snap_ToDemoOrigin()
+{
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, DEMO_ORIGIN_Y, 0.f, 1.f));
+    m_pTransformCom->LookTo(XMVectorSet(0.f, 0.f, -1.f, 0.f));
+
+    if (m_pController)
+        m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
+}
+
+void CBoss_Metaknight::Reanchor_FromRootBone()
+{
+    if (nullptr == m_pBody)
+        return;
+
+    const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr(DEMO_ROOT_BONE);
+    if (nullptr == pBone)
+        return;
+
+    _matrix matBoneWorld = XMLoadFloat4x4(pBone)
+        * XMLoadFloat4x4(m_pBody->Get_CombinedWorldMatrixPtr());
+
+    _vector vNew = XMVectorSetW(matBoneWorld.r[3], 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vNew);
+    if (m_pController)
+        m_pController->Set_FootPosition(vNew);
+
+    _vector vBoneLook = XMVectorSetY(XMVectorNegate(matBoneWorld.r[2]), 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vBoneLook)) > 1e-4f)
+        m_pTransformCom->LookTo(XMVector3Normalize(vBoneLook));
+}
+
+const CBoss_Metaknight::DEMO_DESC& CBoss_Metaknight::Get_DemoDesc(EDemo eDemo)
+{
+    static constexpr const _char* UPPER_CUTS[] = {
+        "DemoUpperCaliburCut1", "DemoUpperCaliburCut2", "DemoUpperCaliburCut3",
+        "DemoUpperCaliburCut4", "DemoUpperCaliburCut5", "DemoUpperCaliburCut6",
+        "DemoUpperCaliburCut7",
+    };
+    static constexpr const _char* LOCKLOSE_CUTS[] = { "DemoLockingSwordWinCut1" };
+
+    static const DEMO_DESC DESCS[] = {
+        { KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_UPPERCALIBUR,
+          KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_UPPERCALIBUR_END,
+          UPPER_CUTS, _countof(UPPER_CUTS) },
+
+        { KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN,
+          KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_LOCKING_WIN_END,
+          LOCKLOSE_CUTS, _countof(LOCKLOSE_CUTS) },
+    };
+
+    return DESCS[static_cast<_uint>(eDemo)];
+}
+
+void CBoss_Metaknight::Queue_DeathClips()
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (nullptr == pAnim)
+        return;
+
+    static constexpr const _char* DEATH_CLIPS[] = {
+        "DeathLanding", "DeathMaskBreak", "EscapeStart", "Escape",
+    };
+
+    pAnim->Play(DEATH_CLIPS[0], false, true, 0.f, s_fDefaultAnimSpeed);
+
+    for (_uint i = 1; i < _countof(DEATH_CLIPS); ++i)
+    {
+        CAnimator::ANI_PLAY_INFO tInfo{};
+        tInfo.strAniName = DEATH_CLIPS[i];
+        tInfo.bLoop = false;
+        tInfo.bRestart = true;
+        tInfo.fBlend = 0.f;
+        tInfo.fSpeed = s_fDefaultAnimSpeed;
+        pAnim->Enqueue(tInfo);
+    }
 }
 
 HRESULT CBoss_Metaknight::Ready_MetaEvents()
@@ -984,16 +1123,16 @@ HRESULT CBoss_Metaknight::Ready_MetaEvents()
         const auto* pDesc = static_cast<ENEMY_ATTACHMENT_BEGIN_DESC*>(pData);
         if (nullptr == pDesc || pDesc->eContext != ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE)
             return;
-        if (m_bAttached)
+        if (m_Lock.bAttached)
             return;
         if (nullptr == pDesc->pBoneMatrix || nullptr == pDesc->pAnchorWorld)
             return;
 
-        m_bAttached = true;
-        m_vAttachSaveScale = m_pTransformCom->Get_Scaled();
+        m_Lock.bAttached = true;
+        m_Lock.vSaveScale = m_pTransformCom->Get_Scaled();
 
-        m_pAttachBone = pDesc->pBoneMatrix;
-        m_pAttachAnchor = pDesc->pAnchorWorld;
+        m_Lock.pAttachBone = pDesc->pBoneMatrix;
+        m_Lock.pAttachAnchor = pDesc->pAnchorWorld;
 
         if (m_pController)
             m_pController->Set_Enabled(false);
@@ -1048,4 +1187,49 @@ CBoss_Metaknight* CBoss_Metaknight::Clone(void* pArg)
 void CBoss_Metaknight::Free()
 {
     __super::Free();
+}
+
+void CBoss_Metaknight::ROCK_FIELD::Build(const _float3 fCornersIn[4])
+{
+    _float3 c[4] = { fCornersIn[0], fCornersIn[1], fCornersIn[2], fCornersIn[3] };
+    Sort_CornersPerimeter(c);
+
+    XMVECTOR c0 = XMLoadFloat3(&c[0]);
+    XMVECTOR c1 = XMLoadFloat3(&c[1]);
+    XMVECTOR c2 = XMLoadFloat3(&c[2]);
+    XMVECTOR c3 = XMLoadFloat3(&c[3]);
+
+    const bool bTileAlongU =
+        (XMVectorGetX(XMVector3Length(c1 - c0)) >= XMVectorGetX(XMVector3Length(c3 - c0)));
+
+    const int rowCounts[5] = { 5, 4, 5, 4, 5 };
+    int idx = 0;
+    for (int r = 0; r < 5; ++r)
+    {
+        const float rowT = r / 4.f;
+        const int   n = rowCounts[r];
+        for (int t = 0; t < n; ++t)
+        {
+            const float tileT = (n == 5) ? (t / 4.f) : ((t + 0.5f) / 4.f);
+            const float u = bTileAlongU ? tileT : rowT;
+            const float v = bTileAlongU ? rowT : tileT;
+
+            XMVECTOR bottom = XMVectorLerp(c0, c1, u);
+            XMVECTOR top = XMVectorLerp(c3, c2, u);
+            XMStoreFloat3(&vTiles[idx++], XMVectorLerp(bottom, top, v));
+        }
+    }
+}
+
+void CBoss_Metaknight::ROCK_FIELD::Select_Safe(CGameInstance_Proxy* pProxy)
+{
+    for (int i = 0; i < TILE_COUNT; ++i)
+        bSafe[i] = false;
+
+    int count = 0;
+    while (count < SAFE_COUNT)
+    {
+        const int r = pProxy->RandomInt(0, TILE_COUNT - 1);
+        if (!bSafe[r]) { bSafe[r] = true; ++count; }
+    }
 }
