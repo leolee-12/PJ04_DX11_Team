@@ -31,7 +31,6 @@
 #include "Kirby_SequenceLock.h"
 
 #include "Kirby_MetaKnightEncounter.h"
-#include "Kirby_UpperCalibur.h"
 #include "Kirby_MetaKnight_QTE.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
@@ -84,9 +83,6 @@ void CKirby_StateMachine::Update_StateMachine(const _float fTimeDelta)
 {
     if (m_pCurState == nullptr)
         return;
-
-    if (m_pGameInstance_Proxy->Key_Down(DIK_5))
-        Change_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE);
 
     m_pCurState->Update(m_pKirby, fTimeDelta);
 }
@@ -167,17 +163,18 @@ void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION
         }
         case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_UPPERCALIBUR:
         {
-            Change_State(KIRBY_STATE_TYPE::METAKNIGHT_UPPERCALIBUR);
+            Change_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE);
             break;
         }
-        //case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN:
-        //{
-        //    Change_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE);
-        //    break;
-        //}
-        case KIRBY_POSITION_SYNC_CONTEXT::_COUNT:
+        case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN:
         {
             break;
+        }
+        case KIRBY_POSITION_SYNC_CONTEXT::_COUNT:
+        default:        
+        {
+            MSG_BOX("Request_PositionSync_StateMachine Error: CKirby_StateMachine");
+            return;
         }
     }
 
@@ -234,7 +231,9 @@ void CKirby_StateMachine::Request_SequenceLock_End_StateMachine(const KIRBY_LEVE
 void CKirby_StateMachine::Request_MetaKnight_ParryBegin_StateMachine()
 {
     Change_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE);
+    m_pCurState->Request_MetaKnight_ParryBegin(m_pKirby);
 }
+
 void CKirby_StateMachine::Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility)
 {
     if (m_pKirby->Has_Deform())
@@ -296,7 +295,6 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE, CKirby_DeformCarBridge::Create())))          return E_FAIL;
 
     if (FAILED(Register_State(KIRBY_STATE_TYPE::METAKNIGHT_ENCOUNTER, CKirby_MetaKnightEncounter::Create())))   return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::METAKNIGHT_UPPERCALIBUR, CKirby_UpperCalibur::Create())))       return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::METAKNIGHT_QTE, CKirby_MetaKnight_QTE::Create())))              return E_FAIL;
 
     if (FAILED(Register_State(KIRBY_STATE_TYPE::STAGE_CLEAR, CKirby_Clear::Create())))                          return E_FAIL;

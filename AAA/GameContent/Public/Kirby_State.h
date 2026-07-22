@@ -31,7 +31,7 @@ enum class KIRBY_STATE_TYPE
 
 
 	CUTSCENE_GRABBED, CAR_FIRST_BREAK_WALL, DEFORM_CAR_BRIDGE,
-	METAKNIGHT_ENCOUNTER, METAKNIGHT_UPPERCALIBUR, METAKNIGHT_QTE,
+	METAKNIGHT_ENCOUNTER, METAKNIGHT_QTE,
 	QTE_GRABBED,
 	STAGE_CLEAR,
 	SEQUENCE_LOCK,
@@ -85,6 +85,9 @@ public:
 	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc) {}
 
 	virtual void Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc) {}
+
+	// MetaKnight
+	virtual void Request_MetaKnight_ParryBegin(CKirby* pKirby) {};
 
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
