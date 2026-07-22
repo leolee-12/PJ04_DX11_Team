@@ -48,7 +48,7 @@ public:
     static constexpr _float s_fRockCooldown = 60.f;
     //static constexpr _float s_fUpperCooldown = 90.f;
     static constexpr _float s_fUpperCooldown = 3.f;
-
+    
     static constexpr _float LOCK_TIMEOUT = 10.f;
     static constexpr _float ATTACH_YAW_OFFSET = 180.f;
 
@@ -134,7 +134,7 @@ public:
 
     void  Set_TopViewCam(_bool bOn);
 
-    void Start_PatternCooldowns(_float fUsedCooldown);
+    void  Start_PatternCooldowns(_float fUsedCooldown);
 
     void  Enable_CatchBox(_bool bOn);
     void  Reset_CatchHit() { m_bCatchHit = false; }
@@ -147,7 +147,7 @@ public:
     void Begin_LockLoseDemo();
     void End_LockLoseDemo();
 
-    void  Set_ParryWindow(_bool bOn);
+    void Set_ParryWindow(_bool bOn);
 
     void Begin_LockingSync();
     void Sync_LockingProgress(_float fProgress01);
@@ -202,7 +202,7 @@ private:
     _float        m_fDodgeCooldown = { 0.f };
     _float        m_fGigaCooldown = { s_fGigaCooldown };
     _float        m_fRockCooldown = { 0.f };
-    _float        m_fUpperCooldown = { 0.f };
+    _float        m_fUpperCooldown = { s_fUpperCooldown };
     
     
     enum class EPhaseTrans { NONE, HOP, LANDING, WAIT, DONE };

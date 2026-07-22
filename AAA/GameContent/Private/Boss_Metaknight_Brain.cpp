@@ -27,7 +27,6 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     //    });
 
     CBTNode* pCombat = CBTSequence::Create({
-        Make_LockOutcomeBranch(),
         Make_GigaBranch(),
         Make_StepApproach(),
         Make_UnlessInRange(Make_DashIn()),
@@ -37,6 +36,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     if (iPhase >= 1)
     {
         return CBTReactiveSelector::Create({
+            Make_LockOutcomeBranch(),
             Make_DodgeBranch(),
             Make_RockBranch(),
             Make_UpperBranch(),
@@ -44,6 +44,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
             });
     }
     return CBTReactiveSelector::Create({
+        Make_LockOutcomeBranch(),
         Make_DodgeBranch(),
         Make_UpperBranch(),
         pCombat,
