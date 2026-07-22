@@ -82,6 +82,13 @@ _bool CBoss_Brain::IsFacing(_fvector dir, _float dot) const
     return XMVectorGetX(XMVector3Dot(look, dir)) >= dot;
 }
 
+void CBoss_Brain::Reset_Tree()
+{
+    _int iPhase = Owner()->Get_Phase();
+    if (iPhase >= 0 && iPhase < static_cast<_int>(m_PhaseBTs.size()))
+        m_PhaseBTs[iPhase]->Reset();
+}
+
 _bool CBoss_Brain::RotateYawTo(_fvector dir, _float degPerSec, _float dt)
 {
     if (XMVector3Equal(dir, XMVectorZero())) return true;

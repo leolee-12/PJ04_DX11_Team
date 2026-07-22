@@ -8,7 +8,7 @@ class CBoss_Metaknight_Body final : public CMultiHitBoxPart
     GENERATED_BODY(CBoss_Metaknight_Body)
 
 public:
-    enum METAKNIGHT_HITBOX { MKHB_SLASH, MKHB_END };
+    enum METAKNIGHT_HITBOX { MKHB_SLASH, MKHB_CATCH, MKHB_END };
 
 private:
     CBoss_Metaknight_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

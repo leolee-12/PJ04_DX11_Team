@@ -15,8 +15,8 @@ HRESULT CBoss_Metaknight_Body::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg))) return E_FAIL;
     if (FAILED(Ready_Components()))        return E_FAIL;
 
-    // TODO: 검 파트 생기면 검 쪽으로 이동 검토. 지금은 오른손 소켓 기준 임시 판정
     Add_HitBox(MKHB_SLASH, "RHaveL", COLLIDER::SPHERE, 2.f, 0.f, 0.f, 0.f);
+    Add_HitBox(MKHB_CATCH, "C_BodyJ", COLLIDER::SPHERE, 1.5f, 0.f, 0.f, 0.f);
 
     m_pAnimatorCom->Play("Wait", false);
 

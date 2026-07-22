@@ -10,11 +10,16 @@ NS_BEGIN(Client)
 
 class CKirby;
 class CKirby_Body;
+class CBoss_Metaknight;
 
 class CLIENT_DLL CKirby_MetaKnight_QTE final : public CKirby_State
 {
 private:
 	enum class METAKNIGHT_QTE_STATE { QTE, SUCCESS, FAIL, METANIGHT_QTE_STATE_END };
+
+	static constexpr _float QTE_GAIN_PER_HIT = 0.05f;
+	static constexpr _float QTE_DECAY = 0.06f;       
+	static constexpr _float QTE_FOLLOW = 6.f;        
 
 private:
 	CKirby_MetaKnight_QTE();
@@ -47,10 +52,17 @@ private:
 	void Exit_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eState);
 
 private:
+	_uint m_iQTE_InputCount{};
 	METAKNIGHT_QTE_STATE m_eMetaKnightQTEState{};
 
-	_uint m_iQTE_InputCount{};
-	_float m_fQTEProgress{};
+	CBoss_Metaknight* m_pMeta{};
+
+	_bool     m_bQTEStart{ false };
+	SUBHANDLE m_tShowHandle{};
+	SUBHANDLE m_tHideHandle{};
+
+	_float m_fGauge{};         
+	_float m_fSeek{};          
 
 public:
 	static CKirby_MetaKnight_QTE* Create();

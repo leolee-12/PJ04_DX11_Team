@@ -43,6 +43,13 @@ namespace
             return atan2f(a.z - cz, a.x - cx) < atan2f(b.z - cz, b.x - cx);
             });
     }
+
+    _bool Is_SwordHit(HIT_TYPE eHitType)
+    {
+        return eHitType == HIT_TYPE::SWORD_DEFAULT
+            || eHitType == HIT_TYPE::SWORD_SPIN
+            || eHitType == HIT_TYPE::UPWARD_SLASH;
+    }
 }
 
 CBoss_Metaknight::CBoss_Metaknight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -62,14 +69,8 @@ HRESULT CBoss_Metaknight::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    Subscribe_Event(APPEAR_TAG, [this](void*) {
-        if (m_bAppearPending || Get_Life() != EBOSS_LIFE::HIDDEN)
-            return;
-        m_bAppearPending = true;
-        m_fAppearTimer = 0.f;
-        Set_Active(true);
-        Hide_AllParts();
-        });
+    if (FAILED(Ready_MetaEvents()))
+        return E_FAIL;
 
     m_strBossName = L"메타나이트";
     m_fMaxHP = 100.f;
@@ -105,6 +106,34 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
         m_fGigaCooldown -= fTimeDelta;
     if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fRockCooldown > 0.f)
         m_fRockCooldown -= fTimeDelta;
+    if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fUpperCooldown > 0.f)
+        m_fUpperCooldown -= fTimeDelta;
+
+    if (m_bLockingQTE)
+    {
+        m_fLockTimer += fTimeDelta;
+
+        if (!m_bLockCamFired && m_fLockTimer >= LOCK_CAM_DELAY)
+        {
+            m_bLockCamFired = true;
+            Fire_CutsceneCamera(LOCK_CAM_TRACK);
+            m_pGameInstance_Proxy->Publish(EventTag::QTE_Show, nullptr);
+        }
+
+        if (m_bLockCamFired && !m_bLockJudged)
+        {
+            if (m_fLockGauge >= LOCK_GAUGE_WIN)
+                Judge_Locking(true);
+            else if (m_fLockGauge <= LOCK_GAUGE_LOSE)
+                Judge_Locking(false);
+        }
+
+        if (!m_bLockJudged && m_fLockTimer >= LOCK_TIMEOUT)
+        {
+            Detach_FromKirby();
+            Exit_Locking();
+        }
+    }
 
     if (m_bAppearPending)
     {
@@ -131,6 +160,7 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
 
 void CBoss_Metaknight::Late_Update(_float fTimeDelta)
 {
+    Update_Attachment();
     __super::Late_Update(fTimeDelta);
 }
 
@@ -371,6 +401,19 @@ HRESULT CBoss_Metaknight::Ready_PartObjects()
 
     Set_ActiveSword(EMK_SWORD::GALAXIA);
 
+
+    m_pBody->Set_HitBox_OnEnter(CBoss_Metaknight_Body::MKHB_CATCH,
+        [this](CCollider* pOther)
+        {
+            if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+            if (m_bCatchHit)
+                return;
+
+            m_bCatchHit = true;
+            m_pBody->Enable_HitBox(CBoss_Metaknight_Body::MKHB_CATCH, false);
+        });
+
     return S_OK;
 }
 
@@ -381,6 +424,17 @@ const _float4x4* CBoss_Metaknight::Get_FxParentMatrix(const _wstring& strFx) con
 
 void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
 {
+    if (m_bParryWindow && Is_SwordHit(tInfo.eHitType))
+    {
+        /*METAKNIGHT_PARRY_DESC tParry{};
+        tParry.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
+        tParry.fAnimSpeed = s_fDefaultAnimSpeed;
+        m_pGameInstance_Proxy->Publish(EventTag::Metaknight_ParryBegin, &tParry);*/
+
+        Enter_Locking();
+        return;
+    }
+
     if (m_bDodgeInvuln)
         return;
 
@@ -391,6 +445,17 @@ void CBoss_Metaknight::Damaged(const ATTACK_INFO& tInfo)
     }
 
     __super::Damaged(tInfo);
+}
+
+void CBoss_Metaknight::Update_AI(_float fTimeDelta)
+{
+    if (m_bLockingQTE || m_bAttached)
+    {
+        Clear_MoveDir();
+        return;
+    }
+
+    __super::Update_AI(fTimeDelta);
 }
 
 void CBoss_Metaknight::Set_ActiveSword(EMK_SWORD eSword)
@@ -518,6 +583,204 @@ void CBoss_Metaknight::Start_PatternCooldowns(_float fUsedCooldown)
 {
     if (s_fRockCooldown <= fUsedCooldown) m_fRockCooldown = s_fRockCooldown;
     if (s_fGigaCooldown <= fUsedCooldown) m_fGigaCooldown = s_fGigaCooldown;
+    if (s_fUpperCooldown <= fUsedCooldown) m_fUpperCooldown = s_fUpperCooldown;
+}
+
+void CBoss_Metaknight::Enable_CatchBox(_bool bOn)
+{
+    if (m_pBody)
+        m_pBody->Enable_HitBox(CBoss_Metaknight_Body::MKHB_CATCH, bOn);
+}
+
+void CBoss_Metaknight::Begin_UpperCaliburDemo()
+{
+    static constexpr const _char* CUTS[] = {
+        "DemoUpperCaliburCut1", "DemoUpperCaliburCut2", "DemoUpperCaliburCut3",
+        "DemoUpperCaliburCut4", "DemoUpperCaliburCut5", "DemoUpperCaliburCut6",
+        "DemoUpperCaliburCut7",
+    };
+
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 7.f, 0.f, 1.f));
+    m_pTransformCom->LookTo(XMVectorSet(0.f, 0.f, -1.f, 0.f));
+    if (m_pController)
+        m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
+
+    KIRBY_POSITION_SYNC_BEGIN_DESC Sync{};
+    Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_UPPERCALIBUR;
+    XMStoreFloat4x4(&Sync.AnchorWorld,
+        Strip_Scale(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+    Sync.fAnimSpeed = s_fDefaultAnimSpeed;
+    Sync.fBlendDuration = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Sync);
+
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (nullptr == pAnim)
+        return;
+
+    pAnim->Play(CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
+
+    for (_uint i = 1; i < _countof(CUTS); ++i)
+    {
+        CAnimator::ANI_PLAY_INFO tInfo{};
+        tInfo.strAniName = CUTS[i];
+        tInfo.bLoop = false;
+        tInfo.bRestart = true;
+        tInfo.fBlend = 0.f;
+        tInfo.fSpeed = s_fDefaultAnimSpeed;
+        pAnim->Enqueue(tInfo);
+    }
+}
+
+void CBoss_Metaknight::End_UpperCaliburDemo()
+{
+    if (m_pBody)
+    {
+        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("TopL");
+        if (pBone)
+        {
+            _matrix matBoneWorld = XMLoadFloat4x4(pBone)
+                * XMLoadFloat4x4(m_pBody->Get_CombinedWorldMatrixPtr());
+
+            _vector vNew = XMVectorSetW(matBoneWorld.r[3], 1.f);
+            m_pTransformCom->Set_State(STATE::POSITION, vNew);
+            if (m_pController)
+                m_pController->Set_FootPosition(vNew);
+
+            _vector vBoneLook = XMVectorSetY(XMVectorNegate(matBoneWorld.r[2]), 0.f);
+            if (XMVectorGetX(XMVector3LengthSq(vBoneLook)) > 1e-4f)
+                m_pTransformCom->LookTo(XMVector3Normalize(vBoneLook));
+        }
+    }
+
+    m_pMovement->Set_GravityEnabled(true);
+
+    KIRBY_POSITION_SYNC_END_DESC SyncEnd{ KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_UPPERCALIBUR_END };
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &SyncEnd);
+
+    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+void CBoss_Metaknight::Begin_LockLoseDemo()
+{
+    static constexpr const _char* CUTS[] = {
+        "DemoLockingSwordWinCut1"
+    };
+
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 7.f, 0.f, 1.f));
+    m_pTransformCom->LookTo(XMVectorSet(0.f, 0.f, -1.f, 0.f));
+    if (m_pController)
+        m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
+
+    KIRBY_POSITION_SYNC_BEGIN_DESC Sync{};
+    Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_UPPERCALIBUR;
+    XMStoreFloat4x4(&Sync.AnchorWorld,
+        Strip_Scale(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+    Sync.fAnimSpeed = s_fDefaultAnimSpeed;
+    Sync.fBlendDuration = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Sync);
+
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (nullptr == pAnim)
+        return;
+
+    pAnim->Play(CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
+
+    for (_uint i = 1; i < _countof(CUTS); ++i)
+    {
+        CAnimator::ANI_PLAY_INFO tInfo{};
+        tInfo.strAniName = CUTS[i];
+        tInfo.bLoop = false;
+        tInfo.bRestart = true;
+        tInfo.fBlend = 0.f;
+        tInfo.fSpeed = s_fDefaultAnimSpeed;
+        pAnim->Enqueue(tInfo);
+    }
+}
+
+void CBoss_Metaknight::End_LockLoseDemo()
+{
+    if (m_pBody)
+    {
+        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("TopL");
+        if (pBone)
+        {
+            _matrix matBoneWorld = XMLoadFloat4x4(pBone)
+                * XMLoadFloat4x4(m_pBody->Get_CombinedWorldMatrixPtr());
+
+            _vector vNew = XMVectorSetW(matBoneWorld.r[3], 1.f);
+            m_pTransformCom->Set_State(STATE::POSITION, vNew);
+            if (m_pController)
+                m_pController->Set_FootPosition(vNew);
+
+            _vector vBoneLook = XMVectorSetY(XMVectorNegate(matBoneWorld.r[2]), 0.f);
+            if (XMVectorGetX(XMVector3LengthSq(vBoneLook)) > 1e-4f)
+                m_pTransformCom->LookTo(XMVector3Normalize(vBoneLook));
+        }
+    }
+
+    m_pMovement->Set_GravityEnabled(true);
+
+    KIRBY_POSITION_SYNC_END_DESC SyncEnd{ KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_UPPERCALIBUR_END };
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &SyncEnd);
+
+    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+void CBoss_Metaknight::Set_ParryWindow(_bool bOn)
+{
+    m_bParryWindow = bOn;
+
+    if (nullptr == m_pHurtBox)
+        return;
+
+    CAPSULE_DESC Cap{};
+    if (!Get_HurtBoxDesc(Cap))
+        return;
+
+    CCollider::COLLIDER_DESC Desc{};
+    Desc.pOwner = this;
+    Desc.vCenter = Cap.vCenter;
+    Desc.fRadius = bOn ? PARRY_HURT_RADIUS : Cap.fRadius;
+    Desc.fHeight = Cap.fHeight;
+    Desc.vRadians = Cap.vRadians;
+
+    m_pHurtBox->Reset_Bounding(Desc);
+}
+
+void CBoss_Metaknight::Begin_LockingSync()
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (nullptr == pAnim)
+        return;
+
+    pAnim->Pause();
+    pAnim->Seek(LOCK_GAUGE_START);
+    m_bLockSyncing = true;
+}
+
+void CBoss_Metaknight::Sync_LockingProgress(_float fProgress01)
+{
+    if (!m_bLockSyncing)
+        return;
+
+    fProgress01 = fProgress01 < 0.f ? 0.f : (fProgress01 > 1.f ? 1.f : fProgress01);
+    m_fLockGauge = fProgress01;
+
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Seek(fProgress01);
+}
+
+void CBoss_Metaknight::End_LockingSync()
+{
+    if (!m_bLockSyncing)
+        return;
+
+    m_bLockSyncing = false;
+
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Resume();
 }
 
 void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)
@@ -627,6 +890,140 @@ void CBoss_Metaknight::Update_PhaseTransition(_float fTimeDelta)
         if (!pAnim || !pAnim->Is_Blending())
             m_ePhaseTrans = EPhaseTrans::DONE;
     }
+}
+
+void CBoss_Metaknight::Update_Attachment()
+{
+    if (nullptr == m_pAttachBone || nullptr == m_pAttachAnchor)
+        return;
+
+    _matrix matAttach = XMLoadFloat4x4(m_pAttachBone) * XMLoadFloat4x4(m_pAttachAnchor);
+
+    matAttach = XMMatrixRotationY(XMConvertToRadians(ATTACH_YAW_OFFSET)) * matAttach;
+
+    matAttach = Strip_Scale(matAttach);
+    matAttach.r[0] *= m_vAttachSaveScale.x;
+    matAttach.r[1] *= m_vAttachSaveScale.y;
+    matAttach.r[2] *= m_vAttachSaveScale.z;
+
+    m_pTransformCom->Set_WorldMatrix(matAttach);
+}
+
+void CBoss_Metaknight::Enter_Locking()
+{
+    if (m_bLockingQTE)
+        return;
+
+    m_bLockingQTE = true;
+    m_fLockTimer = 0.f;
+    m_bLockCamFired = false;
+    m_bLockJudged = false;
+    m_fLockGauge = LOCK_GAUGE_START;
+
+    Enable_CatchBox(false);
+    Set_ParryWindow(false);
+
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Play("LockingSword", false, true, 0.f, s_fDefaultAnimSpeed);
+
+    Begin_LockingSync();
+}
+
+void CBoss_Metaknight::Exit_Locking()
+{
+    if (!m_bLockingQTE)
+        return;
+
+    if (m_bLockCamFired)
+    {
+        m_bLockCamFired = false;
+
+        m_pGameInstance_Proxy->Publish(EventTag::QTE_Hide, nullptr);
+
+        CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+    }
+
+    m_bLockingQTE = false;
+
+    if (auto* pBrain = static_cast<CBoss_Brain*>(m_pBrain))
+        pBrain->Reset_Tree();
+}
+
+void CBoss_Metaknight::Detach_FromKirby()
+{
+    if (!m_bAttached)
+        return;
+
+    m_bAttached = false;
+    m_pAttachBone = nullptr;
+    m_pAttachAnchor = nullptr;
+
+    if (m_pController)
+        m_pController->Set_Enabled(true);
+
+    m_pMovement->Sync_To_Controller();
+    m_pMovement->Set_GravityEnabled(true);
+}
+
+void CBoss_Metaknight::Judge_Locking(_bool bPlayerWin)
+{
+    m_bLockJudged = true;
+
+    m_pGameInstance_Proxy->Publish(EventTag::QTE_Hide, nullptr);
+
+    End_LockingSync();
+
+    m_eLockOutcome = bPlayerWin ? ELockOutcome::MK_LOSE : ELockOutcome::MK_WIN;
+
+    Detach_FromKirby();
+    Exit_Locking();
+}
+
+HRESULT CBoss_Metaknight::Ready_MetaEvents()
+{
+    Subscribe_Event(APPEAR_TAG, [this](void*) {
+        if (m_bAppearPending || Get_Life() != EBOSS_LIFE::HIDDEN)
+            return;
+        m_bAppearPending = true;
+        m_fAppearTimer = 0.f;
+        Set_Active(true);
+        Hide_AllParts();
+        });
+
+    Subscribe_Event(EventTag::Enemy_AttachmentBegin, [this](void* pData) {
+        const auto* pDesc = static_cast<ENEMY_ATTACHMENT_BEGIN_DESC*>(pData);
+        if (nullptr == pDesc || pDesc->eContext != ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE)
+            return;
+        if (m_bAttached)
+            return;
+        if (nullptr == pDesc->pBoneMatrix || nullptr == pDesc->pAnchorWorld)
+            return;
+
+        m_bAttached = true;
+        m_vAttachSaveScale = m_pTransformCom->Get_Scaled();
+
+        m_pAttachBone = pDesc->pBoneMatrix;
+        m_pAttachAnchor = pDesc->pAnchorWorld;
+
+        if (m_pController)
+            m_pController->Set_Enabled(false);
+
+        m_pMovement->Set_GravityEnabled(false);
+
+        Enter_Locking();
+        });
+
+    Subscribe_Event(EventTag::Enemy_AttachmentEnd, [this](void* pData) {
+        const auto* pDesc = static_cast<ENEMY_ATTACHMENT_END_DESC*>(pData);
+        if (nullptr == pDesc || pDesc->eContext != ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE)
+            return;
+
+        Detach_FromKirby();
+        Exit_Locking();
+        });
+
+    return S_OK;
 }
 
 #ifdef _DEBUG
