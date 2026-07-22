@@ -361,6 +361,15 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect\CageGlowEffect">
       <UniqueIdentifier>{732f78e3-2105-4db3-b1a1-b91ef2c7f0a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor">
+      <UniqueIdentifier>{a635d2af-ffd7-4249-9928-530e4b40697c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst">
+      <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
+      <UniqueIdentifier>{d41fb018-cdcd-4071-b86d-a77216d8f744}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
     </Filter>
@@ -1186,6 +1195,12 @@
     <Filter Include="00. GameObject\11. WaddleDee">
       <UniqueIdentifier>{28f1e19d-7639-4e84-b992-8ed2dceda685}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\12. LightShaft">
+      <UniqueIdentifier>{31c36387-052b-4427-a9ec-951e46335daa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\12. LightShaft\LightShaft">
+      <UniqueIdentifier>{4349424d-523c-4239-8713-006d1270e465}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
@@ -1539,21 +1554,6 @@
     </Filter>
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor">
-      <UniqueIdentifier>{a635d2af-ffd7-4249-9928-530e4b40697c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst">
-      <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
-      <UniqueIdentifier>{d41fb018-cdcd-4071-b86d-a77216d8f744}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\12. LightShaft">
-      <UniqueIdentifier>{31c36387-052b-4427-a9ec-951e46335daa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\12. LightShaft\LightShaft">
-      <UniqueIdentifier>{4349424d-523c-4239-8713-006d1270e465}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2415,6 +2415,9 @@
     <ClInclude Include="..\public\LevelLight_DB.h">
       <Filter>97. DataSystem\LevelLight</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LightShaft.h">
+      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClInclude>
@@ -2486,6 +2489,9 @@
     </ClInclude>
     <ClInclude Include="..\public\MetaknightNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeteorBurst.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeteorRock.h">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
@@ -3005,12 +3011,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Water_RenderBinder.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MeteorBurst.h">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LightShaft.h">
-      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3812,6 +3812,9 @@
     <ClCompile Include="..\private\LevelLight_DB.cpp">
       <Filter>97. DataSystem\LevelLight</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LightShaft.cpp">
+      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClCompile>
@@ -3874,6 +3877,9 @@
     </ClCompile>
     <ClCompile Include="..\private\MetaknightNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeteorBurst.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeteorRock.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
@@ -4367,12 +4373,6 @@
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MeteorBurst.cpp">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LightShaft.cpp">
-      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
@@ -4399,6 +4399,9 @@
     <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
     <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
@@ -4420,6 +4423,9 @@
     <None Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_UI.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
@@ -4437,12 +4443,6 @@
     </None>
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_UI.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
