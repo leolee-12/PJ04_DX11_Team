@@ -163,7 +163,7 @@ void CEffect_NonParticle::Update_Size(const _float fTimeDelta, const _float fRat
     if (m_bSizeChange == false)
         m_fSize = fSize;
 
-    Apply_PropertyScale(fSize);
+    Apply_PropertyScale(fSize, fRatio);
 }
 
 void CEffect_NonParticle::Update_Color(const _float fTimeDelta, const _float fRatio)
