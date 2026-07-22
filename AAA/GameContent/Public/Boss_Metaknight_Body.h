@@ -27,8 +27,13 @@ public:
     virtual HRESULT Render() override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
+public:
+    void    OffMask() { m_bOffMask = true; }
+
 private:
     enum METAKNIGHT_PASS : _uint { PASS_SHADOW = 0, PASS_BODY = 1, PASS_WING = 2, PASS_SHOULDER = 3, PASS_EYE = 4, PASS_FACE = 5 };
+
+    _bool m_bOffMask = { false };
 
 private:
     HRESULT Ready_Components();

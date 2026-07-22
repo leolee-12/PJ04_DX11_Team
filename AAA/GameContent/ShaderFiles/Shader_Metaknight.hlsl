@@ -302,6 +302,16 @@ PS_FORWARD_OUT PS_GETIT(VS_OUT In)
     return Out;
 }
 
+PS_OUT PS_ESCAPEMANT(VS_OUT In)
+{
+    float3 vAlbedo, vMRA, Nw;
+    vAlbedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    vMRA = float3(0.f, 1.f, 1.f);
+    Nw = Sample_WorldNormal(g_NormalTexture, In.vTexcoord, In);
+    
+    return Make_GBuffer(In, vAlbedo, Nw, vMRA);
+}
+
 technique11 DefaultTechnique
 {
     pass ShadowPass // 0
@@ -384,5 +394,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN_NA();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_GETIT();
+    }
+    pass EscapeMant // 9
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_ESCAPEMANT();
     }
 }
