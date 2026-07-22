@@ -177,13 +177,13 @@ void CKirby_MetaKnight_QTE::Enter_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE
     {
         case METAKNIGHT_QTE_STATE::QTE:
         {
-            pAnimator->Play("Metaknight_LockingSword", false, true, 0.1f, 0.f);
+            pAnimator->Play("Metaknight_LockingSword", false, true, 0.f, 0.f);
             break;
         }
 
         case METAKNIGHT_QTE_STATE::SUCCESS:
         {
-            pAnimator->Play("Metaknight_DemoLockingSwordWinCut1", false, true, 0.1f, 1.5f);
+            pAnimator->Play("Metaknight_DemoLockingSwordWinCut1", false, true, 0.f, 1.5f);
             break;
         }
         case METAKNIGHT_QTE_STATE::FAIL:
