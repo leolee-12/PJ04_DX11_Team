@@ -405,6 +405,7 @@
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_MetaKnightSword.h" />
     <ClInclude Include="..\Public\Kirby_Ability_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
@@ -441,6 +442,8 @@
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
+    <ClInclude Include="..\Public\Kirby_MetaSword.h" />
+    <ClInclude Include="..\Public\Kirby_MetaHat.h" />
     <ClInclude Include="..\Public\Kirby_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ToyHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
@@ -851,6 +854,7 @@
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_MetaKnightSword.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
@@ -926,6 +930,8 @@
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\Kirby_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaSword.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaHat.cpp" />
     <ClCompile Include="..\Private\Kirby_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ToyHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />

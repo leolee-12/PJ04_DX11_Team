@@ -50,6 +50,8 @@
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
+#include "Kirby_MetaSword.h"
+#include "Kirby_MetaHat.h"
 #include "Kirby_ToyHammer.h"
 #include "Kirby_ToyHat.h"
 
@@ -480,6 +482,15 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
+
+            // Meta Sword
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_MetaSword::PROTOTYPE_TAG, CKirby_MetaSword::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_MetaSword"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/MetaSword/MetaSword.ysh"));
+            // Meta Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_MetaHat::PROTOTYPE_TAG, CKirby_MetaHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_MetaHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/MetaHat/MetaHat.ysh"));
 
             // Toy Hammer
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_ToyHammer::PROTOTYPE_TAG,
