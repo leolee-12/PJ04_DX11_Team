@@ -12,10 +12,13 @@
 #include "EnvVolume_Light.h"
 #include "Env_SpotLight.h"
 #include "Env_InstanceController.h"
+#include "World_BlendCollector.h"
+#include "LevelDesign_Registry.h"
 #include "GameContent_Log.h"
-#include "Parsing_Utils.h"
+#include "GameObject_Factory.h"
 
 #include "GameInstance.h"
+#include "Parsing_Utils.h"
 
 namespace
 {
@@ -40,6 +43,34 @@ namespace
 			|| strPrototypeTag == CEnvVolume_Culling::PROTOTYPE_TAG
 			|| strPrototypeTag == CEnvVolume_Light::PROTOTYPE_TAG
 			|| strPrototypeTag == CEnv_SpotLight::PROTOTYPE_TAG;
+	}
+
+	enum class ADDED_MAP_OBJECT_FAMILY
+	{
+		UNKNOWN,
+		ENV,
+		LEVELDESIGN
+	};
+
+	ADDED_MAP_OBJECT_FAMILY Resolve_AddedMapObjectFamily(const _wstring& strPrototypeTag)
+	{
+		if (Is_AddedEnvRuntimePrototype(strPrototypeTag))
+			return ADDED_MAP_OBJECT_FAMILY::ENV;
+
+		const auto* pRegistration = CGameObject_Factory::GetInstance()->Get_Registration(strPrototypeTag);
+		if (nullptr == pRegistration)
+			return ADDED_MAP_OBJECT_FAMILY::UNKNOWN;
+
+		if (pRegistration->strCategory == L"ENV_TRIGGER")
+			return ADDED_MAP_OBJECT_FAMILY::ENV;
+
+		if (pRegistration->strCategory == L"LEVELDESIGN_OBJECT"
+			|| pRegistration->strCategory == L"DEFORM_OBJECT")
+		{
+			return ADDED_MAP_OBJECT_FAMILY::LEVELDESIGN;
+		}
+
+		return ADDED_MAP_OBJECT_FAMILY::UNKNOWN;
 	}
 
 	ENV_OBJECT_DESC Make_AddedEnvRuntimeDesc(const MAP_ADD_OBJECT& Added)
@@ -89,13 +120,17 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	const MAP_RUNTIME_LEVELS& Levels = Request.Levels;
 	const MAP_SPAWN_TARGETS& Targets = Request.Targets;
 	const MAP_SPAWN_OPTIONS& Options = Request.Options;
+	const _bool bNeedWorldBlendCollector = Options.bSpawnEnv || Options.bSpawnAddedLevelDesign;
 	MAP_OBJECT_CREATED_CALLBACK pCreatedCallback = Request.pCreatedCallback;
 	void* pCallbackContext = Request.pCallbackContext;
 	CMapStage** ppOutStage = Request.ppOutStage;
 	CEnv_InstanceController** ppOutEnvInstanceController = Request.ppOutEnvInstanceController;
 
-	if (!Options.bSpawnStage && !Options.bSpawnEnv)
+	if (!Options.bSpawnStage && !Options.bSpawnEnv
+		&& !Options.bSpawnAddedEnv && !Options.bSpawnAddedLevelDesign)
+	{
 		return E_FAIL;
+	}
 
 	if (nullptr != pOutReport)
 		*pOutReport = {};
@@ -122,15 +157,46 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 
 	const size_t iExpectedObjectCount =
 		(Options.bSpawnStage ? 1u + iGimmickObjectCount : 0u)
-		+ (Options.bSpawnEnv
-			? Package.EnvObjectDescs.size() + Package.AddedObjectDescs.size() + 1u
-			: 0u);
+		+ (Options.bSpawnEnv ? Package.EnvObjectDescs.size() + 1u : 0u)
+		+ ((Options.bSpawnAddedEnv || Options.bSpawnAddedLevelDesign)
+			? Package.AddedObjectDescs.size()
+			: 0u)
+		+ (bNeedWorldBlendCollector ? 1u : 0u);
 
 	CreatedObjects.reserve(iExpectedObjectCount);
 	PendingCallbacks.reserve(iExpectedObjectCount);
 
 	CMapStage* pStage = nullptr;
 	CEnv_InstanceController* pEnvInstanceController = nullptr;
+
+	if (bNeedWorldBlendCollector && nullptr == CWorld_BlendCollector::Find(m_pProxy))
+	{
+		CGameObject* pCollectorObject = nullptr;
+
+		if (FAILED(m_pProxy->Add_GameObject_Return(
+			&pCollectorObject,
+			ETOUI(LEVEL::STATIC),
+			CWorld_BlendCollector::PROTOTYPE_TAG,
+			ETOUI(LEVEL::STATIC),
+			CWorld_BlendCollector::LAYER_TAG,
+			CWorld_BlendCollector::OBJECT_TAG,
+			nullptr)))
+		{
+			Rollback(CreatedObjects);
+			return E_FAIL;
+		}
+
+		if (nullptr == dynamic_cast<CWorld_BlendCollector*>(pCollectorObject))
+		{
+			if (nullptr != pCollectorObject)
+				m_pProxy->Destroy_GameObject(pCollectorObject);
+
+			Rollback(CreatedObjects);
+			return E_FAIL;
+		}
+
+		CreatedObjects.push_back(pCollectorObject);
+	}
 
 	if (Options.bSpawnStage)
 	{
@@ -323,65 +389,132 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				pStaticObject->Set_InstanceController(pEnvInstanceController);
 			}
 		}
-	
-		for (const MAP_ADD_OBJECT& Added : Package.AddedObjectDescs)
+
+		}
+
+		if (Options.bSpawnAddedEnv || Options.bSpawnAddedLevelDesign)
 		{
-			CGameObject* pCreatedObject = nullptr;
-
-			ENV_OBJECT_DESC AddedEnvRuntimeDesc{};
-			void* pArg = nullptr;
-
-			if (Is_AddedEnvRuntimePrototype(Added.strPrototypeTag))
+			for (const MAP_ADD_OBJECT& Added : Package.AddedObjectDescs)
 			{
-				AddedEnvRuntimeDesc = Make_AddedEnvRuntimeDesc(Added);
-				pArg = &AddedEnvRuntimeDesc;
+				const ADDED_MAP_OBJECT_FAMILY eFamily = Resolve_AddedMapObjectFamily(Added.strPrototypeTag);
+
+				CGameObject* pCreatedObject = nullptr;
+				ENV_OBJECT_DESC AddedEnvRuntimeDesc{};
+				LD_OBJECT_ENTRY AddedLevelDesignRuntimeEntry{};
+				void* pArg = nullptr;
+				_uint iPrototypeLevel = {};
+				_uint iPlaceLevel = {};
+
+				if (ADDED_MAP_OBJECT_FAMILY::ENV == eFamily)
+				{
+					if (!Options.bSpawnAddedEnv)
+						continue;
+
+					AddedEnvRuntimeDesc = Make_AddedEnvRuntimeDesc(Added);
+					pArg = &AddedEnvRuntimeDesc;
+					iPrototypeLevel = Levels.iObjectLevel;
+					iPlaceLevel = Targets.EnvEffect.iPlaceLevel;
+				}
+				else if (ADDED_MAP_OBJECT_FAMILY::LEVELDESIGN == eFamily)
+				{
+					if (!Options.bSpawnAddedLevelDesign)
+						continue;
+
+					const LD_SPAWN_SPEC* pPlacementSpec = CLevelDesign_Registry::Find_PlacementSpec(Added.strPrototypeTag);
+
+					if (nullptr != pPlacementSpec)
+					{
+						_float4 vPosition = { 0.f, 0.f, 0.f, 1.f };
+						JsonUtils::Try_ReadFloat4Array(Added.jObject, "Transform.vPosition", &vPosition);
+
+						const _float3 vPlacementPosition = { vPosition.x, vPosition.y, vPosition.z };
+
+						if (!CLevelDesign_Registry::Make_DefaultDesc(
+							Added.strPrototypeTag,
+							Levels.iLevelDesignModelPrototypeLevel,
+							Added.strObjectTag,
+							vPlacementPosition,
+							&AddedLevelDesignRuntimeEntry))
+						{
+							Rollback(CreatedObjects);
+							return E_FAIL;
+						}
+
+						pArg = std::visit(
+							[](auto& Desc) -> void*
+							{
+								return static_cast<void*>(&Desc);
+							},
+							AddedLevelDesignRuntimeEntry);
+
+						iPrototypeLevel = Levels.iLevelDesignPrototypeLevel;
+					}
+					else
+					{
+						iPrototypeLevel = Levels.iObjectLevel;
+					}
+
+					iPlaceLevel = Levels.iLevelDesignObjectLevel;
+				}
+				else
+				{
+					Log_GameContentWarning(
+						"Added map object spawn failed: unsupported prototype="
+						+ WstrToStr(Added.strPrototypeTag));
+
+					Rollback(CreatedObjects);
+					return E_FAIL;
+				}
+
+				if (FAILED(m_pProxy->Add_GameObject_Return(
+					&pCreatedObject,
+					iPrototypeLevel,
+					Added.strPrototypeTag.c_str(),
+					iPlaceLevel,
+					Added.strLayerTag.c_str(),
+					Added.strObjectTag,
+					pArg)))
+				{
+					Log_GameContentWarning(
+						"Added map object spawn failed: prototype="
+						+ WstrToStr(Added.strPrototypeTag));
+
+					Rollback(CreatedObjects);
+					return E_FAIL;
+				}
+
+				if (nullptr != pCreatedObject)
+					pCreatedObject->Deserialize(Added.jObject);
+
+				CreatedObjects.push_back(pCreatedObject);
+				PendingCallbacks.push_back({
+								pCreatedObject,
+								Added.strPrototypeTag,
+								Added.strLayerTag,
+								Added.strObjectTag
+					});
+			}
+		}
+
+		if (nullptr != pOutReport)
+		{
+			pOutReport->iSectionCount = static_cast<_uint>(Package.StageDesc.SectionDescs.size());
+
+			if (Options.bSpawnStage)
+			{
+				pOutReport->bStageLoaded = true;
+				pOutReport->strStageName = Package.StageDesc.strStageName;
 			}
 
-			if (FAILED(m_pProxy->Add_GameObject_Return(
-				&pCreatedObject,
-				Levels.iObjectLevel,
-				Added.strPrototypeTag.c_str(),
-				Targets.EnvEffect.iPlaceLevel,
-				Added.strLayerTag.c_str(),
-				Added.strObjectTag,
-				pArg)))
+			if (Options.bSpawnEnv)
 			{
-				Rollback(CreatedObjects);
-				return E_FAIL;
+				pOutReport->iEnvDescriptorCount = static_cast<_uint>(Package.EnvObjectDescs.size());
+				pOutReport->iEnvCreatedCount = iEnvCreatedCount;
+				pOutReport->iEnvSkippedMissingModel = Package.iEnvSkippedMissingModel;
+				pOutReport->iEnvSkippedCreateFailed = iEnvSkippedCreateFailed;
+				pOutReport->iEnvJsonLoadedCount = static_cast<_uint>(Package.EnvJsonPaths.size());
 			}
-
-			if (nullptr != pCreatedObject)
-				pCreatedObject->Deserialize(Added.jObject);
-
-			CreatedObjects.push_back(pCreatedObject);
-			PendingCallbacks.push_back({
-				pCreatedObject,
-				Added.strPrototypeTag,
-				Added.strLayerTag,
-				Added.strObjectTag
-				});
 		}
-	}
-
-	if (nullptr != pOutReport)
-	{
-		pOutReport->iSectionCount = static_cast<_uint>(Package.StageDesc.SectionDescs.size());
-
-		if (Options.bSpawnStage)
-		{
-			pOutReport->bStageLoaded = true;
-			pOutReport->strStageName = Package.StageDesc.strStageName;
-		}
-
-		if (Options.bSpawnEnv)
-		{
-			pOutReport->iEnvDescriptorCount = static_cast<_uint>(Package.EnvObjectDescs.size());
-			pOutReport->iEnvCreatedCount = iEnvCreatedCount;
-			pOutReport->iEnvSkippedMissingModel = Package.iEnvSkippedMissingModel;
-			pOutReport->iEnvSkippedCreateFailed = iEnvSkippedCreateFailed;
-			pOutReport->iEnvJsonLoadedCount = static_cast<_uint>(Package.EnvJsonPaths.size());
-		}
-	}
 
 	if (nullptr != ppOutStage && Options.bSpawnStage)
 		*ppOutStage = pStage;

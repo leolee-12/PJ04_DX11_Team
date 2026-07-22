@@ -260,9 +260,7 @@ _bool CMap_EditSession::Track_DeletedPreviewObject(CGameObject* pObject)
 	return false;
 }
 
-_bool CMap_EditSession::Track_EditedPreviewObject(
-	CGameObject* pObject,
-	const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+_bool CMap_EditSession::Track_EditedPreviewObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (nullptr == pObject)
 		return false;
@@ -312,9 +310,7 @@ _bool CMap_EditSession::Clear_EditedPreviewObject(CGameObject* pObject)
 	return 0 < iErased;
 }
 
-_bool CMap_EditSession::Try_GetEditedEnvObject(
-	const _wstring& strStableKey,
-	EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
+_bool CMap_EditSession::Try_GetEditedEnvObject(const _wstring& strStableKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == pOutEdit || strStableKey.empty())
 		return false;
@@ -327,9 +323,7 @@ _bool CMap_EditSession::Try_GetEditedEnvObject(
 	return true;
 }
 
-_bool CMap_EditSession::Track_EditedMapSection(
-	const _wstring& strSectionKey,
-	const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+_bool CMap_EditSession::Track_EditedMapSection(const _wstring& strSectionKey, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (strSectionKey.empty())
 		return false;
@@ -639,10 +633,7 @@ void CMap_EditSession::Set_Change(const MAP_EDIT_CHANGE& Desc)
 	m_AddedObjectOrder.clear();
 }
 
-void CMap_EditSession::Register_AddedObject(
-	CGameObject* pObject,
-	const MAP_ADD_OBJECT& Desc,
-	const _wstring& strDisplayName)
+void CMap_EditSession::Register_AddedObject(CGameObject* pObject, const MAP_ADD_OBJECT& Desc, const _wstring& strDisplayName)
 {
 	if (nullptr == pObject)
 		return;
@@ -753,9 +744,7 @@ const vector<CGameObject*>& CMap_EditSession::Get_AddedObjectOrder() const
 	return m_AddedObjectOrder;
 }
 
-_bool CMap_EditSession::Try_GetAddedObjectItem(
-	CGameObject* pObject,
-	MAP_EDIT_ADDED_ITEM* pOutItem) const
+_bool CMap_EditSession::Try_GetAddedObjectItem(CGameObject* pObject, MAP_EDIT_ADDED_ITEM* pOutItem) const
 {
 	if (nullptr == pObject || nullptr == pOutItem)
 		return false;
@@ -772,21 +761,17 @@ MAP_EDIT_CHANGE CMap_EditSession::Build_ChangeSnapShot() const
 {
 	MAP_EDIT_CHANGE Snapshot = m_tEditData.OverrideDesc;
 
-	if (!m_tEditData.bLoadEnv || m_AddedObjectOrder.empty())
+	if (m_AddedObjectOrder.empty())
 		return Snapshot;
-
-	Snapshot.AddedMapObjects.clear();
 
 	for (CGameObject* pObject : m_AddedObjectOrder)
 	{
 		const auto Iter = m_AddedObjectsByRuntime.find(pObject);
-		if (Iter == m_AddedObjectsByRuntime.end())
+		if (Iter == m_AddedObjectsByRuntime.end() || nullptr == pObject)
 			continue;
 
 		MAP_ADD_OBJECT AddedDesc = Iter->second;
-
-		if (nullptr != pObject)
-			AddedDesc.jObject = pObject->Serialize();
+		AddedDesc.jObject = pObject->Serialize();
 
 		const auto UiIter = m_AddedObjectUiItems.find(pObject);
 		if (UiIter != m_AddedObjectUiItems.end())
@@ -808,7 +793,19 @@ MAP_EDIT_CHANGE CMap_EditSession::Build_ChangeSnapShot() const
 			continue;
 		}
 
-		Snapshot.AddedMapObjects.push_back(AddedDesc);
+		const auto SnapshotIter = find_if(
+			Snapshot.AddedMapObjects.begin(),
+			Snapshot.AddedMapObjects.end(),
+			[&](const MAP_ADD_OBJECT& Existing)
+			{
+				return Existing.strLayerTag == AddedDesc.strLayerTag
+					&& Existing.strObjectTag == AddedDesc.strObjectTag;
+			});
+
+		if (SnapshotIter != Snapshot.AddedMapObjects.end())
+			*SnapshotIter = AddedDesc;
+		else
+			Snapshot.AddedMapObjects.push_back(AddedDesc);
 	}
 
 	return Snapshot;

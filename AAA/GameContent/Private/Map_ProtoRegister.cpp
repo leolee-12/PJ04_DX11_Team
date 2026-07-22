@@ -14,6 +14,7 @@
 #include "MapGimmickSection.h"
 #include "MapStage.h"
 #include "GameObject_Factory.h"
+#include "LevelDesign_ProtoRegister.h"
 
 #include "GameInstance.h"
 
@@ -59,8 +60,7 @@ CMap_ProtoRegister::CMap_ProtoRegister(ID3D11Device* pDevice, ID3D11DeviceContex
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MAP_PACKAGE&
-	Package)
+HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MAP_PACKAGE& Package)
 {
 	if (FAILED(Ready_ObjectPrototypes(Levels.iObjectLevel)))
 		return E_FAIL;
@@ -161,24 +161,8 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 		}
 	}
 
-	for (const MAP_ADD_OBJECT& Added : Package.AddedObjectDescs)
-	{
-		if (m_pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
-			continue;
-
-		auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(Added.strPrototypeTag);
-		if (nullptr == pReg)
-			return E_FAIL;
-
-		pReg->ResourceLoader(m_pProxy, m_pDevice, m_pContext, Levels.iObjectLevel);
-		if (FAILED(m_pProxy->Add_Prototype(
-			Levels.iObjectLevel,
-			Added.strPrototypeTag.c_str(),
-			static_cast<CGameObject*>(pReg->CreatorFunc(m_pDevice, m_pContext)))))
-		{
-			return E_FAIL;
-		}
-	}
+	if (FAILED(Ready_AddedObjectPrototypes(Levels, Package.AddedObjectDescs)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -289,6 +273,62 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 
 
 	return S_OK;
+}
+
+HRESULT CMap_ProtoRegister::Ready_AddedObjectPrototypes(const MAP_RUNTIME_LEVELS& Levels, const vector<MAP_ADD_OBJECT>& AddedDescs)
+{
+	CLevelDesign_ProtoRegister* pLevelDesignRegister = CLevelDesign_ProtoRegister::Create(m_pDevice, m_pContext);
+	if (nullptr == pLevelDesignRegister)
+		return E_FAIL;
+
+	LD_RUNTIME_LEVELS LevelDesignLevels{};
+	LevelDesignLevels.iObjectLevel = Levels.iLevelDesignObjectLevel;
+	LevelDesignLevels.iPrototypeLevel = Levels.iLevelDesignPrototypeLevel;
+	LevelDesignLevels.iModelPrototypeLevel = Levels.iLevelDesignModelPrototypeLevel;
+
+	HRESULT hr = S_OK;
+
+	for (const MAP_ADD_OBJECT& Added : AddedDescs)
+	{
+		const HRESULT hrLevelDesign = pLevelDesignRegister->Ready_PlacementPrototype(LevelDesignLevels, Added.strPrototypeTag);
+		if (S_OK == hrLevelDesign)
+			continue;
+
+		if (FAILED(hrLevelDesign))
+		{
+			hr = hrLevelDesign;
+			break;
+		}
+
+		if (m_pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
+			continue;
+
+		auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(Added.strPrototypeTag);
+		if (nullptr == pReg)
+		{
+			hr = E_FAIL;
+			break;
+		}
+
+		pReg->ResourceLoader(m_pProxy, m_pDevice, m_pContext, Levels.iObjectLevel);
+
+		CGameObject* pPrototype = static_cast<CGameObject*>(pReg->CreatorFunc(m_pDevice, m_pContext));
+		if (nullptr == pPrototype)
+		{
+			hr = E_FAIL;
+			break;
+		}
+
+		if (FAILED(m_pProxy->Add_Prototype(Levels.iObjectLevel, Added.strPrototypeTag.c_str(), pPrototype)))
+		{
+			Safe_Release(pPrototype);
+			hr = E_FAIL;
+			break;
+		}
+	}
+
+	Safe_Release(pLevelDesignRegister);
+	return hr;
 }
 
 HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_SECTION_DESC& Desc)

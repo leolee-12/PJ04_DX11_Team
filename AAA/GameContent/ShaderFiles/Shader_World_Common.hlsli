@@ -11,6 +11,7 @@ Texture2D g_UnknownTexture;
 float4 g_vColor = float4(1.f, 1.f, 1.f, 1.f);
 float3 g_vMRA = float3(0.f, 1.f, 1.f);
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+uint g_iHasNormalTexture = 0u;
 float g_NormalStrength = 1.f;
 float g_MaskStrength = 1.f;
 
@@ -38,6 +39,12 @@ uint g_iShadowAlphaSource = 0u;
 #define SHADOW_ALPHA_DISCARD_ALL 3u
 #define SHADOW_ALPHA_DIFFUSE_R 4u
 #define SHADOW_ALPHA_UNKNOWN_R 5u
+
+float4 g_vLightDir = float4(0.f, -1.f, 0.f, 0.f);
+float4 g_vLightDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+float4 g_vCamPosition = float4(0.f, 0.f, 0.f, 1.f);
+float g_fBlendOpacity = 1.f;
+float g_fBlendFresnel = 5.f;
 
 Texture2D g_DepthTexture;
 Texture2D<uint> g_MaterialIDTexture;
@@ -170,6 +177,14 @@ float2 Get_UnknownUV(PS_IN In)
     return Apply_UVTransform(Select_UV_PS(In, g_iUnknownUVIndex), g_vUVTransformUnknown);
 }
 
+float2 Get_ScreenUV(float4 vProjPos)
+{
+    float2 vScreenUV;
+    vScreenUV.x = vProjPos.x / vProjPos.w * 0.5f + 0.5f;
+    vScreenUV.y = vProjPos.y / vProjPos.w * -0.5f + 0.5f;
+    return vScreenUV;
+}
+
 float3 Reconstruct_Normal(PS_IN In, float2 vNormalUV)
 {
     float3 N = normalize(In.vNormal.xyz);
@@ -179,6 +194,15 @@ float3 Reconstruct_Normal(PS_IN In, float2 vNormalUV)
     float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg * g_NormalStrength;
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
     return mul(nTS, float3x3(T, B, N));
+}
+
+float3 Get_ShadingNormal(PS_IN In, float2 vNormalUV)
+{
+      [branch]
+    if (0u == g_iHasNormalTexture)
+        return In.vNormal.xyz;
+
+    return Reconstruct_Normal(In, vNormalUV);
 }
 
 
@@ -359,7 +383,7 @@ PS_OUT PS_TREESHADOW(PS_IN In)
     return PS_DIFF_SAMPLE(In, Get_BaseUV(In));
 }
 
-PS_OUT PS_GRASS_FUR(PS_IN In)
+PS_OUT PS_DCUT_COLOR(PS_IN In)
 {
     Apply_DitherFromPixelInput(In);
 
@@ -372,11 +396,11 @@ PS_OUT PS_GRASS_FUR(PS_IN In)
     float4 vGrassColor = float4(g_vColor.rgb, vMask.a);
 
     return Make_GBufferOutput(
-                In,
-                vGrassColor,
-                vNormal,
-                float4(vMRA, 1.f),
-                float4(g_vEmissiveColor.rgb * vMask.a, 1.f));
+                  In,
+                  vGrassColor,
+                  vNormal,
+                  float4(vMRA, 1.f),
+                  float4(g_vEmissiveColor.rgb * vMask.a, 1.f));
 }
 
 PS_OUT PS_COLOR(PS_IN In)
@@ -384,7 +408,7 @@ PS_OUT PS_COLOR(PS_IN In)
     Apply_DitherFromPixelInput(In);
 
     float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
-    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+    float3 vNormal = Get_ShadingNormal(In, Get_NormalUV(In));
 
     return Make_GBufferOutput(
               In,
@@ -404,7 +428,7 @@ PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
 {
     Apply_DitherFromPixelInput(In);
 
-    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+    float3 vNormal = Get_ShadingNormal(In, Get_NormalUV(In));
 
     return Make_GBufferOutput(
                 In,
@@ -458,6 +482,43 @@ float4 PS_UKWN_BLACK_OVERLAY(PS_IN In) : SV_TARGET0
     return float4(0.f, 0.f, 0.f, fShadeAlpha);
 }
 
+PS_OUT PS_DCUT_UMN(PS_IN In)
+{
+    Apply_DitherFromPixelInput(In);
+
+    float fMask = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In)).a;
+    if (fMask < 0.1f)
+        discard;
+
+    float3 vDiffuse = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).rgb;
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+
+    return Make_GBufferOutput(
+                  In,
+                  float4(vDiffuse, fMask),
+                  vNormal,
+                  float4(vMRA, 1.f),
+                  float4(g_vEmissiveColor.rgb * fMask, 1.f));
+}
+
+float4 PS_BLEND_DMN(PS_IN In) : SV_TARGET0
+{
+    Apply_DitherFromPixelInput(In);
+
+    float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
+    float fAlpha = saturate(vDiffuse.a);
+
+    if (fAlpha < 0.001f)
+        discard;
+
+    float3 vNormal = normalize(Get_ShadingNormal(In, Get_NormalUV(In)));
+    float fNdotL = saturate(dot(vNormal, -normalize(g_vLightDir.xyz)));
+    float3 vLit = vDiffuse.rgb * (g_vLightDiffuse.rgb * fNdotL + 0.25f);
+
+    return float4(vLit + g_vEmissiveColor.rgb, fAlpha);
+}
+
 
 
 struct PS_DECAL_OUT
@@ -466,14 +527,6 @@ struct PS_DECAL_OUT
     float4 vNormal : SV_TARGET1;
     float4 vMRA : SV_TARGET2;
 };
-
-float2 Get_ScreenUV(float4 vProjPos)
-{
-    float2 vScreenUV;
-    vScreenUV.x = vProjPos.x / vProjPos.w * 0.5f + 0.5f;
-    vScreenUV.y = vProjPos.y / vProjPos.w * -0.5f + 0.5f;
-    return vScreenUV;
-}
 
 float Sample_SceneDepth(float2 vScreenUV)
 {
