@@ -43,8 +43,11 @@ private:
     void Update_MetaKnightState(CKirby* pKirby, _float fTimeDelta);
     void Exit_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eState);
 
+    // MetaKnight
+    virtual void Request_MetaKnight_ParryBegin(CKirby* pKirby) override;
+
 private:
-    METAKNIGHT_QTE_STATE m_eMetaKnightQTEState{};
+    METAKNIGHT_QTE_STATE m_eMetaKnightQTEState{ METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END };
 
     _float m_fQTEProgress{};
     _float m_fQTEAnimationProgress{};
@@ -52,11 +55,9 @@ private:
 
     CBoss_Metaknight* m_pMetaKnight{};
     SUBHANDLE m_tQTEShowHandle{};
-    SUBHANDLE m_tQTEHideHandle{};
 
 public:
     static CKirby_MetaKnight_QTE* Create();
-
 private:
     virtual void Free() override;
 };

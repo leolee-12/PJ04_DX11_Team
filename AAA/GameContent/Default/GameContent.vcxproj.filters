@@ -1579,9 +1579,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight">
       <UniqueIdentifier>{214b11c1-771e-4020-8ec5-f099665e5154}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_UpperCalibur">
-      <UniqueIdentifier>{5324c53d-e5a2-4ce1-aaaf-848967137c15}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter">
       <UniqueIdentifier>{33020856-964e-4101-8c62-ae1ac0a1eb1a}</UniqueIdentifier>
     </Filter>
@@ -3069,9 +3066,6 @@
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_UpperCalibur.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_UpperCalibur</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
     </ClInclude>
@@ -4456,9 +4450,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_UpperCalibur.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_UpperCalibur</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
