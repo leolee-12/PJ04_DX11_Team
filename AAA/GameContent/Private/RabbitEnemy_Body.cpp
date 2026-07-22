@@ -75,13 +75,13 @@ HRESULT CRabbitEnemy_Body::Ready_Components()
 {
     PART_SETUP t{};
     t.tShader = Shader_Monster;
-    t.szModelProtoTag = TEXT("Prototype_Component_Model_RabbitEnemy_Body");
-    t.szAnimEventFile = L"../../Resources/CHJ/Monster/RabbitEnemy/Body/RabbitEnemy_AnimEvents.json";
+    t.szModelProtoTag = TEXT("Prototype_Component_Model_RabbitEnemyBig_Body");
+    t.szAnimEventFile = L"../../Resources/CHJ/Monster/RabbitEnemyBig/Body/RabbitEnemyBig_AnimEvents.json";
 
     if (FAILED(Ready_MeshPart(t)))
         return E_FAIL;
 
-    m_pFaceTextureCom = Add_Component<CTexture>(TEXT("Com_FaceTexture"), CTexture::Create(m_pDevice, m_pContext, L"../../Resources/CHJ/Monster/RabbitEnemy/Body/RabbitEnemyEye.%02d.dds", FACE_COUNT));
+    m_pFaceTextureCom = Add_Component<CTexture>(TEXT("Com_FaceTexture"), CTexture::Create(m_pDevice, m_pContext, L"../../Resources/CHJ/Monster/RabbitEnemyBig/Body/RabbitEnemyEye.%02d.dds", FACE_COUNT));
     if (nullptr == m_pFaceTextureCom)
         return E_FAIL;
 

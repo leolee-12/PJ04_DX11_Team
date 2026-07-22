@@ -364,6 +364,15 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect\CageGlowEffect">
       <UniqueIdentifier>{732f78e3-2105-4db3-b1a1-b91ef2c7f0a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor">
+      <UniqueIdentifier>{a635d2af-ffd7-4249-9928-530e4b40697c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst">
+      <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
+      <UniqueIdentifier>{d41fb018-cdcd-4071-b86d-a77216d8f744}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
     </Filter>
@@ -841,6 +850,9 @@
     <Filter Include="00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Parts">
       <UniqueIdentifier>{fe7e052f-51ba-469b-9f31-530f697b2eba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Parts\Body">
+      <UniqueIdentifier>{c2529f83-4a12-47f2-bb8f-14811cf830be}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\State">
       <UniqueIdentifier>{d15d51a9-910b-478d-b4e0-64426bf72ff6}</UniqueIdentifier>
     </Filter>
@@ -868,14 +880,53 @@
     <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Parts">
       <UniqueIdentifier>{ce482e86-e093-4609-a0e6-efb22570872b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Parts\Body">
+      <UniqueIdentifier>{d3d014a9-d557-4522-9f0f-6bc90594c0e2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29\State">
       <UniqueIdentifier>{0e61f2dc-a669-4eed-be50-a2ea74f8a588}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\15. Gigatzo">
       <UniqueIdentifier>{1fd4df8a-0665-4b79-a7b8-4db91c6f5721}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\15. Gigatzo\Brain">
+      <UniqueIdentifier>{1dc70a31-f58b-453b-b290-82dbe4313bb5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\15. Gigatzo\Parts">
       <UniqueIdentifier>{a7e33fe9-d4ee-43f8-ae01-d21f0d5df3d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\15. Gigatzo\Parts\Body">
+      <UniqueIdentifier>{0cbecd2b-f18a-4f38-ac3c-d9ad95b82f9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\15. Gigatzo\State">
+      <UniqueIdentifier>{9634618f-a756-4ac1-9ac2-8f046474310b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\15. Gigatzo\State\Attack">
+      <UniqueIdentifier>{932f2c14-0dcb-480c-8bfb-442343d9f888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy">
+      <UniqueIdentifier>{6533d81f-dbb7-4e01-a78c-0da94c9ad30b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy\Brain">
+      <UniqueIdentifier>{97afe544-8dfc-4571-b000-fcea3e23caee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy\Parts">
+      <UniqueIdentifier>{b3669e93-eba1-496f-b838-8476621f8b4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy\Parts\Body">
+      <UniqueIdentifier>{4f396293-2cbc-41a8-a499-96b1089e6562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy\State">
+      <UniqueIdentifier>{5a646d12-a5d1-4b96-a978-d44489eff8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy\State\Chase">
+      <UniqueIdentifier>{eae618ca-68f4-4bea-b5fc-cd2f5d197e1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy\State\Find">
+      <UniqueIdentifier>{16eebd3a-d329-4d6d-ad3a-41036abe6d15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\16. Noddy\State\SleepStart">
+      <UniqueIdentifier>{5a8fba65-8d57-459a-bbbf-ee9b1daeed89}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase">
       <UniqueIdentifier>{de6fdd7b-10fb-45d6-ad3d-ed06421c157b}</UniqueIdentifier>
@@ -1156,6 +1207,12 @@
     <Filter Include="00. GameObject\11. WaddleDee">
       <UniqueIdentifier>{28f1e19d-7639-4e84-b992-8ed2dceda685}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\12. LightShaft">
+      <UniqueIdentifier>{31c36387-052b-4427-a9ec-951e46335daa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\12. LightShaft\LightShaft">
+      <UniqueIdentifier>{4349424d-523c-4239-8713-006d1270e465}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
@@ -1179,6 +1236,9 @@
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Invisible\04. SoundArea">
       <UniqueIdentifier>{c42bd8d2-711b-42b4-b333-090254cdb85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\05. MeteorGenerator">
+      <UniqueIdentifier>{1c769d67-1f32-41a4-8633-dc40f1ff8d00}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Invisible\99. Unsupported">
       <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
@@ -1387,8 +1447,20 @@
     <Filter Include="01. Projectile\00. PhysicsProjectile\02. KoKabu">
       <UniqueIdentifier>{bd02d882-8d9d-4bb9-acde-f8024bf59fc0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Projectile\00. PhysicsProjectile\03.">
+    <Filter Include="01. Projectile\00. PhysicsProjectile\03. Bullet">
       <UniqueIdentifier>{da473f75-77ec-480a-b2ed-18e3035027aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\03. Bullet\GigatzoBullet">
+      <UniqueIdentifier>{154b4a47-ad94-4bdc-895f-a4017b2431be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\04. MeteorRock">
+      <UniqueIdentifier>{c07598eb-b183-40b3-9838-91a6c3a044a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\04. MeteorRock\Large">
+      <UniqueIdentifier>{ed565495-236e-48ac-9e4d-0f21e21d3a80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\04. MeteorRock\Small">
+      <UniqueIdentifier>{e8534d8c-915a-434c-b8a0-389436d5629c}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
@@ -1965,6 +2037,21 @@
     <ClInclude Include="..\public\GigantEdge_Sword.h">
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge\Part\Sword</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Gigatzo.h">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gigatzo_Body.h">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gigatzo_Brain.h">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gigatzo_State_Attack.h">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo\State\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GigatzoBullet.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\03. Bullet\GigatzoBullet</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Gorilla_Ring.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
     </ClInclude>
@@ -2232,6 +2319,9 @@
     <ClInclude Include="..\Public\LD_LensFlare.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LD_MeteorGenerator.h">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\05. MeteorGenerator</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_PopFlower.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClInclude>
@@ -2346,6 +2436,9 @@
     <ClInclude Include="..\public\LevelLight_DB.h">
       <Filter>97. DataSystem\LevelLight</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LightShaft.h">
+      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClInclude>
@@ -2417,6 +2510,18 @@
     </ClInclude>
     <ClInclude Include="..\public\MetaknightNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeteorBurst.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeteorRock.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeteorRock_Large.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock\Large</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeteorRock_Small.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock\Small</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MiniBoss.h">
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
@@ -2517,6 +2622,24 @@
     <ClInclude Include="..\public\Nail_Trail.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Trail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Noddy.h">
+      <Filter>00. GameObject\06. Monster\16. Noddy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Noddy_Body.h">
+      <Filter>00. GameObject\06. Monster\16. Noddy\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Noddy_Brain.h">
+      <Filter>00. GameObject\06. Monster\16. Noddy\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Noddy_State_Chase.h">
+      <Filter>00. GameObject\06. Monster\16. Noddy\State\Chase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Noddy_State_Find.h">
+      <Filter>00. GameObject\06. Monster\16. Noddy\State\Find</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Noddy_State_SleepStart.h">
+      <Filter>00. GameObject\06. Monster\16. Noddy\State\SleepStart</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\NormalEnemy.h">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy</Filter>
     </ClInclude>
@@ -2616,6 +2739,15 @@
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RangerEnemy.h">
+      <Filter>00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RangerEnemy_Body.h">
+      <Filter>00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RangerEnemy_Brain.h">
+      <Filter>00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Brain</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\RectCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClInclude>
@@ -2657,6 +2789,15 @@
     </ClInclude>
     <ClInclude Include="..\public\Singleton_Destroyer.h">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SirKibble.h">
+      <Filter>00. GameObject\06. Monster\14. SirKibble%28Cutter%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SirKibble_Body.h">
+      <Filter>00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SirKibble_Brain.h">
+      <Filter>00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Brain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SkySphere.h">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
@@ -3326,6 +3467,21 @@
     <ClCompile Include="..\private\GigantEdge_Sword.cpp">
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge\Part\Sword</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Gigatzo.cpp">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gigatzo_Body.cpp">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gigatzo_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gigatzo_State_Attack.cpp">
+      <Filter>00. GameObject\06. Monster\15. Gigatzo\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GigatzoBullet.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\03. Bullet\GigatzoBullet</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Gorilla_Ring.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
     </ClCompile>
@@ -3578,6 +3734,9 @@
     <ClCompile Include="..\Private\LD_LensFlare.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. LD_Effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LD_MeteorGenerator.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\05. MeteorGenerator</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LD_PopFlower.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClCompile>
@@ -3683,6 +3842,9 @@
     <ClCompile Include="..\private\LevelLight_DB.cpp">
       <Filter>97. DataSystem\LevelLight</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LightShaft.cpp">
+      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClCompile>
@@ -3745,6 +3907,18 @@
     </ClCompile>
     <ClCompile Include="..\private\MetaknightNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeteorBurst.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeteorRock.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeteorRock_Large.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock\Large</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeteorRock_Small.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock\Small</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MiniBoss.cpp">
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
@@ -3842,6 +4016,24 @@
     <ClCompile Include="..\private\Nail_Trail.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Effect\Trail</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Noddy.cpp">
+      <Filter>00. GameObject\06. Monster\16. Noddy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Noddy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\16. Noddy\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Noddy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\16. Noddy\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Noddy_State_Chase.cpp">
+      <Filter>00. GameObject\06. Monster\16. Noddy\State\Chase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Noddy_State_Find.cpp">
+      <Filter>00. GameObject\06. Monster\16. Noddy\State\Find</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Noddy_State_SleepStart.cpp">
+      <Filter>00. GameObject\06. Monster\16. Noddy\State\SleepStart</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\NormalEnemy.cpp">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy</Filter>
     </ClCompile>
@@ -3935,6 +4127,15 @@
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\RangerEnemy.cpp">
+      <Filter>00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RangerEnemy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RangerEnemy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Brain</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\RectCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClCompile>
@@ -3970,6 +4171,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Singleton_Destroyer.cpp">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SirKibble.cpp">
+      <Filter>00. GameObject\06. Monster\14. SirKibble%28Cutter%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SirKibble_Body.cpp">
+      <Filter>00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SirKibble_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Brain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SkySphere.cpp">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
@@ -4227,6 +4437,9 @@
     </None>
     <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>

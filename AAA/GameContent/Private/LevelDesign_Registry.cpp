@@ -28,6 +28,7 @@
 #include "LD_DeformCarBreakWall.h"
 #include "LD_GarageRadio.h"
 #include "LD_CopyEssence.h"
+#include "LD_MeteorGenerator.h"
 
 #include "Parsing_Utils.h"
 
@@ -405,6 +406,7 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	CLD_GarageRadio::Register_LevelDesignSpecs();
 	CLD_ArrowBoard::Register_LevelDesignSpecs();
 	CLD_CopyEssence::Register_LevelDesignSpecs();
+	CLD_MeteorGenerator::Register_LevelDesignSpecs();
 }
 
 NS_END
