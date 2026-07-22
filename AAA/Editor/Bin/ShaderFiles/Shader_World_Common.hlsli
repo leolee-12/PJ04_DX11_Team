@@ -177,6 +177,14 @@ float2 Get_UnknownUV(PS_IN In)
     return Apply_UVTransform(Select_UV_PS(In, g_iUnknownUVIndex), g_vUVTransformUnknown);
 }
 
+float2 Get_ScreenUV(float4 vProjPos)
+{
+    float2 vScreenUV;
+    vScreenUV.x = vProjPos.x / vProjPos.w * 0.5f + 0.5f;
+    vScreenUV.y = vProjPos.y / vProjPos.w * -0.5f + 0.5f;
+    return vScreenUV;
+}
+
 float3 Reconstruct_Normal(PS_IN In, float2 vNormalUV)
 {
     float3 N = normalize(In.vNormal.xyz);
@@ -499,26 +507,15 @@ float4 PS_BLEND_DMN(PS_IN In) : SV_TARGET0
     Apply_DitherFromPixelInput(In);
 
     float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
-    float fBaseAlpha = saturate(vDiffuse.a * g_vColor.a * g_fBlendOpacity);
+    float fAlpha = saturate(vDiffuse.a);
 
-    if (fBaseAlpha < 0.001f)
+    if (fAlpha < 0.001f)
         discard;
 
     float3 vNormal = normalize(Get_ShadingNormal(In, Get_NormalUV(In)));
-    float2 vScreenUV = Get_ScreenUV(In.vProjPos);
-    float3 vWorldPos = RecoverWorldPos(vScreenUV, In.vProjPos.z / In.vProjPos.w,
-        g_ProjMatrixInverse, g_ViewMatrixInverse);
-    float3 vViewDir = normalize(g_vCamPosition.xyz - vWorldPos);
-
     float fNdotL = saturate(dot(vNormal, -normalize(g_vLightDir.xyz)));
-    float3 vLit = vDiffuse.rgb * g_vColor.rgb * (g_vLightDiffuse.rgb * fNdotL + 0.25f);
+    float3 vLit = vDiffuse.rgb * (g_vLightDiffuse.rgb * fNdotL + 0.25f);
 
-    float fFresnel = 0.f;
-    [branch]
-    if (g_fBlendFresnel > 0.f)
-        fFresnel = pow(1.f - saturate(dot(vNormal, vViewDir)), g_fBlendFresnel);
-
-    float fAlpha = saturate(fBaseAlpha + fFresnel * (1.f - fBaseAlpha));
     return float4(vLit + g_vEmissiveColor.rgb, fAlpha);
 }
 
@@ -530,14 +527,6 @@ struct PS_DECAL_OUT
     float4 vNormal : SV_TARGET1;
     float4 vMRA : SV_TARGET2;
 };
-
-float2 Get_ScreenUV(float4 vProjPos)
-{
-    float2 vScreenUV;
-    vScreenUV.x = vProjPos.x / vProjPos.w * 0.5f + 0.5f;
-    vScreenUV.y = vProjPos.y / vProjPos.w * -0.5f + 0.5f;
-    return vScreenUV;
-}
 
 float Sample_SceneDepth(float2 vScreenUV)
 {

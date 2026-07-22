@@ -181,7 +181,7 @@ technique11 DefaultTechnique
     }
     pass BLEND_DMN_Pass // 17
     {
-        SetRasterizerState(RS_Cull_CW);
+        SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NoWrite, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 

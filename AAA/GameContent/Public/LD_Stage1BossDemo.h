@@ -29,8 +29,7 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 	static void Register_LevelDesignSpecs();
-	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC&
-		Spec, LD_OBJECT_ENTRY* pOutEntry);
+	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
@@ -41,8 +40,6 @@ private:
 	virtual HRESULT Ready_Components() override;
 
 	virtual void On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase) override;
-	virtual _bool Should_RenderMesh(_uint iMeshIndex) const override;
-	virtual _uint Resolve_RenderPass(_uint iMeshIndex) const override;
 
 	HRESULT Ready_Stage1BossDemo();
 	void On_Event(const _wstring& strEventTag);

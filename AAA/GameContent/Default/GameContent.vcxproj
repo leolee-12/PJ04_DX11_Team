@@ -30,6 +30,7 @@
     <ClInclude Include="..\public\Armadillo_WallImpact.h" />
     <ClInclude Include="..\public\Assault_Smoke.h" />
     <ClInclude Include="..\public\AttackDecal.h" />
+    <ClInclude Include="..\Public\BlendRenderable.h" />
     <ClInclude Include="..\public\Boss_GorillaRush.h" />
     <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
@@ -486,6 +487,7 @@
     <ClInclude Include="..\Public\WarpOutEffect.h" />
     <ClInclude Include="..\Public\Water_Defines.h" />
     <ClInclude Include="..\Public\Water_RenderBinder.h" />
+    <ClInclude Include="..\Public\World_BlendCollector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
@@ -925,6 +927,7 @@
     <ClCompile Include="..\Private\WarpInEffect.cpp" />
     <ClCompile Include="..\Private\WarpOutEffect.cpp" />
     <ClCompile Include="..\Private\Water_RenderBinder.cpp" />
+    <ClCompile Include="..\Private\World_BlendCollector.cpp" />
     <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>
   <ItemGroup>

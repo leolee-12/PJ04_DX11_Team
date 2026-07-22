@@ -19,6 +19,7 @@
 #include "UI_Eraser.h"
 #include "UI_CurtainTexture.h"
 #include "Env_InstanceController.h"
+#include "World_BlendCollector.h"
 #include "Collider.h"
 #include "Bubble_Manager.h"
 #include "Map_Loader.h"
@@ -131,6 +132,10 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
 
     if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC),
         CEnv_InstanceController::PROTOTYPE_TAG, CEnv_InstanceController::Create(pDevice, pContext))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC),
+        CWorld_BlendCollector::PROTOTYPE_TAG, CWorld_BlendCollector::Create(pDevice, pContext))))
         return E_FAIL;
     
     if (FAILED(Ready_Prototype_UIPartObjects(pProxy, pDevice, pContext)))

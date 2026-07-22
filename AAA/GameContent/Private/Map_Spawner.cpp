@@ -12,6 +12,7 @@
 #include "EnvVolume_Light.h"
 #include "Env_SpotLight.h"
 #include "Env_InstanceController.h"
+#include "World_BlendCollector.h"
 #include "LevelDesign_Registry.h"
 #include "GameContent_Log.h"
 #include "GameObject_Factory.h"
@@ -119,6 +120,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	const MAP_RUNTIME_LEVELS& Levels = Request.Levels;
 	const MAP_SPAWN_TARGETS& Targets = Request.Targets;
 	const MAP_SPAWN_OPTIONS& Options = Request.Options;
+	const _bool bNeedWorldBlendCollector = Options.bSpawnEnv || Options.bSpawnAddedLevelDesign;
 	MAP_OBJECT_CREATED_CALLBACK pCreatedCallback = Request.pCreatedCallback;
 	void* pCallbackContext = Request.pCallbackContext;
 	CMapStage** ppOutStage = Request.ppOutStage;
@@ -158,13 +160,43 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 		+ (Options.bSpawnEnv ? Package.EnvObjectDescs.size() + 1u : 0u)
 		+ ((Options.bSpawnAddedEnv || Options.bSpawnAddedLevelDesign)
 			? Package.AddedObjectDescs.size()
-			: 0u);
+			: 0u)
+		+ (bNeedWorldBlendCollector ? 1u : 0u);
 
 	CreatedObjects.reserve(iExpectedObjectCount);
 	PendingCallbacks.reserve(iExpectedObjectCount);
 
 	CMapStage* pStage = nullptr;
 	CEnv_InstanceController* pEnvInstanceController = nullptr;
+
+	if (bNeedWorldBlendCollector && nullptr == CWorld_BlendCollector::Find(m_pProxy))
+	{
+		CGameObject* pCollectorObject = nullptr;
+
+		if (FAILED(m_pProxy->Add_GameObject_Return(
+			&pCollectorObject,
+			ETOUI(LEVEL::STATIC),
+			CWorld_BlendCollector::PROTOTYPE_TAG,
+			ETOUI(LEVEL::STATIC),
+			CWorld_BlendCollector::LAYER_TAG,
+			CWorld_BlendCollector::OBJECT_TAG,
+			nullptr)))
+		{
+			Rollback(CreatedObjects);
+			return E_FAIL;
+		}
+
+		if (nullptr == dynamic_cast<CWorld_BlendCollector*>(pCollectorObject))
+		{
+			if (nullptr != pCollectorObject)
+				m_pProxy->Destroy_GameObject(pCollectorObject);
+
+			Rollback(CreatedObjects);
+			return E_FAIL;
+		}
+
+		CreatedObjects.push_back(pCollectorObject);
+	}
 
 	if (Options.bSpawnStage)
 	{
