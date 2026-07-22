@@ -1102,9 +1102,6 @@
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\Mant">
       <UniqueIdentifier>{8889da8d-8df3-4363-a83d-d90d79299ddf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\NamePlate">
-      <UniqueIdentifier>{0897852f-355c-48a5-ab53-ba14325ed1c8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Part\ReplicaSword">
       <UniqueIdentifier>{cc608e8c-af5c-4970-b6ba-68aa9a8e8fe0}</UniqueIdentifier>
     </Filter>
@@ -4471,10 +4468,8 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl">
+    <None Include="..\ShaderFiles\Shader_AttackDecal.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Decal</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>

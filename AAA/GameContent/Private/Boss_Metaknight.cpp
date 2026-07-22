@@ -105,6 +105,8 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
         m_fGigaCooldown -= fTimeDelta;
     if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fRockCooldown > 0.f)
         m_fRockCooldown -= fTimeDelta;
+    if (Get_Life() == EBOSS_LIFE::ACTIVE && m_fUpperCooldown > 0.f)
+        m_fUpperCooldown -= fTimeDelta;
 
     if (m_bAppearPending)
     {
@@ -371,6 +373,19 @@ HRESULT CBoss_Metaknight::Ready_PartObjects()
 
     Set_ActiveSword(EMK_SWORD::GALAXIA);
 
+
+    m_pBody->Set_HitBox_OnEnter(CBoss_Metaknight_Body::MKHB_CATCH,
+        [this](CCollider* pOther)
+        {
+            if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+            if (m_bCatchHit)
+                return;
+
+            m_bCatchHit = true;
+            m_pBody->Enable_HitBox(CBoss_Metaknight_Body::MKHB_CATCH, false);
+        });
+
     return S_OK;
 }
 
@@ -518,6 +533,17 @@ void CBoss_Metaknight::Start_PatternCooldowns(_float fUsedCooldown)
 {
     if (s_fRockCooldown <= fUsedCooldown) m_fRockCooldown = s_fRockCooldown;
     if (s_fGigaCooldown <= fUsedCooldown) m_fGigaCooldown = s_fGigaCooldown;
+    if (s_fUpperCooldown <= fUsedCooldown) m_fUpperCooldown = s_fUpperCooldown;
+}
+
+void CBoss_Metaknight::Enable_CatchBox(_bool bOn)
+{
+    if (m_pBody)
+        m_pBody->Enable_HitBox(CBoss_Metaknight_Body::MKHB_CATCH, bOn);
+}
+
+void CBoss_Metaknight::Begin_UpperCaliburDemo()
+{
 }
 
 void CBoss_Metaknight::Fire_CutsceneCamera(const _tchar* szTrack)

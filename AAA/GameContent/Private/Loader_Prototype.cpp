@@ -319,24 +319,36 @@ HRESULT CLIENT_DLL Load_Level_FromManifest(const LEVEL_LOAD_CONTEXT& ctx, const 
 {
     LEVEL_MANIFEST Manifest{};
     if (FAILED(Load_LevelManifest(strManifestPath, &Manifest)))
+    {
+        MSG_BOX("LevelManifest Load Failed");
         return E_FAIL;
+    }
 
     MAP_LOAD_RESULT report{};
     CMapStage* pMapStage = nullptr;
     if (FAILED(CMap_Loader::Spawn_Map(ctx.pDevice, ctx.pContext,
         Manifest.strMapManifest, Manifest.strObjectsFile,
         iLevelIndex, &report, &pMapStage)))
+    {
+        MSG_BOX("MapLoad Failed");
         return E_FAIL;
+    }
 
     if (FAILED(Load_Level(ctx.pProxy, ctx.pDevice, ctx.pContext,
         Manifest.strObjectsFile.c_str(), iLevelIndex)))
+    {
+        MSG_BOX("LevelObject Load Failed");
         return E_FAIL;
+    }
 
     if (!Manifest.strUIFile.empty())
     {
         if (FAILED(Load_Level_UI(ctx.pProxy, ctx.pDevice, ctx.pContext,
             Manifest.strUIFile.c_str(), iLevelIndex)))
+        {
+            MSG_BOX("UI Load Failed");
             return E_FAIL;
+        }
     }
 
     if (!Manifest.strRenderGlobalsFile.empty())

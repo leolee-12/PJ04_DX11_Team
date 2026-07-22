@@ -20,6 +20,12 @@ namespace
 
 CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
 {
+    // 튜닝용
+    return CBTReactiveSelector::Create({
+        Make_UpperBranch(),
+        Loop("Wait", 0.5f, SPD),
+        });
+
     CBTNode* pCombat = CBTSequence::Create({
         Make_GigaBranch(),
         Make_StepApproach(),
@@ -32,11 +38,13 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
         return CBTReactiveSelector::Create({
             Make_DodgeBranch(),
             Make_RockBranch(),
+            Make_UpperBranch(),
             pCombat,
             });
     }
     return CBTReactiveSelector::Create({
         Make_DodgeBranch(),
+        Make_UpperBranch(),
         pCombat,
         });
 }
@@ -801,6 +809,259 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
         pDiveFall,
         Clip("DiveBombEnd", SPD, 0.2f),
         pEnd,
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UpperCalibur()
+{
+    // 러시 노드와 분기 노드가 공유하는 상태
+    auto bCaught = make_shared<bool>(false);
+    auto vRushDir = make_shared<_float3>(_float3(0.f, 0.f, 1.f));
+
+    auto* pBegin = CBTAction::Create(
+        [this, bCaught](CBlackboard*, _float) {
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            pMeta->Set_AttackBusy(true);     // 패턴 중엔 회피로 캔슬되지 않게
+            pMeta->Reset_CatchHit();
+            *bCaught = false;
+            return BT_STATUS::SUCCESS;
+        },
+        [this] { static_cast<CBoss_Metaknight*>(m_pOwner)->Set_AttackBusy(false); });
+
+    auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
+        auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+        pMeta->Enable_CatchBox(false);
+        pMeta->Set_AttackBusy(false);
+        m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
+        m_pOwner->Get_Movement()->Set_LockFacing(false);
+        pMeta->Start_PatternCooldowns(CBoss_Metaknight::s_fUpperCooldown);
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto Branch = [](shared_ptr<bool> b, _bool bWant, CBTNode* pBody) -> CBTNode* {
+        return CBTSequence::Create({
+            CBTCondition::Create([b, bWant](CBlackboard*) { return *b == bWant; }),
+            pBody,
+            });
+        };
+
+    return CBTSequence::Create({
+        pBegin,
+        Make_UC_BackStep(),
+        Make_UC_Charge(),
+        Make_UC_Rush(bCaught, vRushDir),
+        CBTSelector::Create({
+            Branch(bCaught, true,  Make_UC_CatchSuccess()),
+            Branch(bCaught, false, Make_UC_Brake(vRushDir)),
+        }),
+        pEnd,
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_BackStep()
+{
+    auto bOn = make_shared<bool>(false);
+
+    return CBTAction::Create(
+        [this, bOn](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*bOn)
+            {
+                Anim()->Play("UpperCaliburRaisingStep", false, true, 0.15f, SPD);
+                mv->Set_LockFacing(true);   // 뒤로 가면서도 커비를 계속 봐야 하므로 자동 페이싱 차단
+                *bOn = true;
+            }
+
+            RotateYawTo(Dir_ToTargetXZ(), TURN_DEG, dt);
+
+            // 클립 진행도에 맞춰 살짝 뒤로 (LOOK 반대 방향)
+            mv->Set_WindowMoveSpeed(UC_BACK_SPEED, Anim()->Get_Progress());
+            m_pOwner->Add_MoveDir(-m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
+
+            if (Anim()->Is_Finished())
+            {
+                mv->Set_LockFacing(false);
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn] {
+            *bOn = false;
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_Charge()
+{
+    auto bOn = make_shared<bool>(false);
+    auto fT = make_shared<_float>(0.f);
+
+    return CBTAction::Create(
+        [this, bOn, fT](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*bOn)
+            {
+                Anim()->Play("UpperCaliburRaisingCharge", true, true, 0.15f, SPD);
+                mv->Set_LockFacing(true);
+                *fT = 0.f;
+                *bOn = true;
+            }
+
+            // 차지하는 동안 계속 커비를 조준
+            RotateYawTo(Dir_ToTargetXZ(), TURN_DEG, dt);
+
+            *fT += dt;
+            if (*fT >= UC_CHARGE_TIME)
+            {
+                mv->Set_LockFacing(false);
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, fT] {
+            *bOn = false; *fT = 0.f;
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_ptr<_float3> vDir)
+{
+    auto bOn = make_shared<bool>(false);
+    auto fT = make_shared<_float>(0.f);
+    auto vStart = make_shared<_float3>();
+
+    return CBTAction::Create(
+        [this, bOn, fT, vStart, bCaught, vDir](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            auto* mv = m_pOwner->Get_Movement();
+            auto* tf = m_pOwner->Get_Transform();
+
+            if (!*bOn)
+            {
+                // 돌진 시작 순간의 방향을 고정 (이후엔 커비를 추적하지 않음)
+                mv->Face_Instant(XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos));
+                mv->Set_LockFacing(true);
+
+                XMStoreFloat3(vDir.get(),
+                    XMVector3Normalize(XMVectorSetY(tf->Get_State(STATE::LOOK), 0.f)));
+                XMStoreFloat3(vStart.get(), tf->Get_State(STATE::POSITION));
+
+                Anim()->Play("UpperCaliburRaisingMove", true, true, 0.1f, SPD);
+
+                pMeta->Reset_CatchHit();
+                pMeta->Enable_CatchBox(true);
+
+                *bCaught = false;
+                *fT = 0.f;
+                *bOn = true;
+            }
+
+            *fT += dt;
+            mv->Set_MoveSpeed(UC_RUSH_SPEED);
+            m_pOwner->Add_MoveDir(XMLoadFloat3(vDir.get()));
+
+            if (pMeta->Is_CatchHit())
+            {
+                pMeta->Enable_CatchBox(false);
+                *bCaught = true;
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+
+            const _float fRun = XMVectorGetX(XMVector3Length(
+                XMVectorSetY(tf->Get_State(STATE::POSITION) - XMLoadFloat3(vStart.get()), 0.f)));
+
+            // 일정 거리 이상 달렸거나 벽에 막혀 시간만 흐르면 실패
+            if (fRun >= UC_RUSH_MAX_DIST || *fT >= UC_RUSH_TIMEOUT)
+            {
+                pMeta->Enable_CatchBox(false);
+                *bCaught = false;
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, fT] {
+            *bOn = false; *fT = 0.f;
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            pMeta->Enable_CatchBox(false);
+            m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_Brake(shared_ptr<_float3> vDir)
+{
+    auto bOn = make_shared<bool>(false);
+    auto fT = make_shared<_float>(0.f);
+
+    return CBTAction::Create(
+        [this, bOn, fT, vDir](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*bOn)
+            {
+                Anim()->Play("UpperCaliburBrake", false, true, 0.1f, SPD);
+                mv->Set_LockFacing(true);
+                *fT = 0.f;
+                *bOn = true;
+            }
+
+            const _float fSkidTime = 2.f * UC_BRAKE_DIST / UC_RUSH_SPEED;
+            *fT += dt;
+
+            if (*fT < fSkidTime)
+            {
+                // 진행 방향은 그대로 두고 속도만 깎아서 발 끄는 느낌
+                mv->Set_MoveSpeed(UC_RUSH_SPEED * (1.f - *fT / fSkidTime));
+                m_pOwner->Add_MoveDir(XMLoadFloat3(vDir.get()));
+            }
+
+            RotateYawTo(XMVectorNegate(XMLoadFloat3(vDir.get())), UC_BRAKE_TURN_DEG, dt);
+
+            if (*fT >= fSkidTime && Anim()->Is_Finished())
+            {
+                mv->Set_MoveSpeed(BASE_SPEED);
+                mv->Set_LockFacing(false);
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, fT] {
+            *bOn = false; *fT = 0.f;
+            m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_CatchSuccess()
+{
+    auto* pBegin = CBTAction::Create([this](CBlackboard*, _float) {
+        auto* mv = m_pOwner->Get_Movement();
+        mv->Set_MoveSpeed(BASE_SPEED);      // 돌진 속도 원복
+        mv->Set_LockFacing(false);          // 러시에서 걸어둔 페이싱 잠금 해제
+        return BT_STATUS::SUCCESS;
+        });
+
+    return CBTSequence::Create({
+        pBegin,
+        Clip("UpperCaliburAttackStart", SPD, 0.1f),
+        Clip("UpperCaliburAttackUp", SPD, 0.f),
+        Clip("UpperCaliburAttackDown", SPD, 0.f),
+        Clip("UpperCaliburAttackFinish", SPD, 0.f),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UpperBranch()
+{
+    return CBTSequence::Create({
+        CBTCondition::Create([this](CBlackboard* pBB) {
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_UpperReady()
+                && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
+        Make_UpperCalibur(),
+        Clip("Wait", SPD, 0.2f),
         });
 }
 
