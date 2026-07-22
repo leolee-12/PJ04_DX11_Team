@@ -9,6 +9,8 @@ NS_END
 NS_BEGIN(Client)
 
 struct LD_SPAWN_SPEC;
+class CLightShaft;
+class CProjectile;
 
 class CLD_MeteorGenerator final : public CLevelDesignObject
 {
@@ -40,9 +42,14 @@ protected:
 private:
     HRESULT                         Ready_Trigger();
     void                            Fire_Rock();
+    void                            Ensure_LightShaft();
 
 private:
     LD_METEOR_DESC                  m_tMeteorDesc = {};
+    CLightShaft*                    m_pLightShaft = { nullptr };
+    _float                          m_fShaftTimer = { 0.f };
+    _float                          m_fShaftDur = { 0.f };
+    _bool                           m_bFalling = { false };
     CCollider*                      m_pTrigger = { nullptr };
     _bool                           m_bFired = { false };
     _float                          m_fFireTimer = { 0.f };

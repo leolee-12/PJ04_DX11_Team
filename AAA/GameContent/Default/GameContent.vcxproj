@@ -57,6 +57,7 @@
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
+    <ClInclude Include="..\Public\LightShaft.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
     <ClInclude Include="..\Public\MeteorBurst.h" />
@@ -553,6 +554,7 @@
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
+    <ClCompile Include="..\Private\LightShaft.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
     <ClCompile Include="..\Private\MeteorBurst.cpp" />
@@ -1046,6 +1048,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_Fluid.hlsl" />
+    <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Metaknight.hlsl">
