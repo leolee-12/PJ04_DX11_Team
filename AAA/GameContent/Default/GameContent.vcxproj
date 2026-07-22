@@ -63,7 +63,6 @@
     <ClInclude Include="..\Public\LightShaft.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
-    <ClInclude Include="..\Public\Kirby_UpperCalibur.h" />
     <ClInclude Include="..\Public\MeteorBurst.h" />
     <ClInclude Include="..\Public\MeteorRock.h" />
     <ClInclude Include="..\Public\MeteorRock_Large.h" />
@@ -569,7 +568,6 @@
     <ClCompile Include="..\Private\LightShaft.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
-    <ClCompile Include="..\Private\Kirby_UpperCalibur.cpp" />
     <ClCompile Include="..\Private\MeteorBurst.cpp" />
     <ClCompile Include="..\Private\MeteorRock.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
