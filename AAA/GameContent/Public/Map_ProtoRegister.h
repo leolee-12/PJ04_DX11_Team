@@ -15,6 +15,7 @@ public:
 
 public:
 	HRESULT Ready_ObjectPrototypes(_uint iObjectLevel);
+	HRESULT Ready_AddedObjectPrototypes(const MAP_RUNTIME_LEVELS& Levels, const vector<MAP_ADD_OBJECT>& AddedDescs);
 	HRESULT Ready_MapSectionModel(_uint iModelLevel, const MAP_SECTION_DESC& Desc);
 	HRESULT Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_DESC& Desc, _bool bCookCollisionMesh, _bool bEnablePickingData);
 

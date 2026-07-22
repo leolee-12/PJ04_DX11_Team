@@ -37,6 +37,9 @@
     <Filter Include="00. GameObject\02. EnvObject">
       <UniqueIdentifier>{ce9ba11f-9390-48f8-9a7f-e24b38b55608}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\BlendCollector">
+      <UniqueIdentifier>{9bdd24d6-a54e-4a25-b9ab-a89027989589}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\02. EnvObject\EnvTrigger">
       <UniqueIdentifier>{f61d97f4-06b5-4b44-8a89-c4328f90ddfb}</UniqueIdentifier>
     </Filter>
@@ -1623,6 +1626,9 @@
     <ClInclude Include="..\Public\BladeKnight_Sword.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BlendRenderable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BombAimDot.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. BombAimDot</Filter>
     </ClInclude>
@@ -3030,6 +3036,9 @@
     <ClInclude Include="..\Public\Water_RenderBinder.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\World_BlendCollector.h">
+      <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -4393,6 +4402,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Water_RenderBinder.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\World_BlendCollector.cpp">
+      <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>

@@ -123,6 +123,96 @@ void CLD_WaterArea::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
     pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
+json CLD_WaterArea::Serialize() const
+{
+    json j = __super::Serialize();
+    json jWaterMaterial = json::object();
+
+    jWaterMaterial["ShallowColor"] = { m_tWaterRenderDesc.vShallowColor.x, m_tWaterRenderDesc.vShallowColor.y,
+    m_tWaterRenderDesc.vShallowColor.z, m_tWaterRenderDesc.vShallowColor.w };
+    jWaterMaterial["DeepColor"] = { m_tWaterRenderDesc.vDeepColor.x, m_tWaterRenderDesc.vDeepColor.y, m_tWaterRenderDesc.vDeepColor.z,
+    m_tWaterRenderDesc.vDeepColor.w };
+    jWaterMaterial["ShallowColorStrength"] = m_tWaterRenderDesc.fShallowColorStrength;
+    jWaterMaterial["Opacity"] = m_tWaterRenderDesc.fOpacity;
+    jWaterMaterial["DepthFadeDistance"] = m_tWaterRenderDesc.fDepthFadeDistance;
+
+    jWaterMaterial["NormalTiling0"] = { m_tWaterRenderDesc.vNormalTiling0.x, m_tWaterRenderDesc.vNormalTiling0.y };
+    jWaterMaterial["NormalSpeed0"] = { m_tWaterRenderDesc.vNormalSpeed0.x, m_tWaterRenderDesc.vNormalSpeed0.y };
+    jWaterMaterial["NormalTiling1"] = { m_tWaterRenderDesc.vNormalTiling1.x, m_tWaterRenderDesc.vNormalTiling1.y };
+    jWaterMaterial["NormalSpeed1"] = { m_tWaterRenderDesc.vNormalSpeed1.x, m_tWaterRenderDesc.vNormalSpeed1.y };
+    jWaterMaterial["NormalStrength"] = m_tWaterRenderDesc.fNormalStrength;
+
+    jWaterMaterial["FresnelPower"] = m_tWaterRenderDesc.fFresnelPower;
+    jWaterMaterial["ReflectionStrength"] = m_tWaterRenderDesc.fReflectionStrength;
+    jWaterMaterial["RefractionStrength"] = m_tWaterRenderDesc.fRefractionStrength;
+    jWaterMaterial["LightReceiveStrength"] = m_tWaterRenderDesc.fLightReceiveStrength;
+    jWaterMaterial["SpecularPower"] = m_tWaterRenderDesc.fSpecularPower;
+    jWaterMaterial["SpecularStrength"] = m_tWaterRenderDesc.fSpecularStrength;
+
+    jWaterMaterial["FoamWidth"] = m_tWaterRenderDesc.fFoamWidth;
+    jWaterMaterial["FoamStrength"] = m_tWaterRenderDesc.fFoamStrength;
+    jWaterMaterial["FoamNoiseTiling"] = { m_tWaterRenderDesc.vFoamNoiseTiling.x, m_tWaterRenderDesc.vFoamNoiseTiling.y };
+    jWaterMaterial["FoamNoiseSpeed"] = { m_tWaterRenderDesc.vFoamNoiseSpeed.x, m_tWaterRenderDesc.vFoamNoiseSpeed.y };
+    jWaterMaterial["FoamNoiseStrength"] = m_tWaterRenderDesc.fFoamNoiseStrength;
+    jWaterMaterial["FoamBlur"] = m_tWaterRenderDesc.fFoamBlur;
+
+    jWaterMaterial["CausticTiling"] = { m_tWaterRenderDesc.vCausticTiling.x, m_tWaterRenderDesc.vCausticTiling.y };
+    jWaterMaterial["CausticSpeed"] = { m_tWaterRenderDesc.vCausticSpeed.x, m_tWaterRenderDesc.vCausticSpeed.y };
+    jWaterMaterial["CausticStrength"] = m_tWaterRenderDesc.fCausticStrength;
+    jWaterMaterial["CausticNoiseStrength"] = m_tWaterRenderDesc.fCausticNoiseStrength;
+    jWaterMaterial["CausticBlur"] = m_tWaterRenderDesc.fCausticBlur;
+
+    j["WaterMaterial"] = jWaterMaterial;
+    return j;
+}
+
+void CLD_WaterArea::Deserialize_Internal(const json& j)
+{
+    __super::Deserialize_Internal(j);
+
+    const auto IterWaterMaterial = j.find("WaterMaterial");
+    if (IterWaterMaterial == j.end() || !IterWaterMaterial->is_object())
+        return;
+
+    WATER_RENDER_DESC Desc = m_tWaterRenderDesc;
+    const json& jWaterMaterial = *IterWaterMaterial;
+
+    JsonUtils::Try_ReadFloat4Array(jWaterMaterial, "ShallowColor", &Desc.vShallowColor);
+    JsonUtils::Try_ReadFloat4Array(jWaterMaterial, "DeepColor", &Desc.vDeepColor);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "ShallowColorStrength", &Desc.fShallowColorStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "Opacity", &Desc.fOpacity);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "DepthFadeDistance", &Desc.fDepthFadeDistance);
+
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "NormalTiling0", &Desc.vNormalTiling0);
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "NormalSpeed0", &Desc.vNormalSpeed0);
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "NormalTiling1", &Desc.vNormalTiling1);
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "NormalSpeed1", &Desc.vNormalSpeed1);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "NormalStrength", &Desc.fNormalStrength);
+
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "FresnelPower", &Desc.fFresnelPower);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "ReflectionStrength", &Desc.fReflectionStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "RefractionStrength", &Desc.fRefractionStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "LightReceiveStrength", &Desc.fLightReceiveStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "SpecularPower", &Desc.fSpecularPower);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "SpecularStrength", &Desc.fSpecularStrength);
+
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "FoamWidth", &Desc.fFoamWidth);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "FoamStrength", &Desc.fFoamStrength);
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "FoamNoiseTiling", &Desc.vFoamNoiseTiling);
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "FoamNoiseSpeed", &Desc.vFoamNoiseSpeed);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "FoamNoiseStrength", &Desc.fFoamNoiseStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "FoamBlur", &Desc.fFoamBlur);
+
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "CausticTiling", &Desc.vCausticTiling);
+    JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "CausticSpeed", &Desc.vCausticSpeed);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "CausticStrength", &Desc.fCausticStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "CausticNoiseStrength", &Desc.fCausticNoiseStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "CausticBlur", &Desc.fCausticBlur);
+
+    Sanitize_WaterRenderDesc(&Desc);
+    m_tWaterRenderDesc = Desc;
+}
+
 #pragma region Editable
 _bool CLD_WaterArea::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 {
@@ -164,6 +254,10 @@ void CLD_WaterArea::Register_LevelDesignSpecs()
         Spec.eModelType = MODEL::NONANIM;
         Spec.pPrototypeFactory = &Create_Prototype;
         Spec.pBuildDesc = &Build_Desc;
+
+        if (JsonUtils::Equals_NoCase(pObjectName, OBJECT_NAME))
+            Spec.pMakeDefaultDesc = &Make_DefaultDesc;
+
         Spec.ModelRequirements =
         {
                 { MODEL_PROTO_TAG, WATER_MODEL_PATH, MODEL::NONANIM, false }
@@ -199,6 +293,20 @@ _bool CLD_WaterArea::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jE
     Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
 
     *pOutEntry = std::move(Desc);
+    return true;
+}
+
+_bool CLD_WaterArea::Make_DefaultDesc(const LD_OBJECT_DESC& CommonDesc, _uint iModelProtoLevel,
+    const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+    if (!Build_Desc(CommonDesc, json::object(), Spec, pOutEntry))
+        return false;
+
+    LD_SURFACE_AREA_DESC* pDesc = get_if<LD_SURFACE_AREA_DESC>(pOutEntry);
+    if (nullptr == pDesc)
+        return false;
+
+    pDesc->iModelProtoLevel = iModelProtoLevel;
     return true;
 }
 

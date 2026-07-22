@@ -130,12 +130,8 @@ HRESULT CLD_AudioArea::Initialize_Prototype()
 
 HRESULT CLD_AudioArea::Initialize(void* pArg)
 {
-	LD_PARSED_OBJECT DefaultDesc{};
 	if (nullptr == pArg)
-	{
-		Build_DefaultAudioAreaDesc(&DefaultDesc);
-		pArg = &DefaultDesc;
-	}
+		return E_FAIL;
 
 	const LD_PARSED_OBJECT* pParsedDesc = static_cast<const LD_PARSED_OBJECT*>(pArg);
 
@@ -502,8 +498,43 @@ void CLD_AudioArea::Register_LevelDesignSpecs()
 		Spec.pPrototypeFactory = &Create_Prototype;
 		Spec.pBuildDesc = nullptr;
 
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor"))
+			Spec.pMakeDefaultDesc = &Make_DefaultDesc;
+
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 	}
+}
+
+_bool CLD_AudioArea::Make_DefaultDesc(const LD_OBJECT_DESC& CommonDesc, _uint iModelProtoLevel,
+	const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+	UNREFERENCED_PARAMETER(iModelProtoLevel);
+
+	if (nullptr == pOutEntry)
+		return false;
+
+	if (Spec.strPrototypeTag != PROTOTYPE_TAG
+		|| Spec.strLayerTag != LAYER_TAG
+		|| Spec.eCategory != LD_CATEGORY::AUDIO_AREA)
+	{
+		return false;
+	}
+
+	if (!JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"AreaBgmRequestor"))
+		return false;
+
+	LD_PARSED_OBJECT Desc{};
+	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+	Desc.eCategory = Spec.eCategory;
+
+	Desc.AudioArea.iSoundId = 1u;
+	Desc.AudioArea.strShapeType = L"Rectangular";
+	Desc.AudioArea.vAreaSize = { 1.f, 1.f, 1.f };
+	Desc.AudioArea.iFadeInFrame = 60u;
+	Desc.AudioArea.iInactivateFrame = 60u;
+
+	*pOutEntry = std::move(Desc);
+	return true;
 }
 
 CGameObject* CLD_AudioArea::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

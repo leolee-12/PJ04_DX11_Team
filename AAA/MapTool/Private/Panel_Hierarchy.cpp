@@ -139,6 +139,82 @@ namespace
             pLevel->Restore_DeletedMapPreviewEnv(strRestoreKey);
     }
 
+    void Draw_MapPreviewDeletedLevelDesignOverrides(MapTool::CLevel_Edit* pLevel)
+    {
+        ImGui::TextUnformatted("Deleted LevelDesign Overrides");
+
+        const CMap_EditSession* pSession =
+            (nullptr != pLevel) ? pLevel->Get_MapPreviewSession() : nullptr;
+
+        if (nullptr == pSession || 0 == pSession->Get_DeletedLevelDesignCount())
+        {
+            ImGui::TextDisabled("No deleted LevelDesign overrides.");
+            return;
+        }
+
+        _wstring strRestoreKey;
+        _bool bRestoreAll = false;
+
+        if (ImGui::Button("Restore All##LevelDesign"))
+            bRestoreAll = true;
+
+        ImGui::BeginChild("DeletedLevelDesignOverrides", ImVec2(0.f, 160.f), true);
+
+        for (const auto& strKey : pSession->Get_DeletedLevelDesignOrder())
+        {
+            CMap_EditSession::MAP_EDIT_LD_ITEM Item{};
+            if (!pSession->Try_GetDeletedLevelDesignItem(strKey, &Item))
+                continue;
+
+            const string strKeyUtf8 = WstrToStr(strKey);
+            const string strDisplayUtf8 =
+                WstrToStr(Item.strDisplayName.empty() ? strKey : Item.strDisplayName);
+
+            const string strLayerUtf8 = WstrToStr(Item.strLayerTag);
+            const string strObjectTagUtf8 = WstrToStr(Item.strObjectTag);
+            const string strSourceUtf8 = WstrToStr(Item.wstrSourceFile);
+            const string strSectionUtf8 = WstrToStr(Item.wstrSection);
+            const string strEntryUtf8 = WstrToStr(Item.wstrEntryKey);
+
+            ImGui::PushID(strKeyUtf8.c_str());
+
+            ImGui::TextWrapped("%s", strDisplayUtf8.c_str());
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("%s", strKeyUtf8.c_str());
+
+            if (!strLayerUtf8.empty() || !strObjectTagUtf8.empty())
+            {
+                ImGui::TextDisabled(
+                    "Layer=%s / Tag=%s",
+                    strLayerUtf8.c_str(),
+                    strObjectTagUtf8.c_str());
+            }
+
+            if (!strSourceUtf8.empty() || !strSectionUtf8.empty() || !strEntryUtf8.empty())
+            {
+                ImGui::TextDisabled(
+                    "File=%s / Section=%s / Entry=%s / Uid=%u",
+                    strSourceUtf8.c_str(),
+                    strSectionUtf8.c_str(),
+                    strEntryUtf8.c_str(),
+                    Item.iUid);
+            }
+
+            if (ImGui::SmallButton("Restore"))
+                strRestoreKey = strKey;
+
+            ImGui::Separator();
+            ImGui::PopID();
+        }
+
+        ImGui::EndChild();
+
+        if (bRestoreAll)
+            pLevel->Restore_AllDeletedMapPreviewLevelDesign();
+        else if (!strRestoreKey.empty())
+            pLevel->Restore_DeletedMapPreviewLevelDesign(strRestoreKey);
+    }
+
     void Draw_MapPreviewAddedOverrides(MapTool::CLevel_Edit* pLevel)
     {
         ImGui::TextUnformatted("Added Map Overrides");
@@ -533,6 +609,9 @@ void CPanel_Hierarchy::Render()
 
     ImGui::Separator();
     Draw_MapPreviewDeletedOverrides(pLevel);
+
+    ImGui::Separator();
+    Draw_MapPreviewDeletedLevelDesignOverrides(pLevel);
 
     ImGui::Separator();
     Draw_MapPreviewAddedOverrides(pLevel);
