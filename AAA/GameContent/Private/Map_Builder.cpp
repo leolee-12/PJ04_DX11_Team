@@ -176,10 +176,7 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 		Desc.wstrModelPath = wstrModelPath;
 		Desc.wstrModelProtoTag = wstrModelProtoTag;
 		Desc.iModelProtoLevel = 0;
-		Desc.eSectionType = Section.eType;
-		Desc.eRenderID = Section.eRenderID;
 		Desc.bRenderable = true;
-		Desc.bEnableCulling = true;
 		Desc.bUseCollMesh = true;
 
 		pOutStageDesc->SectionDescs.push_back(Desc);

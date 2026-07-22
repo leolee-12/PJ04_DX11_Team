@@ -1,6 +1,7 @@
 #include "MapSection.h"
 #include "Shader_PassMeta.h"
 #include "Map_EditFile.h"
+#include "GameContent_Log.h"
 
 #include "GameInstance.h"
 
@@ -27,9 +28,6 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_strSectionName = pDesc->strSectionName;
 	m_strModelProtoTag = pDesc->wstrModelProtoTag;
 	m_iModelProtoLevel = pDesc->iModelProtoLevel;
-	m_eSectionType = pDesc->eSectionType;
-	m_eRenderID = pDesc->eRenderID;
-	m_bEnableCulling = pDesc->bEnableCulling;
 	m_bRenderable = pDesc->bRenderable;
 	m_bUseCollMesh = pDesc->bUseCollMesh;
 
@@ -51,15 +49,20 @@ HRESULT CMapSection::Initialize(void* pArg)
 HRESULT CMapSection::Validate_Initialized()
 {
 	if (FAILED(__super::Validate_Initialized()))
+	{
+		Log_GameContentWarning("MapSection component invalid: " + WstrToStr(m_strSectionName));
 		return E_FAIL;
+	}
 	if (m_strSectionName.empty() || m_strModelProtoTag.empty())
+	{
+		Log_GameContentWarning("MapSection descriptor invalid: " + WstrToStr(m_strSectionName));
 		return E_FAIL;
-	if (ETOUI(m_eSectionType) >= MAP_SECTION_TYPE_COUNT)
-		return E_FAIL;
-	if (ETOUI(m_eRenderID) >= ETOUI(RENDERID::END))
-		return E_FAIL;
+	}
 	if (m_bUseCollMesh && (!m_bHasCollMesh || nullptr == m_pColliderActor))
+	{
+		Log_GameContentWarning("MapSection collider invalid: " + WstrToStr(m_strSectionName));
 		return E_FAIL;
+	}
 	return S_OK;
 }
 
@@ -122,13 +125,12 @@ _bool CMapSection::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 
 	pOutDesc->eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
 	pOutDesc->strStableKey = CMap_EditFile::Make_SectionKey(m_strStageName, m_strSectionName);
-	pOutDesc->iCapabilities = EDIT_CAP_RENDERABLE | EDIT_CAP_CULL_FRUSTUM | EDIT_CAP_MESH_LAYER;
+	pOutDesc->iCapabilities = EDIT_CAP_RENDERABLE | EDIT_CAP_MESH_LAYER;
 
 	if (m_bHasCollMesh)	pOutDesc->iCapabilities |= EDIT_CAP_COLLISION_MESH;
 
 	pOutDesc->Policy.bRenderable = m_bRenderable;
 	pOutDesc->Policy.bUseCullDistance = false;
-	pOutDesc->Policy.bUseCullFrustum = m_bEnableCulling;
 	pOutDesc->Policy.bUseCollMesh = m_bHasCollMesh && m_bUseCollMesh;
 	pOutDesc->Policy.bUseShadow = false;
 
@@ -149,7 +151,6 @@ _bool CMapSection::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 HRESULT CMapSection::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 {
 	m_bRenderable = Policy.bRenderable;
-	m_bEnableCulling = Policy.bUseCullFrustum;
 	Set_UseCollMesh(m_bHasCollMesh ? Policy.bUseCollMesh : false);
 	return S_OK;
 }
@@ -215,32 +216,13 @@ _bool CMapSection::Should_RenderMesh(_uint iMesh) const
 json CMapSection::Serialize_SectionState() const
 {
 	json j = IReflectable::Serialize();
-
 	j["SectionName"] = WstrToStr(m_strSectionName);
-	j["SectionRender"]["RenderID"] = static_cast<_int>(m_eRenderID);
-
 	return j;
 }
 
 void CMapSection::Deserialize_SectionState(const json& j)
 {
 	IReflectable::Deserialize_Internal(j);
-
-	if (j.contains("SectionRender") && j["SectionRender"].is_object())
-	{
-		const json& jRender = j["SectionRender"];
-
-		if (jRender.contains("RenderID") && jRender["RenderID"].is_number_integer())
-			Set_RenderID(static_cast<RENDERID>(jRender["RenderID"].get<_int>()));
-	}
-}
-
-void CMapSection::Set_RenderID(RENDERID eRenderID)
-{
-	if (ETOUI(eRenderID) >= ETOUI(RENDERID::END))
-		return;
-
-	m_eRenderID = eRenderID;
 }
 
 void CMapSection::Set_UseCollMesh(_bool bUseCollMesh)

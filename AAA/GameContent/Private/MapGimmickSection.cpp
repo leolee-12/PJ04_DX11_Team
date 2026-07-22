@@ -5,6 +5,7 @@
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
+#include "GameContent_Log.h"
 
 namespace
 {
@@ -50,13 +51,17 @@ HRESULT CMapGimmickSection::Initialize(void* pArg)
 		|| nullptr == pEntry->pFragments
 		|| 0 == pEntry->iNumFragments)
 	{
+		Log_GameContentWarning("MapGimmickSection entry invalid");
 		return E_FAIL;
 	}
 
 	for (_uint i = 0; i < pEntry->iNumFragments; ++i)
 	{
 		if (nullptr == pEntry->pFragments[i].pFragmentName)
+		{
+			Log_GameContentWarning("MapGimmickSection fragment invalid: " + WstrToStr(pEntry->pSectionName));
 			return E_FAIL;
+		}
 	}
 
 	m_pEntry = pEntry;
@@ -273,9 +278,7 @@ HRESULT CMapGimmickSection::Ready_Fragments()
 		if (!Fragment.MeshIndices.empty())
 			continue;
 
-#ifdef _DEBUG
-		OutputDebugStringA(("[MapGimmickSection] Missing fragment mesh group: " + Fragment.strFragmentName + "\n").c_str());
-#endif
+		Log_GameContentWarning("MapGimmickSection fragment missing: " + WstrToStr(m_pEntry->pSectionName) + "/" + Fragment.strFragmentName);
 		return E_FAIL;
 	}
 
@@ -316,7 +319,10 @@ HRESULT CMapGimmickSection::Ready_Trigger()
 	BoundingBox TriggerBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
 
 	if (!GeometryUtils::Expand_AABB(&TriggerBounds, m_pEntry->fTriggerPadding))
+	{
+		Log_GameContentWarning("MapGimmickSection trigger invalid: " + WstrToStr(m_pEntry->pSectionName));
 		return E_FAIL;
+	}
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;

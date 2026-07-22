@@ -14,7 +14,7 @@ namespace
 	inline constexpr const _char*	ANIM_END = "DeformCarGetEnd";
 	inline constexpr const _char*	DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FIRST, ANIM_END, "", "" };
 	inline constexpr const _tchar*	BREAK_WALL_EFFECT_ID = L"BreakWallEffect";
-	inline constexpr const _float3  BREAK_WALL_EFFECT_OFFSET[] = {
+	inline constexpr const _float3  BREAK_WALL_EFFECT_OFFSETS[] = {
 		{-3.7f, 8.4f, -2.75f},
 		{+3.5f, 9.0f, -2.75f},
 		{-3.4f, 9.6f, -2.75f},
@@ -25,7 +25,6 @@ namespace
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX = 10u;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_CRUCK_SHADE_MESH_INDEX = 2u;
 
-	//inline constexpr const _uint DISABLE_MESH_INDICES[] = { 1 };
 	inline constexpr const _uint ON_TO_OFF_MESH_INDICES[] = { 0,1,2 };
 	inline constexpr const _uint OFF_TO_ON_MESH_INDICES[] = { 3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 };
 	
@@ -277,9 +276,6 @@ HRESULT CLD_DeformCarBreakWall::Ready_RenderComponent()
 	if (DEFORM_CAR_BREAK_WALL_MESH_COUNT != static_cast<_uint>(m_pModelCom->Get_NumMeshes()))
 		return E_FAIL;
 
-	//for (_uint iMeshIndex : DISABLE_MESH_INDICES)
-	//	Set_MeshVisible(iMeshIndex, false);
-
 	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, true);
 
@@ -351,12 +347,12 @@ void CLD_DeformCarBreakWall::On_Event()
 	else
 		XMStoreFloat3(&vEffectPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
 	
-	for (_uint i = 0; i < 3; ++i)
+	for (_uint i = 0; i < _countof(BREAK_WALL_EFFECT_OFFSETS); ++i)
 	{
 		_float3 vPos = vEffectPos;
-		vPos.x += BREAK_WALL_EFFECT_OFFSET[i].x;
-		vPos.y += BREAK_WALL_EFFECT_OFFSET[i].y;
-		vPos.z += BREAK_WALL_EFFECT_OFFSET[i].z;
+		vPos.x += BREAK_WALL_EFFECT_OFFSETS[i].x;
+		vPos.y += BREAK_WALL_EFFECT_OFFSETS[i].y;
+		vPos.z += BREAK_WALL_EFFECT_OFFSETS[i].z;
 		CEffect_Loader::GetInstance()->Spawn(BREAK_WALL_EFFECT_ID, Get_LevelIndex(), vPos);
 	}
 

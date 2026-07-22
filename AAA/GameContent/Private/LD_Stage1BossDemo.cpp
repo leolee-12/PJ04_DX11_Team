@@ -130,6 +130,9 @@ CGameObject* CLD_Stage1BossDemo::Create_Prototype(ID3D11Device* pDevice, ID3D11D
 
 HRESULT CLD_Stage1BossDemo::Ready_Events()
 {
+	if (FAILED(__super::Ready_Events()))
+		return E_FAIL;
+
 	Subscribe_Event(EventTag::Cutscene_GorillaBreak,
 		[this](void*) { On_Event(EventTag::Cutscene_GorillaBreak); });
 
