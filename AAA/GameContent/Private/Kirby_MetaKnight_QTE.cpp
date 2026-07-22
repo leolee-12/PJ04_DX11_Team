@@ -8,6 +8,16 @@
 
 #include "Boss_Metaknight.h"
 
+namespace
+{
+    constexpr _float QTE_START_PROGRESS = 0.2f;
+    constexpr _float QTE_INCREASE_PER_INPUT = 0.05f;
+    constexpr _float QTE_DECREASE_PER_SEC = 0.06f;
+    constexpr _float QTE_PROGRESS_FOLLOW_SPEED = 6.f;
+    constexpr _float QTE_SUCCESS_PROGRESS = 0.9f;
+    constexpr _float QTE_FAIL_PROGRESS = 0.005f;
+}
+
 CKirby_MetaKnight_QTE::CKirby_MetaKnight_QTE()
 {
 }
@@ -22,86 +32,70 @@ HRESULT CKirby_MetaKnight_QTE::Initialize()
 
 KIRBY_STATE_TYPE CKirby_MetaKnight_QTE::Get_StateType()
 {
-    return KIRBY_STATE_TYPE::METAKNIGHT_UPPERCALIBUR;
+    return KIRBY_STATE_TYPE::METAKNIGHT_QTE;
 }
 
 void CKirby_MetaKnight_QTE::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
-    m_iQTE_InputCount = 0;
-    m_bQTEStart = false;
-
-    m_tShowHandle = m_pGameInstance_Proxy->Subscribe(EventTag::QTE_Show,
-        [this, pKirby](void*) {
-            m_fGauge = 0.2f;
-            m_fSeek = 0.2f;
-            m_bQTEStart = true;
-
-            BOSS_QUERY q{};
-            m_pGameInstance_Proxy->Publish(EventTag::Query_Boss, &q);
-            m_pMeta = dynamic_cast<CBoss_Metaknight*>(q.pBoss);
-
-            pKirby->Get_Body()->Get_Animator()->Pause();
-        });
-
-    m_tHideHandle = m_pGameInstance_Proxy->Subscribe(EventTag::QTE_Hide,
-        [this](void*) {
-            m_bQTEStart = false;
-        });
-
-    // 메타나이트 부착 이벤트
-    ENEMY_ATTACHMENT_BEGIN_DESC tDesc{};
-    tDesc.pBoneMatrix = pKirby->Get_Body()->Get_BoneMatrixPtr("limbsM");
-    tDesc.pAnchorWorld =pKirby->Get_Transform()->Get_WorldMatrixPtr();
-    tDesc.eContext =ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE;
-    m_pGameInstance_Proxy->Publish(EventTag::Enemy_AttachmentBegin, &tDesc);
-
-
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
     pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
 
-    CAnimator::ANI_PLAY_INFO tInfo{};
-    tInfo.bLoop = false;
-    tInfo.bRestart = true;
-    tInfo.fBlend = 0.1f;
-    tInfo.fSpeed = 1.5f;
+    m_fQTEProgress = QTE_START_PROGRESS;
+    m_fQTEAnimationProgress = QTE_START_PROGRESS;
+    m_bQTEStarted = false;
+    m_pMetaKnight = nullptr;
 
-    tInfo.strAniName = "Metaknight_LockingSword";
-    pAnimator->Play(&tInfo);
+    m_tQTEShowHandle = m_pGameInstance_Proxy->Subscribe(EventTag::QTE_Show, [this, pKirby](void*)
+        {
+            if (m_eMetaKnightQTEState != METAKNIGHT_QTE_STATE::QTE)
+                return;
+
+            // MetaKnight 포인터 가지고 오기
+            BOSS_QUERY tQuery{};
+            m_pGameInstance_Proxy->Publish(EventTag::Query_Boss, &tQuery);
+            m_pMetaKnight = dynamic_cast<CBoss_Metaknight*>(tQuery.pBoss);
+
+            m_bQTEStarted = true;
+        }
+    );
+
+    m_tQTEHideHandle = m_pGameInstance_Proxy->Subscribe(EventTag::QTE_Hide, [this, pKirby](void*)
+        {
+            m_bQTEStarted = false;
+        }
+    );
+
+    ENEMY_ATTACHMENT_BEGIN_DESC tDesc{};
+    tDesc.pBoneMatrix = pKirby->Get_Body()->Get_BoneMatrixPtr("limbsM");
+    tDesc.pAnchorWorld = pKirby->Get_Transform()->Get_WorldMatrixPtr();
+    tDesc.eContext = ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE;
+    m_pGameInstance_Proxy->Publish(EventTag::Enemy_AttachmentBegin, &tDesc);
+
+    m_eMetaKnightQTEState = METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END;
+    Change_MetaKnightState(pKirby, METAKNIGHT_QTE_STATE::QTE);
 }
 
 void CKirby_MetaKnight_QTE::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-
-    if (m_bQTEStart)
-    {
-        m_fGauge = max(0.f, m_fGauge - QTE_DECAY * fTimeDelta);
-        m_fSeek += (m_fGauge - m_fSeek) * min(1.f, QTE_FOLLOW * fTimeDelta);
-
-        pKirby->Get_Body()->Get_Animator()->Seek(m_fSeek);
-
-        if (m_pMeta)
-            m_pMeta->Sync_LockingProgress(m_fSeek);
-    }
-
-    //if (pAnimator->Get_CurrentAnimName() == "Metaknight_DemoUpperCaliburCut7" && pAnimator->Is_Finished())
-    //{
-    //    Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
-    //}
+    Update_MetaKnightState(pKirby, fTimeDelta);
 }
 
 void CKirby_MetaKnight_QTE::Exit(CKirby* pKirby)
 {
+    m_pGameInstance_Proxy->UnSubscribe(m_tQTEShowHandle);
+    m_pGameInstance_Proxy->UnSubscribe(m_tQTEHideHandle);
+
+    ENEMY_ATTACHMENT_END_DESC tDesc{};
+    tDesc.eContext = ENEMY_ATTACHMENT_CONTEXT::METAKNIGHT_QTE;
+    m_pGameInstance_Proxy->Publish(EventTag::Enemy_AttachmentEnd, &tDesc);
+
+    m_bQTEStarted = false;
+    m_pMetaKnight = nullptr;
+
     __super::Exit(pKirby);
-
-    m_pGameInstance_Proxy->UnSubscribe(m_tShowHandle);
-    m_pGameInstance_Proxy->UnSubscribe(m_tHideHandle);
-
-    m_bQTEStart = false;
 }
 
 _bool CKirby_MetaKnight_QTE::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -109,26 +103,21 @@ _bool CKirby_MetaKnight_QTE::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
     if (__super::Handle_Command(pKirby, pCommand))
         return true;
 
-    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
-
-    switch (eCommandType)
+    switch (pCommand->GetCommandType())
     {
-        // Attack
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
             if (!pCommand->IsDown())
                 return false;
 
-            if (!m_bQTEStart)
+            if (m_eMetaKnightQTEState != METAKNIGHT_QTE_STATE::QTE || !m_bQTEStarted)
                 return true;
 
-            ++m_iQTE_InputCount;
-            m_fGauge = min(1.f, m_fGauge + QTE_GAIN_PER_HIT);
-
+            m_fQTEProgress += QTE_INCREASE_PER_INPUT;
+            Helper::FloatClamp(m_fQTEProgress, 0.f, 1.f);
             return true;
         }
     }
-
     return false;
 }
 
@@ -138,24 +127,10 @@ void CKirby_MetaKnight_QTE::Request_PositionSync(CKirby* pKirby, const KIRBY_POS
     {
         case KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOCKING_WIN:
         {
-            // 위치
             CTransform* pTransform = pKirby->Get_Transform();
             pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
-
             pKirby->Get_Movement()->Sync_To_Controller();
-
-            // Ani
-            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-            pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
-
-            CAnimator::ANI_PLAY_INFO tInfo{};
-            tInfo.bLoop = false;
-            tInfo.bRestart = true;
-            tInfo.fBlend = pDesc->fBlendDuration;
-            tInfo.fSpeed = pDesc->fAnimSpeed;
-
-            tInfo.strAniName = "Metaknight_LockingSword";
-            pAnimator->Play(&tInfo);       
+            Change_MetaKnightState(pKirby, METAKNIGHT_QTE_STATE::SUCCESS);
             break;
         }
         default:
@@ -170,16 +145,15 @@ void CKirby_MetaKnight_QTE::Request_PositionSync_End(CKirby* pKirby, const KIRBY
 {
     switch (pDesc->eType)
     {
-    case KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_LOCKING_WIN_END:
-    {
-        // Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
-        break;
-    }
-    default:
-    {
-        MSG_BOX("Event Error 2: CKirby_MetaKnight_QTE");
-        break;
-    }
+        case KIRBY_POSITION_SYNC_END_REASON::METAKNIGHT_LOCKING_WIN_END:
+        {
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Error 2: CKirby_MetaKnight_QTE");
+            break;
+        }
     }
 }
 
@@ -197,15 +171,96 @@ void CKirby_MetaKnight_QTE::Change_MetaKnightState(CKirby* pKirby, METAKNIGHT_QT
 
 void CKirby_MetaKnight_QTE::Enter_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eState)
 {
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
+    switch (eState)
+    {
+        case METAKNIGHT_QTE_STATE::QTE:
+        {
+            pAnimator->Play("Metaknight_LockingSword", false, true, 0.1f, 0.f);
+            break;
+        }
+
+        case METAKNIGHT_QTE_STATE::SUCCESS:
+        {
+            pAnimator->Play("Metaknight_DemoLockingSwordWinCut1", false, true, 0.1f, 1.5f);
+            break;
+        }
+        case METAKNIGHT_QTE_STATE::FAIL:
+        {
+            MSG_BOX("Not implemented: CKirby_MetaKnight_QTE");
+            Change_MetaKnightState(pKirby, METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END);
+            break;
+        }
+        case METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END:
+        {
+            break;
+        }
+    }
 }
 
 void CKirby_MetaKnight_QTE::Update_MetaKnightState(CKirby* pKirby, _float fTimeDelta)
 {
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+    switch (m_eMetaKnightQTEState)
+    {
+        case METAKNIGHT_QTE_STATE::QTE:
+        {
+            if (!m_bQTEStarted)
+                break;
+
+            m_fQTEProgress -= QTE_DECREASE_PER_SEC * fTimeDelta;
+            Helper::FloatClamp(m_fQTEProgress, 0.f, 1.f);
+
+            _float fFollowRatio = QTE_PROGRESS_FOLLOW_SPEED * fTimeDelta;
+            Helper::FloatClamp(fFollowRatio, 0.f, 1.f);
+            m_fQTEAnimationProgress += (m_fQTEProgress - m_fQTEAnimationProgress) * fFollowRatio;
+
+            pAnimator->Seek(m_fQTEAnimationProgress);
+
+            if (m_pMetaKnight != nullptr)
+                m_pMetaKnight->Sync_LockingProgress(m_fQTEAnimationProgress);
+
+            if (m_fQTEAnimationProgress >= QTE_SUCCESS_PROGRESS)
+            {
+                Change_MetaKnightState(pKirby, METAKNIGHT_QTE_STATE::SUCCESS);
+                return;
+            }
+
+            if (m_fQTEAnimationProgress <= QTE_FAIL_PROGRESS)
+            {
+                Change_MetaKnightState(pKirby, METAKNIGHT_QTE_STATE::FAIL);
+                return;
+            }
+            break;
+        }
+
+        case METAKNIGHT_QTE_STATE::SUCCESS:
+        case METAKNIGHT_QTE_STATE::FAIL:
+            if (pAnimator->Is_Finished())
+                Change_MetaKnightState(pKirby, METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END);
+            break;
+
+        case METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END:
+            Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
+            break;
+    }
 }
 
 void CKirby_MetaKnight_QTE::Exit_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE_STATE eState)
 {
+    switch (eState)
+    {
+        case METAKNIGHT_QTE_STATE::QTE:
+            m_bQTEStarted = false;
+            break;
+
+        case METAKNIGHT_QTE_STATE::SUCCESS:
+        case METAKNIGHT_QTE_STATE::FAIL:
+        case METAKNIGHT_QTE_STATE::METANIGHT_QTE_STATE_END:
+            break;
+    }
 }
 
 void CKirby_MetaKnight_QTE::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
@@ -221,7 +276,6 @@ CKirby_MetaKnight_QTE* CKirby_MetaKnight_QTE::Create()
         MSG_BOX("Failed to Created: CKirby_MetaKnight_QTE");
         Safe_Release(pInstance);
     }
-
     return pInstance;
 }
 

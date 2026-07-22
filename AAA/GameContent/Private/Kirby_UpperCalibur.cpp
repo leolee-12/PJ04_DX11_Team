@@ -34,10 +34,10 @@ void CKirby_UpperCalibur::Update(CKirby* pKirby, const _float fTimeDelta)
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-    //if (pAnimator->Get_CurrentAnimName() == "Metaknight_DemoUpperCaliburCut7" && pAnimator->Is_Finished())
-    //{
-    //    Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
-    //}
+    if (pAnimator->Get_CurrentAnimName() == "Metaknight_DemoUpperCaliburCut7" && pAnimator->Is_Finished())
+    {
+        Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
+    }
 }
 
 void CKirby_UpperCalibur::Exit(CKirby* pKirby)
