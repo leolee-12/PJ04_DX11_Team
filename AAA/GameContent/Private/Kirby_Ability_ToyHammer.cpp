@@ -78,8 +78,9 @@ COPY_ABILITY_TYPE CKirby_Ability_ToyHammer::Get_AbilityType()
 void CKirby_Ability_ToyHammer::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_bReqEndAttackState = false;
+    m_iNormalAttackCount = 0;
 
-    Clear_Overlay(pKirby);
+    Clear_Overlay(pKirby, 1, 0.f);
 
     m_eToyHammerState = TOY_HAMMER_STATE::TOY_HAMER_STATE_END;
     Change_ToyHammerState(pKirby, m_eToyHammerStartState);
@@ -91,10 +92,16 @@ void CKirby_Ability_ToyHammer::Update_AttackState(CKirby* pKirby, _float fTimeDe
     Update_ToyHammerState(pKirby, fTimeDelta);
 
     m_bIsCharging = false;
+    m_bWheelHammerPressing = false;
 }
 
 void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
 {
+    m_bIsCharging = false;
+    m_bWheelHammerPressing = false;
+    m_bReserveNextAttack = false;
+
+    m_iNormalAttackCount = 0;
 }
 
 _bool CKirby_Ability_ToyHammer::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -110,10 +117,15 @@ _bool CKirby_Ability_ToyHammer::Handle_Command(CKirby* pKirby, CKirby_Command* p
         {
             if (pCommand->IsDown())
             {
+                CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+                if ((m_eToyHammerState == TOY_HAMMER_STATE::ATTACK_END && pAnimator->Get_Progress() >= 0.8f) ||
+                    m_eToyHammerState == TOY_HAMMER_STATE::ATTACK_END)
+                    m_bReserveNextAttack = true;
             }
             else if (pCommand->IsPress())
             {
                 m_bIsCharging = true;
+                m_bWheelHammerPressing = true;
             }
             else if (pCommand->IsUp())
             {
@@ -129,19 +141,11 @@ _bool CKirby_Ability_ToyHammer::Handle_Command(CKirby* pKirby, CKirby_Command* p
 _bool CKirby_Ability_ToyHammer::Enter_Attack_KeyDown(CKirby* pKirby)
 {
     if (pKirby->Get_Movement()->Is_Grounded())
-    {
         m_eToyHammerStartState = TOY_HAMMER_STATE::CHARGE_START;
-        pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
-    }
-
     else
-    {
-        // 점프 공격 미구현
-        //m_eToyHammerStartState = TOY_HAMMER_STATE::CHARGE_START;
-        return true;
-    }
+        m_eToyHammerStartState = TOY_HAMMER_STATE::WHEELHAMMER;
 
-    //pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+    pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
 
     return true;
 }
@@ -190,27 +194,69 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
     {
         case TOY_HAMMER_STATE::ATTACK_START:
         {
-            pAnimator->Play("HammerAttackStartToy", false, true, 0.1f, 1.5f);
+            pAnimator->Play("HammerAttackStartToy", false, true, 0.1f, 2.f);
             break;
         }
         case TOY_HAMMER_STATE::ATTACK:
         {
-            pAnimator->Play("HammerAttackToy", false, true, 0.1f, 1.5f);
+            Clear_Overlay(pKirby, 1, 0.f);
+            ++m_iNormalAttackCount;
+            pAnimator->Play("HammerAttackToy", false, true, 0.1f, 2.f);
             break;
         }
         case TOY_HAMMER_STATE::ATTACK_END:
         {
-            pAnimator->Play("HammerAttackHitToy", false, true, 0.1f, 1.5f);
+            pAnimator->Play("HammerAttackHitToy", false, true, 0.1f, 2.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::ATTACK_FINAL:
+        {
+            pAnimator->Play("HammerAttackFinalToy", false, true, 0.1f, 2.f);
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_START:
         {
-            pAnimator->Play("OnigorosiHammerStart", false, true, 0.1f, 1.5f);
+            m_iChargeCount = 0;
+            m_bAttackEndOverlayApplied = false;
+            pAnimator->Play("OnigorosiHammerStart", false, true, 0.f, 3.f);
             break;
         }
         case TOY_HAMMER_STATE::CHARGING:
         {
-            pAnimator->Play("OnigorosiHammerCharge", true, true, 0.1f, 1.5f);
+            m_eChargeLevel = CHARGE_LEVEL::LV1;
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge1.wav", 0.2f);
+            pAnimator->Play("OnigorosiHammerCharge", false, true, 0.1f, 4.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_1:
+        {
+            pAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_2:
+        {
+            pAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
+        {
+            pAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER:
+        {
+            pAnimator->Play("WheelHammer", false, true, 0.f, 3.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER_END:
+        {
+            m_bWheelHammerEndOverlayApplied = false;
+            pAnimator->Play("WheelHammerEnd", false, true, 0.03f, 3.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
+        {
+            pAnimator->Play("WheelHammerFall", false, true, 0.03f, 3.f);
             break;
         }
         case TOY_HAMMER_STATE::TOY_HAMER_STATE_END:
@@ -249,6 +295,30 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::ATTACK_END:
         {
+            const _float fRatio = pAnimator->Get_Progress();
+
+            if (fRatio >= 0.5f && m_bReserveNextAttack)
+            {
+                if (m_iNormalAttackCount >= 4)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_FINAL);
+                else
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK);
+                m_bReserveNextAttack = false;
+                return;
+            }
+
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+
+            if (!m_bAttackEndOverlayApplied && fRatio >= 0.8f)
+            {
+                pAnimator->Set_Mask("HaveHammerWait", "R_ShoulderJ", true, 1.f, 0.1f, 0.0f);
+                m_bAttackEndOverlayApplied = true;
+            }
+
+            break;
+        }
+        case TOY_HAMMER_STATE::ATTACK_FINAL:
+        {
             AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
             break;
         }
@@ -263,9 +333,86 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::CHARGING:
         {
-            // Test Out
+            if (pAnimator->Is_Finished())
+            {
+                ++m_iChargeCount;
+
+                if (m_iChargeCount == 1)
+                {
+                    m_eChargeLevel = CHARGE_LEVEL::LV2;
+                    m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge2.wav", 0.2f);
+                }
+                else if(m_iChargeCount == 2)
+                {
+                    m_eChargeLevel = CHARGE_LEVEL::LV3;
+                    m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge3.wav", 0.2f);
+                }
+
+                pAnimator->Play("OnigorosiHammerCharge", false, true, 0.1f, 1.5f);
+            }
+
             if (!m_bIsCharging)
+            {
+                if (m_eChargeLevel == CHARGE_LEVEL::LV1)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::CHARGE_ATTACK_1);
+                if (m_eChargeLevel == CHARGE_LEVEL::LV2)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::CHARGE_ATTACK_2);
+                else if (m_eChargeLevel == CHARGE_LEVEL::LV3)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::CHARGE_ATTACK_3);
+
+                return;
+            }
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_1:
+        {
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_2:
+        {
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
+        {
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER:
+        {
+            if (pAnimator->Is_Finished())
+            {
+                if (m_bWheelHammerPressing)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::WHEELHAMMER_FALL);
+                else
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::WHEELHAMMER_END);
+            }
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER_END:
+        {
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+
+            const _float fRatio = pAnimator->Get_Progress();
+            if (!m_bWheelHammerEndOverlayApplied && fRatio >= 0.4f)
+            {
+                pAnimator->Set_Mask("HaveHammerWait", "R_ShoulderJ", true, 1.f, 0.2f, 0.f);
+                m_bWheelHammerEndOverlayApplied = true;
+            }
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
+        {
+            if(pKirby->Get_Movement()->Is_Grounded())
+            {
                 Change_ToyHammerState(pKirby, TOY_HAMER_STATE_END);
+                return;
+            }
+
+            if (!m_bWheelHammerPressing)
+                Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+
             break;
         }
     }
@@ -287,11 +434,39 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
         {
             break;
         }
+        case TOY_HAMMER_STATE::ATTACK_FINAL:
+        {
+            break;
+        }
         case TOY_HAMMER_STATE::CHARGE_START:
         {
             break;
         }
         case TOY_HAMMER_STATE::CHARGING:
+        {
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_1:
+        {
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_2:
+        {
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
+        {
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER:
+        {
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER_END:
+        {
+            break;
+        }
+        case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
         {
             break;
         }

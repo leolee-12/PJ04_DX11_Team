@@ -10,11 +10,14 @@ class CLIENT_DLL CKirby_Ability_ToyHammer final : public CKirby_Ability
 {
 private:
     enum TOY_HAMMER_STATE
-    {        
-        ATTACK_START, ATTACK, ATTACK_END,
-        CHARGE_START, CHARGING,
+    {
+        ATTACK_START, ATTACK, ATTACK_END, ATTACK_FINAL,
+        CHARGE_START, CHARGING, CHARGE_ATTACK_1, CHARGE_ATTACK_2, CHARGE_ATTACK_3,
+        WHEELHAMMER, WHEELHAMMER_END, WHEELHAMMER_FALL,
         TOY_HAMER_STATE_END
     };
+
+    enum CHARGE_LEVEL { LV1, LV2, LV3 };
 
 private:
     CKirby_Ability_ToyHammer();
@@ -46,6 +49,16 @@ private:
 
     _bool m_bReserveNextAttack{};
     _bool m_bIsCharging{};
+
+    _bool m_bAttackEndOverlayApplied{};
+    _bool m_bWheelHammerEndOverlayApplied{};
+
+    _uint m_iNormalAttackCount{};
+
+    _uint m_iChargeCount{};
+    CHARGE_LEVEL m_eChargeLevel{};
+
+    _bool m_bWheelHammerPressing{};
 
 private:
     void Change_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eNext);
