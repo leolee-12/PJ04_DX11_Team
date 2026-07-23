@@ -6,6 +6,11 @@
 #include "Boss_Gorilla_Body.h"
 #include "Boss_Gorilla.h"
 
+namespace 
+{
+    constexpr const _tchar* SND_ARMSPIN = L"CharaBossGorilla_ArmSpin.wav";
+}
+
 CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
 {
     return CBTReactiveSelector::Create({
@@ -50,7 +55,7 @@ CBTNode* CBoss_Gorilla_Brain::Make_ArmSpin()
         [this, fSpinT, bSpin, fSpinDuration, fSpinTurnDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
             if (!*bSpin) {
                 m_pOwner->Get_BodyAnimator()->Play("ArmSpin", true, true, 0.2f, SPD);
-                m_pOwner->Play_ActionLoopSFX(TEXT("CharaBossGorilla_ArmSpin.wav"));
+                m_pOwner->Play_LoopSFX(TEXT("CharaBossGorilla_ArmSpin.wav"), 0.25f);
                 *bSpin = true;
             }
             *fSpinT += dt;
@@ -67,13 +72,13 @@ CBTNode* CBoss_Gorilla_Brain::Make_ArmSpin()
                 _float fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
                 pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
             }
-            if (*fSpinT >= fSpinDuration) { m_pOwner->Stop_ActionLoopSFX(); *fSpinT = 0.f; *bSpin = false; return BT_STATUS::SUCCESS; }
+            if (*fSpinT >= fSpinDuration) { m_pOwner->Stop_LoopSFX(SND_ARMSPIN); *fSpinT = 0.f; *bSpin = false; return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
         [this, fSpinT, bSpin]() {
             if (!*bSpin) return;
             *fSpinT = 0.f; *bSpin = false;
-            m_pOwner->Stop_ActionLoopSFX();
+            m_pOwner->Stop_LoopSFX(SND_ARMSPIN);
         });
 
     return CBTSequence::Create({

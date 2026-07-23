@@ -13,7 +13,6 @@
 #include "Boss_Cage.h"
 
 #include "Effect_Loader.h"
-#include "DropStar_Manager.h"
 
 // 3페이즈: 66%, 33% 에서 전환 (PhaseCount = size()+1 = 3) Brain의 Get_PhaseCount와 일치!
 const vector<_float> CBoss_Gorilla::s_Thresholds = { 0.5f };
@@ -202,6 +201,8 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         if (Handle_SoundAnimEvent(e, phase))
             return;
+        if (Handle_DropStarsAnimEvent(e, phase))
+            return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))
         {
@@ -366,14 +367,6 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                 m_pGameInstance_Proxy->Publish(StrToWstr(e.strParam), nullptr);
             }
                 break;
-            case EANIM_EVENT::DropStars:
-            {
-                if (phase == ANIM_EVENT_PHASE::POINT)
-                    CDropStar_Manager::GetInstance()->Spawn_Preset(Get_LevelIndex(),
-                                        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()),
-                                        StrToWstr(e.strParam), e.vOffset);
-                break;
-            }
             default: 
                 break;
         }
