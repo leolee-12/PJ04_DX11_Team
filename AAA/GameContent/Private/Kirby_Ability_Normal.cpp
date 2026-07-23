@@ -97,7 +97,7 @@ void CKirby_Ability_Normal::Update_AttackState(CKirby* pKirby, _float fTimeDelta
     }
     if (m_pGameInstance_Proxy->Key_Down(DIK_8))
     {
-        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::METAKNIGHT_SWORD);
+        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::TOY_HAMMER);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         Off_InhaleEffect();
     }
