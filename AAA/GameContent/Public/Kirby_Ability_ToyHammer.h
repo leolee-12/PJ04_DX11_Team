@@ -52,6 +52,7 @@ private:
 
     _bool m_bAttackEndOverlayApplied{};
     _bool m_bAttackFinalEndOverlayApplied{};
+    _bool m_bAttackFinalAddVelocity{};
     _bool m_bWheelHammerEndOverlayApplied{};
 
     _uint m_iNormalAttackCount{};
