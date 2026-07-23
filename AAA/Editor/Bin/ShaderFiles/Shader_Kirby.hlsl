@@ -224,10 +224,7 @@ PS_OUT PS_PART(PS_IN In)
     
     float3 Nw = mul(nTS, TBN);
 
-    if (vMtrlDiffuse.a < 0.1f)
-        discard;
-
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = float4(vMtrlDiffuse.rgb, 1.f);
     Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(mra, 1.f);
