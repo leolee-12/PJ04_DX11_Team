@@ -98,6 +98,7 @@ namespace
 			return E_FAIL;
 
 		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
+		pOutResult->bSkipMesh = ETOI(MAP_PASS::DISCARD) == Layer.iPass;
 
 		if (FAILED(Bind_MapParams(Ctx)))
 			return E_FAIL;
@@ -145,6 +146,10 @@ namespace
 				if (FAILED(Ctx.pShader->Bind_Matrix("g_ProjMatrixInverse",
 					Ctx.pGI_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
 					return E_FAIL;
+				if ((ETOI(WORLD_PASS::BLEND_UKWN_LIGHT) == Layer.iPass ||
+					ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass) &&
+					FAILED(Ctx.pGI_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), Ctx.pShader, "g_DepthTexture")))
+					return E_FAIL;
 			}
 
 			const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DMN);
@@ -184,6 +189,10 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iHasNormalTexture", &iHasNormalTexture, sizeof(_uint))))
 			return E_FAIL;
 
+		if (ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass
+			&& FAILED(Ctx.pModel->Bind_Material(Ctx.pShader, "g_ExtraRTexture", Ctx.iMesh, static_cast<MTEX_TYPE>(Layer.iExtraTexType[0]), static_cast<_uint>(Layer.iExtraBind[0]))))
+			return E_FAIL;
+
 		return S_OK;
 	}
 
@@ -193,6 +202,7 @@ namespace
 
 		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
 		const _uint iUnknownUVIndex = (Layer.iUnknownUVIndex <= 3u) ? Layer.iUnknownUVIndex : 0u;
+		const _uint iExtraRUVIndex = Layer.iExtraUVIndex[0];
 		_float2 vOffset = Layer.bUseUVTransform
 			? _float2{ Layer.vUVOffset.x, Layer.vUVOffset.y }
 			: _float2{ 0.f, 0.f };
@@ -241,6 +251,11 @@ namespace
 
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUnknownUVIndex", &iUnknownUVIndex, sizeof(_uint)))) return E_FAIL;
+
+		if (ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass &&
+			FAILED(Ctx.pShader->Bind_RawValue("g_iExtraR_UVIndex", &iExtraRUVIndex, sizeof(_uint))))
+			return E_FAIL;
+
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(_float4)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_vUVTransformNormal", &vUVTransformNormal, sizeof(_float4)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_vUVTransformMaterial", &vUVTransformMaterial, sizeof(_float4)))) return E_FAIL;

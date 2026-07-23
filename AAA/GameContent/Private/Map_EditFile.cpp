@@ -51,17 +51,11 @@ namespace
 		_bool bHasRenderable = { false };
 		_bool bRenderable = { true };
 
-		_bool bHasEnableCulling = { false };
-		_bool bEnableCulling = { true };
-
 		_bool bHasWorldMatrix = { false };
 		_float4x4 matWorld = {};
 
 		_bool bHasUseCollMesh = { false };
 		_bool bUseCollMesh = { false };
-
-		_bool bHasRenderID = { false };
-		RENDERID eRenderID = { RENDERID::NONBLEND };
 	};
 
 	struct MAP_LD_EDITED_DESC
@@ -270,9 +264,6 @@ namespace
 
 		if (Common.iPolicyMask & EDIT_CAP_RENDERABLE)
 			pOutDesc->bRenderable = Policy.bRenderable;
-
-		if (Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM)
-			pOutDesc->bEnableCulling = Policy.bUseCullFrustum;
 
 		if (Common.bHasWorldMatrix)
 		{
@@ -505,16 +496,6 @@ namespace
 			pOutDesc->bRenderable = IterRenderable->get<bool>();
 		}
 
-		const auto IterEnableCulling = jValue.find("EnableCulling");
-		if (IterEnableCulling != jValue.end())
-		{
-			if (!IterEnableCulling->is_boolean())
-				return E_FAIL;
-
-			pOutDesc->bHasEnableCulling = true;
-			pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
-		}
-
 		const auto IterWorldMatrix = jValue.find("WorldMatrix");
 		if (IterWorldMatrix != jValue.end())
 		{
@@ -573,7 +554,6 @@ namespace
 		Desc.strStableKey = Edit.strStableKey;
 
 		if (Edit.bHasRenderable)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_RENDERABLE, Edit.bRenderable);
-		if (Edit.bHasEnableCulling)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_FRUSTUM, Edit.bEnableCulling);
 		if (Edit.bHasUseCollMesh)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_COLLISION_MESH, Edit.bUseCollMesh);
 
 		if (Edit.bHasWorldMatrix)

@@ -14,7 +14,6 @@ class CLIENT_DLL CMapSection final : public CMapObject, public IEditable
 	GENERATED_BODY(CMapSection)
 
 	PROPERTY(_bool, m_bRenderable, L"Renderable", L"MapSection");
-	PROPERTY(_bool, m_bEnableCulling, L"Enable Culling", L"MapSection");
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_MapSection";
@@ -39,8 +38,6 @@ public:
 public:
 	json	Serialize_SectionState() const;
 	void	Deserialize_SectionState(const json& j);
-	void	Set_RenderID(RENDERID eRenderID);
-	void	Set_Culling(_bool bEnableCulling) { m_bEnableCulling = bEnableCulling; }
 	void	Set_UseCollMesh(_bool bUseCollMesh);
 	void	Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
 	_bool	Has_CollMesh() const { return m_bHasCollMesh; }
@@ -49,9 +46,6 @@ public:
 	// Creation descriptor baseline for MapTool policy and transform overrides.
 	const MAP_SECTION_DESC& Get_Desc() const { return m_tDesc; }
 
-	MAP_SECTION_TYPE		Get_SectionType() const { return m_eSectionType; }
-	RENDERID				Get_RenderID() const { return m_eRenderID; }
-	_bool					Is_Culling() const { return m_bEnableCulling; }
 	_bool					Is_Renderable() const { return m_bRenderable; }
 	const _wstring&			Get_SectionName() const { return m_strSectionName; }
 	const _wstring&			Get_StageName() const { return m_strStageName; }
@@ -78,8 +72,6 @@ private:
 	_wstring			m_strStageName;
 	_wstring			m_strModelProtoTag;
 	_uint				m_iModelProtoLevel = {};
-	MAP_SECTION_TYPE	m_eSectionType = { MAP_SECTION_TYPE::UNKNOWN };
-	RENDERID			m_eRenderID = { RENDERID::NONBLEND };
 	const _float4x4*	m_pParentMatrix = {};
 	_float4x4			m_CombinedWorldMatrix = {};
 	MAP_SECTION_DESC	m_tDesc = {};

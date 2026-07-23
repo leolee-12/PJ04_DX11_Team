@@ -25,9 +25,13 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     //    Make_UpperBranch(),
     //    Loop("Wait", 0.5f, SPD),
     //    });
+    
+    // 에디터 애니매이션 편집용
+    return CBTReactiveSelector::Create({
+        Clip("Wait", SPD, 0.f),
+        });
 
     CBTNode* pCombat = CBTSequence::Create({
-        Make_LockOutcomeBranch(),
         Make_GigaBranch(),
         Make_StepApproach(),
         Make_UnlessInRange(Make_DashIn()),
@@ -37,6 +41,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     if (iPhase >= 1)
     {
         return CBTReactiveSelector::Create({
+            Make_LockOutcomeBranch(),
             Make_DodgeBranch(),
             Make_RockBranch(),
             Make_UpperBranch(),
@@ -44,6 +49,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
             });
     }
     return CBTReactiveSelector::Create({
+        Make_LockOutcomeBranch(),
         Make_DodgeBranch(),
         Make_UpperBranch(),
         pCombat,
@@ -1020,7 +1026,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_CatchSuccess()
                 mv->Set_MoveSpeed(BASE_SPEED);
                 mv->Set_LockFacing(false);
 
-                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_UpperCaliburDemo();
+                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_Demo(CBoss_Metaknight::EDemo::UPPER_CALIBUR);
                 *bOn = true;
                 return BT_STATUS::RUNNING;
             }
@@ -1035,7 +1041,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_CatchSuccess()
         [bOn] { *bOn = false; });
 
     auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
-        static_cast<CBoss_Metaknight*>(m_pOwner)->End_UpperCaliburDemo();
+        static_cast<CBoss_Metaknight*>(m_pOwner)->End_Demo(CBoss_Metaknight::EDemo::UPPER_CALIBUR);
         return BT_STATUS::SUCCESS;
         });
 
@@ -1086,7 +1092,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_LockLose()
         [this, bOn](CBlackboard*, _float) -> BT_STATUS {
             if (!*bOn)
             {
-                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_LockLoseDemo();
+                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_Demo(CBoss_Metaknight::EDemo::LOCK_LOSE);
                 *bOn = true;
                 return BT_STATUS::RUNNING;
             }
@@ -1096,7 +1102,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_LockLose()
         [bOn] { *bOn = false; });
 
     auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
-        static_cast<CBoss_Metaknight*>(m_pOwner)->End_LockLoseDemo();
+        static_cast<CBoss_Metaknight*>(m_pOwner)->End_Demo(CBoss_Metaknight::EDemo::LOCK_LOSE);
         return BT_STATUS::SUCCESS;
         });
 

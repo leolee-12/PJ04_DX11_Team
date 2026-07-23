@@ -36,6 +36,7 @@
     <ClInclude Include="..\public\Boss_Leopard.h" />
     <ClInclude Include="..\public\Boss_Leopard_Body.h" />
     <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_EscapeMant.h" />
     <ClInclude Include="..\Public\Bouncy.h" />
     <ClInclude Include="..\Public\Bouncy_Body.h" />
     <ClInclude Include="..\Public\Bouncy_Brain.h" />
@@ -537,6 +538,7 @@
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_EscapeMant.cpp" />
     <ClCompile Include="..\Private\Bouncy.cpp" />
     <ClCompile Include="..\Private\Bouncy_Body.cpp" />
     <ClCompile Include="..\Private\Bouncy_Brain.cpp" />
