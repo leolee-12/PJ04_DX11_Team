@@ -332,6 +332,34 @@ CDropStar_Manager::STAR_SPAWN_DESC CDropStar_Manager::Get_Preset(STAR_SPAWN_PRES
         }
 #pragma endregion
 #pragma region 보스 - 캐롤라인
+        case STAR_SPAWN_PRESET::LEOPARD_LANDING:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 6;
+            tSpawnDesc.fRange = 5.f;
+            tSpawnDesc.fStartDeg = 0.f;
+            tSpawnDesc.fSweepDeg = 300.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 1.5f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::LEOPARD_ASSAULTSLASH:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 3;
+            tSpawnDesc.fRange = 1.5f;
+            tSpawnDesc.fStartDeg = 225.f;
+            tSpawnDesc.fSweepDeg = -90.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 2.f;
+            tSpawnDesc.fLifeTime = 3.f;
+            break;
+        }
 #pragma endregion
     }
 
@@ -395,7 +423,8 @@ CDropStar_Manager::STAR_SPAWN_PRESET CDropStar_Manager::Name_To_Preset(const _ws
         { L"AramaDilloHitWallLanding",  STAR_SPAWN_PRESET::ARMADILLO_HIT_WALL_LANDING   },
         { L"AramaDilloTwinDance",       STAR_SPAWN_PRESET::ARMADILLO_TWINDANCE          },
         { L"AramaDilloPartnerDestroy",  STAR_SPAWN_PRESET::ARMADILLO_PARTNER_DESTROY    },
-
+        { L"LeopardLanding",            STAR_SPAWN_PRESET::LEOPARD_LANDING              },
+        { L"LeopardAssaultSlash",       STAR_SPAWN_PRESET::LEOPARD_ASSAULTSLASH         },
     };
 
     auto it = s_Table.find(strName);

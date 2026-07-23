@@ -26,6 +26,13 @@ public:
 
     enum PILLAR : _int { PILLAR_FL, PILLAR_FR, PILLAR_BR, PILLAR_BL, PILLAR_COUNT };
 
+#pragma region 캐롤라인 보스씬 사운드
+    static constexpr const _tchar* SND_LIGHT_ON             = L"CharaBossLeopard_LightOn.wav";
+    static constexpr const _tchar* SND_LIGHT_OFF            = L"CharaBossLeopard_LightOff.wav";
+    static constexpr const _tchar* SND_JUMPATTACK_LANDING   = L"CharaBossLeopard_ShockWave.wav";
+
+#pragma endregion
+
 private:
     CBoss_Leopard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CBoss_Leopard(const CBoss_Leopard& Prototype);
