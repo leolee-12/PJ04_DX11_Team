@@ -162,6 +162,9 @@ json CLD_WaterArea::Serialize() const
     jWaterMaterial["CausticNoiseStrength"] = m_tWaterRenderDesc.fCausticNoiseStrength;
     jWaterMaterial["CausticBlur"] = m_tWaterRenderDesc.fCausticBlur;
 
+    jWaterMaterial["WaveAmplitude"] = m_tWaterRenderDesc.fWaveAmplitude;
+    jWaterMaterial["WaveSpeed"] = m_tWaterRenderDesc.fWaveSpeed;
+
     j["WaterMaterial"] = jWaterMaterial;
     return j;
 }
@@ -208,6 +211,9 @@ void CLD_WaterArea::Deserialize_Internal(const json& j)
     JsonUtils::Try_ReadFloat(jWaterMaterial, "CausticStrength", &Desc.fCausticStrength);
     JsonUtils::Try_ReadFloat(jWaterMaterial, "CausticNoiseStrength", &Desc.fCausticNoiseStrength);
     JsonUtils::Try_ReadFloat(jWaterMaterial, "CausticBlur", &Desc.fCausticBlur);
+
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "WaveAmplitude", &Desc.fWaveAmplitude);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "WaveSpeed", &Desc.fWaveSpeed);
 
     Sanitize_WaterRenderDesc(&Desc);
     m_tWaterRenderDesc = Desc;

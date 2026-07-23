@@ -724,6 +724,9 @@ namespace
 			jClassOverride["CausticStrength"] = Desc.fCausticStrength;
 			jClassOverride["CausticNoiseStrength"] = Desc.fCausticNoiseStrength;
 			jClassOverride["CausticBlur"] = Desc.fCausticBlur;
+
+			jClassOverride["WaveAmplitude"] = Desc.fWaveAmplitude;
+			jClassOverride["WaveSpeed"] = Desc.fWaveSpeed;
 		}
 
 		return jClassOverride;
@@ -835,6 +838,11 @@ namespace
 			if (FAILED(Load_OptionalFloat(jClassOverride, "CausticNoiseStrength", &Desc.fCausticNoiseStrength)))
 				return E_FAIL;
 			if (FAILED(Load_OptionalFloat(jClassOverride, "CausticBlur", &Desc.fCausticBlur)))
+				return E_FAIL;
+
+			if (FAILED(Load_OptionalFloat(jClassOverride, "WaveAmplitude", &Desc.fWaveAmplitude)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "WaveSpeed", &Desc.fWaveSpeed)))
 				return E_FAIL;
 
 			*pOutClassOverride = WaterOverride;
