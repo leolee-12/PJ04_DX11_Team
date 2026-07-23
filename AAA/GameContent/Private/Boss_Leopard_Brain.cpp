@@ -4,6 +4,8 @@
 #include "Monster_Movement.h"
 #include "Boss_Leopard_Body.h"
 
+#include "DropStar_Manager.h"
+
 CBTNode* CBoss_Leopard_Brain::Build_PhaseTree(_int)
 {
     return CBTSequence::Create({
@@ -219,7 +221,13 @@ CBTNode* CBoss_Leopard_Brain::Make_ChargeDash()
             return BT_STATUS::SUCCESS;
         }),
         FaceWindup("JumpAttackMoveStart", TURN_DEG, SPD),
-        Make_Dash(), Make_Groggy(), Clip("JumpAttackEnd", SPD),
+        Make_Dash(), 
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Play_OneShotSFX(CBoss_Leopard::SND_JUMPATTACK_LANDING, 0.3f);
+            CDropStar_Manager::GetInstance()->Spawn_Preset(m_pOwner->Get_LevelIndex(), XMLoadFloat4x4(m_pOwner->Get_Transform()->Get_WorldMatrixPtr()), L"LeopardLanding");
+            return BT_STATUS::SUCCESS;
+        }),
+        Make_Groggy(), Clip("JumpAttackEnd", SPD),
         });
 }
 
@@ -297,7 +305,10 @@ CBTNode* CBoss_Leopard_Brain::Make_AssaultSlash()
                 Enable_Hit(CBoss_Leopard_Body::LHB_ASSAULT, false);
                 Leo->Spotlight_Off();
                 Leo->Set_AfterimageFx(false);
-                s->started = false; return BT_STATUS::SUCCESS;
+                s->started = false; 
+                CDropStar_Manager::GetInstance()->Spawn_Preset(m_pOwner->Get_LevelIndex(),
+                    XMLoadFloat4x4(m_pOwner->Get_Transform()->Get_WorldMatrixPtr()), L"LeopardAssaultSlash");
+                return BT_STATUS::SUCCESS;
             }
             return BT_STATUS::RUNNING;
         }, [this, s] {
@@ -320,7 +331,7 @@ CBTNode* CBoss_Leopard_Brain::Make_AssaultSlash()
                 static_cast<CBoss_Leopard*>(m_pOwner)->Spotlight_TrackKirby();
                 return BT_STATUS::SUCCESS; }),
             FaceWindup("AssaultSlashStart", TURN_DEG, SPD),
-            pSlash, Clip("AssaultSlashEnd", SPD),
+            pSlash, Clip("AssaultSlashEnd", SPD)
             });
 }
 

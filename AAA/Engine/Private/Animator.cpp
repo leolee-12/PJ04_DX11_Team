@@ -20,7 +20,7 @@ CAnimator::CAnimator(const CAnimator& Prototype)
 HRESULT CAnimator::Initialize(void* pArg)
 {
     if (pArg == nullptr)
-        return E_FAIL;
+        return S_FALSE;
 
     ANIMATOR_DESC* pDesc = static_cast<ANIMATOR_DESC*>(pArg);
     m_pModel = pDesc->pModel;
@@ -614,7 +614,7 @@ CAnimator* CAnimator::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
     return new CAnimator(pDevice, pContext);
 }
 
-CComponent* CAnimator::Clone(void* pArg)
+CAnimator* CAnimator::Clone(void* pArg)
 {
     CAnimator* pInstance = new CAnimator(*this);
     if (FAILED(pInstance->Initialize(pArg)))
