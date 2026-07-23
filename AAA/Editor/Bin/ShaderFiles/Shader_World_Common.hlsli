@@ -597,6 +597,31 @@ float4 PS_BLEND_UKWN2_LIGHT(PS_IN In) : SV_TARGET0
     return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
 }
 
+PS_OUT PS_UKWN2_SAND_OPAQUE(PS_IN In)
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vShaftUV = Select_UV_PS(In, g_iUnknownUVIndex);
+    float2 vNoiseUV = Apply_UVTransform(Select_UV_PS(In, g_iExtraR_UVIndex), g_vUVTransformUnknown);
+
+    float3 vShaft = g_UnknownTexture.Sample(LinearSampler, vShaftUV).rgb;
+    float fNoise = saturate(g_ExtraRTexture.Sample(LinearSampler, vNoiseUV).r * 2.f);
+    float fShaftBrightness = saturate(max(vShaft.r, max(vShaft.g, vShaft.b)));
+    float fMask = saturate(fShaftBrightness * fNoise * max(g_MaskStrength, 0.f));
+
+    if (fMask < 0.1f)
+        discard;
+
+    float3 vNormal = Get_ShadingNormal(In, Get_NormalUV(In));
+
+    return Make_GBufferOutput(
+                  In,
+                  float4(g_vColor.rgb * lerp(0.25f, 1.f, fMask), 1.f),
+                  vNormal,
+                  float4(g_vMRA, 1.f),
+                  float4(g_vEmissiveColor.rgb, 1.f));
+}
+
 
 
 struct PS_DECAL_OUT
