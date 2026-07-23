@@ -275,15 +275,20 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
     return nullptr;
 }
 
-void CKirby::Put_WeaponOnBack(_bool bOn)
+void CKirby::Set_OnOffPartMode(KIRBY_PART_MODE ePartMode)
 {
     COPY_ABILITY_TYPE eAbilityType = m_pKirby_Ability->Get_AbilityType();
-    CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
 
+    CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
     if (pWeapon == nullptr)
         return;
 
-    pWeapon->Put_OnBack(this, bOn);
+    CKirby_OnOffPart* pHat = Find_HatPart(eAbilityType);
+    if (pHat == nullptr)
+        return;
+
+    pWeapon->Set_PartMode(this, ePartMode);
+    pHat->Set_PartMode(this, ePartMode);
 }
 
 CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)

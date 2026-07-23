@@ -14,6 +14,8 @@ NS_BEGIN(Client)
 
 class CKirby;
 
+enum class KIRBY_PART_MODE { DEFAULT, BACK };
+
 class CKirby_OnOffPart abstract : public CPartObject
 {
 	GENERATED_BODY_ABSTRACT(CKirby_OnOffPart)
@@ -47,7 +49,7 @@ public:
 
 	void PartOnOff(_bool bOn) { m_bOn = bOn; }
 
-	virtual void Put_OnBack(CKirby* pKirby, _bool bOn);
+	virtual void Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode) {};
 
 protected:
 	struct KIRBY_PART_COMPONENT_DESC

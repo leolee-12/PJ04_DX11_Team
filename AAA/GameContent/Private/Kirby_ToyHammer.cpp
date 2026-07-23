@@ -1,6 +1,7 @@
 #include "Kirby_ToyHammer.h"
 
-#include "GameInstance.h"
+#include "Kirby.h"
+#include "Kirby_Body.h"
 
 CKirby_ToyHammer::CKirby_ToyHammer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CKirby_OnOffPart(pDevice, pContext)
@@ -62,6 +63,26 @@ HRESULT CKirby_ToyHammer::Render()
     }
 
     return S_OK;
+}
+
+void CKirby_ToyHammer::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
+{
+    switch (ePartMode)
+    {
+        case KIRBY_PART_MODE::BACK:
+        {
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("CenterL"));
+            m_pAnimatorCom->Play("Carry", true, true, 0.f);
+            break;
+        }
+        case KIRBY_PART_MODE::DEFAULT:
+        default:
+        {
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
+            m_pAnimatorCom->Play("Reset", true, true, 0.f);
+            break;
+        }
+    }
 }
 
 HRESULT CKirby_ToyHammer::Ready_Components()

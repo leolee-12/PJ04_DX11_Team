@@ -29,6 +29,9 @@ public:
     virtual HRESULT Render() override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
+public:
+    virtual void Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode) override;
+
 private:
     HRESULT Ready_Components();
 
