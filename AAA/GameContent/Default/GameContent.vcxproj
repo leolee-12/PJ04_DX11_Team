@@ -315,6 +315,9 @@
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
+    <ClInclude Include="..\public\UI_CurtainFadeOut.h" />
+    <ClInclude Include="..\public\UI_CurtainStamp.h" />
+    <ClInclude Include="..\public\UI_CurtainStatic.h" />
     <ClInclude Include="..\public\UI_CutFade.h" />
     <ClInclude Include="..\public\UI_Dialogue.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
@@ -510,6 +513,7 @@
     <ClInclude Include="..\Public\UI_Title.h" />
     <ClInclude Include="..\public\UI_LetterBox.h" />
     <ClInclude Include="..\public\UI_TitleLogo.h" />
+    <ClInclude Include="..\public\UI_UIFadeOut.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\WaddleDee.h" />
@@ -812,6 +816,9 @@
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
+    <ClCompile Include="..\private\UI_CurtainFadeOut.cpp" />
+    <ClCompile Include="..\private\UI_CurtainStamp.cpp" />
+    <ClCompile Include="..\private\UI_CurtainStatic.cpp" />
     <ClCompile Include="..\private\UI_CutFade.cpp" />
     <ClCompile Include="..\private\UI_Dialogue.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
@@ -983,6 +990,7 @@
     <ClCompile Include="..\Private\UI_Title.cpp" />
     <ClCompile Include="..\Private\UI_LetterBox.cpp" />
     <ClCompile Include="..\Private\UI_TitleLogo.cpp" />
+    <ClCompile Include="..\private\UI_UIFadeOut.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WaddleDee.cpp" />

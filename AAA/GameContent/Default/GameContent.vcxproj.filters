@@ -1354,6 +1354,9 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo">
       <UniqueIdentifier>{bbb4987a-476e-4041-a47f-d7275e792b36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\UIFade">
+      <UniqueIdentifier>{3f500f6a-d507-439f-9a53-9a11e7caa168}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\HelpUI">
       <UniqueIdentifier>{3129b019-37b4-434d-a7f9-b49f78201594}</UniqueIdentifier>
     </Filter>
@@ -1417,11 +1420,20 @@
     <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim\Eraser">
       <UniqueIdentifier>{9a4d44ca-fd80-4fdb-9d7d-9329be74e4c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim\FadeOut">
+      <UniqueIdentifier>{8a15715e-982c-422d-b62c-ffebcf5cf829}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim\Stamp">
+      <UniqueIdentifier>{2ed51668-a0b6-4727-88a2-26dc383dedb0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim\Texture">
       <UniqueIdentifier>{b1b94500-8f62-4ab4-b98d-314399c987ff}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIPart\Curtain\SpriteAnim">
       <UniqueIdentifier>{4fcbe505-82ee-440a-a5d0-a9ffa573f348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Static">
+      <UniqueIdentifier>{13bd804c-8e7b-4c11-8a03-5122195266d2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIPart\Effect">
       <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
@@ -2967,8 +2979,17 @@
     <ClInclude Include="..\public\UI_CurtainAnimBase.h">
       <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_CurtainFadeOut.h">
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\FadeOut</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\UI_CurtainSequenceBase.h">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_CurtainStamp.h">
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Stamp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_CurtainStatic.h">
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Static</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_CurtainTexture.h">
       <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Texture</Filter>
@@ -3056,6 +3077,9 @@
     </ClInclude>
     <ClInclude Include="..\public\UI_TitleLogo.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_UIFadeOut.h">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\UIFade</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIAnimatorCom.h">
       <Filter>00. GameObject\97. UI\Component\Animator</Filter>
@@ -4373,8 +4397,17 @@
     <ClCompile Include="..\private\UI_CurtainAnimBase.cpp">
       <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UI_CurtainFadeOut.cpp">
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\FadeOut</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\UI_CurtainSequenceBase.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_CurtainStamp.cpp">
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Stamp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_CurtainStatic.cpp">
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Static</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_CurtainTexture.cpp">
       <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Texture</Filter>
@@ -4453,6 +4486,9 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_TitleLogo.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_UIFadeOut.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\UIFade</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIAnimatorCom.cpp">
       <Filter>00. GameObject\97. UI\Component\Animator</Filter>

@@ -7,6 +7,7 @@ NS_BEGIN(Client)
 class CLIENT_DLL CUI_FadeOut final : public CUI_CurtainSequenceBase
 {
     GENERATED_BODY(CUI_FadeOut)
+    PROPERTY(_wstring, m_strDoneEvent, L"DoneEvent", L"Sequence")
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_UI_FadeOut";
 
