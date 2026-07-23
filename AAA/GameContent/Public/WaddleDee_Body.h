@@ -6,6 +6,7 @@ NS_BEGIN(Engine)
 class CShader;
 class CModel;
 class CAnimator;
+class CTexture;
 NS_END
 
 NS_BEGIN(Client)
@@ -19,8 +20,8 @@ public:
 	{
 	};
 
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_WaddleDee_Body";
-	static constexpr const _tchar* PART_TAG = L"Body";
+	static constexpr const _tchar*	PROTOTYPE_TAG = L"Proto_WaddleDee_Body";
+	static constexpr const _tchar*	PART_TAG = L"Body";
 
 private:
 	CWaddleDee_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -41,6 +42,8 @@ public:
 	CAnimator* Get_Animator() const { return m_pAnimatorCom; }
 	_bool Has_Animation(const _char* pAnimName) const;
 	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
+	void Set_Eye(_uint iIndex) { m_iEyeIndex = (iIndex < EYE_COUNT) ? iIndex : 0; }
+	_uint Get_Eye() const { return m_iEyeIndex; }
 
 private:
 	HRESULT Ready_Components();
@@ -50,6 +53,12 @@ private:
 	CShader*	m_pShaderCom = { nullptr };
 	CModel*		m_pModelCom = { nullptr };
 	CAnimator*	m_pAnimatorCom = { nullptr };
+	CTexture*	m_pEyeTextureCom = { nullptr };
+	CTexture*	m_pEyeMaskTextureCom = { nullptr };
+	_uint		m_iEyeIndex = { 0 };
+
+private:
+	static constexpr const _uint	EYE_COUNT = { 6 };
 
 public:
 	static CWaddleDee_Body*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

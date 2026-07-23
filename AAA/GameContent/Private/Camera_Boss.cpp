@@ -66,6 +66,12 @@ void CCamera_Boss::Priority_Update(_float fTimeDelta)
         vAt = XMLoadFloat3(&m_vTopCenter);
     }
 
+    if (m_bHold && m_bInit)
+    {
+        vEye = XMLoadFloat3(&m_eyeCur);
+        vAt = XMLoadFloat3(&m_atCur);
+    }
+
     if (!m_bInit) { XMStoreFloat3(&m_eyeCur, vEye); XMStoreFloat3(&m_atCur, vAt); m_bInit = true; }
 
     _vector eVel = XMLoadFloat3(&m_eyeVel), aVel = XMLoadFloat3(&m_atVel);
@@ -134,6 +140,10 @@ HRESULT CCamera_Boss::Ready_Events()
         }
         else 
             m_bTopView = false;
+        });
+
+    Subscribe_Event(EventTag::BossCam_Hold, [this](void* p) {
+        m_bHold = p ? *static_cast<_bool*>(p) : false;
         });
 
     return Ready_ShakeEvents();

@@ -109,9 +109,6 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\07. BoostGas">
       <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind">
-      <UniqueIdentifier>{0c876f5f-219a-4b8c-9c29-6065f339a1cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. Env">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
     </Filter>
@@ -135,6 +132,9 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. CarThinGas">
       <UniqueIdentifier>{153a0fc3-3a45-4226-a92e-f8805cd20075}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind">
+      <UniqueIdentifier>{0c876f5f-219a-4b8c-9c29-6065f339a1cf}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\23. OnLadderEffect">
       <UniqueIdentifier>{4b622f74-20a8-4a20-bef5-f729f8d7191f}</UniqueIdentifier>
@@ -573,6 +573,12 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\06. ToyHat">
       <UniqueIdentifier>{7af620b6-9bf2-4179-85f8-9ceec58c5594}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword">
+      <UniqueIdentifier>{ae28f6b8-df31-4738-814d-50b367972186}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat">
+      <UniqueIdentifier>{8f59b103-c3fe-4a3c-bcb6-b6b800dd6ac4}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
@@ -1228,12 +1234,6 @@
     <Filter Include="00. GameObject\11. WaddleDee">
       <UniqueIdentifier>{28f1e19d-7639-4e84-b992-8ed2dceda685}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\12. LightShaft">
-      <UniqueIdentifier>{31c36387-052b-4427-a9ec-951e46335daa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\12. LightShaft\LightShaft">
-      <UniqueIdentifier>{4349424d-523c-4239-8713-006d1270e465}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
@@ -1591,21 +1591,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight">
-      <UniqueIdentifier>{214b11c1-771e-4020-8ec5-f099665e5154}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter">
-      <UniqueIdentifier>{33020856-964e-4101-8c62-ae1ac0a1eb1a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE">
-      <UniqueIdentifier>{5739041f-3609-4363-996a-8f573294ddfa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword">
-      <UniqueIdentifier>{ae28f6b8-df31-4738-814d-50b367972186}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat">
-      <UniqueIdentifier>{8f59b103-c3fe-4a3c-bcb6-b6b800dd6ac4}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1679,9 +1664,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\CoasterWind.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Boss.h">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -1877,6 +1859,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Character_States.h">
       <Filter>99. Defines\Hojun</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CoasterWind.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_Circle01.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01</Filter>
@@ -2160,6 +2145,9 @@
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_MetaKnightSword.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Normal.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClInclude>
@@ -2167,9 +2155,6 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_Ability_MetaKnightSword.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_ToyHammer.h">
@@ -2283,11 +2268,17 @@
     <ClInclude Include="..\Public\Kirby_Ladder.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaSword.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_OnOffPart.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
@@ -2495,9 +2486,6 @@
     </ClInclude>
     <ClInclude Include="..\public\LevelLight_DB.h">
       <Filter>97. DataSystem\LevelLight</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LightShaft.h">
-      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
@@ -3099,15 +3087,6 @@
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_MetaSword.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_MetaHat.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3175,9 +3154,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\CoasterWind.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Boss.cpp">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -3370,6 +3346,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Character.cpp">
       <Filter>00. GameObject\04. Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CoasterWind.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_Circle01.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01</Filter>
@@ -3617,6 +3596,9 @@
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_MetaKnightSword.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClCompile>
@@ -3624,9 +3606,6 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Ability_MetaKnightSword.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_ToyHammer.cpp">
@@ -3734,11 +3713,17 @@
     <ClCompile Include="..\Private\Kirby_Ladder.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaSword.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
@@ -3934,9 +3919,6 @@
     </ClCompile>
     <ClCompile Include="..\private\LevelLight_DB.cpp">
       <Filter>97. DataSystem\LevelLight</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LightShaft.cpp">
-      <Filter>00. GameObject\12. LightShaft\LightShaft</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
@@ -4502,15 +4484,6 @@
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_MetaSword.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_MetaHat.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
@@ -4542,9 +4515,6 @@
     </None>
     <None Include="..\ShaderFiles\Shader_Leopard.hlsl">
       <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_LightShaft.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>

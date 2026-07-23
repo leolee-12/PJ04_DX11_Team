@@ -58,6 +58,8 @@ protected:
     void           Publish_Boss_Appeared();
     void           Publish_HP();
 
+    _bool		    Handle_DropStarsAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+
     _float       Get_HPRatio() const { return m_fMaxHP > 0.f ? m_fCurHP / m_fMaxHP : 0.f; }
 
 protected:

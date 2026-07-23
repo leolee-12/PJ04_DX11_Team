@@ -27,9 +27,9 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     //    });
     
     // 에디터 애니매이션 편집용
-    return CBTReactiveSelector::Create({
-        Clip("Wait", SPD, 0.f),
-        });
+    //return CBTReactiveSelector::Create({
+    //    Clip("Wait", SPD, 0.f),
+    //    });
 
     CBTNode* pCombat = CBTSequence::Create({
         Make_GigaBranch(),
@@ -1109,8 +1109,91 @@ CBTNode* CBoss_Metaknight_Brain::Make_LockLose()
     return CBTSequence::Create({
         pDemo,
         pEnd,
-        Clip("LockingSwordLoseWait", SPD, 0.1f),
-        Clip("Wait", SPD, 0.2f),
+        Loop("LockingSwordLoseWait", 5.f, SPD),
+        Make_LockLose_Return(),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_LockLose_Return()
+{
+    auto* pHoldOn = CBTAction::Create(
+        [this](CBlackboard*, _float) {
+            static_cast<CBoss_Metaknight*>(m_pOwner)->Hold_BossCam(true);
+            return BT_STATUS::SUCCESS;
+        },
+        [this] { static_cast<CBoss_Metaknight*>(m_pOwner)->Hold_BossCam(false); });
+
+    auto* pHoldOff = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Hold_BossCam(false);
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto* pReplicaOn = CBTAction::Create([this](CBlackboard*, _float) {
+        auto* mk = static_cast<CBoss_Metaknight*>(m_pOwner);
+        mk->Retire_Galaxia();
+        mk->Set_ActiveSword(CBoss_Metaknight::EMK_SWORD::REPLICA);
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto* pFallBegin = CBTAction::Create([this](CBlackboard*, _float) {
+        m_pOwner->Get_Movement()->Set_GravityEnabled(true);
+        return BT_STATUS::SUCCESS;
+        });
+
+    return CBTSequence::Create({
+        pHoldOn,                        // 보스캠 고정 시작
+        Clip("JumpStart", SPD, 0.1f),   // 점프스타트(윈드업)
+        Make_ReturnFly(),               // 점프 상승 + 맵중앙 수평이동
+        pReplicaOn,                     // 레플리카 소드 on + 바닥 갤럭시아 정리
+        pFallBegin,                     // 중력 on
+        Make_UC_Fall(),                 // Fall + Is_Grounded 대기(재사용)
+        Clip("Landing", SPD, 0.1f),     // 착지
+        pHoldOff,                       // 보스캠 추적 재개
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_ReturnFly()
+{
+    auto bOn = make_shared<bool>(false);
+    auto iPhase = make_shared<_int>(0);   // 0=상승, 1=맵중앙 수평이동
+    auto vGoal = make_shared<_float3>();
+
+    return CBTAction::Create(
+        [this, bOn, iPhase, vGoal](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            _vector vSelf = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+
+            if (!*bOn)
+            {
+                Anim()->Play("Jump", false, true, 0.1f, SPD);
+                mv->Set_GravityEnabled(false);
+                XMStoreFloat3(vGoal.get(), vSelf + XMVectorSet(0.f, RET_RISE_H, 0.f, 0.f));
+                *iPhase = 0;
+                *bOn = true;
+            }
+
+            const _float fSpeed = (*iPhase == 0) ? RET_RISE_SPEED : RET_MOVE_SPEED;
+            if (mv->Fly_Toward(XMLoadFloat3(vGoal.get()), fSpeed, dt, GIGA_ARRIVE))
+            {
+                if (*iPhase == 0)
+                {
+                    _float fY = XMVectorGetY(m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+                    _vector vC = XMVectorSet(0.f, fY, 0.f, 1.f);
+                    mv->Face_Instant(vC);
+                    XMStoreFloat3(vGoal.get(), vC);
+                    *iPhase = 1;
+                }
+                else
+                {
+                    *bOn = false; *iPhase = 0;
+                    return BT_STATUS::SUCCESS;
+                }
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, iPhase] {
+            *bOn = false; *iPhase = 0;
+            m_pOwner->Get_Movement()->Set_GravityEnabled(true);
         });
 }
 

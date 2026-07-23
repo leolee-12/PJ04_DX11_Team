@@ -83,19 +83,10 @@ HRESULT CKirby_MetaSword::Render()
         }
         else
         {
-            static constexpr _float4 vConstantDiffuse = { 1.f, 0.72f, 0.08f, 1.f };
-            if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantDiffuse", &vConstantDiffuse, sizeof(_float4))))
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::UNKNOWN, 1)))
                 return E_FAIL;
 
-            static constexpr _float3 vConstantMRA = { 0.25f, 0.18f, 1.f };
-            if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantMRA", &vConstantMRA, sizeof(_float3))))
-                return E_FAIL;
-
-            static constexpr _float4 vConstantEmissive = { 0.05f, 0.025f, 0.f, 1.f };
-            if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &vConstantEmissive, sizeof(_float4))))
-                return E_FAIL;
-
-            iPassIndex = ETOUI(KIRBY_SHADER_PASS::ANIM_CONSTANT_PBR);
+            iPassIndex = ETOUI(KIRBY_SHADER_PASS::META_SWORD);
         }
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))

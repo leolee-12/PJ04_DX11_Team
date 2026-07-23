@@ -494,6 +494,23 @@ void CBoss_Metaknight::Hide_Sword(EMK_SWORD eSword)
     }
 }
 
+void CBoss_Metaknight::Drop_Galaxia()
+{
+    if (m_pSword)
+        m_pSword->Drop_Freeze();
+}
+
+void CBoss_Metaknight::Retire_Galaxia()
+{
+    if (m_pSword)
+        m_pSword->Retire_Drop();
+}
+
+void CBoss_Metaknight::Hold_BossCam(_bool bOn)
+{
+    m_pGameInstance_Proxy->Publish(EventTag::BossCam_Hold, &bOn);
+}
+
 void CBoss_Metaknight::Show_Mant(_bool bOn)
 {
     if (m_pMant)
@@ -669,6 +686,9 @@ void CBoss_Metaknight::Begin_Demo(EDemo eDemo)
 
 void CBoss_Metaknight::End_Demo(EDemo eDemo)
 {
+    if (eDemo == EDemo::LOCK_LOSE)
+        Drop_Galaxia();
+
     Reanchor_FromRootBone();
 
     m_pMovement->Set_GravityEnabled(true);

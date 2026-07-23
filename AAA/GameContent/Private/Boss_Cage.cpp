@@ -7,10 +7,12 @@
 CBoss_Cage::CBoss_Cage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CContainerObject{ pDevice, pContext }
 {
+    m_bShow = false;
 }
 
 CBoss_Cage::CBoss_Cage(const CBoss_Cage& Prototype)
     : CContainerObject(Prototype)
+    , m_bShow(Prototype.m_bShow)
 {
 }
 
@@ -321,7 +323,11 @@ void CBoss_Cage::On_Deserialized()
     __super::On_Deserialized();
 
     if (m_pGameInstance_Proxy && !m_pGameInstance_Proxy->Is_EditMode())
-        Set_Active(false);
+        if (m_bShow)
+            Start_Descend_InPlace();
+        else
+            Set_Active(false);
+
 }
 
 void CBoss_Cage::Attach_To_Bone(const _float4x4* pBoneMatrix, const _float4x4* pOwnerWorld, _fmatrix OffsetMatrix)

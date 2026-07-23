@@ -152,6 +152,9 @@ HRESULT CWaddleDee::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
+	if (FAILED(Ready_AnimEvents()))
+		return E_FAIL;
+
 	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
@@ -299,6 +302,33 @@ HRESULT CWaddleDee::Ready_PartObjects()
 	m_pBody = dynamic_cast<CWaddleDee_Body*>(iter->second);
 	if (nullptr == m_pBody)
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CWaddleDee::Ready_AnimEvents()
+{
+	if (nullptr == m_pBody)
+		return E_FAIL;
+
+	CAnimator* pAnim = m_pBody->Get_Animator();
+	if (nullptr == pAnim)
+		return E_FAIL;
+
+	pAnim->Set_EventCallback(
+		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
+		{
+			switch (static_cast<EANIM_EVENT>(e.iEventType))
+			{
+			case EANIM_EVENT::SetEye:
+				if (phase == ANIM_EVENT_PHASE::POINT)
+					m_pBody->Set_Eye(static_cast<_uint>(e.iIntParam));
+				break;
+
+			default:
+				break;
+			}
+		});
 
 	return S_OK;
 }

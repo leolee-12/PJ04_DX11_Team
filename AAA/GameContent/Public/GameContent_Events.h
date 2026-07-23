@@ -60,6 +60,7 @@ namespace Client
         inline constexpr const _tchar* BossCam_Focus = L"BossCam_Focus";
         inline constexpr const _tchar* BossCam_Config = L"BossCam_Config";
         inline constexpr const _tchar* BossCam_TopView = L"BossCam_TopView";
+        inline constexpr const _tchar* BossCam_Hold = L"BossCam_Hold";
 
         // Screen Fx
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
