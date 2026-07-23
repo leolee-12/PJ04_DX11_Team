@@ -44,8 +44,6 @@ private:
 	static ENV_SOURCE_TYPE Classify_SourceType(const _wstring& wstrSourceFile);
 	static ENV_EFFECT_TYPE Classify_EffectType(const _wstring& wstrObjectName, const _wstring& wstrComponentName);
 
-	static _bool Try_ParseSectionType(const json& jValue, MAP_SECTION_TYPE* pOut);
-	static _bool Try_ParseRenderID(const json& jValue, RENDERID* pOut);
 	static _bool Try_BuildWorldMatrixFromArray(const json& jSource, const _string& strPath, ENV_OBJECT_DESC* pOutDesc);
 
 	static _wstring Resolve_PathFromManifest(const filesystem::path& ManifestPath, const _wstring& strRawPath);

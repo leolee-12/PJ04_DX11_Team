@@ -171,6 +171,9 @@ _bool CLD_SlopeBoardC::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 
 HRESULT CLD_SlopeBoardC::Ready_Events()
 {
+	if (FAILED(__super::Ready_Events()))
+		return E_FAIL;
+
 	Subscribe_Event(TEMP_EVENT_TAG, [this](void*) { On_Event(); });
 
 	return S_OK;

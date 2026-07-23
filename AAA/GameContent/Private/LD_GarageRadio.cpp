@@ -157,6 +157,9 @@ CGameObject* CLD_GarageRadio::Create_Prototype(ID3D11Device* pDevice, ID3D11Devi
 
 HRESULT CLD_GarageRadio::Ready_Events()
 {
+	if (FAILED(__super::Ready_Events()))
+		return E_FAIL;
+
 	Subscribe_Event(TEMP_EVENT_TAG, [this](void* pData)
 		{
 			_float4x4* pMat = { nullptr };

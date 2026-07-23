@@ -38,16 +38,6 @@ static const char* TexTypeName(_uint t)
     return (t < MTEX_TYPE_MAX) ? names[t] : "?";
 }
 
-static int ToMapRenderGroupIndex(RENDERID eRenderID)
-{
-    return (eRenderID == RENDERID::BLEND) ? 1 : 0;
-}
-
-static RENDERID FromMapRenderGroupIndex(int iIndex)
-{
-    return (iIndex == 1) ? RENDERID::BLEND : RENDERID::NONBLEND;
-}
-
 static int FindExactMeshNameIndex(CModel* pModel, const string& strMeshName)
 {
     if (nullptr == pModel || strMeshName.empty())
@@ -844,8 +834,6 @@ void CImGui_Manager::Draw_Inspector()
                 Draw_Properties(pSection);
                 ImGui::Separator();
                 Draw_MeshLayerPanel(pSection);
-                ImGui::Separator();
-                Draw_MapSectionRenderOptions(pSection);
                 ImGui::PopID();
             }
             ImGui::Separator();
@@ -1503,21 +1491,6 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
         if (FAILED(pModel->Save_MeshLayers()))
             MSG_BOX("MESH LAYER SAVE FAILED");
     }
-}
-
-void CImGui_Manager::Draw_MapSectionRenderOptions(CMapSection* pSection)
-{
-    if (nullptr == pSection)
-        return;
-
-    if (!ImGui::CollapsingHeader("Render Group (per Section)", ImGuiTreeNodeFlags_DefaultOpen))
-        return;
-
-    int iRenderGroup = ToMapRenderGroupIndex(pSection->Get_RenderID());
-    const char* RenderGroups[] = { "NONBLEND", "BLEND" };
-
-    if (ImGui::Combo("Render Group", &iRenderGroup, RenderGroups, IM_ARRAYSIZE(RenderGroups)))
-        pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
 void CImGui_Manager::Free()

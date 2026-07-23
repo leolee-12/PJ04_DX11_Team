@@ -78,16 +78,6 @@ namespace
 		}
 	}
 
-	int ToMapRenderGroupIndex(RENDERID eRenderID)
-	{
-		return (eRenderID == RENDERID::BLEND) ? 1 : 0;
-	}
-
-	RENDERID FromMapRenderGroupIndex(int iIndex)
-	{
-		return (iIndex == 1) ? RENDERID::BLEND : RENDERID::NONBLEND;
-	}
-
 	_bool* FindBoolProperty(IReflectable* pHolder, const _wstring& strName, const _wstring& strCategory)
 	{
 		if (nullptr == pHolder)
@@ -2183,7 +2173,10 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		DrawUVCombo("Base UV", Layer.iUVIndex);
 
 		if (Ui.bWorldPassMeshUi)
+		{
 			DrawUVCombo("Unknown UV", Layer.iUnknownUVIndex);
+			DrawUVCombo("ExtraR UV", Layer.iExtraUVIndex[0]);
+		}
 
 		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
 			bChanged = true;
@@ -2259,6 +2252,11 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 			ImGui::TableNextColumn();
 			DrawCompactLayerSlotCell("Unk", "##WorldTexUnknown", MTEX_TYPE::UNKNOWN);
+
+			ImGui::TableNextRow();
+
+			ImGui::TableNextColumn();
+			DrawCompactExtraCell("ExR", "##WorldExR", Layer.iExtraBind[0], Layer.iExtraTexType[0]);
 
 			ImGui::EndTable();
 		}
@@ -2368,14 +2366,10 @@ void CPanel_Inspector::Draw_MapStageSections(CMapStage* pMapStage)
 			}
 
 			const _bool bRenderable = ReadBoolProperty(pSection, L"Renderable", L"MapSection", pSection->Get_Desc().bRenderable);
-			const _bool bEnableCulling = ReadBoolProperty(pSection, L"Enable Culling", L"MapSection", pSection->Get_Desc().bEnableCulling);
 			const _bool bUseCollMesh = pSection->Has_CollMesh() && pSection->Is_UseCollMesh();
 
-			ImGui::TextDisabled("R:%s  C:%s",
-				bRenderable ? "On" : "Off",
-				bEnableCulling ? "On" : "Off");
-			ImGui::TextDisabled("Shadow: Forced  CollMesh:%s",
-				bUseCollMesh ? "On" : "Off");
+			ImGui::TextDisabled("R:%s", bRenderable ? "On" : "Off");
+			ImGui::TextDisabled("Shadow: Forced  CollMesh:%s", bUseCollMesh ? "On" : "Off");
 
 			ImGui::Separator();
 			ImGui::PopID();
@@ -2419,28 +2413,11 @@ void CPanel_Inspector::Draw_MapStageSections(CMapStage* pMapStage)
 
 			ImGui::Separator();
 			Draw_Properties(m_pFocusedMapSection);
-			ImGui::Separator();
-			Draw_MapSectionRenderOptions(m_pFocusedMapSection);
 
 			ImGui::PopID();
 		}
 	}
 	ImGui::EndChild();
-}
-
-void CPanel_Inspector::Draw_MapSectionRenderOptions(CMapSection* pSection)
-{
-	if (nullptr == pSection)
-		return;
-
-	if (!ImGui::CollapsingHeader("Render Group (per Section)", ImGuiTreeNodeFlags_DefaultOpen))
-		return;
-
-	int iRenderGroup = ToMapRenderGroupIndex(pSection->Get_RenderID());
-	const char* RenderGroups[] = { "NONBLEND", "BLEND" };
-
-	if (ImGui::Combo("Render Group", &iRenderGroup, RenderGroups, IM_ARRAYSIZE(RenderGroups)))
-		pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
 #ifdef _DEBUG

@@ -258,6 +258,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				Entry.pObjectTag,
 				&Desc)))
 			{
+				Log_GameContentWarning("MapGimmickSection spawn failed: " + WstrToStr(StageDesc.strStageName) + "/" + WstrToStr(Entry.pSectionName));
 				Rollback(CreatedObjects);
 				return E_FAIL;
 			}
