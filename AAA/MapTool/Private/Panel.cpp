@@ -18,12 +18,7 @@ HRESULT CPanel::Initialize(CPanel_Manager* pPanelManager)
 
 _bool CPanel::Begin_Panel()
 {
-	_bool bVisible = ImGui::Begin(m_szName, &m_bOpen, m_iWindowFlags);
-
-	m_bHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
-	m_bFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-
-	return bVisible;
+	return ImGui::Begin(m_szName, &m_bOpen, m_iWindowFlags);
 }
 
 void CPanel::End_Panel()

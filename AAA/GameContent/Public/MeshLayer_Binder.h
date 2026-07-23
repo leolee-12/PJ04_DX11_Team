@@ -1,5 +1,4 @@
 #pragma once
-#include "MeshLayer_Profile.h"
 #include "Shader_PassMeta.h"
 
 NS_BEGIN(Engine)
@@ -11,12 +10,34 @@ NS_END
 
 NS_BEGIN(Client)
 
+enum class MESH_LAYER_PROFILE : _uint
+{
+	MAP,
+
+	WORLD_NONANIM,
+	WORLD_ANIM,
+	WORLD_INSTANCE,
+};
+
+enum class MESH_LAYER_RENDER_KIND : _uint
+{
+	MAIN,
+	SHADOW,
+	DECAL,
+	MAIN_BLEND
+};
+
 struct MESH_LAYER_BIND_CONTEXT
 {
 	CShader* pShader = { nullptr };
 	CModel* pModel = { nullptr };
 	CCullingState* pCullingState = { nullptr };
 	CGameInstance_Proxy* pGI_Proxy = { nullptr };
+
+	void Set_Renderer(CShader* pShader_, CModel* pModel_, CGameInstance_Proxy* pProxy_, CCullingState* pCulling_ = nullptr)
+	{
+		pShader = pShader_; pModel = pModel_; pGI_Proxy = pProxy_; pCullingState = pCulling_;
+	}
 
 	_uint iMesh = { 0 };
 	const MESH_LAYER_IDX* pLayer = { nullptr };

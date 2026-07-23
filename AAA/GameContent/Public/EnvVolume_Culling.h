@@ -18,12 +18,7 @@ private:
 	virtual ~CEnvVolume_Culling() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
-
-private:
-	_bool m_bActive = { false };
 
 #ifdef _DEBUG
 protected:

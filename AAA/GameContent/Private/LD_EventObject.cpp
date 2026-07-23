@@ -467,10 +467,7 @@ HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex, MES
 			return E_FAIL;
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pCullingState = m_pCullingState;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 		Ctx.iMesh = iMeshIndex;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;

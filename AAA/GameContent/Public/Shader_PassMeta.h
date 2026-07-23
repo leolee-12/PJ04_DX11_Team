@@ -81,17 +81,6 @@ inline _bool Is_ValidMapPassValue(_int iPass)
 	return 0 <= iPass && iPass < ETOI(MAP_PASS::_COUNT);
 }
 
-inline const MAP_SHADER_PASS_META* Find_MapShaderPassMeta(_int iPass)
-{
-	for (const auto& Meta : g_MapShaderPassMetas)
-	{
-		if (ETOI(Meta.ePass) == iPass)
-			return &Meta;
-	}
-
-	return &g_MapShaderPassMetas[static_cast<_uint>(MAP_DEFAULT_PASS)];
-}
-
 inline _int Get_MapShaderPassComboIndex(_int iPass)
 {
 	for (_uint i = 0; i < _countof(g_MapShaderPassMetas); ++i)
@@ -170,6 +159,7 @@ enum class WORLD_PASS : _int
 	BLEND_DMN, // 17 - BLEND_HDR에서 렌더링하는 포워드 반투명 패스
 	BLEND_UKWN_LIGHT, // 18 - UNKNOWN 밝기를 마스크로 사용하는 빛줄기 패스
 	BLEND_UKWN2_LIGHT, // 19 - 두 UNKNOWN 텍스처를 조합하는 빛줄기 패스
+	UKWN2_SAND_OPAQUE, // 20
 
 	COUNT
 };
@@ -203,6 +193,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::BLEND_DMN,			"BLEND_DMN",			DIFF | MRA | NORM },
 	{ WORLD_PASS::BLEND_UKWN_LIGHT,		"BLEND_UKWN_LIGHT",		UKWN },
 	{ WORLD_PASS::BLEND_UKWN2_LIGHT,	"BLEND_UKWN2_LIGHT",	UKWN },
+	{ WORLD_PASS::UKWN2_SAND_OPAQUE,	"UKWN2_SAND_OPAQUE",    UKWN },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -223,17 +214,6 @@ inline _bool Is_WorldBlendPass(_int iPass)
 	default:
 		return false;
 	}
-}
-
-inline const WORLD_SHADER_PASS_META* Find_WorldShaderPassMeta(_int iPass)
-{
-	for (const auto& Meta : g_WorldShaderPassMetas)
-	{
-		if (ETOI(Meta.ePass) == iPass)
-			return &Meta;
-	}
-
-	return &g_WorldShaderPassMetas[0];
 }
 
 inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
@@ -258,6 +238,7 @@ inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
 		return SHADOW_ALPHA_SOURCE::DIFFUSE_R;
 
 	case WORLD_PASS::DMN_OPAQUE:
+	case WORLD_PASS::UKWN2_SAND_OPAQUE:
 		return SHADOW_ALPHA_SOURCE::NONE;
 
 	case WORLD_PASS::DISCARD:
@@ -311,6 +292,8 @@ enum class ANIM_MESH_PASS : _uint
 	COUNT
 };
 #pragma endregion
+
+
 
 #pragma region NonAnim Mesh Pass
 //enum class NONANIM_MESH_PASS : _uint

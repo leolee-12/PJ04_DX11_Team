@@ -21,7 +21,6 @@ public:
 	HRESULT Bind_ShaderResource(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle) const;
 	HRESULT Bind_DefaultShaderResource(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind) const;
 	_bool	Is_Valid(TEXTURE_HANDLE Handle) const;
-	_bool	Is_CompatibleDevice(ID3D11Device* pDevice) const;
 	TEXTURE_HUB_STATS Get_Stats() const;
 
 private:

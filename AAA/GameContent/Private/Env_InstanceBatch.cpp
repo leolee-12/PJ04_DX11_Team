@@ -299,9 +299,7 @@ HRESULT CEnv_InstanceBatch::Render_Instanced()
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy);
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;
@@ -393,9 +391,7 @@ HRESULT CEnv_InstanceBatch::Render_Decal_Instanced()
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy);
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;
@@ -450,9 +446,7 @@ HRESULT CEnv_InstanceBatch::Render_Shadow_Instanced()
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy);
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;

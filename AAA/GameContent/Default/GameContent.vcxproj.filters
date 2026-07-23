@@ -2538,9 +2538,6 @@
     <ClInclude Include="..\Public\MeshLayer_Binder.h">
       <Filter>99. Defines\Leo</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MeshLayer_Profile.h">
-      <Filter>99. Defines\Leo</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\MeshParticleCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClInclude>
@@ -3951,9 +3948,6 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp">
-      <Filter>99. Defines\Leo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MeshLayer_Profile.cpp">
       <Filter>99. Defines\Leo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeshParticleCommon.cpp">

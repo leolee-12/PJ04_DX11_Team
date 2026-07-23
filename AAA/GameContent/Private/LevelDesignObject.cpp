@@ -323,9 +323,7 @@ HRESULT CLevelDesignObject::Render_ShadowMesh(CShader* pShader, CModel* pModel, 
 	const MESH_LAYER_IDX& Layer = pModel->Get_MeshLayer(iMeshIndex);
 
 	MESH_LAYER_BIND_CONTEXT Ctx{};
-	Ctx.pShader = pShader;
-	Ctx.pModel = pModel;
-	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.Set_Renderer(pShader, pModel, m_pGameInstance_Proxy);
 	Ctx.iMesh = iMeshIndex;
 	Ctx.pLayer = &Layer;
 	Ctx.eProfile = eProfile;

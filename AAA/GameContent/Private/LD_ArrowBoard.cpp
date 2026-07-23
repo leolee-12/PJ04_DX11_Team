@@ -314,10 +314,7 @@ HRESULT CLD_ArrowBoard::Render_Model()
 		Layer.vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
 
 	MESH_LAYER_BIND_CONTEXT Ctx{};
-	Ctx.pShader = m_pShaderCom;
-	Ctx.pModel = m_pModelCom;
-	Ctx.pCullingState = m_pCullingState;
-	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 	Ctx.iMesh = 0u;
 	Ctx.pLayer = &Layer;
 	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;

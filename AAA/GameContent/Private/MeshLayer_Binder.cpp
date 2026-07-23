@@ -78,12 +78,15 @@ _uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_REND
 	switch (eProfile)
 	{
 	case MESH_LAYER_PROFILE::MAP:
-		return MeshLayerProfile::Resolve_MapPass(Layer, iFallbackPass);
+		return Is_ValidMapPassValue(Layer.iPass) ? static_cast<_uint>(Layer.iPass) : iFallbackPass;
 
 	case MESH_LAYER_PROFILE::WORLD_NONANIM:
 	case MESH_LAYER_PROFILE::WORLD_ANIM:
 	case MESH_LAYER_PROFILE::WORLD_INSTANCE:
-		return MeshLayerProfile::Resolve_WorldPass(Layer, iFallbackPass);
+	{
+		const WORLD_PASS ePass = static_cast<WORLD_PASS>(Layer.iPass);
+		return WORLD_PASS::DEFAULT != ePass && Is_ValidWorldPassValue(Layer.iPass) ? static_cast<_uint>(ePass) : iFallbackPass;
+	}
 
 	default:
 		return iFallbackPass;
@@ -189,8 +192,10 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iHasNormalTexture", &iHasNormalTexture, sizeof(_uint))))
 			return E_FAIL;
 
-		if (ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass
-			&& FAILED(Ctx.pModel->Bind_Material(Ctx.pShader, "g_ExtraRTexture", Ctx.iMesh, static_cast<MTEX_TYPE>(Layer.iExtraTexType[0]), static_cast<_uint>(Layer.iExtraBind[0]))))
+		if ((ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass ||
+			ETOI(WORLD_PASS::UKWN2_SAND_OPAQUE) == Layer.iPass) &&
+			FAILED(Bind_MapExtraSlotSafe(Ctx, "g_ExtraRTexture", Layer.iExtraBind[0], static_cast<MTEX_TYPE>(Layer.iExtraTexType[0]),
+				DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 
 		return S_OK;
@@ -252,7 +257,8 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUnknownUVIndex", &iUnknownUVIndex, sizeof(_uint)))) return E_FAIL;
 
-		if (ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass &&
+		if ((ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass ||
+			ETOI(WORLD_PASS::UKWN2_SAND_OPAQUE) == Layer.iPass) &&
 			FAILED(Ctx.pShader->Bind_RawValue("g_iExtraR_UVIndex", &iExtraRUVIndex, sizeof(_uint))))
 			return E_FAIL;
 
@@ -284,7 +290,7 @@ namespace
 		if (FAILED(Bind_WorldCommonParams(Ctx)))
 			return E_FAIL;
 
-		const _uint iShadowAlphaSource = static_cast<_uint>(MeshLayerProfile::Resolve_WorldShadowAlphaSourceFromLayer(Layer));
+		const _uint iShadowAlphaSource = static_cast<_uint>(Resolve_WorldShadowAlphaSource(static_cast<WORLD_PASS>(Layer.iPass)));
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iShadowAlphaSource", &iShadowAlphaSource, sizeof(_uint))))
 			return E_FAIL;
 

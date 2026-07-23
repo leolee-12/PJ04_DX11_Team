@@ -398,10 +398,7 @@ HRESULT CLevelDesign_Ladder::Render_Model(CModel* pModel)
 		const MESH_LAYER_IDX& Layer = pModel->Get_MeshLayer(i);
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = pModel;
-		Ctx.pCullingState = m_pCullingState;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, pModel, m_pGameInstance_Proxy, m_pCullingState);
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;

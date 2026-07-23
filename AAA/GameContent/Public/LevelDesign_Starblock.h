@@ -54,9 +54,6 @@ public:
 	virtual void On_SpatEnd() override;
 	virtual _float3 Get_SpatPivotOffset() const override { return m_vSpatPivot; }
 
-public:
-	const LD_BREAKABLE_DESC& Get_BreakableDesc() const { return m_tBreakableDesc; }
-
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };

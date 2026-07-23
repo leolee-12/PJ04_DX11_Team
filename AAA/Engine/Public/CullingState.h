@@ -61,10 +61,8 @@ public:
 	void Refresh_WorldBounds(const _float4x4& WorldMatrix);
 	void Evaluate(const CULLING_EVALUATION_INPUT& Desc);
 
-	void Reset_Channel(CHANNEL eChannel);
 	void Reset_AllResults();
 
-	_bool Has_Bounds() const;
 	_bool Is_Culled(CHANNEL eChannel) const;
 	_float Get_Dissolve(CHANNEL eChannel) const;
 

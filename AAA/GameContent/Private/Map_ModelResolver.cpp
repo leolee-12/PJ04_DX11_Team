@@ -261,23 +261,6 @@ _bool CMap_ModelResolver::Resolve_EnvObject(ENV_OBJECT_DESC* pDesc)
 	return false;
 }
 
-void CMap_ModelResolver::Clear_EnvModelCache()
-{
-	m_pEnvModelIndex.reset();
-	Invalidate_EnvModelCache(m_strMapRoot);
-}
-
-void CMap_ModelResolver::Invalidate_EnvModelCache(const _wstring& strMapRoot)
-{
-	const path Root = path(strMapRoot) / L"Env";
-	const _wstring strCacheKey = Make_EnvModelIndexKey(Root);
-
-	lock_guard<mutex> Lock(Get_EnvModelIndexMutex());
-	Get_EnvModelIndexCache().erase(strCacheKey);
-	Get_RejectedModelLogSet().clear();
-	Get_TrimmedResolveLogSet().clear();
-}
-
 void CMap_ModelResolver::Build_MapSectionCandidates(
 	const _wstring& strSectionName,
 	vector<_wstring>* pOutCandidates) const

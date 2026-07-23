@@ -233,10 +233,7 @@ HRESULT CLevelDesign_Breakable::Render()
 		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
 		{
 			MESH_LAYER_BIND_CONTEXT Ctx{};
-			Ctx.pShader = m_pShaderCom;
-			Ctx.pModel = m_pModelCom;
-			Ctx.pCullingState = m_pCullingState;
-			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+			Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
@@ -259,10 +256,7 @@ HRESULT CLevelDesign_Breakable::Render()
 		else
 		{
 			MESH_LAYER_BIND_CONTEXT Ctx{};
-			Ctx.pShader = m_pShaderCom;
-			Ctx.pModel = m_pModelCom;
-			Ctx.pCullingState = m_pCullingState;
-			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+			Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;

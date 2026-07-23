@@ -1,7 +1,7 @@
 #pragma once
 #include "LevelDesignObject.h"
 #include "BlendRenderable.h"
-#include "MeshLayer_Profile.h"
+#include "MeshLayer_Binder.h"
 
 NS_BEGIN(Engine)
 class CShader;
