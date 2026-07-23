@@ -13,7 +13,6 @@ HRESULT CBoss_Metaknight_Sword::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))  return E_FAIL;
     if (FAILED(Ready_Components()))         return E_FAIL;
 
-    // TODO: 실측 후 튜닝 (갈락시아는 GigantEdge 검보다 작음)
     CAPSULE_DESC CapsuleDesc{};
     CapsuleDesc.vCenter = { 0.f, 0.f, 0.f };
     CapsuleDesc.fHeight = 1.2f;
@@ -22,9 +21,57 @@ HRESULT CBoss_Metaknight_Sword::Initialize(void* pArg)
     if (FAILED(Ready_HitBox(CapsuleDesc)))
         return E_FAIL;
 
+
+    CCollider::COLLIDER_DESC PickDesc{};
+    PickDesc.pOwner = this;
+    PickDesc.vCenter = { 0.f, 0.f, 0.f };
+    PickDesc.fRadius = 0.6f;
+    PickDesc.fHeight = 0.6f;
+    m_pPickBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
+        TEXT("PickBox_Com"), &PickDesc);
+    if (nullptr == m_pPickBox)
+        return E_FAIL;
+
+    m_pPickBox->Set_OnEnter([this](CCollider* pOther) {
+        if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+            return;
+        if (m_bTaken)
+            return;
+        m_bTaken = true;
+        m_pPickBox->Set_Enabled(false);
+        Set_Active(false);
+        });
+
+    m_pPickBox->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_pPickBox, ETOUI(COLLISION_LAYER::EXCALIBUR));
+
     m_iShadowPassIdx = 6;
 
     return S_OK;
+}
+
+void CBoss_Metaknight_Sword::Late_Update(_float fTimeDelta)
+{
+    if (!m_bDropped)
+    {
+        __super::Late_Update(fTimeDelta);
+        return;
+    }
+
+    if (!m_bActive)
+        return;
+
+    m_CombinedWorldMatrix = m_DropWorld;
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
+
+    if (m_pPickBox && m_pPickBox->Is_Enabled())
+    {
+        m_pPickBox->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+#ifdef _DEBUG
+        m_pGameInstance_Proxy->Add_DebugComponent(m_pPickBox);
+#endif
+    }
 }
 
 HRESULT CBoss_Metaknight_Sword::Render()
@@ -57,6 +104,24 @@ HRESULT CBoss_Metaknight_Sword::Render()
     }
 
     return S_OK;
+}
+
+void CBoss_Metaknight_Sword::Drop_Freeze()
+{
+    if (m_bDropped)
+        return;
+    m_bDropped = true;
+
+    m_DropWorld = m_CombinedWorldMatrix;
+
+    if (m_pHitBox)  m_pHitBox->Set_Enabled(false);
+    if (m_pPickBox) m_pPickBox->Set_Enabled(true);
+}
+
+void CBoss_Metaknight_Sword::Retire_Drop()
+{
+    if (m_pPickBox) m_pPickBox->Set_Enabled(false);
+    Set_Active(false);
 }
 
 HRESULT CBoss_Metaknight_Sword::Ready_Components()
