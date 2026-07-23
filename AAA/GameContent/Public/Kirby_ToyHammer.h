@@ -8,6 +8,9 @@ class CKirby_ToyHammer final : public CKirby_OnOffPart
 {
     GENERATED_BODY(CKirby_ToyHammer)
 
+private:
+    enum TOY_HAMMER_MESH { HANDLE, HEAD, TOP, MESH_END };
+
 public:
     struct KIRBY_TOYHAMMER_DESC : public CKirby_OnOffPart::KIRBY_ONONFFPART_DESC
     {
@@ -32,8 +35,13 @@ public:
 public:
     virtual void Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode) override;
 
+    void BurnHammer(_bool bBurn) { m_bBurn = bBurn; }
+
 private:
     HRESULT Ready_Components();
+
+private:
+    _bool m_bBurn{};
 
 public:
     static CKirby_ToyHammer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

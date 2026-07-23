@@ -43,6 +43,9 @@ HRESULT CKirby_ToyHammer::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        if (m_bBurn && (i == TOY_HAMMER_MESH::HEAD || i == TOY_HAMMER_MESH::TOP))
+            continue;
+
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
             return E_FAIL;
 

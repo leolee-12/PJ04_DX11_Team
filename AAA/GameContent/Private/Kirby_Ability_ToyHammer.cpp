@@ -262,6 +262,11 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             pToyHammerAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.f);
             break;
         }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_4:
+        {
+            pAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.f);
+            break;
+        }
         case TOY_HAMMER_STATE::WHEELHAMMER:
         {
             pAnimator->Play("WheelHammer", false, true, 0.f, 3.f);
@@ -366,6 +371,9 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             {
                 ++m_iChargeCount;
 
+                CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
+                CAnimator* pToyHammerAnimator = pToyHammer->Get_Animator();
+
                 if (m_iChargeCount == 1)
                 {
                     m_eChargeLevel = CHARGE_LEVEL::LV2;
@@ -376,11 +384,16 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                     m_eChargeLevel = CHARGE_LEVEL::LV3;
                     m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge3.wav", 0.2f);
                 }
-
+                else if(m_iChargeCount == 12)
+                {
+                    m_eChargeLevel = CHARGE_LEVEL::LV4;
+                    m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_ChargeBurst.wav", 0.2f);
+                    pToyHammer->BurnHammer(true);
+                }
+                
                 pAnimator->Play("OnigorosiHammerCharge", false, true, 0.1f, 2.5f);
 
-                CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
-                CAnimator* pToyHammerAnimator = pToyHammer->Get_Animator();
+
                 pToyHammerAnimator->Play("OnigorosiHammerCharge", false, true, 0.1f, 2.5f);
             }
 
@@ -392,6 +405,8 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                     Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::CHARGE_ATTACK_2);
                 else if (m_eChargeLevel == CHARGE_LEVEL::LV3)
                     Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::CHARGE_ATTACK_3);
+                else if (m_eChargeLevel == CHARGE_LEVEL::LV4)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::CHARGE_ATTACK_4);
 
                 return;
             }
@@ -408,6 +423,11 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
+        {
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_4:
         {
             AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
             break;
@@ -489,6 +509,12 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
         {
+            break;
+        }
+        case TOY_HAMMER_STATE::CHARGE_ATTACK_4:
+        {
+            CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
+            pToyHammer->BurnHammer(false);
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER:
