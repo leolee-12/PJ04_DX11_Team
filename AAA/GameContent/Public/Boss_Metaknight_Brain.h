@@ -62,6 +62,10 @@ private:
     static constexpr _float UC_FALL_MIN_TIME = 0.15f;
     static constexpr _float UC_FALL_TIMEOUT = 5.f;
 
+    static constexpr _float RET_RISE_H = 20.f;
+    static constexpr _float RET_RISE_SPEED = 30.f;
+    static constexpr _float RET_MOVE_SPEED = 18.f;
+
 private:
     _int m_iLastCombo = { 0 };
 
@@ -101,6 +105,8 @@ private:
     CBTNode* Make_UC_CatchSuccess();
     CBTNode* Make_UC_Fall();
     CBTNode* Make_LockLose();
+    CBTNode* Make_LockLose_Return();
+    CBTNode* Make_ReturnFly();
 
 
     // 트리 조립 유틸

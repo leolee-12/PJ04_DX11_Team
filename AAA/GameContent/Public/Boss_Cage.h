@@ -15,6 +15,7 @@ class CCage_WaddleDee;
 class CBoss_Cage final : public CContainerObject
 {
     GENERATED_BODY(CBoss_Cage)
+    PROPERTY(_bool, m_bShow, L"Start Show", L"Cage")
 
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Boss_Cage";
