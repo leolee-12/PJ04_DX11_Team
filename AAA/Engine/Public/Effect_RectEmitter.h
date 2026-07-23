@@ -22,6 +22,7 @@ PROPERTY(_bool, m_bUseParticleRoll, L"Use Particle Roll", L"Rect Animation");
 
 // Sprite Animation Texture
 PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
+PROPERTY(_bool, m_bRandomTextureFrame, L"Random Texture Frame", L"Sprite Animation");
 
 PROPERTY(_int, m_iTexFrameX, L"Frame X_T", L"Sprite Animation");
 PROPERTY(_int, m_iTexFrameY, L"Frame Y_T", L"Sprite Animation");

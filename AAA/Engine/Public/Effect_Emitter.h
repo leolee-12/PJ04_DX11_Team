@@ -130,6 +130,7 @@ protected:
 
         _float fAge{};
         _float fLifeTime{ 1.f };
+        _float fRandomValue{};
 
         _float fAlpha{ 1.f };
 

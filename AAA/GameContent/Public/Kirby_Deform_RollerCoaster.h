@@ -2,6 +2,8 @@
 
 #include "Kirby_Deform.h"
 
+#include "Effect_Loader.h"
+
 NS_BEGIN(Engine)
 NS_END
 
@@ -79,6 +81,8 @@ private:
 	_float m_fAccRailSpeed{};
 
 	CSound_Handle m_RunningSound{};
+
+	FX_HANDLE hCoasterWind{};
 
 private:
 	_float m_fLeftRightDegree{};

@@ -323,6 +323,7 @@ _bool CEffect_Emitter::Spawn_EmitterParticle()
 
     pParticle->bAlive = true;
     pParticle->fAge = 0.f;
+    pParticle->fRandomValue = m_pGameInstance_Proxy->RandomFloat(0.f, 1.f);
     pParticle->bParentDetached = false;
     pParticle->bParentDetachPending = false;
     XMStoreFloat4x4(&pParticle->DetachedParentWorldMatrix, XMMatrixIdentity());

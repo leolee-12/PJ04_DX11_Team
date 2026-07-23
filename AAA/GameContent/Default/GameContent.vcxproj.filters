@@ -109,6 +109,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\07. BoostGas">
       <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind">
+      <UniqueIdentifier>{0c876f5f-219a-4b8c-9c29-6065f339a1cf}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. Env">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
     </Filter>
@@ -1588,6 +1591,21 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight">
+      <UniqueIdentifier>{214b11c1-771e-4020-8ec5-f099665e5154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnightEncounter">
+      <UniqueIdentifier>{33020856-964e-4101-8c62-ae1ac0a1eb1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE">
+      <UniqueIdentifier>{5739041f-3609-4363-996a-8f573294ddfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword">
+      <UniqueIdentifier>{ae28f6b8-df31-4738-814d-50b367972186}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat">
+      <UniqueIdentifier>{8f59b103-c3fe-4a3c-bcb6-b6b800dd6ac4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1661,6 +1679,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CoasterWind.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Boss.h">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -2146,6 +2167,9 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_MetaKnightSword.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_ToyHammer.h">
@@ -3075,6 +3099,15 @@
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaSword.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_MetaHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3142,6 +3175,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. BoostGas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CoasterWind.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Boss.cpp">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -3588,6 +3624,9 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\04. Kirby_Ability_Sleep</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_MetaKnightSword.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_ToyHammer.cpp">
@@ -4462,6 +4501,15 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\MetaKnight\MetaKnight_QTE</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaSword.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\07. MetaSword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_MetaHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

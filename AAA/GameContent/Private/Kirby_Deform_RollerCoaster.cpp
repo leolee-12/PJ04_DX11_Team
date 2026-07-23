@@ -12,6 +12,8 @@
 #include "LevelDesign_Rail.h"
 #include "RailTrack.h"
 
+#include "Effect_Loader.h"
+
 CKirby_Deform_RollerCoaster::CKirby_Deform_RollerCoaster()
 {
 }
@@ -199,6 +201,13 @@ void CKirby_Deform_RollerCoaster::Enter_CoasterState(CKirby* pKirby, DEFORM_ROLL
             pAnimator->Play("Running", true, false, 0.1f, 1.5f);
             m_RunningSound = m_pGameInstance_Proxy->Play_SFX_Section_Loop(L"HeroDeformRollerCoaster_Running.wav", 0.04741f, 0.23682f, 0.05f);
 
+    /*        if (FAILED(CEffect_Loader::GetInstance()->Spawn(L"CoasterWind", pKirby->Get_LevelIndex(),
+                _float3{ 0.f, 0.f, 0.f }, _float3{ 0.f, 0.f, 1.f }, _float3{ 0.f, 0.f, 0.f },
+                pKirby->Get_Transform()->Get_WorldMatrixPtr(), nullptr, &hCoasterWind)))
+            {
+                hCoasterWind.Clear();
+            }*/
+
             break;
         }
         case DEFORM_ROLLERCOASTER_STATE::WAIT:
@@ -261,6 +270,11 @@ void CKirby_Deform_RollerCoaster::Exit_CoasterState(CKirby* pKirby, DEFORM_ROLLE
 
             if (XMVectorGetX(XMVector3LengthSq(vLook)) > Helper::fEpsilon)
                 pTransform->LookTo(XMVector3Normalize(vLook), XMVectorSet(0.f, 1.f, 0.f, 0.f));
+
+            //if(CEffect_Loader::GetInstance()->Is_Current(hCoasterWind))
+            //    hCoasterWind.p->Start_FadeOut();
+
+            //hCoasterWind.Clear();
 
             break;
         }
