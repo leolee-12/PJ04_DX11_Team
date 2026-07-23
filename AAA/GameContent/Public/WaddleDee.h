@@ -48,6 +48,7 @@ private:
 	virtual void On_Deserialized() override;
 
 	HRESULT Ready_PartObjects();
+	HRESULT Ready_AnimEvents();
 	HRESULT Ready_HurtBox();
 	HRESULT Validate_Initialized();
 	_bool Is_Sitting() const;
