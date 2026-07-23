@@ -58,8 +58,11 @@ public:
 	_float Get_SpeedPerSec() const { return m_fSpeedPerSec; }
 
 	void Set_State(STATE eState, _fvector vState) {
-		//XMStoreFloat4(static_cast<_float4*>(&m_WorldMatrix.m[ETOUI(eState)]), vState);
-		XMStoreFloat4(&m_States[ETOUI(eState)], vState);
+		_float fW = 0.f;
+		if (eState == STATE::POSITION)
+			fW = 1.f;
+
+		XMStoreFloat4(&m_States[ETOUI(eState)], XMVectorSetW(vState, fW));
 	}
 
 	void Set_WorldMatrix(const _fmatrix Matrix) {

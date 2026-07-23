@@ -114,6 +114,8 @@ void CProjectile_Nail::Enter_Stuck(const _float3& vNormal)
     m_fStuckTimer = STUCK_LINGER;
     Stop_Meteo();
 
+    m_pGameInstance_Proxy->Play_SFX(L"CharaBossLeopard_NailStuck.wav", 0.2f);
+
     UNREFERENCED_PARAMETER(vNormal);   // TODO(선택): 표면 노멀에 맞춰 정렬(꽂힌 각도)
 }
 

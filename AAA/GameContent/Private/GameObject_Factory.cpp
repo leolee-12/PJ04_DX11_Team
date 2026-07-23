@@ -797,6 +797,12 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::PROTOTYPE_TAG, CWaddleDee_Body::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh", XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYE_TEX_PROTO, 
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEye.%02d.dds", CWaddleDee_Body::EYE_COUNT));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYEMASK_TEX_PROTO,
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEyeMask.%02d.dds", CWaddleDee_Body::EYE_COUNT));
         )
     );
 
