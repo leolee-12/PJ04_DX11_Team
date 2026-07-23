@@ -22,6 +22,17 @@ public:
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;
     static constexpr _float DEATH_SHAKE_SEC = 0.7f;
 
+#pragma region 아르마딜로 사운드
+    static constexpr const _tchar* SND_STUNLOOP         = L"CharaBasic_Stunning.wav";
+    static constexpr const _tchar* SND_SHAKECAGE        = L"CharaBossArmadillo_ShakeCage.wav";
+    static constexpr const _tchar* SND_GETKIRBY         = L"CharaBossArmadillo_GetHero.wav";
+    static constexpr const _tchar* SND_TWINDANCE        = L"CharaBossArmadillo_TwinDanceLoop.wav";
+    static constexpr const _tchar* SND_ROLLINGBOUND     = L"CharaBossArmadillo_RollingBound.wav";
+    static constexpr const _tchar* SND_ROLLINGHITWALL   = L"CharaBossArmadillo_RollingHitWall.wav";
+    static constexpr const _tchar* SND_ROLLINGLOOP      = L"CharaBossArmadillo_RollingLoop.wav";
+    static constexpr const _tchar* SND_ROLLINGPASS      = L"CharaBossArmadillo_RollingNoLoop.wav";
+#pragma endregion
+
 private:
     CBoss_Armadillo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CBoss_Armadillo(const CBoss_Armadillo& Prototype);

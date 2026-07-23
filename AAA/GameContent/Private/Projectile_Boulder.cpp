@@ -8,6 +8,7 @@
 #include "Collider.h"
 #include "Projectile_Movement.h"
 #include "Effect_Loader.h"
+#include "DropStar_Manager.h"
 
 CProjectile_Boulder::CProjectile_Boulder(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPhysicsProjectile{ pDevice, pContext }
@@ -55,6 +56,13 @@ void CProjectile_Boulder::On_Bounce(_int iCount)
     _float3 vPos{};
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
     CEffect_Loader::GetInstance()->Spawn(TEXT("RockBounce"), m_iLevelIndex, vPos);
+
+    if (iCount == 1)
+    {
+        CDropStar_Manager::GetInstance()->Spawn_Preset(Get_LevelIndex(),
+            XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), L"GorillaRockImpact");
+    }
+
     if (iCount >= 3)
         Enter_Break();
     else

@@ -52,6 +52,7 @@ private:
     CShader* m_pShaderCom = { nullptr };
     CModel* m_pModelCom = { nullptr };
     CAnimator* m_pAnimatorCom = { nullptr };
+    CSound_Handle m_RollSound{};
 
     STATE  m_eState = { STATE::CARRIED };
 

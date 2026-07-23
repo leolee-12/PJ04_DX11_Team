@@ -8,6 +8,7 @@
 #include "Collider.h"
 #include "Projectile_Movement.h"
 #include "Effect_Loader.h"
+#include "DropStar_Manager.h"
 
 CProjectile_Partner::CProjectile_Partner(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPhysicsProjectile{ pDevice, pContext }
@@ -60,6 +61,9 @@ void CProjectile_Partner::On_Launched()
     m_eState = STATE::FLYING;
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("TwinRolling", true, true, 0.2f, ANIM_SPEED);
+
+    m_RollSound.Stop();
+    m_RollSound = m_pGameInstance_Proxy->Play_SFX_Section_Loop(L"CharaBossArmadillo_PartnerRollingLoop.wav", 0.10f, 0.21f, 0.08f);
 }
 
 void CProjectile_Partner::Enter_Break()
@@ -76,6 +80,12 @@ void CProjectile_Partner::Enter_Break()
 
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("Break", false, true);
+
+    CDropStar_Manager::GetInstance()->Spawn_Preset(Get_LevelIndex(),
+        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), L"AramaDilloPartnerDestroy");
+
+    m_RollSound.Stop();
+    m_pGameInstance_Proxy->Play_SFX(L"CharaBossArmadillo_PartnerBreak.wav", 0.15f);
 }
 
 void CProjectile_Partner::Update_Terminal(_float dt)
@@ -179,4 +189,8 @@ CGameObject* CProjectile_Partner::Clone(void* pArg)
     if (FAILED(p->Initialize(pArg))) { MSG_BOX("Failed to Cloned : CProjectile_Partner"); Safe_Release(p); }
     return p;
 }
-void CProjectile_Partner::Free() { __super::Free(); }
+void CProjectile_Partner::Free() 
+{ 
+    m_RollSound.Stop();
+    __super::Free();
+}

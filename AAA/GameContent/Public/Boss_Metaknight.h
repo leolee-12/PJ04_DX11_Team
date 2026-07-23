@@ -127,6 +127,9 @@ public:
     EMK_SWORD Get_ActiveSword() const { return m_eActiveSword; }
     void      Enable_SwordHit(_bool bOn);
     void      Hide_Sword(EMK_SWORD eSword);
+    void      Drop_Galaxia();
+    void      Retire_Galaxia();
+    void      Hold_BossCam(_bool bOn);
 
     void      Show_Mant(_bool bOn);
     void      Play_MantSync(const _char* szClip, _bool bLoop, _float fBland = 0.2f, _float fSpeed = 1.5f);
@@ -267,7 +270,7 @@ private:
     _float m_fDeathTimer = { 0.f };
 
     // µð¹ö±×
-    static constexpr _bool s_bSkipIntro = true;
+    static constexpr _bool s_bSkipIntro = false;
 
 private:
     HRESULT Ready_MetaEvents();

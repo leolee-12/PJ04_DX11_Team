@@ -1,9 +1,7 @@
 #include "WaddleDee_Body.h"
 #include "GameInstance.h"
 #include "GameContent_const.h"
-#include "Shader.h"
-#include "Model.h"
-#include "Animator.h"
+
 #include "Cage_WaddleDee.h"
 
 namespace
@@ -82,9 +80,9 @@ HRESULT CWaddleDee_Body::Render()
 
         if (0 == i)
         {
-            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+            if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeTexture", m_iEyeIndex)))
                 return E_FAIL;
-            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeMaskTexture", i, MTEX_TYPE::UNKNOWN, 2)))
+            if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeMaskTexture", m_iEyeIndex)))
                 return E_FAIL;
         }
         else
@@ -155,7 +153,19 @@ HRESULT CWaddleDee_Body::Ready_Components()
 
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-    AnimDesc.strDataFile = TEXT("");
+    AnimDesc.strDataFile = TEXT("../../Resources/YSH/WaddleDee/Body/Model_Anim_AnimEvents.json");
+
+    m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"),
+        CTexture::Create(m_pDevice, m_pContext,
+            L"../../Resources/YSH/WaddleDee/Body/DeeEye.%02d.dds", EYE_COUNT));
+    if (nullptr == m_pEyeTextureCom)
+        return E_FAIL;
+
+    m_pEyeMaskTextureCom = Add_Component<CTexture>(TEXT("Com_EyeMaskTexture"),
+        CTexture::Create(m_pDevice, m_pContext,
+            L"../../Resources/YSH/WaddleDee/Body/DeeEyeMask.%02d.dds", EYE_COUNT));
+    if (nullptr == m_pEyeMaskTextureCom)
+        return E_FAIL;
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
     if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))

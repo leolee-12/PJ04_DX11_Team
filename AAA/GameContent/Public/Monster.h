@@ -112,14 +112,21 @@ public:
 	void						Enable_Controller(_bool bEnable);
 	virtual void				Enable_Colliders(_bool bEnable);
 
-	void						Play_ActionLoopSFX(const _tchar* pKey);
-	void						Stop_ActionLoopSFX();
+
+	// 사운드 헬퍼(TODO : 필요하면 3D 사운드 헬퍼도 추가)
+	void						Play_LoopSFX(const _tchar* pSoundKey, _float fVolume = 1.f);
+	void						Play_SectionLoopSFX(const _tchar* pSoundKey, _float fStart, _float fEnd, _float fVolume = 1.f);
+	void						Release_LoopSFX(const _tchar* pSoundKey);
+	void						Stop_LoopSFX(const _tchar* pSoundKey);
+	void						Stop_AllSounds();
+
+	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
+	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+
 	void						Stop_AllFx(_bool bImmediate);
 	void						Start_LaunchSmokeFx();
 	void						Play_LandingSmokeFx();
 	void						Stop_LaunchSmokeFx(_bool bImmediate = false);
-	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
-	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
 protected:
 	CController*				m_pController = { nullptr };
@@ -133,9 +140,8 @@ protected:
 	CCollider*					m_pInteractCollider = { nullptr };
 	CCollider*					m_pHurtBox = { nullptr };
 	
-	CSound_Handle				m_ActionLoopSnd;
-
-	unordered_map<_wstring, FX_HANDLE> m_Effects;
+	unordered_map<_wstring, FX_HANDLE>		m_Effects;
+	unordered_map<_wstring, CSound_Handle>	m_Sounds;
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};

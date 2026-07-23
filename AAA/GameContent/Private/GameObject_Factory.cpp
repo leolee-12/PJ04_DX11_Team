@@ -50,6 +50,8 @@
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
+#include "Kirby_MetaSword.h"
+#include "Kirby_MetaHat.h"
 #include "Kirby_ToyHammer.h"
 #include "Kirby_ToyHat.h"
 
@@ -72,6 +74,7 @@
 #include "SwordChargeEffect.h"
 #include "BombExplosion.h"
 #include "BoostGas.h"
+#include "CoasterWind.h"
 #include "CarMilkyWay.h"
 #include "CommonHit.h"
 #include "SpitObject.h"
@@ -258,7 +261,6 @@
 #include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
 #include "LD_MeteorGenerator.h"
-#include "LightShaft.h"
 
 // EnvObject
 #include "EnvTrigger_Generic.h"
@@ -480,6 +482,15 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
+
+            // Meta Sword
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_MetaSword::PROTOTYPE_TAG, CKirby_MetaSword::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_MetaSword"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/MetaSword/MetaSword.ysh"));
+            // Meta Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_MetaHat::PROTOTYPE_TAG, CKirby_MetaHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_MetaHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/MetaHat/MetaHat.ysh"));
 
             // Toy Hammer
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_ToyHammer::PROTOTYPE_TAG,
@@ -862,11 +873,6 @@ void CGameObject_Factory::Register_NonAnimObject()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorRock_Small::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Small/VolcanoRock_S.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Model_VolcanoRock_SpotLight"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/SpotLight/VolcanoRock_SpotLight.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CLightShaft::PROTOTYPE_TAG, CLightShaft::Create(pDevice, pContext));
         )
     );
 }
@@ -936,11 +942,20 @@ void CGameObject_Factory::Register_AnimObject()
 
     Register(CLD_CopyEssence::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_CopyEssence),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_CopyEssence::MODEL_PROTO_TAG,
-            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh", true));));
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/CopyEssence.ysh", true));));
 }
 
 void CGameObject_Factory::Register_Effect()
 {
+    Register(CCoasterWind::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCoasterWind),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_CoasterWind.iLevelID, Texture_CoasterWind.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CoasterWind.szFileTag, Texture_CoasterWind.iNumTex));
+        )
+    );
+
     // BoostGas
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
