@@ -32,7 +32,12 @@ namespace
 		case ENV_INTERACT_TYPE::PHYSICS_PROP:
 			Preset.eShape = ENV_INTERACT_SHAPE::CAPSULE;
 			Preset.bTouchByPlayerBody = true;
-			break;
+			Preset.fKickPower = 10.f;           // 수평
+			Preset.fUpImpulse = 12.f;           // 수직 → 약 51° 대각선, 정점 약 2.5유닛
+			Preset.fMaxSpeed = 30.f;
+			Preset.fBounceRestitution = 0.5f;   // 두 번째 뜀은 절반 높이
+			Preset.fBounceFriction = 0.6f;      // 0.2는 수평이 죽어 제자리에 주저앉음
+			break;	
 
 		case ENV_INTERACT_TYPE::BREAKABLE:
 			Preset.eShape = ENV_INTERACT_SHAPE::BOX;

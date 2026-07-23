@@ -49,7 +49,7 @@ void CEnvInteract_KickProp::Late_Update(_float fTimeDelta)
 	if (m_bKicked)
 	{
 		Clamp_DynamicVelocity();
-		Update_BounceState();
+		Update_BounceState(fTimeDelta);
 
 		if (!Is_Active())
 			return;
@@ -324,8 +324,17 @@ void CEnvInteract_KickProp::Kick_FromPlayer(CGameObject* pPlayer)
 	CTransform* pPlayerTransform = pPlayer->Get_Transform();
 	const ENV_INTERACT_PRESET& Preset = m_tDesc.tInteractPreset;
 
-	_vector vKickDirection = XMVectorSetY(pPlayerTransform->Get_State(STATE::LOOK), 0.f);
+	// 발로 찬 느낌: 플레이어 → 프롭 수평 방향. 거의 겹쳐 있으면 플레이어 정면으로 대체
+	_vector vKickDirection = XMVectorSetY(
+		m_pTransformCom->Get_State(STATE::POSITION) - pPlayerTransform->Get_State(STATE::POSITION), 0.f);
+
+	if (XMVectorGetX(XMVector3LengthSq(vKickDirection)) < Helper::fEpsilon)
+		vKickDirection = XMVectorSetY(pPlayerTransform->Get_State(STATE::LOOK), 0.f);
+
 	vKickDirection = XMVector3Normalize(vKickDirection);
+
+	const _float fYaw = XMConvertToRadians(m_pGameInstance_Proxy->RandomFloat(-s_fKickYawDegree, s_fKickYawDegree));
+	vKickDirection = XMVector3TransformNormal(vKickDirection, XMMatrixRotationY(fYaw));
 
 	_vector vKickVelocity = XMVectorScale(vKickDirection, Preset.fKickPower);
 	vKickVelocity = XMVectorSetY(vKickVelocity, Preset.fUpImpulse);
@@ -334,16 +343,23 @@ void CEnvInteract_KickProp::Kick_FromPlayer(CGameObject* pPlayer)
 	m_bKickPending = true;
 }
 
-void CEnvInteract_KickProp::Update_BounceState()
+void CEnvInteract_KickProp::Update_BounceState(_float fTimeDelta)
 {
+	const ENV_INTERACT_PRESET& Preset = m_tDesc.tInteractPreset;
+
+	m_fKickedElapsed += fTimeDelta;
+	if (m_fKickedElapsed >= s_fMaxKickLifeSecond)
+	{
+		Deactivate();
+		return;
+	}
+
 	_vector vVelocity = m_pRigidBodyCom->Get_LinearVelocity();
-	_float fVerticalVelocity = XMVectorGetY(vVelocity);
+	const _float fVerticalVelocity = XMVectorGetY(vVelocity);
 
 	if (m_fPreviousVerticalVelocity < 0.f && fVerticalVelocity >= 0.f)
 	{
 		++m_iBounceCount;
-
-		const ENV_INTERACT_PRESET& Preset = m_tDesc.tInteractPreset;
 
 		if (m_iBounceCount >= s_iDisappearBounceCount)
 		{
@@ -359,19 +375,22 @@ void CEnvInteract_KickProp::Update_BounceState()
 			return;
 		}
 
+		// 튈 때 수평 방향을 살짝 틀어서 점프하듯 다른 쪽으로 뜀
+		const _float fYaw = XMConvertToRadians(m_pGameInstance_Proxy->RandomFloat(-s_fBounceYawDegree, s_fBounceYawDegree));
+		_vector vHorizontal = XMVector3TransformNormal(XMVectorSetY(vVelocity, 0.f), XMMatrixRotationY(fYaw));
+		vHorizontal = XMVectorScale(vHorizontal, Preset.fBounceFriction);
+
 		const _float fBounceUp = -m_fPreviousVerticalVelocity * Preset.fBounceRestitution;
 
-		vVelocity = XMVectorSet(
-			XMVectorGetX(vVelocity) * Preset.fBounceFriction,
-			fBounceUp,
-			XMVectorGetZ(vVelocity) * Preset.fBounceFriction,
-			0.f);
-
-		m_pRigidBodyCom->Set_LinearVelocity(vVelocity);
-		fVerticalVelocity = fBounceUp;
+		m_pRigidBodyCom->Set_LinearVelocity(XMVectorSetY(vHorizontal, fBounceUp));
+		m_fPreviousVerticalVelocity = fBounceUp;
+		return;
 	}
 
-	m_fPreviousVerticalVelocity = fVerticalVelocity;
+	// 씬 중력 -9.81은 커비 스케일(-45) 대비 둥둥 뜸 → 부족분만 매 프레임 보충
+	const _float fFallSpeed = fVerticalVelocity + (s_fGravity - s_fPhysXSceneGravity) * fTimeDelta;
+	m_pRigidBodyCom->Set_LinearVelocity(XMVectorSetY(vVelocity, fFallSpeed));
+	m_fPreviousVerticalVelocity = fFallSpeed;
 }
 
 void CEnvInteract_KickProp::Deactivate()

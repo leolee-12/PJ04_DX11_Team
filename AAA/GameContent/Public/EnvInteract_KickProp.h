@@ -33,7 +33,7 @@ private:
 	void Sync_InteractCollider();
 	void Handle_InteractColliderEnter(CCollider* pOther);
 	void Kick_FromPlayer(CGameObject* pPlayer);
-	void Update_BounceState();
+	void Update_BounceState(_float fTimeDelta);
 	void Deactivate();
 	void Clamp_DynamicVelocity();
 
@@ -42,11 +42,17 @@ private:
 	CCollider* m_pInteractCollider = { nullptr };
 	_bool m_bKicked = { false };
 	_float m_fPreviousVerticalVelocity = { 0.f };
+	_float m_fKickedElapsed = { 0.f };
 	_uint m_iBounceCount = { 0 };
 	_bool m_bKickPending = { false };
 	_float3 m_vPendingKickVelocity = {};
 
-	static constexpr _uint s_iDisappearBounceCount = { 3 };
+	static constexpr _uint  s_iDisappearBounceCount = { 2 };     // 킥 → 1회 바운스 → 다음 착지에 소멸
+	static constexpr _float s_fKickYawDegree = { 8.f };          // 킥 순간 좌우 흔들림
+	static constexpr _float s_fBounceYawDegree = { 30.f };       // 튈 때 방향 틀기
+	static constexpr _float s_fGravity = { -45.f };              // 커비/폭탄과 같은 체감 중력
+	static constexpr _float s_fPhysXSceneGravity = { -9.81f };
+	static constexpr _float s_fMaxKickLifeSecond = { 5.f };      // 낭떠러지로 날아가 영영 안 튀는 경우 보험
 
 public:
 	static CEnvInteract_KickProp* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
