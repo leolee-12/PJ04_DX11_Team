@@ -74,6 +74,7 @@ namespace ProtoDesc
 	// Inhale Mask
 	inline constexpr TEXTURE_DESC Texture_Wind01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind01"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Wind02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind02"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_CoasterWind = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CoasterWind"), TEXT("../../Resources/YSE/Effect/CoasterWind/wind.png"), 1 };
 
 	// SwordSlash1
 	inline constexpr TEXTURE_DESC Texture_Common_Ring02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Ring02"), TEXT("../../Resources/YSE/Effect/Common_Ring03/common_ring02.png"), 1 };

@@ -19,7 +19,7 @@ protected:
 
 public:
     virtual void Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
-
+    void         Reset_Tree();
     CBoss*          Owner() const;
 
 protected:
@@ -33,8 +33,6 @@ protected:
     _vector Dir_ToTargetXZ() const;
     _bool   RotateYawTo(_fvector vDirXZ, _float degPerSec, _float dt);
     _bool   IsFacing(_fvector vDirXZ, _float dot) const;
-
-
 
 protected:
     virtual _int     Get_PhaseCount() const = 0;

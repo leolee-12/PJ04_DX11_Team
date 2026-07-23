@@ -50,6 +50,8 @@
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
+#include "Kirby_MetaSword.h"
+#include "Kirby_MetaHat.h"
 #include "Kirby_ToyHammer.h"
 #include "Kirby_ToyHat.h"
 
@@ -72,6 +74,7 @@
 #include "SwordChargeEffect.h"
 #include "BombExplosion.h"
 #include "BoostGas.h"
+#include "CoasterWind.h"
 #include "CarMilkyWay.h"
 #include "CommonHit.h"
 #include "SpitObject.h"
@@ -211,6 +214,7 @@
 #include "Boss_Metaknight_Sword.h"
 #include "Boss_Metaknight_ReplicaSword.h"
 #include "Boss_Metaknight_Mant.h"
+#include "Boss_Metaknight_EscapeMant.h"
 #include "Projectile_MoonShot.h"
 #include "Excalibur.h"
 #include "Excalibur_Body.h"
@@ -478,6 +482,15 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
+
+            // Meta Sword
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_MetaSword::PROTOTYPE_TAG, CKirby_MetaSword::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_MetaSword"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/MetaSword/MetaSword.ysh"));
+            // Meta Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_MetaHat::PROTOTYPE_TAG, CKirby_MetaHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_MetaHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/MetaHat/MetaHat.ysh"));
 
             // Toy Hammer
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_ToyHammer::PROTOTYPE_TAG,
@@ -934,6 +947,15 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
+    Register(CCoasterWind::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCoasterWind),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_CoasterWind.iLevelID, Texture_CoasterWind.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CoasterWind.szFileTag, Texture_CoasterWind.iNumTex));
+        )
+    );
+
     // BoostGas
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
@@ -1732,7 +1754,23 @@ void CGameObject_Factory::Register_MainBoss()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_Mant::PROTOTYPE_TAG,
                 CBoss_Metaknight_Mant::Create(pDevice, pContext));
 
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_EscapeMant::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/EscapeMant/EscapeMant_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Metaknight_EscapeMant::PROTOTYPE_TAG,
+                CBoss_Metaknight_EscapeMant::Create(pDevice, pContext));
+
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_MoonShot::PROTOTYPE_TAG, CProjectile_MoonShot::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/RockDecal/Cube.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::PROTOTYPE_TAG, CAttackDecal::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::MODEL_PROTO_TAG_A,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Rock/BurstTornadoDebris_Anim.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::MODEL_PROTO_TAG_B,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Rock/BurstTornadoDebrisB_Anim.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::PROTOTYPE_TAG, CProjectile_Rock::Create(pDevice, pContext));
         )
     );
 
@@ -1764,25 +1802,6 @@ void CGameObject_Factory::Register_MainBoss()
                     , XMMatrixRotationY(XMConvertToRadians(180.f))
                 ));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CExcalibur_GetIt::PROTOTYPE_TAG, CExcalibur_GetIt::Create(pDevice, pContext));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/RockDecal/Cube.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::PROTOTYPE_TAG, CAttackDecal::Create(pDevice, pContext));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::MODEL_PROTO_TAG_A,
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Rock/BurstTornadoDebris_Anim.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::MODEL_PROTO_TAG_B,
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Metaknight/Rock/BurstTornadoDebrisB_Anim.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Rock::PROTOTYPE_TAG, CProjectile_Rock::Create(pDevice, pContext));
-        )
-    );
-
-    Register(CAttackDecal::PROTOTYPE_TAG, TEXT("MainBoss"),
-        CREATOR(CAttackDecal),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CAttackDecal::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/RockDecal/Cube.ysh"));
         )
     );
 }

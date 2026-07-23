@@ -8,7 +8,7 @@ class CBoss_Metaknight_Body final : public CMultiHitBoxPart
     GENERATED_BODY(CBoss_Metaknight_Body)
 
 public:
-    enum METAKNIGHT_HITBOX { MKHB_SLASH, MKHB_END };
+    enum METAKNIGHT_HITBOX { MKHB_SLASH, MKHB_CATCH, MKHB_END };
 
 private:
     CBoss_Metaknight_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -27,8 +27,13 @@ public:
     virtual HRESULT Render() override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
+public:
+    void    OffMask() { m_bOffMask = true; }
+
 private:
     enum METAKNIGHT_PASS : _uint { PASS_SHADOW = 0, PASS_BODY = 1, PASS_WING = 2, PASS_SHOULDER = 3, PASS_EYE = 4, PASS_FACE = 5 };
+
+    _bool m_bOffMask = { false };
 
 private:
     HRESULT Ready_Components();

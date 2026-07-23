@@ -12,6 +12,12 @@ BT_STATUS    CBehaviorTree::Tick(_float fTimeDelta)
     return m_pRoot->Tick(m_pBB, fTimeDelta);
 }
 
+void CBehaviorTree::Reset()
+{
+    if (m_pRoot)
+        m_pRoot->Reset();
+}
+
 CBehaviorTree* CBehaviorTree::Create(CBTNode* pRoot)
 {
     CBehaviorTree* pInstance = new CBehaviorTree();

@@ -36,6 +36,7 @@
     <ClInclude Include="..\public\Boss_Leopard.h" />
     <ClInclude Include="..\public\Boss_Leopard_Body.h" />
     <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
+    <ClInclude Include="..\public\Boss_Metaknight_EscapeMant.h" />
     <ClInclude Include="..\Public\Bouncy.h" />
     <ClInclude Include="..\Public\Bouncy_Body.h" />
     <ClInclude Include="..\Public\Bouncy_Brain.h" />
@@ -59,6 +60,7 @@
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
+    <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
     <ClInclude Include="..\Public\MeteorBurst.h" />
@@ -136,6 +138,7 @@
     <ClInclude Include="..\Public\BombExplosion.h" />
     <ClInclude Include="..\Public\BombFuseEffect.h" />
     <ClInclude Include="..\Public\BoostGas.h" />
+    <ClInclude Include="..\Public\CoasterWind.h" />
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
@@ -402,6 +405,7 @@
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_MetaKnightSword.h" />
     <ClInclude Include="..\Public\Kirby_Ability_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
@@ -438,6 +442,8 @@
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
+    <ClInclude Include="..\Public\Kirby_MetaSword.h" />
+    <ClInclude Include="..\Public\Kirby_MetaHat.h" />
     <ClInclude Include="..\Public\Kirby_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ToyHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
@@ -531,6 +537,7 @@
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Metaknight_EscapeMant.cpp" />
     <ClCompile Include="..\Private\Bouncy.cpp" />
     <ClCompile Include="..\Private\Bouncy_Body.cpp" />
     <ClCompile Include="..\Private\Bouncy_Brain.cpp" />
@@ -562,6 +569,7 @@
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
     <ClCompile Include="..\Private\MeteorBurst.cpp" />
@@ -629,6 +637,7 @@
     <ClCompile Include="..\Private\BombExplosion.cpp" />
     <ClCompile Include="..\Private\BombFuseEffect.cpp" />
     <ClCompile Include="..\Private\BoostGas.cpp" />
+    <ClCompile Include="..\Private\CoasterWind.cpp" />
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />
@@ -845,6 +854,7 @@
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_MetaKnightSword.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
@@ -920,6 +930,8 @@
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\Kirby_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaSword.cpp" />
+    <ClCompile Include="..\Private\Kirby_MetaHat.cpp" />
     <ClCompile Include="..\Private\Kirby_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ToyHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
@@ -1070,7 +1082,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AttackDecal.hlsl" />
+    <None Include="..\ShaderFiles\Shader_AttackDecal.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -1,13 +1,12 @@
 #include "Kirby_Ability_Sword.h"
 
-#include "GameInstance.h"
-#include "Movement_Child.h"
-
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
 #include "Kirby_Sword.h"
+
+#include "Movement_Child.h"
 
 #include "Effect_Loader.h"
 

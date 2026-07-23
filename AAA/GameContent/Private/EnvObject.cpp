@@ -119,33 +119,7 @@ HRESULT CEnvObject::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pCullingState = m_pCullingState;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
-		Ctx.iMesh = i;
-		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
-		Ctx.fDissolve = m_fDissolve;
-
-		if (m_bUseCameraDither)
-			Ctx.iExtraFlags |= WorldShaderFlags::Dither;
-
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
+		if (FAILED(Render_Mesh(i, MESH_LAYER_RENDER_KIND::MAIN)))
 			return E_FAIL;
 	}
 
@@ -622,6 +596,39 @@ void CEnvObject::Check_Visible()
 #pragma endregion
 }
 
+HRESULT CEnvObject::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind)
+{
+	const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(iMeshIndex);
+
+	MESH_LAYER_BIND_CONTEXT Ctx{};
+	Ctx.pShader = m_pShaderCom;
+	Ctx.pModel = m_pModelCom;
+	Ctx.pCullingState = m_pCullingState;
+	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.iMesh = iMeshIndex;
+	Ctx.pLayer = &Layer;
+	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
+	Ctx.eKind = eKind;
+	Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
+	Ctx.fDissolve = m_fDissolve;
+
+	if (m_bUseCameraDither)
+		Ctx.iExtraFlags |= WorldShaderFlags::Dither;
+
+	MESH_LAYER_BIND_RESULT Result{};
+	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+		return E_FAIL;
+
+	if (Result.bSkipMesh)
+		return S_OK;
+
+	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		return E_FAIL;
+	if (FAILED(m_pModelCom->Render(iMeshIndex)))
+		return E_FAIL;
+
+	return S_OK;
+}
 
 void CEnvObject::Apply_TransformFromDesc()
 {

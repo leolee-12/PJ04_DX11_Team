@@ -145,6 +145,9 @@ HRESULT CMapObject::Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride)
 
 HRESULT CMapObject::Render_ShadowMesh(_uint iMesh, const _float4x4* pWorldOverride)
 {
+	if (ETOI(MAP_PASS::DISCARD) == m_pModelCom->Get_MeshLayer(iMesh).iPass)
+		return S_OK;
+
 	if (nullptr != pWorldOverride)
 	{
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", pWorldOverride)))

@@ -18,6 +18,8 @@
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
+#include "Kirby_MetaSword.h"
+#include "Kirby_MetaHat.h"
 #include "Kirby_ToyHammer.h"
 #include "Kirby_ToyHat.h"
 
@@ -35,6 +37,7 @@
 #include "Kirby_State.h"
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
+#include "Kirby_Ability_MetaKnightSword.h"
 #include "Kirby_Ability_Bomb.h"
 #include "Kirby_Ability_Ice.h"
 #include "Kirby_Ability_Sleep.h"
@@ -242,6 +245,8 @@ CKirby_OnOffPart* CKirby::Find_WeaponPart(COPY_ABILITY_TYPE eType)
     {
         case COPY_ABILITY_TYPE::SWORD:
             return Find_OnOffPart(CKirby_Sword::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::METAKNIGHT_SWORD:
+            return Find_OnOffPart(CKirby_MetaSword::Kirby_PartTag);
         case COPY_ABILITY_TYPE::TOY_HAMMER:
             return Find_OnOffPart(CKirby_ToyHammer::Kirby_PartTag);
     }
@@ -261,6 +266,8 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
             return Find_OnOffPart(CKirby_SleepHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::SWORD:
             return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::METAKNIGHT_SWORD:
+            return Find_OnOffPart(CKirby_MetaHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::TOY_HAMMER:
             return Find_OnOffPart(CKirby_ToyHat::Kirby_PartTag);
     }
@@ -663,6 +670,26 @@ HRESULT CKirby::Ready_PartObjects()
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
         return E_FAIL;
 
+    // MetaSword
+    CKirby_MetaSword::KIRBY_METASWORD_DESC MetaSwordDesc{};
+    MetaSwordDesc.pParentMatrix = &m_RenderWorldMatrix;
+    MetaSwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
+    MetaSwordDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    MetaSwordDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_MetaSword::PROTOTYPE_TAG, CKirby_MetaSword::Kirby_PartTag, &MetaSwordDesc)))
+        return E_FAIL;
+
+    // MetaHat
+    CKirby_MetaHat::KIRBY_METAHAT_DESC MetaHatDesc{};
+    MetaHatDesc.pParentMatrix = &m_RenderWorldMatrix;
+    MetaHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    MetaHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    MetaHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_MetaHat::PROTOTYPE_TAG, CKirby_MetaHat::Kirby_PartTag, &MetaHatDesc)))
+        return E_FAIL;
+
     // ToyHammer
     CKirby_ToyHammer::KIRBY_TOYHAMMER_DESC ToyHammerDesc{};
     ToyHammerDesc.pParentMatrix = &m_RenderWorldMatrix;
@@ -747,6 +774,7 @@ HRESULT CKirby::Ready_Ability()
 
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create()))) return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))   return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::METAKNIGHT_SWORD, CKirby_Ability_MetaKnightSword::Create()))) return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::BOMB, CKirby_Ability_Bomb::Create())))     return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::ICE, CKirby_Ability_Ice::Create())))       return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SLEEP, CKirby_Ability_Sleep::Create())))   return E_FAIL;
@@ -906,6 +934,13 @@ HRESULT CKirby::Ready_Events()
     );
 #pragma endregion
 
+    // MetaKnight
+    Subscribe_Event(EventTag::Metaknight_ParryBegin,
+        [this](void*)
+        {
+            m_pKirby_StateMachine->Request_MetaKnight_ParryBegin_StateMachine();
+        }
+    );
     return S_OK;
 }
 

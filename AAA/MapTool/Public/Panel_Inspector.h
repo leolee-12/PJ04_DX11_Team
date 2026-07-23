@@ -35,7 +35,6 @@ private:
 	void    Draw_LevelDesignEventPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_MeshLayerPanel(CGameObject* pObject);
 	void    Draw_MapStageSections(CMapStage* pMapStage);
-	void    Draw_MapSectionRenderOptions(CMapSection* pSection);
 
 #ifdef _DEBUG
 	void	Draw_MapSectionViewFilter(CMapStage* pMapStage, CMapSection* pSection, _int iSelectedMeshIndex);

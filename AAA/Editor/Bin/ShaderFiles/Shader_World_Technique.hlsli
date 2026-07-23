@@ -159,7 +159,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DMN_OPAQUE();
     }
-    pass UKWN_BLACK_OVERLAY_Pass // 15
+    pass BLEND_UKWN_OVERLAY_Pass // 15
     {
         SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_NoWrite, 0);
@@ -167,7 +167,7 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_UKWN_BLACK_OVERLAY();
+        PixelShader = compile ps_5_0 PS_BLEND_UKWN_OVERLAY();
     }
     pass DCUT_UMN_Pass // 16
     {
@@ -188,5 +188,25 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BLEND_DMN();
+    }
+    pass BLEND_UKWN_LIGHT_Pass // 18
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BLEND_UKWN_LIGHT();
+    }
+    pass BLEND_UKWN2_LIGHT_Pass // 19
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BLEND_UKWN2_LIGHT();
     }
 }

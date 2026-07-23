@@ -7,21 +7,12 @@
 #include "Parsing_Utils.h"
 #include "TownCondition_Utils.h"
 
-#include <cctype>
 #include <exception>
 
 NS_BEGIN(Client)
 
 namespace
 {
-	_string To_UpperCopy(_string strValue)
-	{
-		for (char& ch : strValue)
-			ch = static_cast<char>(toupper(static_cast<unsigned char>(ch)));
-
-		return strValue;
-	}
-
 	_bool Is_SameText(const wstring& A, const wchar_t* B)
 	{
 		return 0 == _wcsicmp(A.c_str(), B);
@@ -243,32 +234,12 @@ HRESULT CMap_Parser::Parse_Sections(const json& jManifest, MAP_MANIFEST_DESC* pO
 	if (!JsonUtils::Try_ReadStringArray(jManifest, "SectionNames", &SectionNames))
 		return E_FAIL;
 
-	const json* pSectionTypes = JsonUtils::Find_JsonValue(jManifest, "SectionTypes");
-	if (nullptr == pSectionTypes || !pSectionTypes->is_array() || pSectionTypes->size() !=
-		SectionNames.size())
-		return E_FAIL;
-
-	const json* pSectionRenderIDs = JsonUtils::Find_JsonValue(jManifest, "SectionRenderIDs");
-	if (nullptr != pSectionRenderIDs && (!pSectionRenderIDs->is_array() || pSectionRenderIDs->size() !=
-		SectionNames.size()))
-		return E_FAIL;
-
 	pOutManifest->Sections.reserve(SectionNames.size());
 
 	for (size_t i = 0; i < SectionNames.size(); ++i)
 	{
-		MAP_SECTION_TYPE eSectionType = MAP_SECTION_TYPE::UNKNOWN;
-		if (!Try_ParseSectionType((*pSectionTypes)[i], &eSectionType))
-			return E_FAIL;
-
-		RENDERID eRenderID = RENDERID::NONBLEND;
-		if (nullptr != pSectionRenderIDs && !Try_ParseRenderID((*pSectionRenderIDs)[i], &eRenderID))
-			return E_FAIL;
-
 		MAP_MANIFEST_SECTION Section{};
 		Section.strName = SectionNames[i];
-		Section.eType = eSectionType;
-		Section.eRenderID = eRenderID;
 		pOutManifest->Sections.push_back(Section);
 	}
 
@@ -287,94 +258,11 @@ HRESULT CMap_Parser::Parse_SectionEntry(const json& jSection, MAP_MANIFEST_DESC*
 		return E_FAIL;
 	}
 
-	const json* pType = JsonUtils::Find_JsonValue(jSection, "Type");
-	if (nullptr == pType)
-		pType = JsonUtils::Find_JsonValue(jSection, "SectionType");
-
-	MAP_SECTION_TYPE eSectionType = MAP_SECTION_TYPE::UNKNOWN;
-	if (nullptr == pType || !Try_ParseSectionType(*pType, &eSectionType))
-		return E_FAIL;
-
-	RENDERID eRenderID = RENDERID::NONBLEND;
-	const json* pRenderID = JsonUtils::Find_JsonValue(jSection, "RenderID");
-	if (nullptr == pRenderID)
-		pRenderID = JsonUtils::Find_JsonValue(jSection, "RenderGroup");
-
-	if (nullptr != pRenderID && !Try_ParseRenderID(*pRenderID, &eRenderID))
-		return E_FAIL;
-
 	MAP_MANIFEST_SECTION Section{};
 	Section.strName = strSectionName;
-	Section.eType = eSectionType;
-	Section.eRenderID = eRenderID;
 	pOutManifest->Sections.push_back(Section);
 
 	return S_OK;
-}
-
-_bool CMap_Parser::Try_ParseSectionType(const json& jValue, MAP_SECTION_TYPE* pOut)
-{
-	if (nullptr == pOut)
-		return false;
-
-	if (jValue.is_number_integer())
-	{
-		const int iValue = jValue.get<int>();
-		if (0 <= iValue && iValue < static_cast<int>(MAP_SECTION_TYPE::END))
-		{
-			*pOut = static_cast<MAP_SECTION_TYPE>(iValue);
-			return true;
-		}
-
-		return false;
-	}
-
-	if (!jValue.is_string())
-		return false;
-
-	const string strValue = To_UpperCopy(jValue.get<string>());
-
-	if (strValue == "DEFAULT") { *pOut = MAP_SECTION_TYPE::DEFAULT; return true; }
-	if (strValue == "BUILDING") { *pOut = MAP_SECTION_TYPE::BUILDING; return true; }
-	if (strValue == "GROUND") { *pOut = MAP_SECTION_TYPE::GROUND; return true; }
-	if (strValue == "ROCK") { *pOut = MAP_SECTION_TYPE::ROCK; return true; }
-	if (strValue == "TRANSPARENT") { *pOut = MAP_SECTION_TYPE::TRANSPARENT; return true; }
-	if (strValue == "WATER") { *pOut = MAP_SECTION_TYPE::WATER; return true; }
-	if (strValue == "EFFECT") { *pOut = MAP_SECTION_TYPE::EFFECT; return true; }
-	if (strValue == "UNKNOWN") { *pOut = MAP_SECTION_TYPE::UNKNOWN; return true; }
-
-	return false;
-}
-
-_bool CMap_Parser::Try_ParseRenderID(const json& jValue, RENDERID* pOut)
-{
-	if (nullptr == pOut)
-		return false;
-
-	if (jValue.is_number_integer())
-	{
-		const int iValue = jValue.get<int>();
-		if (0 <= iValue && iValue < static_cast<int>(RENDERID::END))
-		{
-			*pOut = static_cast<RENDERID>(iValue);
-			return true;
-		}
-
-		return false;
-	}
-
-	if (!jValue.is_string())
-		return false;
-
-	const string strValue = To_UpperCopy(jValue.get<string>());
-
-	if (strValue == "PRIORITY") { *pOut = RENDERID::PRIORITY; return true; }
-	if (strValue == "ANIM_SHADOW") { *pOut = RENDERID::SHADOW; return true; }
-	if (strValue == "NONBLEND") { *pOut = RENDERID::NONBLEND; return true; }
-	if (strValue == "NONLIGHT") { *pOut = RENDERID::NONLIGHT; return true; }
-	if (strValue == "BLEND") { *pOut = RENDERID::BLEND; return true; }
-
-	return false;
 }
 
 _wstring CMap_Parser::Resolve_PathFromManifest(const filesystem::path& ManifestPath, const _wstring& strRawPath)

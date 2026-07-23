@@ -20,6 +20,17 @@ namespace
 
 CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
 {
+    // 튜닝용
+    //return CBTReactiveSelector::Create({
+    //    Make_UpperBranch(),
+    //    Loop("Wait", 0.5f, SPD),
+    //    });
+    
+    // 에디터 애니매이션 편집용
+    //return CBTReactiveSelector::Create({
+    //    Clip("Wait", SPD, 0.f),
+    //    });
+
     CBTNode* pCombat = CBTSequence::Create({
         Make_GigaBranch(),
         Make_StepApproach(),
@@ -30,13 +41,17 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     if (iPhase >= 1)
     {
         return CBTReactiveSelector::Create({
+            Make_LockOutcomeBranch(),
             Make_DodgeBranch(),
             Make_RockBranch(),
+            Make_UpperBranch(),
             pCombat,
             });
     }
     return CBTReactiveSelector::Create({
+        Make_LockOutcomeBranch(),
         Make_DodgeBranch(),
+        Make_UpperBranch(),
         pCombat,
         });
 }
@@ -55,33 +70,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_UnlessInRange(CBTNode* pNode)
         CBTCondition::Create([](CBlackboard* pBB) {
             return pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
             pNode);
-}
-
-CBTNode* CBoss_Metaknight_Brain::Make_DodgeBranch()
-{
-    return CBTSequence::Create({
-        CBTCondition::Create([this](CBlackboard*) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_DodgeRequest(); }),
-        Make_Dodge(),
-        Clip("Wait", SPD, 0.2f),
-        });
-}
-
-CBTNode* CBoss_Metaknight_Brain::Make_GigaBranch()
-{
-    return Make_Optional(
-        CBTCondition::Create([this](CBlackboard* pBB) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_GigaReady()
-                && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
-        Make_GigaMoonShot());
-}
-
-CBTNode* CBoss_Metaknight_Brain::Make_ComboBranch()
-{
-    return Make_Optional(
-        CBTCondition::Create([](CBlackboard* pBB) {
-            return pBB->Get<_float>("DistToTarget", FLT_MAX) <= COMBO_RANGE; }),
-            Make_ComboPick());
 }
 
 CBTNode* CBoss_Metaknight_Brain::Make_Step()
@@ -801,6 +789,476 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
         pDiveFall,
         Clip("DiveBombEnd", SPD, 0.2f),
         pEnd,
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UpperCalibur()
+{
+    // 러시 노드와 분기 노드가 공유하는 상태
+    auto bCaught = make_shared<bool>(false);
+    auto vRushDir = make_shared<_float3>(_float3(0.f, 0.f, 1.f));
+
+    auto* pBegin = CBTAction::Create(
+        [this, bCaught](CBlackboard*, _float) {
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            pMeta->Set_AttackBusy(true);
+            pMeta->Set_ParryWindow(true);
+            pMeta->Reset_CatchHit();
+            *bCaught = false;
+            return BT_STATUS::SUCCESS;
+        },
+        [this] { 
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            pMeta->Set_AttackBusy(false);
+            pMeta->Set_ParryWindow(false);
+        });
+
+    auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
+        auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+        pMeta->Enable_CatchBox(false);
+        pMeta->Set_AttackBusy(false);
+        m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
+        m_pOwner->Get_Movement()->Set_LockFacing(false);
+        pMeta->Start_PatternCooldowns(CBoss_Metaknight::s_fUpperCooldown);
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto Branch = [](shared_ptr<bool> b, _bool bWant, CBTNode* pBody) -> CBTNode* {
+        return CBTSequence::Create({
+            CBTCondition::Create([b, bWant](CBlackboard*) { return *b == bWant; }),
+            pBody,
+            });
+        };
+
+    return CBTSequence::Create({
+        pBegin,
+        Make_UC_BackStep(),
+        Make_UC_Charge(),
+        Make_UC_Rush(bCaught, vRushDir),
+        CBTSelector::Create({
+            Branch(bCaught, true,  Make_UC_CatchSuccess()),
+            Branch(bCaught, false, Make_UC_Brake(vRushDir)),
+        }),
+        pEnd,
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_BackStep()
+{
+    auto bOn = make_shared<bool>(false);
+
+    return CBTAction::Create(
+        [this, bOn](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*bOn)
+            {
+                Anim()->Play("UpperCaliburRaisingStep", false, true, 0.15f, SPD);
+                mv->Set_LockFacing(true);   // 뒤로 가면서도 커비를 계속 봐야 하므로 자동 페이싱 차단
+                *bOn = true;
+            }
+
+            RotateYawTo(Dir_ToTargetXZ(), TURN_DEG, dt);
+
+            // 클립 진행도에 맞춰 살짝 뒤로 (LOOK 반대 방향)
+            mv->Set_WindowMoveSpeed(UC_BACK_SPEED, Anim()->Get_Progress());
+            m_pOwner->Add_MoveDir(-m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
+
+            if (Anim()->Is_Finished())
+            {
+                mv->Set_LockFacing(false);
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn] {
+            *bOn = false;
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_Charge()
+{
+    auto bOn = make_shared<bool>(false);
+    auto fT = make_shared<_float>(0.f);
+
+    return CBTAction::Create(
+        [this, bOn, fT](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*bOn)
+            {
+                Anim()->Play("UpperCaliburRaisingCharge", true, true, 0.15f, SPD);
+                mv->Set_LockFacing(true);
+                *fT = 0.f;
+                *bOn = true;
+            }
+
+            // 차지하는 동안 계속 커비를 조준
+            RotateYawTo(Dir_ToTargetXZ(), TURN_DEG, dt);
+
+            *fT += dt;
+            if (*fT >= UC_CHARGE_TIME)
+            {
+                mv->Set_LockFacing(false);
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, fT] {
+            *bOn = false; *fT = 0.f;
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_ptr<_float3> vDir)
+{
+    auto bOn = make_shared<bool>(false);
+    auto fT = make_shared<_float>(0.f);
+    auto vStart = make_shared<_float3>();
+
+    return CBTAction::Create(
+        [this, bOn, fT, vStart, bCaught, vDir](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            auto* mv = m_pOwner->Get_Movement();
+            auto* tf = m_pOwner->Get_Transform();
+
+            if (!*bOn)
+            {
+                mv->Face_Instant(XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos));
+                mv->Set_LockFacing(true);
+
+                XMStoreFloat3(vDir.get(),
+                    XMVector3Normalize(XMVectorSetY(tf->Get_State(STATE::LOOK), 0.f)));
+                XMStoreFloat3(vStart.get(), tf->Get_State(STATE::POSITION));
+
+                Anim()->Play("UpperCaliburRaisingMove", true, true, 0.1f, SPD);
+
+                pMeta->Reset_CatchHit();
+                pMeta->Enable_CatchBox(true);
+
+                *bCaught = false;
+                *fT = 0.f;
+                *bOn = true;
+            }
+
+            *fT += dt;
+            mv->Set_MoveSpeed(UC_RUSH_SPEED);
+            m_pOwner->Add_MoveDir(XMLoadFloat3(vDir.get()));
+
+            if (pMeta->Is_CatchHit())
+            {
+                pMeta->Enable_CatchBox(false);
+                *bCaught = true;
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+
+            const _float fRun = XMVectorGetX(XMVector3Length(
+                XMVectorSetY(tf->Get_State(STATE::POSITION) - XMLoadFloat3(vStart.get()), 0.f)));
+
+            if (fRun >= UC_RUSH_MAX_DIST || *fT >= UC_RUSH_TIMEOUT)
+            {
+                pMeta->Enable_CatchBox(false);
+                *bCaught = false;
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, fT] {
+            *bOn = false; *fT = 0.f;
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            pMeta->Enable_CatchBox(false);
+            m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_Brake(shared_ptr<_float3> vDir)
+{
+    auto bOn = make_shared<bool>(false);
+
+    return CBTAction::Create(
+        [this, bOn, vDir](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            if (!*bOn)
+            {
+                Anim()->Play("UpperCaliburBrake", false, true, 0.1f, SPD);
+                mv->Set_LockFacing(true);
+                *bOn = true;
+            }
+
+            const _float p = Anim()->Get_Progress();
+            const _float fCur = UC_BRAKE_ENTRY_SPEED * powf(1.f - p, UC_BRAKE_DECAY_POW);
+
+            mv->Set_MoveSpeed(fCur);
+            m_pOwner->Add_MoveDir(XMLoadFloat3(vDir.get()));
+
+            if (p >= 0.15f)
+                RotateYawTo(XMVectorNegate(XMLoadFloat3(vDir.get())), UC_BRAKE_TURN_DEG, dt);
+
+            if (Anim()->Is_Finished())
+            {
+                mv->Set_MoveSpeed(BASE_SPEED);
+                mv->Set_LockFacing(false);
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn] {
+            *bOn = false;
+            m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
+            m_pOwner->Get_Movement()->Set_LockFacing(false);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_CatchSuccess()
+{
+    auto bOn = make_shared<bool>(false);
+
+    auto* pDemo = CBTAction::Create(
+        [this, bOn](CBlackboard*, _float) -> BT_STATUS {
+            if (!*bOn)
+            {
+                auto* mv = m_pOwner->Get_Movement();
+                mv->Set_MoveSpeed(BASE_SPEED);
+                mv->Set_LockFacing(false);
+
+                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_Demo(CBoss_Metaknight::EDemo::UPPER_CALIBUR);
+                *bOn = true;
+                return BT_STATUS::RUNNING;
+            }
+
+            if (Anim()->Is_Finished())
+            {
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [bOn] { *bOn = false; });
+
+    auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->End_Demo(CBoss_Metaknight::EDemo::UPPER_CALIBUR);
+        return BT_STATUS::SUCCESS;
+        });
+
+    return CBTSequence::Create({
+        pDemo,
+        pEnd,
+        Make_UC_Fall(),
+        Clip("Landing", SPD, 0.1f),
+        Clip("Wait", SPD, 0.2f),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UC_Fall()
+{
+    auto bOn = make_shared<bool>(false);
+    auto fT = make_shared<_float>(0.f);
+
+    return CBTAction::Create(
+        [this, bOn, fT](CBlackboard*, _float dt) -> BT_STATUS {
+            if (!*bOn)
+            {
+                Anim()->Play("Fall", true, true, 0.f, SPD);
+                *fT = 0.f;
+                *bOn = true;
+                return BT_STATUS::RUNNING;
+            }
+
+            *fT += dt;
+
+            if (*fT < UC_FALL_MIN_TIME)
+                return BT_STATUS::RUNNING;
+
+            if (m_pOwner->Get_Movement()->Is_Grounded() || *fT >= UC_FALL_TIMEOUT)
+            {
+                *bOn = false;
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [bOn, fT] { *bOn = false; *fT = 0.f; });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_LockLose()
+{
+    auto bOn = make_shared<bool>(false);
+
+    auto* pDemo = CBTAction::Create(
+        [this, bOn](CBlackboard*, _float) -> BT_STATUS {
+            if (!*bOn)
+            {
+                static_cast<CBoss_Metaknight*>(m_pOwner)->Begin_Demo(CBoss_Metaknight::EDemo::LOCK_LOSE);
+                *bOn = true;
+                return BT_STATUS::RUNNING;
+            }
+            if (Anim()->Is_Finished()) { *bOn = false; return BT_STATUS::SUCCESS; }
+            return BT_STATUS::RUNNING;
+        },
+        [bOn] { *bOn = false; });
+
+    auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->End_Demo(CBoss_Metaknight::EDemo::LOCK_LOSE);
+        return BT_STATUS::SUCCESS;
+        });
+
+    return CBTSequence::Create({
+        pDemo,
+        pEnd,
+        Loop("LockingSwordLoseWait", 5.f, SPD),
+        Make_LockLose_Return(),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_LockLose_Return()
+{
+    auto* pHoldOn = CBTAction::Create(
+        [this](CBlackboard*, _float) {
+            static_cast<CBoss_Metaknight*>(m_pOwner)->Hold_BossCam(true);
+            return BT_STATUS::SUCCESS;
+        },
+        [this] { static_cast<CBoss_Metaknight*>(m_pOwner)->Hold_BossCam(false); });
+
+    auto* pHoldOff = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Metaknight*>(m_pOwner)->Hold_BossCam(false);
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto* pReplicaOn = CBTAction::Create([this](CBlackboard*, _float) {
+        auto* mk = static_cast<CBoss_Metaknight*>(m_pOwner);
+        mk->Retire_Galaxia();
+        mk->Set_ActiveSword(CBoss_Metaknight::EMK_SWORD::REPLICA);
+        return BT_STATUS::SUCCESS;
+        });
+
+    auto* pFallBegin = CBTAction::Create([this](CBlackboard*, _float) {
+        m_pOwner->Get_Movement()->Set_GravityEnabled(true);
+        return BT_STATUS::SUCCESS;
+        });
+
+    return CBTSequence::Create({
+        pHoldOn,                        // 보스캠 고정 시작
+        Clip("JumpStart", SPD, 0.1f),   // 점프스타트(윈드업)
+        Make_ReturnFly(),               // 점프 상승 + 맵중앙 수평이동
+        pReplicaOn,                     // 레플리카 소드 on + 바닥 갤럭시아 정리
+        pFallBegin,                     // 중력 on
+        Make_UC_Fall(),                 // Fall + Is_Grounded 대기(재사용)
+        Clip("Landing", SPD, 0.1f),     // 착지
+        pHoldOff,                       // 보스캠 추적 재개
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_ReturnFly()
+{
+    auto bOn = make_shared<bool>(false);
+    auto iPhase = make_shared<_int>(0);   // 0=상승, 1=맵중앙 수평이동
+    auto vGoal = make_shared<_float3>();
+
+    return CBTAction::Create(
+        [this, bOn, iPhase, vGoal](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* mv = m_pOwner->Get_Movement();
+            _vector vSelf = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+
+            if (!*bOn)
+            {
+                Anim()->Play("Jump", false, true, 0.1f, SPD);
+                mv->Set_GravityEnabled(false);
+                XMStoreFloat3(vGoal.get(), vSelf + XMVectorSet(0.f, RET_RISE_H, 0.f, 0.f));
+                *iPhase = 0;
+                *bOn = true;
+            }
+
+            const _float fSpeed = (*iPhase == 0) ? RET_RISE_SPEED : RET_MOVE_SPEED;
+            if (mv->Fly_Toward(XMLoadFloat3(vGoal.get()), fSpeed, dt, GIGA_ARRIVE))
+            {
+                if (*iPhase == 0)
+                {
+                    _float fY = XMVectorGetY(m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+                    _vector vC = XMVectorSet(0.f, fY, 0.f, 1.f);
+                    mv->Face_Instant(vC);
+                    XMStoreFloat3(vGoal.get(), vC);
+                    *iPhase = 1;
+                }
+                else
+                {
+                    *bOn = false; *iPhase = 0;
+                    return BT_STATUS::SUCCESS;
+                }
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [this, bOn, iPhase] {
+            *bOn = false; *iPhase = 0;
+            m_pOwner->Get_Movement()->Set_GravityEnabled(true);
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_DodgeBranch()
+{
+    return CBTSequence::Create({
+        CBTCondition::Create([this](CBlackboard*) {
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_DodgeRequest(); }),
+        Make_Dodge(),
+        Clip("Wait", SPD, 0.2f),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_GigaBranch()
+{
+    return Make_Optional(
+        CBTCondition::Create([this](CBlackboard* pBB) {
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_GigaReady()
+                && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
+        Make_GigaMoonShot());
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_ComboBranch()
+{
+    return Make_Optional(
+        CBTCondition::Create([](CBlackboard* pBB) {
+            return pBB->Get<_float>("DistToTarget", FLT_MAX) <= COMBO_RANGE; }),
+            Make_ComboPick());
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_UpperBranch()
+{
+    return CBTSequence::Create({
+        CBTCondition::Create([this](CBlackboard* pBB) {
+            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_UpperReady()
+                && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
+        Make_UpperCalibur(),
+        Clip("Wait", SPD, 0.2f),
+        });
+}
+
+CBTNode* CBoss_Metaknight_Brain::Make_LockOutcomeBranch()
+{
+    auto iOut = make_shared<_int>(0);
+
+    auto* pRoll = CBTAction::Create([this, iOut](CBlackboard*, _float) {
+        auto e = static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_LockOutcome();
+        *iOut = (e == CBoss_Metaknight::ELockOutcome::MK_WIN) ? 1
+            : (e == CBoss_Metaknight::ELockOutcome::MK_LOSE) ? 2 : 0;
+        return (*iOut != 0) ? BT_STATUS::SUCCESS : BT_STATUS::FAILURE;
+        });
+
+    auto Branch = [](shared_ptr<_int> r, _int want, CBTNode* pBody) -> CBTNode* {
+        return CBTSequence::Create({
+            CBTCondition::Create([r, want](CBlackboard*) { return *r == want; }),
+            pBody,
+            });
+        };
+
+    return CBTSequence::Create({
+        pRoll,
+        CBTSelector::Create({
+            Branch(iOut, 1, Make_UC_CatchSuccess()),
+            Branch(iOut, 2, Make_LockLose()),       
+        }),
         });
 }
 

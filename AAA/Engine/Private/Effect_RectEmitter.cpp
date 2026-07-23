@@ -2,6 +2,7 @@
 
 #include "Effect_RectCommon.h"
 #include "GameInstance.h"
+#include "Shader.h"
 
 CEffect_RectEmitter::CEffect_RectEmitter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Emitter(pDevice, pContext)
@@ -96,9 +97,11 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue()
 
     auto Values = Make_RectValues();
     EffectRect::Update_SpriteAnimations(Values, 0.f, true);
+    const _bool bUseTextureFrame = m_bSpriteAniTexture || m_bRandomTextureFrame;
 
     if (FAILED(EffectRect::Bind_StaticShaderValues(m_pShaderCom, Values)) ||
         FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)) ||
+        FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &bUseTextureFrame, sizeof(_bool))) ||
         FAILED(EffectRect::Bind_Roll(m_pShaderCom, 0.f)))
         return E_FAIL;
 
@@ -109,7 +112,7 @@ HRESULT CEffect_RectEmitter::Bind_EmitterRectValue(const EMITTER_PARTICLE& Parti
 {
     auto Values = Make_RectValues();
 
-    if (m_bSpriteAniTexture == true || m_bSpriteAniMask == true)
+    if (m_bSpriteAniTexture == true || m_bRandomTextureFrame == true || m_bSpriteAniMask == true)
     {
         _float fParticleRatio = 1.f;
         if (Particle.fLifeTime > Helper::fEpsilon)
@@ -117,6 +120,28 @@ HRESULT CEffect_RectEmitter::Bind_EmitterRectValue(const EMITTER_PARTICLE& Parti
         Helper::FloatClamp(fParticleRatio, 0.f, 1.f);
 
         EffectRect::Update_SpriteAnimations(Values, fParticleRatio);
+
+        if (m_bRandomTextureFrame == true)
+        {
+            _int iFrameX = m_iTexFrameX;
+            _int iFrameY = m_iTexFrameY;
+            if (iFrameX < 1)
+                iFrameX = 1;
+            if (iFrameY < 1)
+                iFrameY = 1;
+
+            const _int iTotalFrames = iFrameX * iFrameY;
+            _int iFrameIndex = static_cast<_int>(Particle.fRandomValue * static_cast<_float>(iTotalFrames));
+            Helper::IntClamp(iFrameIndex, 0, iTotalFrames - 1);
+
+            const _float fFrameRatio =
+                (static_cast<_float>(iFrameIndex) + 0.5f) /
+                static_cast<_float>(iTotalFrames);
+            Evaluate_SpriteFrame(
+                iFrameX, iFrameY, fFrameRatio,
+                Values.vCurrentTexUV, Values.vCurrentTexSize);
+        }
+
         if (FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)))
             return E_FAIL;
     }
@@ -136,6 +161,7 @@ void CEffect_RectEmitter::Init_PropertyValue()
     auto Values = Make_RectValues();
     EffectRect::Initialize_DefaultValues(Values);
     m_bUseParticleRoll = true;
+    m_bRandomTextureFrame = false;
 }
 
 EffectRect::VALUES CEffect_RectEmitter::Make_RectValues()

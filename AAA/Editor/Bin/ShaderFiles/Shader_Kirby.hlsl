@@ -15,6 +15,9 @@ Texture2D g_DiffuseTexture;
 Texture2D g_DiffuseTexture1;
 Texture2D g_MRATexture;
 
+Texture2D g_MetaEyeTexture;
+
+
 float4 g_vBodyColor = float4(1.f, 0.45f, 0.55f, 1.f); // 몸  = KirbySkin 검정 영역
 float4 g_vFootColor = float4(1.f, 0.1882353f, 0.3764706f, 1.f); // 발  = G 채널 초록
 float4 g_vBlushColor = float4(1.f, 0.25f, 0.4f, 1.f); // 홍조 = R 채널 빨강
@@ -221,10 +224,7 @@ PS_OUT PS_PART(PS_IN In)
     
     float3 Nw = mul(nTS, TBN);
 
-    if (vMtrlDiffuse.a < 0.1f)
-        discard;
-
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = float4(vMtrlDiffuse.rgb, 1.f);
     Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(mra, 1.f);
@@ -288,6 +288,61 @@ PS_OUT PS_BOMBHAT(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_METASWORD(PS_IN In)
+{
+    PS_OUT Out;
+
+    float3 vCrystal = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+
+    Out.vDiffuse = float4(vCrystal, 1.f);
+    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 0.15f, 1.f, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb + vCrystal, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
+    Out.vGeoNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+    return Out;
+}
+
+PS_OUT PS_METAMASK(PS_IN In)
+{
+    PS_OUT Out;
+
+    float3 vAlbedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1).rgb;
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
+
+    float3 N = normalize(In.vNormal.xyz);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 Bt = normalize(In.vBinormal.xyz);
+    float3x3 TBN = float3x3(T, Bt, N);
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    float3 Nw = mul(nTS, TBN);
+
+    float3 vEmissive = g_vEmissiveColor.rgb;
+
+    float fLum = max(vAlbedo.r, max(vAlbedo.g, vAlbedo.b));
+    float fEyeRegion = 1.f - smoothstep(0.03f, 0.10f, fLum);
+
+    float4 vEyeTex = g_MetaEyeTexture.Sample(ClampSampler, In.vTexcoord);
+    float3 vEyeCol = float3(1.f, 1.f, 0.f) * vEyeTex.r;
+
+    vAlbedo = lerp(vAlbedo, vEyeCol, fEyeRegion);
+    vMRA = lerp(vMRA, float3(0.f, 1.f, 1.f), fEyeRegion);
+    vEmissive += vEyeCol * fEyeRegion;
+
+    Out.vDiffuse = float4(vAlbedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(vMRA, 1.f);
+    Out.vEmissive = float4(vEmissive, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
+    Out.vGeoNormal = float4(N * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass Body // 0
@@ -338,5 +393,25 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BOMBHAT();
+    }
+    pass MetaSwordPass // 5
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_MarkOccluded, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_METASWORD();
+    }
+    pass MetaMaskPass // 6
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_MarkOccluded, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_METAMASK();
     }
 }

@@ -9,6 +9,14 @@ class CKirby;
 class CLIENT_DLL CKirby_Ability_ToyHammer final : public CKirby_Ability
 {
 private:
+    enum TOY_HAMMER_STATE
+    {        
+        ATTACK_START, ATTACK, ATTACK_END,
+        CHARGE_START, CHARGING,
+        TOY_HAMER_STATE_END
+    };
+
+private:
     CKirby_Ability_ToyHammer();
     virtual ~CKirby_Ability_ToyHammer() = default;
 
@@ -24,9 +32,29 @@ public:
 
     virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+    virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;
+    virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
+    virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
+
+public:
+    virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+private:
+    TOY_HAMMER_STATE m_eToyHammerState{ TOY_HAMMER_STATE::TOY_HAMER_STATE_END };
+
+    TOY_HAMMER_STATE m_eToyHammerStartState{ TOY_HAMMER_STATE::TOY_HAMER_STATE_END };
+
+    _bool m_bReserveNextAttack{};
+    _bool m_bIsCharging{};
+
+private:
+    void Change_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eNext);
+    void Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eState);
+    void Update_ToyHammerState(CKirby* pKirby, _float fTimeDelta);
+    void Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eState);
+
 public:
     static CKirby_Ability_ToyHammer* Create();
-
 private:
     virtual void Free() override;
 };

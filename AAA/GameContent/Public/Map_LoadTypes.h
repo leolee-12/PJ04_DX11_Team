@@ -15,8 +15,6 @@ class CEnv_InstanceController;
 struct MAP_MANIFEST_SECTION
 {
 	_wstring strName;
-	MAP_SECTION_TYPE eType = { MAP_SECTION_TYPE::UNKNOWN };
-	RENDERID eRenderID = { RENDERID::NONBLEND };
 };
 
 struct MAP_MANIFEST_DESC
