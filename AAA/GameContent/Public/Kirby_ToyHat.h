@@ -8,6 +8,9 @@ class CKirby_ToyHat final : public CKirby_OnOffPart
 {
     GENERATED_BODY(CKirby_ToyHat)
 
+private:
+    enum TOY_HAT_MESH { HOVERING_STRAP, STRAP, HEAD, MESH_END };
+
 public:
     struct KIRBY_TOYHAT_DESC : public CKirby_OnOffPart::KIRBY_ONONFFPART_DESC
     {
@@ -29,8 +32,12 @@ public:
     virtual HRESULT Render() override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
+    virtual void Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode) override;
+
 private:
     HRESULT Ready_Components();
+
+    TOY_HAT_MESH m_eOffMesh{};
 
 public:
     static CKirby_ToyHat* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

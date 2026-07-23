@@ -14,7 +14,7 @@ NS_BEGIN(Client)
 
 class CKirby;
 
-enum class KIRBY_PART_MODE { DEFAULT, BACK };
+enum class KIRBY_PART_MODE { DEFAULT, BACK, HOVERING };
 
 class CKirby_OnOffPart abstract : public CPartObject
 {
