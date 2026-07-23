@@ -100,6 +100,8 @@ _bool CBoss_Armadillo::Is_Intro_Finished() const
 
 void CBoss_Armadillo::Play_Death()
 {
+    Stop_AllSounds();
+
     Enable_Colliders(false);
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
@@ -173,11 +175,15 @@ void CBoss_Armadillo::Begin_QTE(_float fSeconds)
     m_bQTEEscaped = false;
     m_fQTETimer = fSeconds;
     m_pGameInstance_Proxy->Publish(EventTag::QTE_Show, nullptr);
+
+    Play_SectionLoopSFX(SND_SHAKECAGE, 0.04f, 0.35f, 0.05f);
 }
 
 void CBoss_Armadillo::End_QTE()
 {
     m_pGameInstance_Proxy->Publish(EventTag::QTE_Hide, nullptr);
+
+    Stop_LoopSFX(SND_SHAKECAGE);
 }
 
 void CBoss_Armadillo::Fire_Grab()
@@ -339,6 +345,7 @@ void CBoss_Armadillo::Play_WallImpact()
         XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
 
     CEffect_Loader::GetInstance()->Spawn(L"WallImpact", Get_LevelIndex(), vPos, vLook);
+    Play_OneShotSFX(SND_ROLLINGHITWALL, 0.25f);
 }
 
 HRESULT CBoss_Armadillo::Ready_AnimEvents()
@@ -350,6 +357,8 @@ HRESULT CBoss_Armadillo::Ready_AnimEvents()
         if (Handle_SoundAnimEvent(e, phase))
             return;
         if (Handle_FxAnimEvent(e, phase))
+            return;
+        if (Handle_DropStarsAnimEvent(e, phase))
             return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))
@@ -417,6 +426,7 @@ HRESULT CBoss_Armadillo::Ready_PartObjects()
             m_bCatchHit = true;
             m_pBody->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
             Fire_Grab();
+            Play_OneShotSFX(SND_GETKIRBY, 0.3f);
         });
 
     return S_OK;

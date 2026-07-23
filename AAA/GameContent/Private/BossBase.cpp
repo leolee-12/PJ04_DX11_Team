@@ -3,6 +3,8 @@
 #include "Monster_Movement.h"
 #include "GameContent_Events.h"
 
+#include "DropStar_Manager.h"
+
 CBossBase::CBossBase(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext) {
 }
@@ -167,6 +169,24 @@ void CBossBase::Publish_HP()
     hp.fMaxHP = m_fMaxHP;
     hp.fCurrHp = m_fCurHP;
     m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Updated, &hp);
+}
+
+_bool CBossBase::Handle_DropStarsAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::DropStars)
+        return false;
+
+    if (ePhase != ANIM_EVENT_PHASE::POINT)
+        return true;
+
+    const _wstring strSpawnType = StrToWstr(e.strParam);
+    if (strSpawnType.empty())
+        return true;
+
+    CDropStar_Manager::GetInstance()->Spawn_Preset(Get_LevelIndex(), 
+                    XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), strSpawnType, e.vOffset);
+
+    return true;
 }
 
 void CBossBase::Free()

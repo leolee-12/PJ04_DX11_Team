@@ -8,6 +8,8 @@
 #include "Boss_Armadillo_Body.h"
 #include "Boss_Metaknight_Brain.h"
 
+#include "DropStar_Manager.h"
+
 CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int)
 {
     auto* pOpening = CBTSequence::Create({
@@ -61,12 +63,13 @@ CBTNode* CBoss_Armadillo_Brain::Make_TwinDance()
     auto bOn = make_shared<bool>(false);
     auto fT = make_shared<_float>(0.f);
     auto fBounceCd = make_shared<_float>(0.f);
+    auto fStarCd = make_shared<_float>(0.f);
     auto iBounce = make_shared<_int>(0);
     auto vDir = make_shared<_float3>(_float3(0.f, 0.f, 1.f));
     const _float fDanceTime = 6.f; const _int iMaxBounce = 4; const _float fSpinDeg = 540.f;
 
     auto* pRush = CBTAction::Create(
-        [this, bOn, fT, fBounceCd, iBounce, vDir, fDanceTime, iMaxBounce, fSpinDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+        [this, bOn, fT, fBounceCd, fStarCd, iBounce, vDir, fDanceTime, iMaxBounce, fSpinDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
             auto* pArma = static_cast<CBoss_Armadillo*>(m_pOwner);
             if (!*bOn) {
                 m_pOwner->Get_BodyAnimator()->Play("TwinDance", true, true, 0.1f, SPD);
@@ -74,9 +77,17 @@ CBTNode* CBoss_Armadillo_Brain::Make_TwinDance()
                 m_pOwner->Get_Movement()->Set_LockFacing(true);
                 pArma->Set_TwinDanceOffset(true);
                 *vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 1.f));
-                *fT = 0.f; *iBounce = 0; *fBounceCd = 0.f; *bOn = true;
+                *fT = 0.f; *iBounce = 0; *fBounceCd = 0.f; *fStarCd = 2.f; *bOn = true;
+                m_pOwner->Play_SectionLoopSFX(CBoss_Armadillo::SND_TWINDANCE, 0.10f, 0.55f, 0.15f);
             }
-            *fT += dt; *fBounceCd -= dt;
+            *fT += dt; *fBounceCd -= dt; 
+            *fStarCd -= dt;
+            if (*fStarCd <= 0.f)
+            {
+                CDropStar_Manager::GetInstance()->Spawn_Preset(m_pOwner->Get_LevelIndex(),
+                    XMLoadFloat4x4(m_pOwner->Get_Transform()->Get_WorldMatrixPtr()), L"AramaDilloTwinDance");
+                *fStarCd = 2.f;
+            }
             m_pOwner->Add_MoveDir(*vDir);
             m_pOwner->Get_Transform()->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(fSpinDeg) * dt));
             _float3 vN{};
@@ -91,6 +102,7 @@ CBTNode* CBoss_Armadillo_Brain::Make_TwinDance()
                 m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
                 m_pOwner->Get_Movement()->Set_LockFacing(false);
                 pArma->Set_TwinDanceOffset(false);
+                m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_TWINDANCE);
                 *bOn = false; return BT_STATUS::SUCCESS;
             }
             return BT_STATUS::RUNNING;
@@ -101,6 +113,7 @@ CBTNode* CBoss_Armadillo_Brain::Make_TwinDance()
             m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
             m_pOwner->Get_Movement()->Set_LockFacing(false);
             static_cast<CBoss_Armadillo*>(m_pOwner)->Set_TwinDanceOffset(false);
+            m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_TWINDANCE);
         });
 
     return CBTSequence::Create({
@@ -126,11 +139,12 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
     auto fSegT = make_shared<_float>(0.f);
     auto fAimT = make_shared<_float>(0.f);
     auto vDir = make_shared<_float3>(_float3(0.f, 0.f, 1.f));
+    auto bNear = make_shared<bool>(false);
     const _int iGroggyHits = 3;
     const _float fSegTimeMax = 4.f, fReAimTime = 0.5f, fSnapTurnDeg = 1080.f, fBounceBackSpeed = 8.f, fBounceUpSpeed = 10.f;
 
     auto* pRush = CBTAction::Create(
-        [this, bOn, bGroggy, iState, iWallHits, fSegT, fAimT, vDir, iGroggyHits, fSegTimeMax, fReAimTime, fSnapTurnDeg, fBounceBackSpeed, fBounceUpSpeed](CBlackboard* pBB, _float dt) -> BT_STATUS {
+        [this, bOn, bGroggy, iState, iWallHits, fSegT, fAimT, vDir, bNear, iGroggyHits, fSegTimeMax, fReAimTime, fSnapTurnDeg, fBounceBackSpeed, fBounceUpSpeed](CBlackboard* pBB, _float dt) -> BT_STATUS {
             auto* pArma = static_cast<CBoss_Armadillo*>(m_pOwner);
             if (!*bOn) {
                 m_pOwner->Get_BodyAnimator()->Play("RollAttack", true, true, 0.1f, SPD);
@@ -138,9 +152,20 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
                 *vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 1.f));
                 *iState = 0; *iWallHits = 0; *fSegT = 0.f; *bGroggy = false; *bOn = true;
                 pArma->Set_RollFx(true);
+                m_pOwner->Play_SectionLoopSFX(CBoss_Armadillo::SND_ROLLINGLOOP, 0.10f, 0.37f, 0.25f);
+                *bNear = false;
             }
             if (*iState == 0) {
                 *fSegT += dt; m_pOwner->Add_MoveDir(*vDir);
+                _float fDist = pBB->Get<_float>("DistToTarget", FLT_MAX);
+                if (!*bNear && fDist <= 6.f)
+                {
+                    *bNear = true;
+                    m_pOwner->Play_OneShotSFX(CBoss_Armadillo::SND_ROLLINGPASS, 0.25f);
+                }
+                else if (*bNear && fDist > 8.f)
+                    *bNear = false;
+
                 _float3 vN{};
                 if (pArma->Sweep_Wall(*vDir, WALL_PROBE, &vN)) {
                     ++(*iWallHits);
@@ -150,13 +175,21 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
                         m_pOwner->Get_Movement()->Launch(vBounce, fBounceBackSpeed, fBounceUpSpeed);
                         m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
                         pArma->Set_RollFx(false);
+                        m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_ROLLINGLOOP);
                         *bGroggy = true; *bOn = false; return BT_STATUS::SUCCESS;
                     }
-                    *iState = 1; *fAimT = 0.f;
+
+                    m_pOwner->Play_OneShotSFX(CBoss_Armadillo::SND_ROLLINGBOUND, 0.25f);
+                    CDropStar_Manager::GetInstance()->Spawn_Preset(m_pOwner->Get_LevelIndex(),
+                        XMLoadFloat4x4(m_pOwner->Get_Transform()->Get_WorldMatrixPtr()), L"AramaDilloRollImpact");
+
+                    *iState = 1;
+                    *fAimT = 0.f;
                 }
                 else if (*fSegT >= fSegTimeMax) {
                     m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
                     pArma->Set_RollFx(false);
+                    m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_ROLLINGLOOP);
                     *bOn = false; return BT_STATUS::SUCCESS;
                 }
             }
@@ -181,6 +214,7 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
             *bOn = false;
             m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
             static_cast<CBoss_Armadillo*>(m_pOwner)->Set_RollFx(false);
+            m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_ROLLINGLOOP);
         });
 
     auto bFallOn = make_shared<bool>(false);
@@ -195,7 +229,19 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
 
     auto* pGroggy = CBTSequence::Create({
         CBTCondition::Create([bGroggy](CBlackboard*) { return *bGroggy; }),
-        pFallLoop, Clip("HitWallLanding", SPD), Loop("HitWallLoop", GROGGY_TIME, SPD), Clip("HitWallEnd", SPD),
+        pFallLoop, Clip("HitWallLanding", SPD),
+        CBTAction::Create([this](CBlackboard*, _float) { 
+            m_pOwner->Play_SectionLoopSFX(CBoss_Armadillo::SND_STUNLOOP, 0.03f, 0.45f, 0.25f);
+            return BT_STATUS::SUCCESS;
+            },
+            [this]() { m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_STUNLOOP); 
+            }),
+        Loop("HitWallLoop", GROGGY_TIME, SPD),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_STUNLOOP);
+            return BT_STATUS::SUCCESS;
+        }),
+        Clip("HitWallEnd", SPD),
         });
 
     return CBTSequence::Create({

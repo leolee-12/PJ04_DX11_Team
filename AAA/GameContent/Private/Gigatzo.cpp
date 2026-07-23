@@ -52,20 +52,41 @@ HRESULT CGigatzo::Initialize_Prototype()
 
 HRESULT CGigatzo::Initialize(void* pArg)
 {
+	Read_FireParams(pArg);
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	m_TraitFlags = MT_NONE;
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
 	m_fCullDist = 95.f;
-	Read_FireParams(pArg);
 
 	return S_OK;
+}
+
+_float CGigatzo::Get_InteractRadius() const
+{
+	switch (m_ePitch)
+	{
+	case PITCH::VERTICAL:
+		return 14.f;
+	case PITCH::HORIZONTAL:
+		return 80.f;
+	case PITCH::TILT:
+		return 15.f;
+	default:
+		return 40.f;
+	}
 }
 
 CAnimator* CGigatzo::Get_BodyAnimator() const
 {
 	return m_pBody ? m_pBody->Get_Animator() : nullptr ;
+}
+
+_bool CGigatzo::Is_RenderCulled() const
+{
+	return m_CullState.bRenderCull;
 }
 
 _bool CGigatzo::Is_InCameraFront() const
@@ -84,6 +105,20 @@ _bool CGigatzo::Is_InCameraFront() const
 	_float  fDot = XMVectorGetX(XMVector3Dot(vPos - vCamPos, vCamLook));
 
 	return fDot > 0.f;
+}
+
+_float CGigatzo::Get_FireDistance() const
+{
+	switch (m_ePitch)
+	{
+	case PITCH::VERTICAL:
+	case PITCH::TILT:
+		return 10.f;                  
+	case PITCH::HORIZONTAL:
+		return 50.f;                  
+	default:
+		return 25.f;
+	}
 }
 
 CMonsterBrain* CGigatzo::Create_Brain()

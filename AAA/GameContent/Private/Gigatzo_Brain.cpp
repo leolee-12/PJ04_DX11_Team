@@ -18,34 +18,38 @@ void CGigatzo_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDe
     if (nullptr == m_pOwner)
         return;
 
+	if (nullptr == BlackBoard.pTarget)
+	{
+		m_bArmed = false;
+		return;
+	}
+
     CGigatzo* pGig = static_cast<CGigatzo*>(m_pOwner);
 
-    // 접근 판정: Interact 반경 안 + 카메라 전방(전진코스터: 뒤쪽 억제)
-    _bool bInRange = (nullptr != BlackBoard.pTarget) && pGig->Is_InCameraFront();
+	if (pGig->Is_RenderCulled() || !pGig->Is_InCameraFront())
+	{
+		m_bArmed = false;
+		return;
+	}
 
-    if (!bInRange)
-    {
-        m_bArmed = false;          // 범위 밖 -> 재무장 대기
+	if (!m_bArmed)
+	{
+		m_fFireTimer = 0.f;
+		m_bArmed = true;
+	}
+
+	m_fFireTimer -= fTimeDelta;
+	if (m_fFireTimer > 0.f)
+		return;
+
+	m_fFireTimer += s_fFireInterval;
+
+    if (!Can_Decide(BlackBoard))
         return;
-    }
+    if (m_pOwner->Get_StateType() != MONSTER_STATE_TYPE::IDLE)
+        return;
 
-    if (!m_bArmed)                 // 방금 진입 = 무장 (위상 = 접근 기준)
-        {
-            m_fFireTimer = pGig->Get_InitWaitDelay();
-            m_bArmed = true;
-      }
-
-      m_fFireTimer -= fTimeDelta;
-      if (m_fFireTimer > 0.f)
-          return;
-      m_fFireTimer += s_fFireInterval;
-
-      if (!Can_Decide(BlackBoard))
-          return;
-      if (m_pOwner->Get_StateType() != MONSTER_STATE_TYPE::IDLE)
-          return;
-
-      m_pOwner->Change_State(MONSTER_STATE_TYPE::ATTACK);
+    m_pOwner->Change_State(MONSTER_STATE_TYPE::ATTACK);
 }
 
 CGigatzo_Brain* CGigatzo_Brain::Create(CMonster* pOwner)

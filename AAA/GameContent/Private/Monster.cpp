@@ -842,17 +842,6 @@ void CMonster::Update_SpatPivot_FromBone()
 			pBone->_41, pBone->_42, pBone->_43);
 }
 
-void CMonster::Play_ActionLoopSFX(const _tchar* pKey)
-{
-	m_ActionLoopSnd.Stop();
-	m_ActionLoopSnd = m_pGameInstance_Proxy->Play_SFX_Loop(pKey);
-}
-
-void CMonster::Stop_ActionLoopSFX()
-{
-	m_ActionLoopSnd.Stop();
-}
-
 void CMonster::Play_OneShotSFX(const _tchar* pKey, _float fVolume, ESoundBus eBus)
 {
 	m_pGameInstance_Proxy->Play_SFX(pKey, fVolume, eBus);
@@ -872,6 +861,44 @@ void CMonster::Enable_Colliders(_bool bEnable)
 {
 	if (m_pInteractCollider) m_pInteractCollider->Set_Enabled(bEnable);
 	if (m_pHurtBox)          m_pHurtBox->Set_Enabled(bEnable);
+}
+
+void CMonster::Play_LoopSFX(const _tchar* pSoundKey, _float fVolume)
+{
+	CSound_Handle& Handle = m_Sounds[pSoundKey];
+	Handle.Stop();
+	Handle = m_pGameInstance_Proxy->Play_SFX_Loop(pSoundKey, fVolume, ESoundBus::SFX);
+}
+
+void CMonster::Play_SectionLoopSFX(const _tchar* pSoundKey, _float fStart, _float fEnd, _float fVolume)
+{
+	CSound_Handle& Handle = m_Sounds[pSoundKey];
+	Handle.Stop();
+	Handle = m_pGameInstance_Proxy->Play_SFX_Section_Loop(pSoundKey, fStart, fEnd, fVolume);
+}
+
+void CMonster::Release_LoopSFX(const _tchar* pSoundKey)
+{
+	auto it = m_Sounds.find(pSoundKey);
+	if (it != m_Sounds.end())
+		it->second.Release_Loop();
+}
+
+void CMonster::Stop_LoopSFX(const _tchar* pSoundKey)
+{
+	auto it = m_Sounds.find(pSoundKey);
+	if (it != m_Sounds.end())
+	{
+		it->second.Stop();
+		m_Sounds.erase(it);
+	}
+}
+
+void CMonster::Stop_AllSounds()
+{
+	for (auto& Pair : m_Sounds)
+		Pair.second.Stop();
+	m_Sounds.clear();
 }
 
 void CMonster::On_Swallowed()
@@ -974,7 +1001,7 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 void CMonster::Free()
 {
-	Stop_ActionLoopSFX();
+	Stop_AllSounds();
 
 	Safe_Release(m_pBrain);
 	Safe_Release(m_pStateMachine);
