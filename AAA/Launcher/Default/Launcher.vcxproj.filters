@@ -132,6 +132,9 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Level_ArenaLoading.h">
+      <Filter>01. Levels\00. Loading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Launcher.ico">
@@ -191,6 +194,9 @@
     </ClCompile>
     <ClCompile Include="Launcher.cpp">
       <Filter>98. Default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_ArenaLoading.cpp">
+      <Filter>01. Levels\00. Loading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
