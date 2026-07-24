@@ -47,7 +47,7 @@ private:
 	_bool m_bKickPending = { false };
 	_float3 m_vPendingKickVelocity = {};
 
-	static constexpr _uint  s_iDisappearBounceCount = { 2 };     // 킥 → 1회 바운스 → 다음 착지에 소멸
+	static constexpr _uint  s_iDisappearBounceCount = { 3 };     // 킥 → 1회 바운스 → 다음 착지에 소멸
 	static constexpr _float s_fKickYawDegree = { 8.f };          // 킥 순간 좌우 흔들림
 	static constexpr _float s_fBounceYawDegree = { 30.f };       // 튈 때 방향 틀기
 	static constexpr _float s_fGravity = { -45.f };              // 커비/폭탄과 같은 체감 중력

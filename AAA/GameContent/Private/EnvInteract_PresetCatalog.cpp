@@ -22,6 +22,15 @@ namespace
 			{ L"PuffFlower", ENV_INTERACT_TYPE::BLOOM_PROP, 20u, 1 }
 	};
 
+	_bool Has_InteractivePrefix(const _wstring& wstrObjectName)
+	{
+		static constexpr const _tchar* INTERACTIVE_PREFIX = L"Interactive";
+		static constexpr size_t INTERACTIVE_PREFIX_LENGTH = 11;
+
+		return wstrObjectName.size() > INTERACTIVE_PREFIX_LENGTH
+			&& 0 == _wcsnicmp(wstrObjectName.c_str(), INTERACTIVE_PREFIX, INTERACTIVE_PREFIX_LENGTH);
+	}
+
 	ENV_INTERACT_PRESET Make_BehaviorPreset(ENV_INTERACT_TYPE eType)
 	{
 		ENV_INTERACT_PRESET Preset{};
@@ -76,7 +85,13 @@ _bool CEnvInteract_PresetCatalog::Try_Find(const _wstring& wstrObjectName, ENV_I
 
 	const ENV_INTERACT_CATALOG_ENTRY* pCatalog = Find_InteractCatalog(wstrObjectName);
 	if (nullptr == pCatalog)
-		return false;
+	{
+		if (!Has_InteractivePrefix(wstrObjectName))
+			return false;
+
+		*pOutPreset = Make_BehaviorPreset(ENV_INTERACT_TYPE::PHYSICS_PROP);
+		return true;
+	}
 
 	*pOutPreset = Make_BehaviorPreset(pCatalog->eType);
 	pOutPreset->iRewardChancePercent = pCatalog->iRewardChancePercent;

@@ -1,6 +1,7 @@
 #include "EnvInteract_KickProp.h"
 #include "GameContent_const.h"
 #include "GameContent_Events.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance_Proxy.h"
 #include "Geometry_Utils.h"
@@ -40,6 +41,7 @@ void CEnvInteract_KickProp::Late_Update(_float fTimeDelta)
 	if (m_bKickPending)
 	{
 		m_pRigidBodyCom->Set_Enabled(true);
+		m_pRigidBodyCom->Set_SceneQueryEnabled(false);   // CCT는 씬 쿼리로 발판을 찾음 - 찬 돌 위에 못 올라타게 제외
 		m_pRigidBodyCom->Set_LinearVelocity(XMLoadFloat3(&m_vPendingKickVelocity));
 
 		m_bKickPending = false;
@@ -370,6 +372,12 @@ void CEnvInteract_KickProp::Update_BounceState(_float fTimeDelta)
 				Desc.iAmount = static_cast<_uint>(Preset.iPointStarAmount);
 				m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
 			}
+
+			m_pRigidBodyCom->Sync_From_Body();
+
+			_float3 vEffectPosition{};
+			XMStoreFloat3(&vEffectPosition, m_pTransformCom->Get_State(STATE::POSITION));
+			CEffect_Loader::GetInstance()->Spawn(L"VanishEffect", Get_LevelIndex(), vEffectPosition);
 
 			Deactivate();
 			return;

@@ -511,8 +511,10 @@
     <ClInclude Include="..\public\UI_TitleLogo.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
+    <ClInclude Include="..\Public\VanishEffect.h" />
     <ClInclude Include="..\Public\WaddleDee.h" />
     <ClInclude Include="..\Public\WaddleDee_Body.h" />
+    <ClInclude Include="..\Public\WaddleDee_Hat.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
     <ClInclude Include="..\Public\WarpInEffect.h" />
     <ClInclude Include="..\Public\WarpOutEffect.h" />
@@ -983,8 +985,10 @@
     <ClCompile Include="..\Private\UI_TitleLogo.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
+    <ClCompile Include="..\Private\VanishEffect.cpp" />
     <ClCompile Include="..\Private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WaddleDee_Body.cpp" />
+    <ClCompile Include="..\Private\WaddleDee_Hat.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
     <ClCompile Include="..\Private\WarpInEffect.cpp" />
     <ClCompile Include="..\Private\WarpOutEffect.cpp" />
