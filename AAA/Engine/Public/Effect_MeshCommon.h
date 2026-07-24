@@ -78,6 +78,7 @@ namespace EffectMesh
     ENGINE_DLL HRESULT Bind_ShaderValues(CShader* pShader, const VALUES& Values, _bool bBindUnknownBeforePBR = false);
     ENGINE_DLL HRESULT Bind_Materials(CModel* pModel, CShader* pShader, _uint iMeshIndex, const VALUES& Values);
 
+    ENGINE_DLL void Apply_BillboardRoll(_float4x4& BillboardWorldMatrix, _float fRoll);
     ENGINE_DLL void Update_UVAnimations(VALUES& Values, _float fRatio);
     ENGINE_DLL void Initialize_DefaultValues(VALUES& Values);
 }
