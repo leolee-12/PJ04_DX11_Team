@@ -178,6 +178,9 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon">
       <UniqueIdentifier>{d42fb223-586b-432a-a5ac-61d1154a9385}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\07. DistortionCommon">
+      <UniqueIdentifier>{3d437398-bf98-45ba-99f8-f73ff60751f0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre">
       <UniqueIdentifier>{cd09fc73-01b5-4909-8163-909af424a333}</UniqueIdentifier>
     </Filter>
@@ -2565,6 +2568,12 @@
     <ClInclude Include="..\Public\MeshCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DistortionCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\07. DistortionCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestContainer.h">
+      <Filter>00. GameObject\Test</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\MeshEmitterCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon</Filter>
     </ClInclude>
@@ -4010,6 +4019,12 @@
     <ClCompile Include="..\Private\MeshCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\DistortionCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\07. DistortionCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestContainer.cpp">
+      <Filter>00. GameObject\Test</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon</Filter>
     </ClCompile>
@@ -4560,6 +4575,9 @@
     </None>
     <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Distortion.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>

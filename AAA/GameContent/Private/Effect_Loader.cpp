@@ -11,6 +11,7 @@
 #include "RectEmitterCommon.h"
 #include "MeshEmitterCommon.h"
 #include "TrailCommon.h"
+#include "DistortionCommon.h"
 
 IMPLEMENT_SINGLETON(CEffect_Loader)
 
@@ -176,6 +177,8 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
     if (FAILED(pProxy->Add_Prototype(iLevel, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext))))
         return E_FAIL;
     if (FAILED(pProxy->Add_Prototype(iLevel, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext))))
         return E_FAIL;
 
     return S_OK;
