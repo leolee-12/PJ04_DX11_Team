@@ -20,8 +20,12 @@ public:
 	{
 	};
 
-	static constexpr const _tchar*	PROTOTYPE_TAG = L"Proto_WaddleDee_Body";
-	static constexpr const _tchar*	PART_TAG = L"Body";
+	static constexpr const _tchar*	PROTOTYPE_TAG		= L"Proto_WaddleDee_Body";
+	static constexpr const _tchar*	PART_TAG			= L"Body";
+	static constexpr const _tchar*	EYE_TEX_PROTO		= L"Prototype_Component_Texture_WaddleDee_Eye";
+	static constexpr const _tchar*	EYEMASK_TEX_PROTO	= L"Prototype_Component_Texture_WaddleDee_EyeMask";
+	static constexpr const _uint	EYE_COUNT			= { 6 };
+	static constexpr const _tchar*	ANIM_PROTO			= L"Prototype_Component_Animator_WaddleDee";
 
 private:
 	CWaddleDee_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -56,9 +60,6 @@ private:
 	CTexture*	m_pEyeTextureCom = { nullptr };
 	CTexture*	m_pEyeMaskTextureCom = { nullptr };
 	_uint		m_iEyeIndex = { 0 };
-
-private:
-	static constexpr const _uint	EYE_COUNT = { 6 };
 
 public:
 	static CWaddleDee_Body*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
