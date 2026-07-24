@@ -15,7 +15,7 @@ CUI_FadeOut::CUI_FadeOut(const CUI_FadeOut& Prototype)
 void CUI_FadeOut::On_SequenceStart()
 {
     m_pGameInstance_Proxy->Play_SFX(L"UiResident_TownGeteIn.wav", 0.35f, ESoundBus::UI);
-    m_pGameInstance_Proxy->Fade_BGM_Out(1.f);
+    //m_pGameInstance_Proxy->Fade_BGM_Out(1.f);
 }
 
 void CUI_FadeOut::On_SequenceDone()
