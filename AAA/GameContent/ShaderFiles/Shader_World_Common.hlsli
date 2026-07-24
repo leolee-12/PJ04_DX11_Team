@@ -48,9 +48,10 @@ float4 g_vCamPosition = float4(0.f, 0.f, 0.f, 1.f);
 float g_fBlendOpacity = 1.f;
 float g_fBlendFresnel = 5.f;
 
-static const float LIGHT_CONTACT_FADE_DISTANCE = 0.15f;
+static const float LIGHT_CONTACT_FADE_DISTANCE = 2.f;
 
 Texture2D g_DepthTexture;
+Texture2D g_SceneDiffuseTexture;
 Texture2D<uint> g_MaterialIDTexture;
 
 float3 g_vDecalBoundsCenter = float3(0.f, 0.f, 0.f);
@@ -565,15 +566,17 @@ float4 PS_BLEND_UKWN_LIGHT(PS_IN In) : SV_TARGET0
 
     float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));
     float fEndFade = smoothstep(0.05f, 0.35f, vMeshUV.y);
+    float fViewFacing = abs(normalize(mul(float4(normalize(In.vNormal.xyz), 0.f), g_ViewMatrix).xyz).z);
 
-    float fContactFade = Get_LightContactFade(In.vProjPos);
-
-    float fAlpha = saturate(fBrightness * fEndFade * fContactFade * max(g_MaskStrength, 0.f) * g_vColor.a);
+    float fAlpha = saturate(fBrightness * fEndFade * fViewFacing * max(g_MaskStrength, 0.f) * g_vColor.a);
 
     if (fAlpha < 0.001f)
         discard;
 
-    return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
+    float3 vSceneAlbedo = g_SceneDiffuseTexture.Sample(PointSampler, Get_ScreenUV(In.vProjPos)).rgb;
+    float3 vLight = g_vColor.rgb + g_vEmissiveColor.rgb + vSceneAlbedo * g_vColor.rgb * g_vEmissiveColor.a;
+
+    return float4(vLight * Get_LightContactFade(In.vProjPos), fAlpha);
 }
 
 float4 PS_BLEND_UKWN2_LIGHT(PS_IN In) : SV_TARGET0
@@ -588,13 +591,15 @@ float4 PS_BLEND_UKWN2_LIGHT(PS_IN In) : SV_TARGET0
 
     float fShaftBrightness = saturate(max(vShaft.r, max(vShaft.g, vShaft.b)));
     float fNoiseModulation = lerp(0.5f, 1.f, fNoise);
-    float fContactFade = Get_LightContactFade(In.vProjPos);
-    float fAlpha = saturate(fShaftBrightness * fNoiseModulation * fContactFade * max(g_MaskStrength, 0.f) * g_vColor.a);
+    float fAlpha = saturate(fShaftBrightness * fNoiseModulation * max(g_MaskStrength, 0.f) * g_vColor.a);
 
     if (fAlpha < 0.001f)
         discard;
 
-    return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
+    float3 vSceneAlbedo = g_SceneDiffuseTexture.Sample(PointSampler, Get_ScreenUV(In.vProjPos)).rgb;
+    float3 vLight = g_vColor.rgb + g_vEmissiveColor.rgb + vSceneAlbedo * g_vColor.rgb * g_vEmissiveColor.a;
+
+    return float4(vLight * Get_LightContactFade(In.vProjPos), fAlpha);
 }
 
 PS_OUT PS_UKWN2_SAND_OPAQUE(PS_IN In)

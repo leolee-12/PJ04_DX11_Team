@@ -2052,7 +2052,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		}
 
 		ImGui::SetNextItemWidth(240.f);
-		if (ImGui::ColorEdit3("Emissive Color##MeshLayer", (float*)&Layer.vEmissiveColor, iColorEditFlags))
+		if (ImGui::ColorEdit4("Emissive Color (A=LightShaft Surface)##MeshLayer", (float*)&Layer.vEmissiveColor, iColorEditFlags))
 		{
 			bChanged = true;
 		}

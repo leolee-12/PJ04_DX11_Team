@@ -149,10 +149,14 @@ namespace
 				if (FAILED(Ctx.pShader->Bind_Matrix("g_ProjMatrixInverse",
 					Ctx.pGI_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
 					return E_FAIL;
-				if ((ETOI(WORLD_PASS::BLEND_UKWN_LIGHT) == Layer.iPass ||
-					ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass) &&
-					FAILED(Ctx.pGI_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), Ctx.pShader, "g_DepthTexture")))
-					return E_FAIL;
+				if (ETOI(WORLD_PASS::BLEND_UKWN_LIGHT) == Layer.iPass ||
+					ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass)
+				{
+					if (FAILED(Ctx.pGI_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), Ctx.pShader, "g_DepthTexture")))
+						return E_FAIL;
+					if (FAILED(Ctx.pGI_Proxy->Bind_RT_ShaderResource(TEXT("Target_Diffuse"), Ctx.pShader, "g_SceneDiffuseTexture")))
+						return E_FAIL;
+				}
 			}
 
 			const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DMN);
