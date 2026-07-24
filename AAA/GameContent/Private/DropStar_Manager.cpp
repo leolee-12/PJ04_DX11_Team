@@ -152,7 +152,7 @@ CDropStar_Manager::STAR_SPAWN_DESC CDropStar_Manager::Get_Preset(STAR_SPAWN_PRES
             tSpawnDesc.fStartDeg = 90.f;
             tSpawnDesc.fSweepDeg = -160.f;
             tSpawnDesc.fDelayStart = 0.f;
-            tSpawnDesc.fDelayStep = 0.25f;
+            tSpawnDesc.fDelayStep = 0.15f;
             tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
             tSpawnDesc.fLaunchSpeed = 0.5f;
             tSpawnDesc.fLifeTime = 2.5f;
@@ -166,13 +166,13 @@ CDropStar_Manager::STAR_SPAWN_DESC CDropStar_Manager::Get_Preset(STAR_SPAWN_PRES
             tSpawnDesc.fStartDeg = -90.f;
             tSpawnDesc.fSweepDeg = 160.f;
             tSpawnDesc.fDelayStart = 0.f;
-            tSpawnDesc.fDelayStep = 0.25f;
+            tSpawnDesc.fDelayStep = 0.15f;
             tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
             tSpawnDesc.fLaunchSpeed = 0.5f;
             tSpawnDesc.fLifeTime = 2.5f;
             break;
         }
-        case STAR_SPAWN_PRESET::AFTER_GORILLA_ARM_SPIN:
+        case STAR_SPAWN_PRESET::GORILLA_ARM_SPIN_END:
         {
             tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
             tSpawnDesc.iCount = 4;
@@ -187,7 +187,63 @@ CDropStar_Manager::STAR_SPAWN_DESC CDropStar_Manager::Get_Preset(STAR_SPAWN_PRES
             tSpawnDesc.fLifeTime = 3.5f;
             break;
         }
-        case STAR_SPAWN_PRESET::ROCK_IMPACT:
+        case STAR_SPAWN_PRESET::GORILLA_STAMP_RIGHT:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 1;
+            tSpawnDesc.fRange = 5.f;
+            tSpawnDesc.fStartDeg = 90.f;
+            tSpawnDesc.fSweepDeg = 0.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 1.5f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::GORILLA_STAMP_LEFT:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 1;
+            tSpawnDesc.fRange = 5.f;
+            tSpawnDesc.fStartDeg = -90.f;
+            tSpawnDesc.fSweepDeg = 0.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 1.5f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::GORILLA_STAMP_FINISH:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 4;
+            tSpawnDesc.fRange = 5.f;
+            tSpawnDesc.fStartDeg = 120.f;
+            tSpawnDesc.fSweepDeg = 300.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.05f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 5.f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::GORILLA_CATCH_ATTACK:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 4;
+            tSpawnDesc.fRange = 7.f;
+            tSpawnDesc.fStartDeg = 90.f;
+            tSpawnDesc.fSweepDeg = -90.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.05f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 2.f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::GORILLA_ROCK_IMPACT:
         {
             // 고릴라 돌 낙하시 효과
             tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
@@ -200,6 +256,108 @@ CDropStar_Manager::STAR_SPAWN_DESC CDropStar_Manager::Get_Preset(STAR_SPAWN_PRES
             tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
             tSpawnDesc.fLaunchSpeed = 0.75f;            
             tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+#pragma endregion
+#pragma region 보스 - 아르마딜로
+        case STAR_SPAWN_PRESET::ARAMADILLO_CATCH_ATTACK:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 1;
+            tSpawnDesc.fRange = 3.f;
+            tSpawnDesc.fStartDeg = 180.f;
+            tSpawnDesc.fSweepDeg = 0.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.15f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 3.f;
+            tSpawnDesc.fLifeTime = 3.f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::ARAMADILLO_ROLL_IMPACT:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 2;
+            tSpawnDesc.fRange = 2.f;
+            tSpawnDesc.fStartDeg = 90.f;
+            tSpawnDesc.fSweepDeg = -180.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 1.5f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::ARMADILLO_HIT_WALL_LANDING:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 4;
+            tSpawnDesc.fRange = 3.f;
+            tSpawnDesc.fStartDeg = 90.f;
+            tSpawnDesc.fSweepDeg = 270.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.0f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 1.5f;
+            tSpawnDesc.fLifeTime = 3.f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::ARMADILLO_TWINDANCE:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 1;
+            tSpawnDesc.fRange = 1.f;
+            tSpawnDesc.fStartDeg = 180.f;
+            tSpawnDesc.fSweepDeg = 0.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.05f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 5.f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::ARMADILLO_PARTNER_DESTROY:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 1;
+            tSpawnDesc.fRange = 1.f;
+            tSpawnDesc.fStartDeg = 180.f;
+            tSpawnDesc.fSweepDeg = 0.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.05f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 5.f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+#pragma endregion
+#pragma region 보스 - 캐롤라인
+        case STAR_SPAWN_PRESET::LEOPARD_LANDING:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 6;
+            tSpawnDesc.fRange = 5.f;
+            tSpawnDesc.fStartDeg = 0.f;
+            tSpawnDesc.fSweepDeg = 300.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 1.5f;
+            tSpawnDesc.fLifeTime = 2.5f;
+            break;
+        }
+        case STAR_SPAWN_PRESET::LEOPARD_ASSAULTSLASH:
+        {
+            tSpawnDesc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+            tSpawnDesc.iCount = 3;
+            tSpawnDesc.fRange = 1.5f;
+            tSpawnDesc.fStartDeg = 225.f;
+            tSpawnDesc.fSweepDeg = -90.f;
+            tSpawnDesc.fDelayStart = 0.f;
+            tSpawnDesc.fDelayStep = 0.f;
+            tSpawnDesc.vLocalOffset = { 0.f, 0.5f, 0.f };
+            tSpawnDesc.fLaunchSpeed = 2.f;
+            tSpawnDesc.fLifeTime = 3.f;
             break;
         }
 #pragma endregion
@@ -252,10 +410,21 @@ CDropStar_Manager::STAR_SPAWN_PRESET CDropStar_Manager::Name_To_Preset(const _ws
 {
     static const unordered_map<_wstring, STAR_SPAWN_PRESET> s_Table
     {
-        { L"GorillaArmSweepRight",      STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_RIGHT },
-        { L"GorillaArmSweepLeft",       STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_LEFT  },
-        { L"AfterGorillaArmSpin",       STAR_SPAWN_PRESET::AFTER_GORILLA_ARM_SPIN  },
-        { L"RockImpact",                STAR_SPAWN_PRESET::ROCK_IMPACT             },
+        { L"GorillaArmSweepRight",      STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_RIGHT      },
+        { L"GorillaArmSweepLeft",       STAR_SPAWN_PRESET::GORILLA_ARM_SWEEP_LEFT       },
+        { L"GorillaArmSpinEnd",         STAR_SPAWN_PRESET::GORILLA_ARM_SPIN_END         },
+        { L"GorillaStampRight",         STAR_SPAWN_PRESET::GORILLA_STAMP_RIGHT          },
+        { L"GorillaStampLeft",          STAR_SPAWN_PRESET::GORILLA_STAMP_LEFT           },
+        { L"GorillaStampFinish",        STAR_SPAWN_PRESET::GORILLA_STAMP_FINISH         },
+        { L"GorillaCatchAttack",        STAR_SPAWN_PRESET::GORILLA_CATCH_ATTACK         },
+        { L"GorillaRockImpact",         STAR_SPAWN_PRESET::GORILLA_ROCK_IMPACT          },
+        { L"AramaDilloCatchAttack",     STAR_SPAWN_PRESET::ARAMADILLO_CATCH_ATTACK      },
+        { L"AramaDilloRollImpact",      STAR_SPAWN_PRESET::ARAMADILLO_ROLL_IMPACT       },
+        { L"AramaDilloHitWallLanding",  STAR_SPAWN_PRESET::ARMADILLO_HIT_WALL_LANDING   },
+        { L"AramaDilloTwinDance",       STAR_SPAWN_PRESET::ARMADILLO_TWINDANCE          },
+        { L"AramaDilloPartnerDestroy",  STAR_SPAWN_PRESET::ARMADILLO_PARTNER_DESTROY    },
+        { L"LeopardLanding",            STAR_SPAWN_PRESET::LEOPARD_LANDING              },
+        { L"LeopardAssaultSlash",       STAR_SPAWN_PRESET::LEOPARD_ASSAULTSLASH         },
     };
 
     auto it = s_Table.find(strName);

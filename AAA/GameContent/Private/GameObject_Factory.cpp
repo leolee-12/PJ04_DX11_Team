@@ -261,7 +261,6 @@
 #include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
 #include "LD_MeteorGenerator.h"
-#include "LightShaft.h"
 
 // EnvObject
 #include "EnvTrigger_Generic.h"
@@ -798,6 +797,12 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::PROTOTYPE_TAG, CWaddleDee_Body::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh", XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYE_TEX_PROTO, 
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEye.%02d.dds", CWaddleDee_Body::EYE_COUNT));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYEMASK_TEX_PROTO,
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEyeMask.%02d.dds", CWaddleDee_Body::EYE_COUNT));
         )
     );
 
@@ -874,11 +879,6 @@ void CGameObject_Factory::Register_NonAnimObject()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorRock_Small::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Small/VolcanoRock_S.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Model_VolcanoRock_SpotLight"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/SpotLight/VolcanoRock_SpotLight.ysh"));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CLightShaft::PROTOTYPE_TAG, CLightShaft::Create(pDevice, pContext));
         )
     );
 }
@@ -948,7 +948,7 @@ void CGameObject_Factory::Register_AnimObject()
 
     Register(CLD_CopyEssence::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_CopyEssence),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_CopyEssence::MODEL_PROTO_TAG,
-            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh", true));));
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/CopyEssence.ysh", true));));
 }
 
 void CGameObject_Factory::Register_Effect()

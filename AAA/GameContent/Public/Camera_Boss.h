@@ -49,6 +49,7 @@ private:
     CGameObject* m_pFocusOverride = { nullptr };
     _float       m_fFocusAimHeight = { 2.f };
 
+    _bool   m_bHold = { false };
     _bool   m_bTopView = { false };
     _float3 m_vTopCenter = { 0.f, 0.f, 0.f };
     _float  m_fTopHeight = { 40.f };

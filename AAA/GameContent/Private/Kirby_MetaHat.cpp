@@ -42,27 +42,32 @@ HRESULT CKirby_MetaHat::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        _uint iPassIndex = ETOUI(KIRBY_SHADER_PASS::ANIM_TEXTURED_PBR);
+        const _bool bMask = (i == 0 || i == 2);   // 가면(눈 오버레이) 메쉬
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
             return E_FAIL;
-
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
             return E_FAIL;
-
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
             return E_FAIL;
 
+        _uint iPassIndex = ETOUI(KIRBY_SHADER_PASS::ANIM_TEXTURED_PBR);
+
+        if (bMask)
+        {
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MetaEyeTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+                return E_FAIL;
+            iPassIndex = ETOUI(KIRBY_SHADER_PASS::META_MASK);
+        }
+
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
-
         if (FAILED(m_pShaderCom->Begin(iPassIndex)))
             return E_FAIL;
-
         if (FAILED(m_pModelCom->Render(i)))
             return E_FAIL;
     }
-
+    return S_OK;
     return S_OK;
 }
 

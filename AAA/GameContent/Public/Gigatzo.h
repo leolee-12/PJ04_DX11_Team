@@ -46,16 +46,18 @@ public:
 	// Ä¸½¶ Å©±â º¸°í ¼öÁ¤
 	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
 	virtual _float				Get_CapsuleHeight() const override { return 0.75f; }
-	virtual _float				Get_InteractRadius() const override { return 22.f; }
+	virtual _float				Get_InteractRadius() const override;
 
 	virtual _bool				Block_Hit(const ATTACK_INFO& tInfo) override { return true; }
 	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override { return false; }
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
-
+	_bool						Is_RenderCulled() const;
 	_bool						Is_InCameraFront() const;
 	CGigatzo_Body*				Get_Body() { return m_pBody; }
 	_float						Get_InitWaitDelay() const { return m_fInitWaitDelay; }
+	_float						Get_BulletSpeed() const { return m_fBulletSpeed; }
+	_float						Get_FireDistance() const;
 
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;

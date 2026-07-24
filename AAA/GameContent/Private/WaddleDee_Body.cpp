@@ -1,9 +1,7 @@
 #include "WaddleDee_Body.h"
 #include "GameInstance.h"
 #include "GameContent_const.h"
-#include "Shader.h"
-#include "Model.h"
-#include "Animator.h"
+
 #include "Cage_WaddleDee.h"
 
 namespace
@@ -18,13 +16,22 @@ CWaddleDee_Body::CWaddleDee_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 CWaddleDee_Body::CWaddleDee_Body(const CWaddleDee_Body& Prototype)
     : CPartObject(Prototype)
+    , m_pAnimatorCom(Prototype.m_pAnimatorCom->Clone(nullptr))
 {
 }
 
 HRESULT CWaddleDee_Body::Initialize_Prototype()
 {
-    m_eProjType = PROJ_TYPE::PERSPEC;
-    return S_OK;
+    if (FAILED(__super::Initialize_Prototype()))
+        return E_FAIL;
+
+    m_pAnimatorCom = CAnimator::Create(m_pDevice, m_pContext);
+    if (!m_pAnimatorCom)
+        return E_FAIL;
+
+    CAnimator::ANIMATOR_DESC ProtoDesc{};
+    ProtoDesc.strDataFile = TEXT("../../Resources/YSH/WaddleDee/Body/Model_Anim_AnimEvents.json");
+    return m_pAnimatorCom->Initialize(&ProtoDesc);
 }
 
 HRESULT CWaddleDee_Body::Initialize(void* pArg)
@@ -82,9 +89,9 @@ HRESULT CWaddleDee_Body::Render()
 
         if (0 == i)
         {
-            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+            if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeTexture", m_iEyeIndex)))
                 return E_FAIL;
-            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeMaskTexture", i, MTEX_TYPE::UNKNOWN, 2)))
+            if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeMaskTexture", m_iEyeIndex)))
                 return E_FAIL;
         }
         else
@@ -153,15 +160,17 @@ HRESULT CWaddleDee_Body::Ready_Components()
     if (nullptr == m_pModelCom)
         return E_FAIL;
 
-    CAnimator::ANIMATOR_DESC AnimDesc{};
-    AnimDesc.pModel = m_pModelCom;
-    AnimDesc.strDataFile = TEXT("");
-
-    m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
-    if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
+    m_pEyeTextureCom = Add_Component<CTexture>(m_iPrototypeLevel, EYE_TEX_PROTO, TEXT("Com_EyeTexture"));
+    if (nullptr == m_pEyeTextureCom)
         return E_FAIL;
 
-    return S_OK;
+    m_pEyeMaskTextureCom = Add_Component<CTexture>(m_iPrototypeLevel, EYEMASK_TEX_PROTO, TEXT("Com_EyeMaskTexture"));
+    if (nullptr == m_pEyeMaskTextureCom)
+        return E_FAIL;
+
+    CAnimator::ANIMATOR_DESC AnimDesc{};
+    AnimDesc.pModel = m_pModelCom;
+    return m_pAnimatorCom->Initialize(&AnimDesc);
 }
 
 HRESULT CWaddleDee_Body::Bind_ShaderResources()
@@ -204,5 +213,6 @@ CGameObject* CWaddleDee_Body::Clone(void* pArg)
 
 void CWaddleDee_Body::Free()
 {
+    Safe_Release(m_pAnimatorCom);
     __super::Free();
 }

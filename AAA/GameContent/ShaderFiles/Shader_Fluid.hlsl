@@ -220,7 +220,7 @@ float4 PS_MAIN(PS_IN In, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
     }
 
     // Water Color ÇÕ¼º
-    float fWaterColorWeight = lerp(saturate(g_fShallowColorStrength), 1.f, fDepthRatio);
+    float fWaterColorWeight = lerp(saturate(g_fShallowColorStrength), 1.f, fDepthRatio) * saturate(g_fOpacity);
     float3 vBaseColor = lerp(vRefractedColor, vWaterColor, fWaterColorWeight);
     float3 vFinalColor = vBaseColor;
     vFinalColor += vReflectionColor * fFresnel * g_fReflectionStrength;
@@ -238,7 +238,7 @@ float4 PS_MAIN(PS_IN In, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
     float fFinalAlpha = saturate(lerp(g_fOpacity * 0.65f, g_fOpacity, fDepthRatio));
     fFinalAlpha *= saturate(g_fVisibility);
 
-    return float4(max(vFinalColor, 0.f), fFinalAlpha);
+    return float4(max(vFinalColor, 0.f), 1.f);
 }
 
 technique11 DefaultTechnique
@@ -247,7 +247,7 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_NoWrite, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;

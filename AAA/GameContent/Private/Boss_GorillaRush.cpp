@@ -54,6 +54,8 @@ HRESULT CBoss_GorillaRush::Ready_AnimEvents()
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         if (Handle_SoundAnimEvent(e, phase))
             return;
+        if (Handle_DropStarsAnimEvent(e, phase))
+            return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))
         {

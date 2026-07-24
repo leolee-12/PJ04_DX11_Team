@@ -50,7 +50,7 @@ float g_fAtmosStart, g_fAtmosEnd, g_fAtmosStrength;
 
 float g_fESMConst = 80.f;
 float g_fESMBleed = 0.2f;
-float g_fShadowNormalOffset = 0.08f;
+float g_fShadowNormalOffset = 0.03f;
 float g_fShadowDepthBias = 0.002f;
 
 static const float PI = 3.14159265f;
@@ -309,7 +309,7 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
 
     // 유계 스케일: grazing서 소폭만 키움(tan 폭주 제거)
     float k = 1.f - ndl; // 0(정면)~1(스침)
-    float3 wpShadow = wp + Ng * g_fShadowNormalOffset * (1.f + k * 1.5f);
+    float3 wpShadow = wp + Ng * g_fShadowNormalOffset * (1.f + k * 0.4f);
     float4 lc = mul(float4(wpShadow, 1.f), g_ShadowLightViewMatrix);
     lc = mul(lc, g_ShadowLightProjMatrix);
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
@@ -330,7 +330,8 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
         if (recvMatID == 0 && casterClass > 0.5f)
             shadow = 1.f;
 
-        shadow = lerp(1.f, shadow, smoothstep(0.f, 0.3f, ndl));
+        if (recvMatID != 0)
+            shadow = lerp(1.f, shadow, smoothstep(0.f, 0.3f, ndl));
 
         color *= lerp(0.25f, 1.f, shadow);
     }
