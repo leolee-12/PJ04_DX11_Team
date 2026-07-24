@@ -212,8 +212,12 @@ protected:
 
     const _float4x4* m_pParentMatrix{};
     _float4x4 m_CombinedWorldMatrix{};
+    _float3 m_vAppliedPropertyScale{ 1.f, 1.f, 1.f };
 
 protected:
+    virtual _bool Use_PropertyScaleForParticleSize() const { return false; }
+    const _float3& Get_AppliedPropertyScale() const { return m_vAppliedPropertyScale; }
+
     void Compute_CombinedWorldMatrix();
     _float4x4 Make_BillboardWorldMatrix(const _float4x4& WorldMatrix) const;
     void Set_LocalPositionFromProperty();
