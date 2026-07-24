@@ -52,7 +52,7 @@ float4 PS_WRITE_OFFSET(PS_IN In) : SV_TARGET
     float profile = d.a;
     float2 offset = dir * profile * g_fStrength * g_fAlpha;
 
-    return float4(offset, 0.f, 0.f);
+    return float4(offset, 0.f, 1.f);
 }
 
 technique11 DefaultTechnique
