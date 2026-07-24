@@ -136,7 +136,6 @@ public:
 	virtual HRESULT On_EditTransformChanged() = 0;
 	virtual HRESULT Apply_EditCustomDesc(const EDIT_CUSTOM_DESC& Desc) = 0;
 
-	virtual const MESH_LAYER_IDX* Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const = 0;
 	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) = 0;
 };
 

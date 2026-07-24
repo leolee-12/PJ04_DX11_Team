@@ -37,9 +37,6 @@
     <Filter Include="04. Panels\00. Manager">
       <UniqueIdentifier>{59c1a732-144c-4530-9d03-93792c200f41}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Panels\Console">
-      <UniqueIdentifier>{71b4d72a-263e-4e36-b69c-704742851dc0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="04. Panels\Hierarchy">
       <UniqueIdentifier>{9df3c044-1638-4c5e-b8cd-0125b13d0e80}</UniqueIdentifier>
     </Filter>
@@ -95,9 +92,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Panel.h">
       <Filter>04. Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Console.h">
-      <Filter>04. Panels\Console</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Panel_Hierarchy.h">
       <Filter>04. Panels\Hierarchy</Filter>
@@ -160,9 +154,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Panel.cpp">
       <Filter>04. Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Console.cpp">
-      <Filter>04. Panels\Console</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Hierarchy.cpp">
       <Filter>04. Panels\Hierarchy</Filter>

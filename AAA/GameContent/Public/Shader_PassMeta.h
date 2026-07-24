@@ -52,7 +52,7 @@ struct MAP_SHADER_PASS_META
 {
 	MAP_PASS		ePass;
 	const _char*	szName;
-	_uint			iRequiredTextureMask;
+	_uint			iRequiredTextureMask; // 참조용(패스별 요구 텍스처). 런타임 미독 - 최적화용 아님
 };
 
 inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =

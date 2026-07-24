@@ -194,21 +194,6 @@ HRESULT CLevelDesignObject::On_EditTransformChanged()
 	return S_OK;
 }
 
-const MESH_LAYER_IDX* CLevelDesignObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
-{
-	vector<EDITABLE_MODEL_SLOT> Slots;
-	Collect_EditModelSlots(&Slots);
-
-	if (iModelSlot >= Slots.size())
-		return nullptr;
-
-	CModel* pModel = Slots[iModelSlot].pModel;
-	if (nullptr == pModel || iMesh >= pModel->Get_NumMeshes())
-		return nullptr;
-
-	return &pModel->Get_MeshLayer(iMesh);
-}
-
 HRESULT CLevelDesignObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
 {
 	vector<EDITABLE_MODEL_SLOT> Slots;
