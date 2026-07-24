@@ -93,7 +93,7 @@ void CKirby_ToyHammer::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
     {
         case KIRBY_PART_MODE::BACK:
         {
-            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("CenterL"));
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
             m_pAnimatorCom->Play("Carry", true, true, 0.f);
             break;
         }
@@ -193,6 +193,29 @@ void CKirby_ToyHammer::Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType)
     }
 
     m_pHitBox->Reset_Bounding(tDesc);
+}
+
+_bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY)
+{
+    const _float4x4* pHeadFrontBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadRJ");
+    if (pHeadFrontBoneMatrix == nullptr)
+        return false;
+
+    const _matrix HeadFrontWorldMatrix = XMLoadFloat4x4(pHeadFrontBoneMatrix) * XMLoadFloat4x4(&m_CombinedWorldMatrix);
+
+    _float3 vSweepStart{};
+    XMStoreFloat3(&vSweepStart, HeadFrontWorldMatrix.r[3]);
+
+
+    constexpr _float fSweepRadius = 0.12f;
+    constexpr _float fSweepDistance = 0.1f;
+    constexpr _float3 vSweepDirection = { 0.f, -1.f, 0.f };
+
+    _float3 vHitNormal{};
+    if (!m_pGameInstance_Proxy->Sweep_Sphere(vSweepStart, fSweepRadius, vSweepDirection, fSweepDistance, &vHitNormal, nullptr, true, false))
+        return false;
+
+    return vHitNormal.y >= fNormalY;
 }
 
 HRESULT CKirby_ToyHammer::Ready_Components()

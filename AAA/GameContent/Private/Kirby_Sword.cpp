@@ -115,7 +115,7 @@ void CKirby_Sword::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
     {
         case KIRBY_PART_MODE::BACK:
         {
-            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("CenterL"));
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
             m_pAnimatorCom->Play("Carry", true, true, 0.f);
             break;
         }

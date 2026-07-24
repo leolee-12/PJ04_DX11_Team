@@ -389,6 +389,13 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             pToyHammerAnimator->Play("HammerAttackHit", false, true, 0.1f, 2.5f);
             break;
         }
+        case TOY_HAMMER_STATE::ATTACK_MISS:
+        {
+            //m_iNormalAttackCount = 0;
+            //pAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
+            //pToyHammerAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
+            break;
+        }
         case TOY_HAMMER_STATE::ATTACK_FINAL:
         {
             m_bAttackFinalEndOverlayApplied = false;
@@ -415,32 +422,36 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_1:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack1.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.5f);
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_2:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack2.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.5f);
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack3.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.5f);
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_4:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_AttackFailure1.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("Burst", false, true, 0.1f, 2.5f);
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER:
         {
-            pAnimator->Play("WheelHammer", false, true, 0.f, 3.f);
-            pToyHammerAnimator->Play("WheelHammer", false, true, 0.f, 3.f);
+            pAnimator->Play("WheelHammer", false, true, 0.f, 2.5f);
+            pToyHammerAnimator->Play("WheelHammer", false, true, 0.f, 2.5f);
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_END:
@@ -454,6 +465,13 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         {
             pAnimator->Play("WheelHammerFall", false, true, 0.03f, 3.f);
             pToyHammerAnimator->Play("WheelHammerFall", false, true, 0.03f, 3.f);
+            break;
+        }
+        case TOY_HAMMER_STATE::REBOUND:
+        {
+            //// юс╫ц
+            //CMovement_Child* pMovement = pKirby->Get_Movement();
+            //pMovement->Set_VelocityY(20.f);
             break;
         }
         case TOY_HAMMER_STATE::TOY_HAMER_STATE_END:
@@ -511,6 +529,23 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                 pAnimator->Set_Mask("HaveHammerWait", "R_ShoulderJ", true, 1.f, 0.1f, 0.0f);
                 m_bAttackEndOverlayApplied = true;
             }
+
+            break;
+        }
+        case TOY_HAMMER_STATE::ATTACK_MISS:
+        {
+            //if (pAnimator->Is_Finished())
+            //{
+            //    if (m_bReserveNextAttack)
+            //    {
+            //        Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_START);
+            //        m_bReserveNextAttack = false;
+            //    }
+            //    else
+            //    {
+            //        Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            //    }
+            //}
 
             break;
         }
@@ -664,6 +699,11 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
 
             break;
         }
+        case TOY_HAMMER_STATE::REBOUND:
+        {
+            //Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            break;
+        }
     }
 }
 
@@ -672,25 +712,12 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
     switch (eState)
     {
         case TOY_HAMMER_STATE::ATTACK_START:
-        {
-            break;
-        }
         case TOY_HAMMER_STATE::ATTACK:
-        {
-            break;
-        }
         case TOY_HAMMER_STATE::ATTACK_END:
-        {
-            break;
-        }
+        case TOY_HAMMER_STATE::ATTACK_MISS:
         case TOY_HAMMER_STATE::ATTACK_FINAL:
-        {
-            break;
-        }
         case TOY_HAMMER_STATE::CHARGE_START:
-        {
             break;
-        }
         case TOY_HAMMER_STATE::CHARGING:
         {
             Change_ChargeAniState(pKirby, CHARGE_ANI_STATE::NONE);
@@ -714,14 +741,10 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER:
-        {
-            break;
-        }
-        case TOY_HAMMER_STATE::WHEELHAMMER_END:
-        {
-            break;
-        }
+        case TOY_HAMMER_STATE::WHEELHAMMER_END:      
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
+            break;
+        case TOY_HAMMER_STATE::REBOUND:
         {
             break;
         }
