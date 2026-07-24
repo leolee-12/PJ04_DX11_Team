@@ -19,6 +19,11 @@ public:
 
     static constexpr const _tchar* APPEAR_TAG = TEXT("Metaknight_Appear");
 
+    enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
+    enum class ELockOutcome { NONE, MK_WIN, MK_LOSE };
+    enum class EDemo { UPPER_CALIBUR, LOCK_LOSE };
+
+#pragma region 설정 상수값
     // --- 공통 ---
     static constexpr _float s_fDefaultAnimSpeed = 1.5f;
     static constexpr _float s_fCCT_Radius = 0.75f;
@@ -73,9 +78,11 @@ public:
     static constexpr _float DEATH_SHAKE_SEC = 0.7f;
     static constexpr _float DEATH_MASK_HOLD = 0.5f;
 
-    enum class EMK_SWORD { GALAXIA, REPLICA, NONE };
-    enum class ELockOutcome { NONE, MK_WIN, MK_LOSE };
-    enum class EDemo { UPPER_CALIBUR, LOCK_LOSE };
+#pragma endregion
+
+#pragma region 사운드 키
+    static constexpr const _tchar* SND_ATTACK1CHARGE1 = L"CharaMetaknight_Attack1Charge1.wav";
+#pragma endregion
 
 private:
     CBoss_Metaknight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
