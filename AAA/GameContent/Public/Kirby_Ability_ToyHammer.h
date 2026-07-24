@@ -9,7 +9,7 @@ class CKirby;
 class CLIENT_DLL CKirby_Ability_ToyHammer final : public CKirby_Ability
 {
 private:
-    enum TOY_HAMMER_STATE
+    enum class TOY_HAMMER_STATE
     {
         ATTACK_START, ATTACK, ATTACK_END, ATTACK_FINAL,
         CHARGE_START, CHARGING, CHARGE_ATTACK_1, CHARGE_ATTACK_2, CHARGE_ATTACK_3, CHARGE_ATTACK_4,
@@ -17,7 +17,10 @@ private:
         TOY_HAMER_STATE_END
     };
 
-    enum CHARGE_LEVEL { LV1, LV2, LV3, LV4 };
+    enum class CHARGE_LEVEL { LV1, LV2, LV3, LV4 };
+
+private:
+    enum class CHARGE_ANI_STATE { NONE, WAIT, MOVE, JUMP_START, AIR, JUMP_END };
 
 private:
     CKirby_Ability_ToyHammer();
@@ -44,7 +47,6 @@ public:
 
 private:
     TOY_HAMMER_STATE m_eToyHammerState{ TOY_HAMMER_STATE::TOY_HAMER_STATE_END };
-
     TOY_HAMMER_STATE m_eToyHammerStartState{ TOY_HAMMER_STATE::TOY_HAMER_STATE_END };
 
     _bool m_bReserveNextAttack{};
@@ -57,16 +59,21 @@ private:
 
     _uint m_iNormalAttackCount{};
 
-    _uint m_iChargeCount{};
+    _float m_fChargeTime{};
     CHARGE_LEVEL m_eChargeLevel{};
 
     _bool m_bWheelHammerPressing{};
+
+    CHARGE_ANI_STATE m_eChargeAniState{};
 
 private:
     void Change_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eNext);
     void Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eState);
     void Update_ToyHammerState(CKirby* pKirby, _float fTimeDelta);
     void Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eState);
+
+    void Change_ChargeAniState(CKirby* pKirby, CHARGE_ANI_STATE eState);
+    void Update_ChargeOverlayAni(CKirby* pKirby, _bool bUseMoveAni, _float fTimeDelta);
 
 public:
     static CKirby_Ability_ToyHammer* Create();
