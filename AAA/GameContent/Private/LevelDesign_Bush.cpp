@@ -539,51 +539,41 @@ HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 
 		if (MODEL::ANIM == eModelType)
 		{
+			if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
+				return E_FAIL;
+
 			MESH_LAYER_BIND_CONTEXT Ctx{};
-			Ctx.pShader = pShader;
-			Ctx.pModel = pModel;
-			Ctx.pCullingState = m_pCullingState;
-			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+			Ctx.Set_Renderer(pShader, pModel, m_pGameInstance_Proxy, m_pCullingState);
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::UMN);
 
-			MESH_LAYER_BIND_RESULT Result{};
-			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-				return E_FAIL;
+			_uint iPass = 0u;
+			const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+			if (FAILED(hrBind))     return E_FAIL;
+			if (S_FALSE == hrBind)  continue;
 
-			if (Result.bSkipMesh)
-				continue;
-
-			if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
-				return E_FAIL;
-
-			if (FAILED(pShader->Begin(Result.iPass)))
+			if (FAILED(pShader->Begin(iPass)))
 				return E_FAIL;
 		}
 		else
 		{
 			MESH_LAYER_BIND_CONTEXT Ctx{};
-			Ctx.pShader = pShader;
-			Ctx.pModel = pModel;
-			Ctx.pCullingState = m_pCullingState;
-			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+			Ctx.Set_Renderer(pShader, pModel, m_pGameInstance_Proxy, m_pCullingState);
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::UMN);
 
-			MESH_LAYER_BIND_RESULT Result{};
-			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-				return E_FAIL;
+			_uint iPass = 0u;
+			const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+			if (FAILED(hrBind))     return E_FAIL;
+			if (S_FALSE == hrBind)  continue;
 
-			if (Result.bSkipMesh)
-				continue;
-
-			if (FAILED(pShader->Begin(Result.iPass)))
+			if (FAILED(pShader->Begin(iPass)))
 				return E_FAIL;
 		}
 

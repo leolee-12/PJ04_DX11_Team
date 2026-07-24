@@ -27,14 +27,9 @@ public:
 	_bool					Is_Open() const { return m_bOpen; }
 	void					Set_Open(_bool bOpen) { m_bOpen = bOpen; }
 	_bool*					Get_OpenPtr() { return &m_bOpen; }
-
-	_bool					Is_Hovered() const { return m_bHovered; }
-	_bool					Is_Focused() const { return m_bFocused; }
 	const _char*			Get_Name() const { return m_szName; }
 
 protected:
-	// docs Panel_Base 방식: ImGui::Begin 래핑 + hover/focus 자동 캡처.
-	// 사용 패턴: if (!Begin_Panel()) { End_Panel(); return; } ... End_Panel();
 	_bool					Begin_Panel();
 	void					End_Panel();
 
@@ -47,8 +42,6 @@ protected:
 	_char					m_szName[MAX_PATH] = {};
 	ImGuiWindowFlags		m_iWindowFlags = { 0 };
 	_bool					m_bOpen = { true };
-	_bool					m_bHovered = { false };
-	_bool					m_bFocused = { false };
 
 protected:
 	virtual void			Free() override;

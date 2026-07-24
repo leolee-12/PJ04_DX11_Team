@@ -47,11 +47,6 @@ struct LD_RESOLVED_SPAWN
 
 		return std::visit(ToSpawnArgument, ObjectDesc);
 	}
-
-	const LD_OBJECT_DESC& Get_BaseDesc() const
-	{
-		return Get_LDObjectDesc(ObjectDesc);
-	}
 };
 
 class CLIENT_DLL CLevelDesign_Registry final

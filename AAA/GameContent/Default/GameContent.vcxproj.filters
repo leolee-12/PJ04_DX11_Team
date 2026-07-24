@@ -2580,9 +2580,6 @@
     <ClInclude Include="..\Public\MeshLayer_Binder.h">
       <Filter>99. Defines\Leo</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MeshLayer_Profile.h">
-      <Filter>99. Defines\Leo</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\MeshParticleCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClInclude>
@@ -3108,10 +3105,16 @@
     <ClInclude Include="..\Public\Vacuum.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\VanishEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\WaddleDee.h">
       <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\WaddleDee_Body.h">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WaddleDee_Hat.h">
       <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
@@ -4028,9 +4031,6 @@
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp">
       <Filter>99. Defines\Leo</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MeshLayer_Profile.cpp">
-      <Filter>99. Defines\Leo</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\MeshParticleCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClCompile>
@@ -4529,10 +4529,16 @@
     <ClCompile Include="..\Private\Vacuum.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\VanishEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\WaddleDee.cpp">
       <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\WaddleDee_Body.cpp">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WaddleDee_Hat.cpp">
       <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\WalkSmoke.cpp">

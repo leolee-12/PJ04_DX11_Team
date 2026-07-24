@@ -119,16 +119,6 @@ void CProfiler_Manager::EndCpuSection(EPROFILE_CPU_SECTION eSection)
 	m_bCpuSectionRunning[iIndex] = false;
 }
 
-void CProfiler_Manager::Set_CurrentPass(EPROFILE_RENDER_PASS ePass)
-{
-	m_eCurrentPass = ePass;
-}
-
-EPROFILE_RENDER_PASS CProfiler_Manager::Get_CurrentPass() const
-{
-	return m_eCurrentPass;
-}
-
 void CProfiler_Manager::AddCounter(EPROFILE_COUNTER eCounter, _uint iValue)
 {
 	const _uint iIndex = ETOUI(eCounter);
@@ -136,42 +126,6 @@ void CProfiler_Manager::AddCounter(EPROFILE_COUNTER eCounter, _uint iValue)
 		return;
 
 	m_WorkingSnapshot.Counters[iIndex] += iValue;
-}
-
-void CProfiler_Manager::Record_DrawIndexed(_uint iIndexCount)
-{
-	(void)iIndexCount;
-
-	AddCounter(EPROFILE_COUNTER::DRAWCALL_TOTAL, 1);
-
-	switch (m_eCurrentPass)
-	{
-	case EPROFILE_RENDER_PASS::SHADOW:
-		AddCounter(EPROFILE_COUNTER::DRAWCALL_SHADOW, 1);
-		break;
-	case EPROFILE_RENDER_PASS::NONBLEND:
-		AddCounter(EPROFILE_COUNTER::DRAWCALL_NONBLEND, 1);
-		break;
-	case EPROFILE_RENDER_PASS::DECAL:
-		AddCounter(EPROFILE_COUNTER::DRAWCALL_DECAL, 1);
-		break;
-	case EPROFILE_RENDER_PASS::BLEND:
-		AddCounter(EPROFILE_COUNTER::DRAWCALL_BLEND, 1);
-		break;
-	case EPROFILE_RENDER_PASS::UI:
-		AddCounter(EPROFILE_COUNTER::DRAWCALL_UI, 1);
-		break;
-	default:
-		break;
-	}
-}
-
-void CProfiler_Manager::Record_DrawIndexedInstanced(_uint iIndexCount, _uint iInstanceCount)
-{
-	(void)iInstanceCount;
-
-	Record_DrawIndexed(iIndexCount);
-	AddCounter(EPROFILE_COUNTER::DRAWCALL_INSTANCED, 1);
 }
 
 void CProfiler_Manager::Set_TextureHubStats(const TEXTURE_HUB_STATS& Stats)

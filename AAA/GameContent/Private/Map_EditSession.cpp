@@ -399,25 +399,6 @@ _bool CMap_EditSession::Track_EditedLevelDesignObject(CGameObject* pObject, cons
 	return true;
 }
 
-_bool CMap_EditSession::Clear_EditedLevelDesignObject(CGameObject* pObject)
-{
-	if (nullptr == pObject)
-		return false;
-
-	const auto IterItem = m_MapPreviewLDItems.find(pObject);
-	if (IterItem == m_MapPreviewLDItems.end())
-		return false;
-
-	const _wstring& strStableKey = IterItem->second.strStableKey;
-	if (strStableKey.empty())
-		return false;
-
-	const size_t iErased = m_tEditData.OverrideDesc.EditedLevelDesignObjects.erase(strStableKey);
-
-	m_tEditData.bHasMapContent = true;
-	return 0 < iErased;
-}
-
 _bool CMap_EditSession::Try_GetEditedLevelDesignObject(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == pObject || nullptr == pOutEdit)
@@ -620,17 +601,6 @@ void CMap_EditSession::Set_EnvLoaded(_bool bLoaded)
 void CMap_EditSession::Set_EnvCreatedCount(_uint iCount)
 {
 	m_iEnvCreatedCount = iCount;
-}
-
-void CMap_EditSession::Set_Change(const MAP_EDIT_CHANGE& Desc)
-{
-	m_tEditData.OverrideDesc = Desc;
-	Rebuild_DeletedEnvItemsFromWorkingDelta();
-	Rebuild_DeletedLevelDesignItemsFromWorkingDelta();
-
-	m_AddedObjectsByRuntime.clear();
-	m_AddedObjectUiItems.clear();
-	m_AddedObjectOrder.clear();
 }
 
 void CMap_EditSession::Register_AddedObject(CGameObject* pObject, const MAP_ADD_OBJECT& Desc, const _wstring& strDisplayName)

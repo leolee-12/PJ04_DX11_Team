@@ -53,9 +53,6 @@ public:
 	static _bool				Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static CGameObject*			Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
-public:
-	const LD_BREAKABLE_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
-
 private:
 	enum class BREAKABLE_STATE { INTACT, BREAKING, DESTROYED };
 

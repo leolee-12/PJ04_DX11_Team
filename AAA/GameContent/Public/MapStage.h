@@ -27,8 +27,6 @@ public:
 #ifdef _DEBUG
 	void Set_EditorSoloSection(CMapSection* pSection);
 	void Clear_EditorSoloSection();
-	CMapSection* Get_EditorSoloSection() const { return m_pEditorSoloSection; }
-	_bool Is_EditorSoloSectionEnabled() const { return nullptr != m_pEditorSoloSection; }
 	_bool Should_RenderSection(const CMapSection* pSection) const;
 	void Clear_EditorSoloMeshAllSections();
 #endif

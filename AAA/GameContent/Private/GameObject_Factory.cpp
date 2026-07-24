@@ -93,6 +93,7 @@
 #include "Split_Cylinder.h"
 #include "LensFlare.h"
 #include "ItemEffect.h"
+#include "VanishEffect.h"
 #include "BombHitAim.h"
 #include "BombAimDot.h"
 #include "BreakWallEffect.h"
@@ -307,6 +308,7 @@
 // NPC
 #include "WaddleDee.h"
 #include "WaddleDee_Body.h"
+#include "WaddleDee_Hat.h"
 
 #include "DropStar.h"
 #include "DropStar_Body.h"
@@ -818,8 +820,27 @@ void CGameObject_Factory::Register_Container()
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::PROTOTYPE_TAG, CWaddleDee_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Hat::PROTOTYPE_TAG, CWaddleDee_Hat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh", XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_Pharmacy"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/Pharmacy.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_FoodShop"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/FoodShop.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_Knowledge"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/Knowledge.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_RollingBall"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/RollingBall.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_DeliveryService"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/DeliveryService.ysh", XMMatrixTranslation(0.f, 0.5f, 0.f)));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_Arena"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/Arena.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYE_TEX_PROTO, 
                 CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEye.%02d.dds", CWaddleDee_Body::EYE_COUNT));
@@ -1455,6 +1476,18 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle01"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle01.png"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle02"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle02.png"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle04"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle04.png"), 1));
+        ));
+
+    // VanishEffect
+    Register(CVanishEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CVanishEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
         ));
 
     // 0. WalkSmoke

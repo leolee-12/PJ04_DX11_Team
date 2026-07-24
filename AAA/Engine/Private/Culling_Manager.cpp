@@ -153,14 +153,6 @@ _bool CCulling_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC&
 	return true;
 }
 
-void CCulling_Manager::Invalidate_View(CULLING_VIEW eView)
-{
-	if (!Is_ValidViewIndex(eView))
-		return;
-
-	Reset_ViewState(&m_ViewStates[ETOUI(eView)]);
-}
-
 void CCulling_Manager::Invalidate_All()
 {
 	for (_uint i = 0; i < ETOUI(CULLING_VIEW::END); ++i)

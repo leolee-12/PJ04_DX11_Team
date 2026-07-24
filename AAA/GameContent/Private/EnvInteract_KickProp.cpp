@@ -1,6 +1,7 @@
 #include "EnvInteract_KickProp.h"
 #include "GameContent_const.h"
 #include "GameContent_Events.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance_Proxy.h"
 #include "Geometry_Utils.h"
@@ -37,9 +38,26 @@ void CEnvInteract_KickProp::Late_Update(_float fTimeDelta)
 		return;
 	}
 
+	if (m_bCaptured)
+	{
+		Update_Captured(fTimeDelta);
+
+		if (Is_Active())
+			__super::Late_Update(fTimeDelta);
+
+		return;
+	}
+
+	if (m_bSpat)
+	{
+		__super::Late_Update(fTimeDelta);
+		return;
+	}
+
 	if (m_bKickPending)
 	{
 		m_pRigidBodyCom->Set_Enabled(true);
+		m_pRigidBodyCom->Set_SceneQueryEnabled(false);
 		m_pRigidBodyCom->Set_LinearVelocity(XMLoadFloat3(&m_vPendingKickVelocity));
 
 		m_bKickPending = false;
@@ -49,7 +67,7 @@ void CEnvInteract_KickProp::Late_Update(_float fTimeDelta)
 	if (m_bKicked)
 	{
 		Clamp_DynamicVelocity();
-		Update_BounceState();
+		Update_BounceState(fTimeDelta);
 
 		if (!Is_Active())
 			return;
@@ -58,6 +76,48 @@ void CEnvInteract_KickProp::Late_Update(_float fTimeDelta)
 	m_pRigidBodyCom->Sync_From_Body();
 	Sync_InteractCollider();
 	__super::Late_Update(fTimeDelta);
+}
+
+_bool CEnvInteract_KickProp::Can_BeInhaled(const INHALE_QUERY& q) const
+{
+	UNREFERENCED_PARAMETER(q);
+
+	return Is_Active() && !m_bCaptured && !m_bSpat;
+}
+
+void CEnvInteract_KickProp::Be_Captured(CGameObject* pInhaler)
+{
+	if (nullptr == pInhaler || !Is_Active() || m_bCaptured || m_bSpat)
+		return;
+
+	m_pCaptor = pInhaler;
+	m_bCaptured = true;
+	m_bKickPending = false;
+	m_bKicked = false;
+	m_fPullSpeed = 0.f;
+
+	m_pRigidBodyCom->Set_Enabled(false);
+	m_pInteractCollider->Set_Enabled(false);
+	Release_PhysicsActor();
+}
+
+void CEnvInteract_KickProp::On_SpatBegin()
+{
+	m_pCaptor = nullptr;
+	m_bCaptured = false;
+	m_bSpat = true;
+	m_bKickPending = false;
+	m_bKicked = false;
+
+	m_pRigidBodyCom->Set_Enabled(false);
+	m_pInteractCollider->Set_Enabled(false);
+	Set_Active(true);
+}
+
+void CEnvInteract_KickProp::On_SpatEnd()
+{
+	m_bSpat = false;
+	Deactivate();
 }
 
 HRESULT CEnvInteract_KickProp::Ready_InteractComponents()
@@ -277,7 +337,7 @@ HRESULT CEnvInteract_KickProp::Ready_InteractCollider()
 		});
 
 	Sync_InteractCollider();
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractCollider, ETOUI(COLLISION_LAYER::ENV_INTERACT));
+	m_pGameInstance_Proxy->Register_Collider(m_pInteractCollider, ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
 
 	return S_OK;
 }
@@ -310,12 +370,20 @@ void CEnvInteract_KickProp::Sync_InteractCollider()
 
 void CEnvInteract_KickProp::Handle_InteractColliderEnter(CCollider* pOther)
 {
-	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
-		return;
+	switch (static_cast<COLLISION_LAYER>(pOther->Get_RegisteredGroup()))
+	{
+	case COLLISION_LAYER::PLAYER_HURT:
+	case COLLISION_LAYER::PLAYER_HIT:
+	case COLLISION_LAYER::PLAYER_PROJECTILE:
+	case COLLISION_LAYER::PLAYER_BOMB:
+	case COLLISION_LAYER::PLAYER_BREAKERABLE:
+		Kick_FromPlayer(pOther->Get_Owner());
+		break;
 
-	Kick_FromPlayer(pOther->Get_Owner());
+	default:
+		break;
+	}
 }
-
 void CEnvInteract_KickProp::Kick_FromPlayer(CGameObject* pPlayer)
 {
 	if (m_bKicked || m_bKickPending)
@@ -324,8 +392,17 @@ void CEnvInteract_KickProp::Kick_FromPlayer(CGameObject* pPlayer)
 	CTransform* pPlayerTransform = pPlayer->Get_Transform();
 	const ENV_INTERACT_PRESET& Preset = m_tDesc.tInteractPreset;
 
-	_vector vKickDirection = XMVectorSetY(pPlayerTransform->Get_State(STATE::LOOK), 0.f);
+	// 발로 찬 느낌: 플레이어 → 프롭 수평 방향. 거의 겹쳐 있으면 플레이어 정면으로 대체
+	_vector vKickDirection = XMVectorSetY(
+		m_pTransformCom->Get_State(STATE::POSITION) - pPlayerTransform->Get_State(STATE::POSITION), 0.f);
+
+	if (XMVectorGetX(XMVector3LengthSq(vKickDirection)) < Helper::fEpsilon)
+		vKickDirection = XMVectorSetY(pPlayerTransform->Get_State(STATE::LOOK), 0.f);
+
 	vKickDirection = XMVector3Normalize(vKickDirection);
+
+	const _float fYaw = XMConvertToRadians(m_pGameInstance_Proxy->RandomFloat(-s_fKickYawDegree, s_fKickYawDegree));
+	vKickDirection = XMVector3TransformNormal(vKickDirection, XMMatrixRotationY(fYaw));
 
 	_vector vKickVelocity = XMVectorScale(vKickDirection, Preset.fKickPower);
 	vKickVelocity = XMVectorSetY(vKickVelocity, Preset.fUpImpulse);
@@ -334,16 +411,53 @@ void CEnvInteract_KickProp::Kick_FromPlayer(CGameObject* pPlayer)
 	m_bKickPending = true;
 }
 
-void CEnvInteract_KickProp::Update_BounceState()
+void CEnvInteract_KickProp::Update_Captured(_float fTimeDelta)
 {
+	if (nullptr == m_pCaptor)
+		return;
+
+	CTransform* pCaptorTransform = m_pCaptor->Get_Transform();
+	_vector vMouth = pCaptorTransform->Get_State(STATE::POSITION)
+		+ pCaptorTransform->Get_State(STATE::LOOK) * 0.6f
+		+ pCaptorTransform->Get_State(STATE::UP) * 0.6f;
+
+	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vDirection = vMouth - vSelf;
+	const _float fDistance = XMVectorGetX(XMVector3Length(vDirection));
+
+	if (fDistance <= 0.5f)
+	{
+		SWALLOW_EVENT Event{ this };
+		m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &Event);
+
+		m_pCaptor = nullptr;
+		m_bCaptured = false;
+		Set_Active(false);
+		return;
+	}
+
+	m_fPullSpeed += s_fPullAccel * fTimeDelta;
+	const _float fMoveDistance = min(m_fPullSpeed * fTimeDelta, fDistance);
+	m_pTransformCom->Set_State(STATE::POSITION, vSelf + XMVector3Normalize(vDirection) * fMoveDistance);
+}
+
+void CEnvInteract_KickProp::Update_BounceState(_float fTimeDelta)
+{
+	const ENV_INTERACT_PRESET& Preset = m_tDesc.tInteractPreset;
+
+	m_fKickedElapsed += fTimeDelta;
+	if (m_fKickedElapsed >= s_fMaxKickLifeSecond)
+	{
+		Deactivate();
+		return;
+	}
+
 	_vector vVelocity = m_pRigidBodyCom->Get_LinearVelocity();
-	_float fVerticalVelocity = XMVectorGetY(vVelocity);
+	const _float fVerticalVelocity = XMVectorGetY(vVelocity);
 
 	if (m_fPreviousVerticalVelocity < 0.f && fVerticalVelocity >= 0.f)
 	{
 		++m_iBounceCount;
-
-		const ENV_INTERACT_PRESET& Preset = m_tDesc.tInteractPreset;
 
 		if (m_iBounceCount >= s_iDisappearBounceCount)
 		{
@@ -355,23 +469,32 @@ void CEnvInteract_KickProp::Update_BounceState()
 				m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
 			}
 
+			m_pRigidBodyCom->Sync_From_Body();
+
+			_float3 vEffectPosition{};
+			XMStoreFloat3(&vEffectPosition, m_pTransformCom->Get_State(STATE::POSITION));
+			CEffect_Loader::GetInstance()->Spawn(L"VanishEffect", Get_LevelIndex(), vEffectPosition);
+
 			Deactivate();
 			return;
 		}
 
+		// 튈 때 수평 방향을 살짝 틀어서 점프하듯 다른 쪽으로 뜀
+		const _float fYaw = XMConvertToRadians(m_pGameInstance_Proxy->RandomFloat(-s_fBounceYawDegree, s_fBounceYawDegree));
+		_vector vHorizontal = XMVector3TransformNormal(XMVectorSetY(vVelocity, 0.f), XMMatrixRotationY(fYaw));
+		vHorizontal = XMVectorScale(vHorizontal, Preset.fBounceFriction);
+
 		const _float fBounceUp = -m_fPreviousVerticalVelocity * Preset.fBounceRestitution;
 
-		vVelocity = XMVectorSet(
-			XMVectorGetX(vVelocity) * Preset.fBounceFriction,
-			fBounceUp,
-			XMVectorGetZ(vVelocity) * Preset.fBounceFriction,
-			0.f);
-
-		m_pRigidBodyCom->Set_LinearVelocity(vVelocity);
-		fVerticalVelocity = fBounceUp;
+		m_pRigidBodyCom->Set_LinearVelocity(XMVectorSetY(vHorizontal, fBounceUp));
+		m_fPreviousVerticalVelocity = fBounceUp;
+		return;
 	}
 
-	m_fPreviousVerticalVelocity = fVerticalVelocity;
+	// 씬 중력 -9.81은 커비 스케일(-45) 대비 둥둥 뜸 → 부족분만 매 프레임 보충
+	const _float fFallSpeed = fVerticalVelocity + (s_fGravity - s_fPhysXSceneGravity) * fTimeDelta;
+	m_pRigidBodyCom->Set_LinearVelocity(XMVectorSetY(vVelocity, fFallSpeed));
+	m_fPreviousVerticalVelocity = fFallSpeed;
 }
 
 void CEnvInteract_KickProp::Deactivate()
@@ -428,7 +551,7 @@ void CEnvInteract_KickProp::Free()
 
 		if (nullptr != m_pGameInstance_Proxy)
 		{
-			m_pGameInstance_Proxy->Immediate_Unregister(m_pInteractCollider, ETOUI(COLLISION_LAYER::ENV_INTERACT));
+			m_pGameInstance_Proxy->Immediate_Unregister(m_pInteractCollider, ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
 		}
 
 		m_pInteractCollider->Mark_Unregistered();

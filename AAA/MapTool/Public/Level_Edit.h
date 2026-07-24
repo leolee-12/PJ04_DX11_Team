@@ -85,7 +85,6 @@ public:
 	_bool Clear_EditedMapPreviewSection(const _wstring& strSectionKey);
 	_bool Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
 	_bool Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
-	_bool Clear_EditedMapPreviewLevelDesignObject(CGameObject* pObject);
 	_bool Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
 	HRESULT Clear_MapPreviewEnvObjectOverride(CGameObject* pObject);
 	_bool Commit_MapEditObjectFromCurrentState(CGameObject* pObject);

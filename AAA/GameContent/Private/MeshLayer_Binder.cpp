@@ -3,6 +3,7 @@
 #include "GameInstance_Proxy.h"
 #include "Model.h"
 #include "Shader.h"
+#include "Transform.h"
 #include "CullingState.h"
 
 NS_BEGIN(Client)
@@ -51,6 +52,40 @@ HRESULT MeshLayerBinder::Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIN
 	}
 }
 
+HRESULT MeshLayerBinder::Bind_OrSkip(const MESH_LAYER_BIND_CONTEXT& Ctx, _uint* pOutPass)
+{
+	if (nullptr == pOutPass)
+		return E_FAIL;
+
+	MESH_LAYER_BIND_RESULT Result{};
+	const HRESULT hrBind = Bind(Ctx, &Result);
+	if (FAILED(hrBind))
+		return hrBind;
+
+	if (Result.bSkipMesh)
+		return S_FALSE;
+
+	*pOutPass = Result.iPass;
+	return S_OK;
+}
+
+HRESULT MeshLayerBinder::Bind_WorldViewProj(CShader* pShader, CTransform* pTransform, CGameInstance_Proxy* pGI_Proxy, PROJ_TYPE eProjType)
+{
+	if (nullptr == pShader || nullptr == pTransform || nullptr == pGI_Proxy)
+		return E_FAIL;
+
+	if (FAILED(pTransform->Bind_ShaderResource(pShader, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_Matrix("g_ViewMatrix", pGI_Proxy->Get_Matrix(D3DTS::VIEW, eProjType))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_Matrix("g_ProjMatrix", pGI_Proxy->Get_Matrix(D3DTS::PROJ, eProjType))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT MeshLayerBinder::Bind_TextureSafe(CShader* pShader, CModel* pModel, CGameInstance_Proxy* pGI_Proxy,
 	_uint iMesh, const _char* pConstantName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefaultKind)
 {
@@ -78,12 +113,15 @@ _uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_REND
 	switch (eProfile)
 	{
 	case MESH_LAYER_PROFILE::MAP:
-		return MeshLayerProfile::Resolve_MapPass(Layer, iFallbackPass);
+		return Is_ValidMapPassValue(Layer.iPass) ? static_cast<_uint>(Layer.iPass) : iFallbackPass;
 
 	case MESH_LAYER_PROFILE::WORLD_NONANIM:
 	case MESH_LAYER_PROFILE::WORLD_ANIM:
 	case MESH_LAYER_PROFILE::WORLD_INSTANCE:
-		return MeshLayerProfile::Resolve_WorldPass(Layer, iFallbackPass);
+	{
+		const WORLD_PASS ePass = static_cast<WORLD_PASS>(Layer.iPass);
+		return WORLD_PASS::DEFAULT != ePass && Is_ValidWorldPassValue(Layer.iPass) ? static_cast<_uint>(ePass) : iFallbackPass;
+	}
 
 	default:
 		return iFallbackPass;
@@ -146,10 +184,14 @@ namespace
 				if (FAILED(Ctx.pShader->Bind_Matrix("g_ProjMatrixInverse",
 					Ctx.pGI_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
 					return E_FAIL;
-				if ((ETOI(WORLD_PASS::BLEND_UKWN_LIGHT) == Layer.iPass ||
-					ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass) &&
-					FAILED(Ctx.pGI_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), Ctx.pShader, "g_DepthTexture")))
-					return E_FAIL;
+				if (ETOI(WORLD_PASS::BLEND_UKWN_LIGHT) == Layer.iPass ||
+					ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass)
+				{
+					if (FAILED(Ctx.pGI_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), Ctx.pShader, "g_DepthTexture")))
+						return E_FAIL;
+					if (FAILED(Ctx.pGI_Proxy->Bind_RT_ShaderResource(TEXT("Target_Diffuse"), Ctx.pShader, "g_SceneDiffuseTexture")))
+						return E_FAIL;
+				}
 			}
 
 			const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DMN);
@@ -189,8 +231,10 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iHasNormalTexture", &iHasNormalTexture, sizeof(_uint))))
 			return E_FAIL;
 
-		if (ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass
-			&& FAILED(Ctx.pModel->Bind_Material(Ctx.pShader, "g_ExtraRTexture", Ctx.iMesh, static_cast<MTEX_TYPE>(Layer.iExtraTexType[0]), static_cast<_uint>(Layer.iExtraBind[0]))))
+		if ((ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass ||
+			ETOI(WORLD_PASS::UKWN2_SAND_OPAQUE) == Layer.iPass) &&
+			FAILED(Bind_MapExtraSlotSafe(Ctx, "g_ExtraRTexture", Layer.iExtraBind[0], static_cast<MTEX_TYPE>(Layer.iExtraTexType[0]),
+				DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 
 		return S_OK;
@@ -252,7 +296,8 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUnknownUVIndex", &iUnknownUVIndex, sizeof(_uint)))) return E_FAIL;
 
-		if (ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass &&
+		if ((ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass ||
+			ETOI(WORLD_PASS::UKWN2_SAND_OPAQUE) == Layer.iPass) &&
 			FAILED(Ctx.pShader->Bind_RawValue("g_iExtraR_UVIndex", &iExtraRUVIndex, sizeof(_uint))))
 			return E_FAIL;
 
@@ -284,7 +329,7 @@ namespace
 		if (FAILED(Bind_WorldCommonParams(Ctx)))
 			return E_FAIL;
 
-		const _uint iShadowAlphaSource = static_cast<_uint>(MeshLayerProfile::Resolve_WorldShadowAlphaSourceFromLayer(Layer));
+		const _uint iShadowAlphaSource = static_cast<_uint>(Resolve_WorldShadowAlphaSource(static_cast<WORLD_PASS>(Layer.iPass)));
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iShadowAlphaSource", &iShadowAlphaSource, sizeof(_uint))))
 			return E_FAIL;
 

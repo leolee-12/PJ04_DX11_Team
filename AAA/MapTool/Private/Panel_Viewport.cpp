@@ -2,7 +2,6 @@
 #include "EditInstance.h"
 #include "Level_Edit.h"
 
-#include "GameContent_Events.h"     // UI_RBTN_PROBE / WORLD_RBTN_DOWN
 #include "Editable.h"
 #include "LevelDesignObject.h"
 
@@ -13,16 +12,6 @@
 
 namespace
 {
-	ImGuizmo::OPERATION ToImGuizmoOp(MapTool::GIZMO_OP eOp)
-	{
-		switch (eOp)
-		{
-		case MapTool::GIZMO_OP::ROTATE: return ImGuizmo::ROTATE;
-		case MapTool::GIZMO_OP::SCALE:  return ImGuizmo::SCALE;
-		default:                        return ImGuizmo::TRANSLATE;
-		}
-	}
-
 	_bool Compute_ViewportPickingRay(
 		CGameInstance_Proxy* pProxy,
 		_float fNdcX,
@@ -78,11 +67,6 @@ HRESULT CPanel_Viewport::Initialize()
 	D3D11_BLEND_DESC bd{};
 	bd.RenderTarget[0].BlendEnable = FALSE;                                  // 블렌딩 OFF = RT의 RGB 그대로
 	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-	//bd.AlphaToCoverageEnable = FALSE;
-	//bd.IndependentBlendEnable = FALSE;
-	//bd.RenderTarget[0].BlendEnable = FALSE;
-	//bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	if (FAILED(m_pDevice->CreateBlendState(&bd, &m_pViewportOpaqueBlend)))
 		return E_FAIL;
@@ -140,9 +124,6 @@ void CPanel_Viewport::Render()
 	else
 		ImGui::Dummy(vSize);
 
-	// 뷰포트 스크린 사각형 공유(오버레이/피킹용)
-	pEI->Set_ViewportRect(_float2(vPos.x, vPos.y), _float2(vSize.x, vSize.y));
-
 	CLevel_Edit* pLevel = pEI->Get_Level();
 	if (nullptr == pLevel)
 	{
@@ -185,22 +166,6 @@ void CPanel_Viewport::Render()
 				pLevel->Pick_And_SelectEnvObject(origin, dir);
 		}
 
-		//if (m_pGI_Proxy->Mouse_Down(DIMB::WHEEL))
-		//{
-		//    _float2 vNDC = { ndcX, ndcY };
-		//    UI_RBTN_PROBE eProbe = { vNDC, false };
-		//    m_pGI_Proxy->Publish(TEXT("UI_RButton_Probe"), &eProbe);
-		//
-		//    if (eProbe.bConsumed)
-		//    {
-		//        End_Panel();
-		//        return;
-		//    }
-		//
-		//    WORLD_RBTN_DOWN eEvent = { vNDC };
-		//    m_pGI_Proxy->Publish(TEXT("World_RButton_Click"), &eEvent);
-		//}
-
 		// ESC : 배치 모드 취소
 		if (ImGui::IsKeyPressed(ImGuiKey_Escape))
 			pLevel->End_PlaceMode();
@@ -242,16 +207,14 @@ void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos
 	CTransform* pTransform = pSelected->Get_Transform();
 	_float4x4 matWorld = *pTransform->Get_WorldMatrixPtr();
 
-	ImGuizmo::OPERATION eOp = ToImGuizmoOp(CEditInstance::GetInstance()->Get_GizmoOp());
-
 	_float snap[3] = { 0, 0, 0 };
-	if (eOp == ImGuizmo::TRANSLATE && eProjType == PROJ_TYPE::ORTHO)
+	if (eProjType == PROJ_TYPE::ORTHO)
 		snap[0] = snap[1] = snap[2] = 1.f;
 
 	ImGuizmo::Manipulate(
 		(float*)pView,
 		(float*)pProj,
-		eOp,
+		ImGuizmo::TRANSLATE,
 		ImGuizmo::LOCAL,
 		(float*)&matWorld,
 		nullptr, snap);
@@ -260,7 +223,7 @@ void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos
 
 	if (bUsing)
 	{
-		if (eOp == ImGuizmo::TRANSLATE && eProjType == PROJ_TYPE::ORTHO)
+		if (eProjType == PROJ_TYPE::ORTHO)
 		{
 			_float4 OriginPos = {};
 			XMStoreFloat4(&OriginPos, pTransform->Get_State(STATE::POSITION));

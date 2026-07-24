@@ -12,11 +12,6 @@ namespace MathUtils
         return std::isfinite(fValue);
     }
 
-    inline _bool Is_FiniteDouble(_double dValue)
-    {
-        return std::isfinite(dValue);
-    }
-
     inline _float Sanitize_FiniteFloat(_float fValue, _float fDefault)
     {
         return Is_FiniteFloat(fValue) ? fValue : fDefault;
@@ -71,7 +66,7 @@ namespace MathUtils
 
     inline _double Wrap_FiniteDouble(_double dValue, _double dPeriod, _double dDefault = 0.0)
     {
-        if (!Is_FiniteDouble(dValue) || !Is_FiniteDouble(dPeriod) || dPeriod <= 0.0)
+        if (!std::isfinite(dValue) || !std::isfinite(dPeriod) || dPeriod <= 0.0)
             return dDefault;
 
         _double dResult = std::fmod(dValue, dPeriod);
@@ -88,14 +83,9 @@ namespace MathUtils
             && Is_FiniteFloat(vValue.z);
     }
 
-    inline _float Abs_Float(_float fValue)
-    {
-        return std::fabs(fValue);
-    }
-
     inline _float3 Abs_Float3(const _float3& vValue)
     {
-        return { Abs_Float(vValue.x), Abs_Float(vValue.y), Abs_Float(vValue.z) };
+        return { std::fabs(vValue.x), std::fabs(vValue.y), std::fabs(vValue.z) };
     }
 
     inline _bool Is_NearlyEqualFloat4x4(const _float4x4& A, const _float4x4& B, _float fEpsilon = Helper::fEpsilon)

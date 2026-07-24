@@ -54,9 +54,6 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\ToolApp.h" />
     <ClInclude Include="..\Public\MapTool_Defines.h" />
-    <ClInclude Include="..\Public\MapTool_Enum.h" />
-    <ClInclude Include="..\Public\MapTool_Func.h" />
-    <ClInclude Include="..\Public\MapTool_Struct.h" />
     <ClInclude Include="..\Public\EditCamera.h" />
     <ClInclude Include="..\Public\Edit_Grid.h" />
     <ClInclude Include="..\Public\Panel.h" />

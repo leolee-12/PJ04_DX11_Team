@@ -308,7 +308,6 @@
     <ClInclude Include="..\public\Swing_Smoke.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
-    <ClInclude Include="..\Public\MeshLayer_Profile.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Projectile_Bomb.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
@@ -520,8 +519,10 @@
     <ClInclude Include="..\public\UI_UIFadeOut.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
+    <ClInclude Include="..\Public\VanishEffect.h" />
     <ClInclude Include="..\Public\WaddleDee.h" />
     <ClInclude Include="..\Public\WaddleDee_Body.h" />
+    <ClInclude Include="..\Public\WaddleDee_Hat.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
     <ClInclude Include="..\Public\WarpInEffect.h" />
     <ClInclude Include="..\Public\WarpOutEffect.h" />
@@ -813,7 +814,6 @@
     <ClCompile Include="..\private\Swing_Smoke.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
-    <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Projectile_Bomb.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
@@ -1001,8 +1001,10 @@
     <ClCompile Include="..\private\UI_UIFadeOut.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
+    <ClCompile Include="..\Private\VanishEffect.cpp" />
     <ClCompile Include="..\Private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WaddleDee_Body.cpp" />
+    <ClCompile Include="..\Private\WaddleDee_Hat.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
     <ClCompile Include="..\Private\WarpInEffect.cpp" />
     <ClCompile Include="..\Private\WarpOutEffect.cpp" />
