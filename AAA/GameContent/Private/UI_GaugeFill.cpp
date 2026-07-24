@@ -1,5 +1,4 @@
 #include "UI_GaugeFill.h"
-#include "GameInstance.h"
 #include "GameContent_const.h"
 
 namespace
@@ -18,7 +17,8 @@ namespace
     _bool Is_ValidGaugePass(_int iPass)
     {
         return iPass == ETOI(UI_EFFECT_PASS::GAUGE_FILL_COLOR) ||
-            iPass == ETOI(UI_EFFECT_PASS::GAUGE_FILL_TEXTURE);
+            iPass == ETOI(UI_EFFECT_PASS::GAUGE_FILL_TEXTURE) ||
+            iPass == ETOI(UI_EFFECT_PASS::GAUGE_FILL_RADIAL);
     }
 
     _int Normalize_GaugePass(_int iPass)

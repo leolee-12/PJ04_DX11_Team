@@ -115,6 +115,15 @@ float ComputeGaugeVisible(float2 uv)
     return 1.f - smoothstep(fRatio, min(fRatio + fSoftness, 1.f), fAxis);
 }
 
+float Radial_Axis(float2 uv)
+{
+    float2 p = uv - 0.5f;
+    float ang = atan2(p.x, -p.y); // 위=0, 오른쪽=+pi/2 ... 시계방향
+    if (ang < 0.f)
+        ang += 6.2831853f; // [0, 2pi)
+    return ang / 6.2831853f; // [0,1)
+}
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -346,6 +355,38 @@ PS_OUT PS_TWOCOLOR(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_GAUGE_FILL_RADIAL(PS_IN In)
+{
+    PS_OUT Out;
+
+    float fAxis = Radial_Axis(In.vTexcoord);
+    if (g_iFillDirection == 1)
+        fAxis = 1.f - fAxis; // 반시계
+
+    float fFill = saturate(g_fFillRatio);
+    float fGhost = max(fFill, saturate(g_fGhostRatio));
+
+    if (fAxis > fGhost)                      // 아직 안 찬 각도 = 버림
+        discard;
+
+    float4 fTex = g_Texture.Sample(UISampler, In.vTexcoord); // 링 아트(가운데 알파 비움)
+
+    float fSoft = max(g_fFillSoftness, 0.f);
+    float fFilled = 1.f - smoothstep(fFill, fFill + fSoft, fAxis);
+
+    float3 col = lerp(g_vGhostColor.rgb, g_vColor.rgb, fFilled);
+    float a = fTex.a * g_fAlpha *
+                 lerp(g_vGhostColor.a * g_fGhostAlpha, g_vColor.a, fFilled);
+
+    Out.vColor.rgb = col;
+    Out.vColor.a = a;
+
+    if (Out.vColor.a <= 0.f)
+        discard;
+
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass UI // pass 0
@@ -476,5 +517,15 @@ technique11 DefaultTechnique
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_TWOCOLOR()));
+    }
+
+    pass GaugeFillRadial // pass 13
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_GAUGE_FILL_RADIAL()));
     }
 }
