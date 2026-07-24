@@ -890,7 +890,7 @@ HRESULT CRenderer::Render_Effect_HDR()
 
 HRESULT CRenderer::Render_Distortion()
 {
-    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Distortion"), nullptr, true, false)))
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Distortion"), nullptr, true, true)))
         return E_FAIL;
 
     for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::DISTORTION)])
@@ -1083,8 +1083,10 @@ HRESULT CRenderer::Render_Bloom()
 
     Change_ViewportDesc(Render_Width(), Render_Height());
 
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_DoF"), m_pShaderPost, "g_SceneTexture")))
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_Distort"), m_pShaderPost, "g_SceneTexture")))
         return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_DoF"), m_pShaderPost, "g_SceneTexture")))
+    //    return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShaderPost, "g_BloomTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, { "g_fBloomIntensity", "g_fExposure", "g_fToneMapMode" })))

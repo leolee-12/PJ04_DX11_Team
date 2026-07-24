@@ -18,6 +18,7 @@ namespace Engine
 			{ static_cast<int>(RENDERID::BLEND),     L"BLEND" },
 			{ static_cast<int>(RENDERID::BLEND_HDR), L"BLEND_HDR" },
 			{ static_cast<int>(RENDERID::OCCLUSION), L"OCCLUSION" },
+			{ static_cast<int>(RENDERID::DISTORTION), L"DISTORTION" },
 		};
 
 		return Items;
