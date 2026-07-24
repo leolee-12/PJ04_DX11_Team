@@ -190,6 +190,27 @@ HRESULT Engine::EffectMesh::Bind_Materials(CModel* pModel, CShader* pShader, _ui
     return S_OK;
 }
 
+void Engine::EffectMesh::Apply_BillboardRoll(_float4x4& BillboardWorldMatrix, _float fRoll)
+{
+    _matrix BillboardMatrix = XMLoadFloat4x4(&BillboardWorldMatrix);
+
+    const _float fScaleX = XMVectorGetX(XMVector3Length(BillboardMatrix.r[0]));
+    const _float fScaleY = XMVectorGetX(XMVector3Length(BillboardMatrix.r[1]));
+    const _vector vRight = XMVector3Normalize(BillboardMatrix.r[0]);
+    const _vector vUp = XMVector3Normalize(BillboardMatrix.r[1]);
+    const _float fSin = sinf(fRoll);
+    const _float fCos = cosf(fRoll);
+
+    BillboardMatrix.r[0] = XMVectorSetW(
+        (vRight * fCos + vUp * fSin) * fScaleX,
+        0.f);
+    BillboardMatrix.r[1] = XMVectorSetW(
+        (vUp * fCos - vRight * fSin) * fScaleY,
+        0.f);
+
+    XMStoreFloat4x4(&BillboardWorldMatrix, BillboardMatrix);
+}
+
 void Engine::EffectMesh::Update_UVAnimations(VALUES& Values, _float fRatio)
 {
     MoveUVScroll(fRatio, Values.Diffuse);

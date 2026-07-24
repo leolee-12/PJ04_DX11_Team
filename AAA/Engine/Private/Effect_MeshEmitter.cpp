@@ -175,7 +175,12 @@ HRESULT CEffect_MeshEmitter::Render()
 
         _float4x4 ParticleWorld = Make_EmitterParticleWorldMatrix(Particle);
         if (m_bBillboard == true)
+        {
             ParticleWorld = Make_BillboardWorldMatrix(ParticleWorld);
+            EffectMesh::Apply_BillboardRoll(
+                ParticleWorld,
+                XMConvertToRadians(Particle.vRotation.z));
+        }
 
         if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &ParticleWorld)))
             return E_FAIL;
