@@ -32,11 +32,12 @@ protected:
     virtual void    On_Deserialized() override;   // 로드 직후 자식 숨김(런타임)
 
 private:
-    void Hide_AllChildren();
-    void Start_Intro();
+    void  Hide_AllChildren();
+    void  Start_Intro();
+    _bool Any_PanelBusy() const;
 
 private:
-    enum class EBOARD { IDLE, INTRO, SUCCESS, DONE };
+    enum class EBOARD { IDLE, INTRO, SUCCESS, WAIT_INPUT, DONE };
     EBOARD m_eBoard = { EBOARD::IDLE };
     _float m_fIntroTimer = { 0.f };
     _uint  m_iIntroIdx = { 0 };

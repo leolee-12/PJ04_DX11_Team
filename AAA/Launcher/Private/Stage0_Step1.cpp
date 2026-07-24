@@ -48,7 +48,10 @@ void CStage0_Step1::Update(_float fTimeDelta)
 {
 #ifdef  _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
-        m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
+    {
+        m_pGameInstance_Proxy->Publish(TEXT("Arena_FadeOut_Start"), nullptr);
+        //m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
+    }
     if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
     {
         m_pGameInstance_Proxy->Toggle_DebugRender();
@@ -64,13 +67,16 @@ HRESULT CStage0_Step1::Render()
 HRESULT CStage0_Step1::Ready_Events()
 {
     Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
-        //if (pLoadingLevel)
-        //{
-        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-        //    return;
-        //}
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::ARENA);
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
+        if (pLoadingLevel)
+        {
+            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+            return;
+        }
+        });
+
+    Subscribe_Event(TEXT("Arena_FadeOut_Done"), [this](void* p) {
+        CLevel_ArenaLoading* pLoadingLevel = CLevel_ArenaLoading::Create(m_pDevice, m_pContext);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);

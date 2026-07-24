@@ -29,6 +29,7 @@ public:
     void  Set_Mission(_bool bIsMain, _bool bSucceeded, const _wstring& strName);
     void  Play_Success();
     _bool Is_Succeeded() const { return m_bSucceeded; }
+    _bool Is_Busy() const;
 
 protected:
     virtual void On_Deserialized() override;

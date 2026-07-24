@@ -143,6 +143,7 @@
     <ClInclude Include="..\public\Boss_Stage1.h" />
     <ClInclude Include="..\Public\Launcher_Defines.h" />
     <ClInclude Include="..\Public\Launcher_LevelProfiles.h" />
+    <ClInclude Include="..\public\Level_ArenaLoading.h" />
     <ClInclude Include="..\Public\Level_Defines.h" />
     <ClInclude Include="..\public\Level_FirstLoading.h" />
     <ClInclude Include="..\Public\Stage0_Step1.h" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\Arena.cpp" />
     <ClCompile Include="..\private\Boss_Stage1.cpp" />
+    <ClCompile Include="..\private\Level_ArenaLoading.cpp" />
     <ClCompile Include="..\private\Level_FirstLoading.cpp" />
     <ClCompile Include="..\Private\Stage0_Step1.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
