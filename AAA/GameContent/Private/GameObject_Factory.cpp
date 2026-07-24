@@ -61,6 +61,7 @@
 #include "Kirby_ToyHat.h"
 
 // Effect_Container
+#include "TestContainer.h"
 #include "WalkSmoke.h"
 #include "SwordSlash1.h"
 #include "InhaleContainer.h"
@@ -149,6 +150,7 @@
 #include "MeshParticleCommon.h"
 #include "RectEmitterCommon.h"
 #include "TrailCommon.h"
+#include "DistortionCommon.h"
 #include "EssenceCrown.h"
 
 //sky
@@ -426,6 +428,19 @@ void CGameObject_Factory::Register_Camera()
 
 void CGameObject_Factory::Register_Test()
 {
+    Register(CTestContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CTestContainer),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG,
+                CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestContainer::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_ChargeNoise.iLevelID, Texture_ChargeNoise.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ChargeNoise.szFileTag,
+                    Texture_ChargeNoise.iNumTex));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Container()

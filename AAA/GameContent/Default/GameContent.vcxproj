@@ -227,6 +227,8 @@
     <ClInclude Include="..\public\LevelLight_DB.h" />
     <ClInclude Include="..\Public\MeshEmitterCommon.h" />
     <ClInclude Include="..\public\Projectile_Partner.h" />
+    <ClInclude Include="..\Public\DistortionCommon.h" />
+    <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
@@ -734,6 +736,8 @@
     <ClCompile Include="..\private\LevelLight_DB.cpp" />
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp" />
     <ClCompile Include="..\private\Projectile_Partner.cpp" />
+    <ClCompile Include="..\Private\DistortionCommon.cpp" />
+    <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
@@ -1011,6 +1015,9 @@
       <FileType>Document</FileType>
     </None>
     <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Distortion.hlsl">
       <FileType>Document</FileType>
     </None>
     <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
