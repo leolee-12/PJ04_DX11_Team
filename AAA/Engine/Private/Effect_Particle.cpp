@@ -690,10 +690,11 @@ void CEffect_Particle::Update_ParticleColor(PARTICLE& Particle, _float fLocalRat
 
 _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) const
 {
+    const _float3& vPropertyScale = Get_AppliedPropertyScale();
     _matrix matScale = XMMatrixScaling(
-        Particle.vScale.x,
-        Particle.vScale.y,
-        Particle.vScale.z);
+        Particle.vScale.x * vPropertyScale.x,
+        Particle.vScale.y * vPropertyScale.y,
+        Particle.vScale.z * vPropertyScale.z);
 
     _matrix matRotation = XMMatrixRotationRollPitchYaw(
         XMConvertToRadians(Particle.vRotation.x),

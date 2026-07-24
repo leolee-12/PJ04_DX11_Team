@@ -71,21 +71,21 @@ PROPERTY(_float, m_fEmitterAlpha_Ratio_1, L"Alpha_Ratio 1_E", L"Emitter Alpha");
 PROPERTY(_float, m_fEmitterAlpha_Value_1, L"Alpha_Value 1_E", L"Emitter Alpha");
 
 // Emitter Size
-PROPERTY(_float, m_fEmitterStartSize, L"Start Size_E", L"Emitter Size");
-PROPERTY(_bool, m_bEmitterRandomSize, L"Random Size_E", L"Emitter Size");
-PROPERTY(_float2, m_vEmitterStartSizeRange, L"Size Range_E", L"Emitter Size");
+PROPERTY(_bool, m_bEmitterRandomSize, L"Random Size_E", L"Size");
+PROPERTY(_float2, m_vEmitterStartSizeRange, L"Size Range_E", L"Size");
 
-PROPERTY(_bool, m_bEmitterSizeChange, L"Size Change_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSizeStartValue, L"Size_Start_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSizeEndValue, L"Size_End_E", L"Emitter Size");
+PROPERTY(_float, m_fEmitterStartSize, L"Start Size_E", L"Size");
+PROPERTY(_bool, m_bEmitterSizeChange, L"Size Change_E", L"Size");
+PROPERTY(_float, m_fEmitterSizeStartValue, L"Size_Start_E", L"Size");
+PROPERTY(_float, m_fEmitterSizeEndValue, L"Size_End_E", L"Size");
 
-PROPERTY(_bool, m_bActive_EmitterSize_Ratio_0, L"Size_Active Ratio 0_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Ratio_0, L"Size_Ratio 0_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Value_0, L"Size_Value 0_E", L"Emitter Size");
+PROPERTY(_bool, m_bActive_EmitterSize_Ratio_0, L"Size_Active Ratio 0_E", L"Size");
+PROPERTY(_float, m_fEmitterSize_Ratio_0, L"Size_Ratio 0_E", L"Size");
+PROPERTY(_float, m_fEmitterSize_Value_0, L"Size_Value 0_E", L"Size");
 
-PROPERTY(_bool, m_bActive_EmitterSize_Ratio_1, L"Size_Active Ratio 1_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Ratio_1, L"Size_Ratio 1_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Value_1, L"Size_Value 1_E", L"Emitter Size");
+PROPERTY(_bool, m_bActive_EmitterSize_Ratio_1, L"Size_Active Ratio 1_E", L"Size");
+PROPERTY(_float, m_fEmitterSize_Ratio_1, L"Size_Ratio 1_E", L"Size");
+PROPERTY(_float, m_fEmitterSize_Value_1, L"Size_Value 1_E", L"Size");
 
 // Emitter Color
 PROPERTY(_float3, m_vEmitterColor, L"Color_E", L"Emitter Color");
@@ -201,6 +201,7 @@ public:
     virtual _bool Is_EmissionFinished() const override;
 
 protected:
+    virtual _bool Use_PropertyScaleForParticleSize() const override { return true; }
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
 
     void Reset_Emitter();

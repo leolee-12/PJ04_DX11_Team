@@ -155,10 +155,19 @@ void CEffect_Part::Apply_PropertyScale(_float fUniformScale, _float fRatio)
     if (m_bScaleChange == false)
         m_vScale = vScale;
 
-    m_pTransformCom->Set_Scale(
+    m_vAppliedPropertyScale = {
         vScale.x * fUniformScale,
         vScale.y * fUniformScale,
-        vScale.z * fUniformScale);
+        vScale.z * fUniformScale
+    };
+
+    if (Use_PropertyScaleForParticleSize() == true)
+        m_pTransformCom->Set_Scale(1.f, 1.f, 1.f);
+    else
+        m_pTransformCom->Set_Scale(
+            m_vAppliedPropertyScale.x,
+            m_vAppliedPropertyScale.y,
+            m_vAppliedPropertyScale.z);
 }
 
 void CEffect_Part::Update_Orbit(const _float fRatio)
@@ -566,6 +575,7 @@ void CEffect_Part::Init_PropertyValue()
     m_bActive_Scale_Ratio_1 = false;
     m_fScale_Ratio_1 = 0.75f;
     m_vScale_Value_1 = { 1.f, 1.f, 1.f };
+    m_vAppliedPropertyScale = { 1.f, 1.f, 1.f };
 
     m_bOrbitChange = false;
     m_vOrbitPivot = { 0.f, 0.f, 0.f };
