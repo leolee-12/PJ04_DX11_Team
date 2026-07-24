@@ -81,21 +81,21 @@ PROPERTY(_float, m_fParticleAlpha_Ratio_1, L"Alpha_Ratio 1_P", L"Particle Alpha"
 PROPERTY(_float, m_fParticleAlpha_Value_1, L"Alpha_Value 1_P", L"Particle Alpha");
 
 // Particle Size
-PROPERTY(_float, m_fParticleStartSize, L"Start Size_P", L"Particle Size");
-PROPERTY(_bool, m_bParticleRandomSize, L"Random Size_P", L"Particle Size");
-PROPERTY(_float2, m_vParticleStartSizeRange, L"Size Range_P", L"Particle Size");
+PROPERTY(_bool, m_bParticleRandomSize, L"Random Size_P", L"Size");
+PROPERTY(_float2, m_vParticleStartSizeRange, L"Size Range_P", L"Size");
 
-PROPERTY(_bool, m_bParticleSizeChange, L"Size Change_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSizeStartValue, L"Size_Start_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSizeEndValue, L"Size_End_P", L"Particle Size");
+PROPERTY(_float, m_fParticleStartSize, L"Start Size_P", L"Size");
+PROPERTY(_bool, m_bParticleSizeChange, L"Size Change_P", L"Size");
+PROPERTY(_float, m_fParticleSizeStartValue, L"Size_Start_P", L"Size");
+PROPERTY(_float, m_fParticleSizeEndValue, L"Size_End_P", L"Size");
 
-PROPERTY(_bool, m_bActive_ParticleSize_Ratio_0, L"Size_Active Ratio 0_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSize_Ratio_0, L"Size_Ratio 0_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSize_Value_0, L"Size_Value 0_P", L"Particle Size");
+PROPERTY(_bool, m_bActive_ParticleSize_Ratio_0, L"Size_Active Ratio 0_P", L"Size");
+PROPERTY(_float, m_fParticleSize_Ratio_0, L"Size_Ratio 0_P", L"Size");
+PROPERTY(_float, m_fParticleSize_Value_0, L"Size_Value 0_P", L"Size");
 
-PROPERTY(_bool, m_bActive_ParticleSize_Ratio_1, L"Size_Active Ratio 1_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSize_Ratio_1, L"Size_Ratio 1_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSize_Value_1, L"Size_Value 1_P", L"Particle Size");
+PROPERTY(_bool, m_bActive_ParticleSize_Ratio_1, L"Size_Active Ratio 1_P", L"Size");
+PROPERTY(_float, m_fParticleSize_Ratio_1, L"Size_Ratio 1_P", L"Size");
+PROPERTY(_float, m_fParticleSize_Value_1, L"Size_Value 1_P", L"Size");
 
 // Particle Color
 PROPERTY(_float3, m_vParticleColor, L"Color_P", L"Particle Color");
@@ -203,6 +203,7 @@ public:
 
 protected:
     virtual void On_Deserialized() override;
+    virtual _bool Use_PropertyScaleForParticleSize() const override { return true; }
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
 
     void Reset_Particles();
