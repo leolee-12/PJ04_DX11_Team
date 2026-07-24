@@ -236,26 +236,39 @@ _bool CMap_ModelResolver::Resolve_EnvObject(ENV_OBJECT_DESC* pDesc)
 	if (pDesc->wstrObjectName.empty())
 		return false;
 
-	if (Resolve_EnvByKey(pDesc->wstrObjectName, pDesc))
-		return true;
+	vector<_wstring> Candidates;
+	Add_UniqueCandidate(pDesc->wstrObjectName, &Candidates);
 
-	if (pDesc->wstrObjectName.size() > 1 && L'L' == pDesc->wstrObjectName.back())
+	static constexpr const _tchar* INTERACTIVE_PREFIX = L"Interactive";
+	static constexpr size_t INTERACTIVE_PREFIX_LENGTH = 11;
+
+	if (pDesc->wstrObjectName.size() > INTERACTIVE_PREFIX_LENGTH
+		&& 0 == _wcsnicmp(pDesc->wstrObjectName.c_str(), INTERACTIVE_PREFIX, INTERACTIVE_PREFIX_LENGTH))
 	{
-		const _wstring strTrimmedName =
-			pDesc->wstrObjectName.substr(0, pDesc->wstrObjectName.size() - 1);
+		Add_UniqueCandidate(pDesc->wstrObjectName.substr(INTERACTIVE_PREFIX_LENGTH), &Candidates);
+	}
 
-		if (Resolve_EnvByKey(strTrimmedName, pDesc))
-		{
-			if (Get_TrimmedResolveLogSet().insert(pDesc->wstrObjectName).second)
-			{
-				Log_GameContentInfo(
-					"EnvObject trimmed model match: object=" + WstrToStr(pDesc->wstrObjectName)
-					+ " model=" + WstrToStr(strTrimmedName)
-					+ " path=" + WstrToStr(pDesc->wstrModelPath));
-			}
-
+	for (const _wstring& strCandidate : Candidates)
+	{
+		if (Resolve_EnvByKey(strCandidate, pDesc))
 			return true;
+
+		if (strCandidate.size() <= 1 || L'L' != strCandidate.back())
+			continue;
+
+		const _wstring strTrimmedName = strCandidate.substr(0, strCandidate.size() - 1);
+		if (!Resolve_EnvByKey(strTrimmedName, pDesc))
+			continue;
+
+		if (Get_TrimmedResolveLogSet().insert(pDesc->wstrObjectName).second)
+		{
+			Log_GameContentInfo(
+				"EnvObject trimmed model match: object=" + WstrToStr(pDesc->wstrObjectName)
+				+ " model=" + WstrToStr(strTrimmedName)
+				+ " path=" + WstrToStr(pDesc->wstrModelPath));
 		}
+
+		return true;
 	}
 
 	return false;

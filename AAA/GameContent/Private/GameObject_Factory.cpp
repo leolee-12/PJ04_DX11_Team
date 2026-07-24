@@ -822,7 +822,10 @@ void CGameObject_Factory::Register_Container()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/RollingBall.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_DeliveryService"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/DeliveryService.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/DeliveryService.ysh", XMMatrixTranslation(0.f, 0.5f, 0.f)));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_Arena"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/Arena.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYE_TEX_PROTO, 
                 CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEye.%02d.dds", CWaddleDee_Body::EYE_COUNT));
