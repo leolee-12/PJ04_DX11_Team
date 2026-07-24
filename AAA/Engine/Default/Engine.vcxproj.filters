@@ -307,6 +307,9 @@
     <Filter Include="95. ShaderFiles">
       <UniqueIdentifier>{777fae25-d5a7-44ef-84fe-f18907c6d3c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="95. ShaderFiles\Distortion">
+      <UniqueIdentifier>{fc9684f2-b9db-422e-8d63-75f015726a98}</UniqueIdentifier>
+    </Filter>
     <Filter Include="95. ShaderFiles\raw Shader">
       <UniqueIdentifier>{fb5dcb1b-6cbb-4a13-9d9d-75c0717ece59}</UniqueIdentifier>
     </Filter>
@@ -1021,5 +1024,10 @@
     <None Include="..\ShaderFiles\Shader_VolumetricFog.hlsl">
       <Filter>95. ShaderFiles\raw Shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Distortion.hlsl">
+      <Filter>95. ShaderFiles\Distortion</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

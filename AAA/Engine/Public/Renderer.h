@@ -101,6 +101,8 @@ private:
 	HRESULT Render_SSR();
 	HRESULT Render_DoF();
 	HRESULT Render_Effect_HDR();
+	HRESULT Render_Distortion();
+	HRESULT Render_DistortionApply();
 	HRESULT Render_Bloom();
 
 	HRESULT Render_NonLight();

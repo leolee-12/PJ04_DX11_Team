@@ -73,6 +73,12 @@ HRESULT CRenderer::Initialize()
     if (FAILED(Ready_DepthStencil_Buffer()))
         return E_FAIL;
 
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Distortion"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Scene_Distort"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+
 
     // ui 커튼
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Curtain"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))   // 투명으로 clear
@@ -138,6 +144,12 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Curtain"), TEXT("Target_Curtain"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Distortion"), TEXT("Target_Distortion"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Scene_Distort"), TEXT("Target_Scene_Distort"))))
         return E_FAIL;
 
 
@@ -278,6 +290,12 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_Effect_HDR()))
         return E_FAIL;
+
+    if (FAILED(Render_Distortion()))     
+        return E_FAIL;
+    if (FAILED(Render_DistortionApply()))
+        return E_FAIL;
+
     if (FAILED(Render_Bloom()))
         return E_FAIL;
 
@@ -870,6 +888,56 @@ HRESULT CRenderer::Render_Effect_HDR()
     return m_pGameInstance_Proxy->End_MRT();
 }
 
+HRESULT CRenderer::Render_Distortion()
+{
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Distortion"), nullptr, true, false)))
+        return E_FAIL;
+
+    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::DISTORTION)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+
+        Safe_Release(pRenderObject);
+    }
+    m_RenderObjects[ETOUI(RENDERID::DISTORTION)].clear();
+
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CRenderer::Render_DistortionApply()
+{
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_Distort"), nullptr, false)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::ORTHO))))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::ORTHO))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_DoF"), m_pShaderPost, "g_SceneTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Distortion"), m_pShaderPost, "g_DistortionTexture")))
+        return E_FAIL;
+
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::DISTORTION_APPLY))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
 HRESULT CRenderer::Render_VolumetricFog()
 {
     const _float4* pEnable = m_pGameInstance_Proxy->Get_ShaderGlobal("g_fFogEnable");
@@ -968,7 +1036,7 @@ HRESULT CRenderer::Render_Bloom()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, "g_fThreshold")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_DoF"), m_pShaderPost, "g_SceneTexture")))
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_Distort"), m_pShaderPost, "g_SceneTexture")))
         return E_FAIL;
     if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::BRIGHT))))
         return E_FAIL;

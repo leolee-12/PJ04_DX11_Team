@@ -429,6 +429,8 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaFly()
                 *bOn = true;
             }
 
+            mv->Set_GravityEnabled(false);
+
             if (*iPhase == 2)
             {
                 const _float fRemain = XMVectorGetX(XMVector3Length(
@@ -484,6 +486,9 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaFly()
             return BT_STATUS::RUNNING;
         },
         [this, bOn, iPhase] {
+            if (!*bOn)
+                return;
+
             *bOn = false; *iPhase = 0;
             m_pOwner->Get_Movement()->Set_GravityEnabled(true);
         });
@@ -1192,6 +1197,9 @@ CBTNode* CBoss_Metaknight_Brain::Make_ReturnFly()
             return BT_STATUS::RUNNING;
         },
         [this, bOn, iPhase] {
+            if (!*bOn)
+                return;
+
             *bOn = false; *iPhase = 0;
             m_pOwner->Get_Movement()->Set_GravityEnabled(true);
         });
