@@ -5,6 +5,7 @@
 #include "Camera_Boss.h"
 #include "Camera_AreaCam.h"
 #include "Camera_Dialogue.h"
+#include "Camera_Coaster.h"
 
 CCameraDirector* CCameraDirector::s_pActiveDirector = nullptr;
 
@@ -15,6 +16,7 @@ namespace
     constexpr const _tchar* TAG_CUT = TEXT("CameraCutscene");
     constexpr const _tchar* TAG_BOSS = TEXT("CameraBoss");
     constexpr const _tchar* TAG_DIALOG = TEXT("CameraDialogue");
+    constexpr const _tchar* TAG_COASTER = TEXT("CameraCoaster");
 
     const _tchar* Resolve_AreaCamDataPath(LEVEL eLevel)
     {
@@ -80,6 +82,7 @@ void CCameraDirector::On_CameraChange(void* p)
     const _bool bCut = (d->eCam == ECutsceneCam::Cutscene);
     const _bool bBoss = (d->eCam == ECutsceneCam::Boss);
     const _bool bArea = (d->eCam == ECutsceneCam::Area);
+    const _bool bCoaster = (d->eCam == ECutsceneCam::Coaster);
 
     _bool bReady = false;
     if (bCut)
@@ -88,21 +91,28 @@ void CCameraDirector::On_CameraChange(void* p)
     if (bArea)
     {
         CCamera* pFromCam = nullptr;
-        if (m_pCutCam->Is_Active())       pFromCam = m_pCutCam;
-        else if (m_pBossCam->Is_Active()) pFromCam = m_pBossCam;
-        else if (m_pDlgCam->Is_Active())  pFromCam = m_pDlgCam;
+        if (m_pCutCam->Is_Active())          pFromCam = m_pCutCam;
+        else if (m_pBossCam->Is_Active())    pFromCam = m_pBossCam;
+        else if (m_pDlgCam->Is_Active())     pFromCam = m_pDlgCam;
+        else if (m_pCoasterCam->Is_Active()) pFromCam = m_pCoasterCam;
 
-        if (pFromCam)
+        if (pFromCam == m_pCoasterCam)
+        {
+            m_pAreaCam->Snap();
+        }
+        else if (pFromCam)
         {
             CTransform* pTf = pFromCam->Get_Transform();
             _vector vEye = pTf->Get_State(STATE::POSITION);
             _vector vAt = vEye + pTf->Get_State(STATE::LOOK);
             m_pAreaCam->Begin_Handoff(vEye, vAt, pFromCam->Get_Fovy());
         }
+
         m_pAreaCam->Set_Active(true);
         m_pCutCam->Set_Active(false);
         m_pBossCam->Set_Active(false);
         m_pDlgCam->Set_Active(false);
+        m_pCoasterCam->Set_Active(false);
         return;
     }
 
@@ -117,6 +127,19 @@ void CCameraDirector::On_CameraChange(void* p)
         m_pDlgCam->Set_Active(false);
         m_pBossCam->Snap();
         m_pBossCam->Set_Active(true);
+        m_pCoasterCam->Snap();
+        m_pCoasterCam->Set_Active(false);
+        return;
+    }
+
+    if (bCoaster)
+    {
+        m_pAreaCam->Set_Active(false);
+        m_pCutCam->Set_Active(false);
+        m_pBossCam->Set_Active(false);
+        m_pDlgCam->Set_Active(false);
+        m_pCoasterCam->Snap();
+        m_pCoasterCam->Set_Active(true);
         return;
     }
 }
@@ -132,6 +155,7 @@ void CCameraDirector::On_DialogueCamBegin(void* p)
     m_pAreaCam->Set_Active(false);
     m_pCutCam->Set_Active(false);
     m_pBossCam->Set_Active(false);
+    m_pCoasterCam->Set_Active(false);
 }
 
 HRESULT CCameraDirector::Ensure_Cameras()
@@ -193,12 +217,26 @@ HRESULT CCameraDirector::Ensure_Cameras()
             return E_FAIL;
     }
 
+    if (!m_pGameInstance_Proxy->Has_Prototype(iStatic, CCamera_Coaster::PROTOTYPE_TAG))
+    {
+        m_pGameInstance_Proxy->Add_Prototype(iStatic, CCamera_Coaster::PROTOTYPE_TAG,
+            CCamera_Coaster::Create(m_pDevice, m_pContext));
+
+        CCamera_Coaster::COASTERCAM_DESC CoasterDesc{};
+        CoasterDesc.fFovy = XMConvertToRadians(60.f); CoasterDesc.fNear = 0.1f; CoasterDesc.fFar = 1000.f;
+        if (FAILED(m_pGameInstance_Proxy->Add_GameObject(iStatic, CCamera_Coaster::PROTOTYPE_TAG,
+            iStatic, LAYER_CAMERA, TAG_COASTER, &CoasterDesc)))
+            return E_FAIL;
+    }
+
     m_pAreaCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_AreaCam>(iStatic, LAYER_CAMERA, TAG_AREA);
     m_pCutCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Cutscene>(iStatic, LAYER_CAMERA, TAG_CUT);
     m_pBossCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Boss>(iStatic, LAYER_CAMERA, TAG_BOSS);
     m_pDlgCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Dialogue>(iStatic, LAYER_CAMERA, TAG_DIALOG);
+    m_pCoasterCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Coaster>(iStatic, LAYER_CAMERA, TAG_COASTER);
 
-    if (nullptr == m_pAreaCam || nullptr == m_pCutCam || nullptr == m_pBossCam || nullptr == m_pDlgCam)
+    if (nullptr == m_pAreaCam || nullptr == m_pCutCam || nullptr == m_pBossCam ||
+        nullptr == m_pDlgCam || nullptr == m_pCoasterCam)
     {
         MSG_BOX("CameraDirector: STATIC camera cache failed - creation path broken");
         return E_FAIL;
@@ -208,6 +246,7 @@ HRESULT CCameraDirector::Ensure_Cameras()
     Safe_AddRef(m_pCutCam);
     Safe_AddRef(m_pBossCam);
     Safe_AddRef(m_pDlgCam);
+    Safe_AddRef(m_pCoasterCam);
 
     return S_OK;
 }
@@ -223,6 +262,9 @@ void CCameraDirector::Arrange()
     m_pBossCam->Set_Active(false);
 
     m_pDlgCam->Set_Active(false);
+
+    m_pCoasterCam->Clear_LevelRefs();
+    m_pCoasterCam->Set_Active(false);
 
     s_pActiveDirector = this;
 }
@@ -262,6 +304,7 @@ void CCameraDirector::Free()
         Safe_Release(m_pCutCam);
         Safe_Release(m_pBossCam);
         Safe_Release(m_pDlgCam);
+        Safe_Release(m_pCoasterCam);
     }
 
     __super::Free();

@@ -49,6 +49,7 @@
     <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h" />
     <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
+    <ClInclude Include="..\public\Camera_Coaster.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
     <ClInclude Include="..\Public\Dekabu_Brain.h" />
@@ -314,6 +315,7 @@
     <ClInclude Include="..\public\Projectile_Boulder.h" />
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
+    <ClInclude Include="..\public\UI_AbilityDiscard.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
     <ClInclude Include="..\public\UI_CurtainFadeOut.h" />
     <ClInclude Include="..\public\UI_CurtainStamp.h" />
@@ -554,6 +556,7 @@
     <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp" />
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\private\Camera_Coaster.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
     <ClCompile Include="..\private\Excalibur.cpp" />
@@ -815,6 +818,7 @@
     <ClCompile Include="..\private\Projectile_Boulder.cpp" />
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
+    <ClCompile Include="..\private\UI_AbilityDiscard.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
     <ClCompile Include="..\private\UI_CurtainFadeOut.cpp" />
     <ClCompile Include="..\private\UI_CurtainStamp.cpp" />

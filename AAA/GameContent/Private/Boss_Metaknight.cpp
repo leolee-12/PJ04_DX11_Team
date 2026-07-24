@@ -276,6 +276,10 @@ _bool CBoss_Metaknight::Is_PhaseTransition_Finished() const
 
 void CBoss_Metaknight::On_PhaseChanged(_int iOldPhase, _int iNewPhase)
 {
+    if (iNewPhase == 1)
+    {
+        m_fRockCooldown = 0.f;
+    }
 }
 
 _bool CBoss_Metaknight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const

@@ -65,8 +65,8 @@ public:
     static constexpr _float s_fDodgeCooldown = 4.f;
     static constexpr _float s_fGigaCooldown = 30.f;
     static constexpr _float s_fRockCooldown = 60.f;
-    //static constexpr _float s_fUpperCooldown = 90.f;
-    static constexpr _float s_fUpperCooldown = 3.f;
+    static constexpr _float s_fUpperCooldown = 90.f;
+    //static constexpr _float s_fUpperCooldown = 3.f;
 
     // »ç¸Á
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;
@@ -270,7 +270,7 @@ private:
     _float m_fDeathTimer = { 0.f };
 
     // µð¹ö±×
-    static constexpr _bool s_bSkipIntro = false;
+    static constexpr _bool s_bSkipIntro = true;
 
 private:
     HRESULT Ready_MetaEvents();

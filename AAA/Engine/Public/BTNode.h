@@ -26,17 +26,24 @@ public:
 
 	virtual BT_STATUS Tick(CBlackboard* pBB, _float fDt) override
 	{
+		m_bTicked = true;
 		return m_Fn(pBB, fDt);
 	}
 
 	virtual void Reset() override
 	{
-		if (m_ResetFn) m_ResetFn();
+		if (!m_bTicked)
+			return;
+
+		m_bTicked = false;
+		if (m_ResetFn)
+			m_ResetFn();
 	}
 
 private:
 	TickFn  m_Fn;
 	ResetFn m_ResetFn;
+	_bool   m_bTicked = { false };
 
 public:
 	static CBTAction* Create(TickFn fn, ResetFn rfn = nullptr);

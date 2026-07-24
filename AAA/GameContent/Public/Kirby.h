@@ -137,7 +137,7 @@ public:
 	void Update_DumpCool(_float fTimeDelta);
 	void Reset_DumpCool();
 	_bool Can_Dump();
-	void Req_AbilityDumpCoolDecrease() { m_bDecreaseDumpCool = true; }
+	void Req_AbilityDumpCoolDecrease() { m_bCurDecreaseDumpCool = true; }
 
 	// Deform
 	_bool Has_Deform() { return m_pKirby_Deform ? true : false; }
@@ -238,7 +238,8 @@ private:
 	// Ability Dump
 	_float m_fAccDumpCoolTime{};
 	_float m_fMaxDumpCoolTime{ 0.5f };
-	_bool m_bDecreaseDumpCool{};
+	_bool m_bCurDecreaseDumpCool{};
+	_bool m_bPreDecreaseDumpCool{};
 
 	// Deform
 	CKirby_Deform* m_pKirby_Deform{};
