@@ -41,6 +41,8 @@ enum class MAP_PASS : _uint
 	UKWN,
 	DISCARD,
 
+	EDGEDITHER,   // 10 - 경계에 Dither 적용
+
 	_COUNT
 };
 
@@ -55,16 +57,17 @@ struct MAP_SHADER_PASS_META
 
 inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =
 {
-	{ MAP_PASS::SHADOW,		"Shadow",	0 },
-	{ MAP_PASS::WHITE,		"White",	0 },
-	{ MAP_PASS::DIFF,		"DIFF",		DIFF },
-	{ MAP_PASS::DN,			"DN",		DIFF | NORM },
-	{ MAP_PASS::DMN,		"DMN",		DIFF | NORM | MRA },
-	{ MAP_PASS::DMNU,		"DMNU",		DIFF | NORM | MRA | UKWN },
-	{ MAP_PASS::TOP,		"FRONT",	DIFF | NORM | MRA },
-	{ MAP_PASS::MASK,		"MASK",		DIFF | NORM | MRA },
-	{ MAP_PASS::UKWN,		"UKWN",		UKWN },
-	{ MAP_PASS::DISCARD,	"DISCARD",	0 },
+	{ MAP_PASS::SHADOW,		"Shadow",		0 },
+	{ MAP_PASS::WHITE,		"White",		0 },
+	{ MAP_PASS::DIFF,		"DIFF",			DIFF },
+	{ MAP_PASS::DN,			"DN",			DIFF | NORM },
+	{ MAP_PASS::DMN,		"DMN",			DIFF | NORM | MRA },
+	{ MAP_PASS::DMNU,		"DMNU",			DIFF | NORM | MRA | UKWN },
+	{ MAP_PASS::TOP,		"FRONT",		DIFF | NORM | MRA },
+	{ MAP_PASS::MASK,		"MASK",			DIFF | NORM | MRA },
+	{ MAP_PASS::UKWN,		"UKWN",			UKWN },
+	{ MAP_PASS::DISCARD,	"DISCARD",		0 },
+	{ MAP_PASS::EDGEDITHER,  "EDGEDITHER",	DIFF | NORM | MRA },
 };
 
 static const char* kLayerExTextureNames[MESH_LAYER_EX_GROUP_COUNT][MESH_LAYER_EX_ENTRY_COUNT] =

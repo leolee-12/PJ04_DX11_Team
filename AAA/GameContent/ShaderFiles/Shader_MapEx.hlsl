@@ -650,6 +650,24 @@ PS_OUT PS_DISCARD(PS_IN In)
     return (PS_OUT) 0;
 }
 
+PS_OUT PS_DMN_EDGEDITHER(PS_IN In)
+{
+    // 경계 페이드량 (ease-out, 경계 근처 1)
+    float2 fuv = frac(In.vTexcoord);
+    float d = fuv.y; // 경계 축·쪽 선택 (v=1). u/v0 등은 앞과 동일
+    float w = saturate(g_MaskStrength * 0.5f); // 밴드 폭
+    float t = saturate(1.f - d / max(w, 1e-4f));
+    float k = 3.f; // 이징 세기
+    float alpha = pow(1.f - t, k); // 경계 0, 중앙 1
+
+    // 불투명 패스 -> 디더 컷아웃으로 알파 흉내
+    float dither = frac(dot(In.vPosition.xy, float2(0.5545f, 0.3183f)));
+    if (alpha <= dither)
+        discard;
+
+    return PS_DMN(In); // 남은 픽셀 = 원본 moss 그대로
+}
+
 technique11 DefaultTechnique
 {
     pass Shadow // 0
@@ -747,5 +765,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
+    }
+    pass EdgeDither // 10
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DMN_EDGEDITHER();
     }
 }
