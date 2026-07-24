@@ -7,6 +7,8 @@
 
 namespace
 {
+	constexpr _bool s_bMovePointToPlayerOnPickup = false;
+
 	constexpr const _tchar* POINTSTAR_PICKUP_SOUND = L"ItemPointStar_YellowCatched.wav";
 	constexpr _float s_fPointRotationPerSec = 360.f;
 	constexpr _float s_fPointPickupDuration = 0.75f;
@@ -386,10 +388,14 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 	Desc.iAmount = static_cast<_uint>(m_tPointDesc.iValue);
 	m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
 
+	if (m_bRotate && s_bMovePointToPlayerOnPickup)
+		m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vStartPosition), 1.f));
+
 	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 	m_pGameInstance_Proxy->Play_SFX3D(POINTSTAR_PICKUP_SOUND, vPos, 0.5f);
 
-	const _float3 vEffectPosition = { vStartPosition.x + s_vPickupEffectOffset.x, vStartPosition.y + s_vPickupEffectOffset.y, vStartPosition.z + s_vPickupEffectOffset.z };
+	_float3 vEffectPosition{};
+	XMStoreFloat3(&vEffectPosition, vPos + XMLoadFloat3(&s_vPickupEffectOffset));
 	CEffect_Loader::GetInstance()->Spawn(TEXT("PickUpEffect"), m_iLevelIndex, vEffectPosition);
 
 	if (m_pHurtBox)
@@ -401,13 +407,13 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 		return;
 	}
 
-	Begin_Pickup(vStartPosition);
+	Begin_Pickup();
 }
 
-void CLevelDesign_Point::Begin_Pickup(const _float3& vPickupStartPos)
+void CLevelDesign_Point::Begin_Pickup()
 {
 	const _float3 vScale = m_pTransformCom->Get_Scaled();
-	const _vector vStartPos = XMVectorSetW(XMLoadFloat3(&vPickupStartPos), 1.f);
+	const _vector vStartPos = XMVectorSetW(m_pTransformCom->Get_State(STATE::POSITION), 1.f);
 	const _vector vTargetPos = vStartPos + XMVectorSet(0.f, s_fPointPickupHeight, 0.f, 0.f);
 
 	XMStoreFloat3(&m_vPickupStartPos, vStartPos);
@@ -416,7 +422,6 @@ void CLevelDesign_Point::Begin_Pickup(const _float3& vPickupStartPos)
 	m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(vScale.x, 0.f, 0.f, 0.f));
 	m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, vScale.y, 0.f, 0.f));
 	m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, vScale.z, 0.f));
-	m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
 
 	m_fPickupElapsed = 0.f;
 }

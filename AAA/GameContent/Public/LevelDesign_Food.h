@@ -78,7 +78,7 @@ private:
 	HRESULT			Ready_HurtBox();
 	void			SetUp_Collider_Callback();
 	void			Handle_Pickup(CCollider* pOther);
-	void			Begin_Pickup(const _float3& vStartPos);
+	void			Begin_Pickup();
 	void			Update_Pickup(_float fTimeDelta);
 
 	void			Handle_InhalePull(CCollider* pOther);

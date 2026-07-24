@@ -9,11 +9,14 @@
 
 namespace
 {
+	constexpr _bool s_bMoveFoodToPlayerOnPickup = false;
+
 	constexpr _float s_fFoodFloatHeight = 0.25f;
 	constexpr _float s_fFoodRotationPerSec = 360.f;
 	constexpr _float s_fFoodPickupDuration = 0.75f;
 	constexpr _float s_fFoodPickupHeight = 3.f;
 	constexpr _float s_fFoodPickupTurnCount = 1.f;
+	constexpr _float3 s_vPickupEffectOffset = { 0.f, 2.f, 0.f };
 
 	constexpr _float s_fInhalePullAccel = 40.f;
 	constexpr _float s_fInhaleMouthFwd = 0.6f;
@@ -465,13 +468,20 @@ void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
 	m_fInhalePullSpeed = 0.f;
 	m_pInhaler = nullptr;
 
-	Begin_Pickup(vStartPos);
+	if (s_bMoveFoodToPlayerOnPickup)
+		m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vStartPos), 1.f));
+
+	_float3 vEffectPosition{};
+	XMStoreFloat3(&vEffectPosition, m_pTransformCom->Get_State(STATE::POSITION) + XMLoadFloat3(&s_vPickupEffectOffset));
+	CEffect_Loader::GetInstance()->Spawn(TEXT("PickUpEffect"), m_iLevelIndex, vEffectPosition);
+
+	Begin_Pickup();
 }
 
-void CLevelDesign_Food::Begin_Pickup(const _float3& vPickupStartPos)
+void CLevelDesign_Food::Begin_Pickup()
 {
 	const _float3 vScale = m_pTransformCom->Get_Scaled();
-	const _vector vStartPos = XMVectorSetW(XMLoadFloat3(&vPickupStartPos), 1.f);
+	const _vector vStartPos = XMVectorSetW(m_pTransformCom->Get_State(STATE::POSITION), 1.f);
 	const _vector vTargetPos = vStartPos + XMVectorSet(0.f, s_fFoodPickupHeight, 0.f, 0.f);
 
 	XMStoreFloat3(&m_vPickupStartPos, vStartPos);
@@ -480,7 +490,6 @@ void CLevelDesign_Food::Begin_Pickup(const _float3& vPickupStartPos)
 	m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(vScale.x, 0.f, 0.f, 0.f));
 	m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, vScale.y, 0.f, 0.f));
 	m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, vScale.z, 0.f));
-	m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
 
 	m_fPickupElapsed = 0.f;
 	m_bPickingUp = true;
