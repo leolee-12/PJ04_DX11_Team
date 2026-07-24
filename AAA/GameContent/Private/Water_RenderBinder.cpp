@@ -59,6 +59,9 @@ void Client::Sanitize_WaterRenderDesc(WATER_RENDER_DESC* pDesc)
 	pDesc->fCausticNoiseStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fCausticNoiseStrength, Default.fCausticNoiseStrength, 0.f, 1.f);
 	pDesc->fCausticBlur = MathUtils::Sanitize_ClampedFloat(pDesc->fCausticBlur, Default.fCausticBlur, 0.f, MAX_WATER_MASK_BLUR);
 
+	pDesc->fWaveAmplitude = MathUtils::Sanitize_ClampedFloat(pDesc->fWaveAmplitude, Default.fWaveAmplitude, 0.f, 10.f);
+	pDesc->fWaveSpeed = MathUtils::Sanitize_ClampedFloat(pDesc->fWaveSpeed, Default.fWaveSpeed, 0.f, 10.f);
+
 	pDesc->fVisibility = MathUtils::Sanitize_ClampedFloat(pDesc->fVisibility, Default.fVisibility, 0.f, 1.f);
 }
 
@@ -133,6 +136,13 @@ HRESULT Client::Bind_WaterRenderDesc(CShader* pShader, const WATER_RENDER_DESC& 
 	if (FAILED(pShader->Bind_RawValue("g_fCausticNoiseStrength", &SafeDesc.fCausticNoiseStrength, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(pShader->Bind_RawValue("g_fCausticBlur", &SafeDesc.fCausticBlur, sizeof(_float))))
+		return E_FAIL;
+
+	const _float fWavePhase = fGameTime * SafeDesc.fWaveSpeed;
+	const _float fWaveHeight = SafeDesc.fWaveAmplitude *
+		(0.6f * sinf(fWavePhase) + 0.4f * sinf(fWavePhase * 0.618f + 1.3f));
+
+	if (FAILED(pShader->Bind_RawValue("g_fWaveHeight", &fWaveHeight, sizeof(_float))))
 		return E_FAIL;
 
 	if (FAILED(pShader->Bind_RawValue("g_fGameTime", &fGameTime, sizeof(_float))))

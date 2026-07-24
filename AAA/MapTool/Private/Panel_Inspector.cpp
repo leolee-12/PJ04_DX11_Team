@@ -176,6 +176,11 @@ namespace
 		bChanged |= ImGui::DragFloat("Caustic Noise Strength##WaterMaterial", &Desc.fCausticNoiseStrength, 0.01f, 0.f, 1.f);
 		bChanged |= ImGui::DragFloat("Caustic Blur##WaterMaterial", &Desc.fCausticBlur, 0.05f, 0.f, 8.f, "%.2f");
 
+		ImGui::Separator();
+		ImGui::TextUnformatted("Wave");
+		bChanged |= ImGui::DragFloat("Wave Amplitude##WaterMaterial", &Desc.fWaveAmplitude, 0.01f, 0.f, 10.f, "%.3f");
+		bChanged |= ImGui::DragFloat("Wave Speed##WaterMaterial", &Desc.fWaveSpeed, 0.01f, 0.f, 10.f, "%.3f");
+
 		return bChanged;
 	}
 
@@ -2047,7 +2052,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		}
 
 		ImGui::SetNextItemWidth(240.f);
-		if (ImGui::ColorEdit3("Emissive Color##MeshLayer", (float*)&Layer.vEmissiveColor, iColorEditFlags))
+		if (ImGui::ColorEdit4("Emissive Color (A=LightShaft Surface)##MeshLayer", (float*)&Layer.vEmissiveColor, iColorEditFlags))
 		{
 			bChanged = true;
 		}

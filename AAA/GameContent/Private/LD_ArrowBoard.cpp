@@ -290,13 +290,7 @@ HRESULT CLD_ArrowBoard::Ready_HurtBox()
 
 HRESULT CLD_ArrowBoard::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+	if (FAILED(MeshLayerBinder::Bind_WorldViewProj(m_pShaderCom, m_pTransformCom, m_pGameInstance_Proxy, m_eProjType)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
@@ -313,28 +307,23 @@ HRESULT CLD_ArrowBoard::Render_Model()
 	if (!m_bGlow)
 		Layer.vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
 
+	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", 0u)))
+		return E_FAIL;
+
 	MESH_LAYER_BIND_CONTEXT Ctx{};
-	Ctx.pShader = m_pShaderCom;
-	Ctx.pModel = m_pModelCom;
-	Ctx.pCullingState = m_pCullingState;
-	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 	Ctx.iMesh = 0u;
 	Ctx.pLayer = &Layer;
 	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
 	Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 	Ctx.iFallbackPass = ETOUI(WORLD_PASS::ARROWBOARD_OPAQUE);
 
-	MESH_LAYER_BIND_RESULT Result{};
-	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-		return E_FAIL;
+	_uint iPass = 0u;
+	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+	if (FAILED(hrBind))     return E_FAIL;
+	if (S_FALSE == hrBind)  return S_OK;
 
-	if (Result.bSkipMesh)
-		return S_OK;
-
-	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", 0u)))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+	if (FAILED(m_pShaderCom->Begin(iPass)))
 		return E_FAIL;
 
 	return m_pModelCom->Render(0u);

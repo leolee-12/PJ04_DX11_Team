@@ -15,25 +15,14 @@ CEnvVolume_Culling::CEnvVolume_Culling(const CEnvVolume_Culling& Prototype)
 	m_strProtoTag = PROTOTYPE_TAG;
 }
 
-HRESULT CEnvVolume_Culling::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
-}
-
 HRESULT CEnvVolume_Culling::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	m_strHideKind = m_tDesc.tEffect.strHideKind;
-	m_bActive = false;
 
 	return S_OK;
-}
-
-void CEnvVolume_Culling::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
-{
-	__super::Copy_PrototypeName(pOutData);
 }
 
 #ifdef _DEBUG
@@ -75,8 +64,6 @@ CGameObject* CEnvVolume_Culling::Clone(void* pArg)
 
 void CEnvVolume_Culling::Free()
 {
-	m_bActive = false;
-
 	__super::Free();
 }
 

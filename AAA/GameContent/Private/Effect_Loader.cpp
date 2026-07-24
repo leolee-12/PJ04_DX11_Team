@@ -11,6 +11,7 @@
 #include "RectEmitterCommon.h"
 #include "MeshEmitterCommon.h"
 #include "TrailCommon.h"
+#include "DistortionCommon.h"
 
 IMPLEMENT_SINGLETON(CEffect_Loader)
 
@@ -88,6 +89,7 @@ namespace
         { TEXT("Split_Cylinder"),         TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Cylinder_1.JSON") },
         { TEXT("BreakWallEffect"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_BreakWallEffect_0.JSON") },
         { TEXT("ItemEffect"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_ItemEffect_0.JSON") },
+        { TEXT("VanishEffect"),           TEXT("../../Resources/LevelData/Proto_VanishEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/EffectContainerJSON/CHJ/BubbleAura.JSON") },
         { TEXT("LaunchSmoke"),            TEXT("../../Resources/EffectContainerJSON/CHJ/LaunchSmoke.JSON") },
         { TEXT("MoveSmoke"),              TEXT("../../Resources/EffectContainerJSON/CHJ/MoveSmoke.JSON") },
@@ -175,6 +177,8 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
     if (FAILED(pProxy->Add_Prototype(iLevel, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext))))
         return E_FAIL;
     if (FAILED(pProxy->Add_Prototype(iLevel, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext))))
         return E_FAIL;
 
     return S_OK;

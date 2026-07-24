@@ -142,24 +142,19 @@ HRESULT CEnvObject::Render_Shadow()
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pCullingState = m_pCullingState;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::SHADOW);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  continue;
 
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
@@ -218,9 +213,7 @@ HRESULT CEnvObject::Render_Decal()
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy);
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
@@ -231,13 +224,12 @@ HRESULT CEnvObject::Render_Decal()
 		if (fDissolve > 0.f)
 			Ctx.iExtraFlags |= WorldShaderFlags::Dither;
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-		if (Result.bSkipMesh)
-			continue;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  continue;
 
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
@@ -531,13 +523,7 @@ _bool CEnvObject::Should_CreatePhysicsActor() const
 
 HRESULT CEnvObject::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+	if (FAILED(MeshLayerBinder::Bind_WorldViewProj(m_pShaderCom, m_pTransformCom, m_pGameInstance_Proxy, m_eProjType)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
@@ -601,10 +587,7 @@ HRESULT CEnvObject::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind)
 	const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(iMeshIndex);
 
 	MESH_LAYER_BIND_CONTEXT Ctx{};
-	Ctx.pShader = m_pShaderCom;
-	Ctx.pModel = m_pModelCom;
-	Ctx.pCullingState = m_pCullingState;
-	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 	Ctx.iMesh = iMeshIndex;
 	Ctx.pLayer = &Layer;
 	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
@@ -615,14 +598,12 @@ HRESULT CEnvObject::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind)
 	if (m_bUseCameraDither)
 		Ctx.iExtraFlags |= WorldShaderFlags::Dither;
 
-	MESH_LAYER_BIND_RESULT Result{};
-	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-		return E_FAIL;
+	_uint iPass = 0u;
+	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+	if (FAILED(hrBind))     return E_FAIL;
+	if (S_FALSE == hrBind)  return S_OK;
 
-	if (Result.bSkipMesh)
-		return S_OK;
-
-	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+	if (FAILED(m_pShaderCom->Begin(iPass)))
 		return E_FAIL;
 	if (FAILED(m_pModelCom->Render(iMeshIndex)))
 		return E_FAIL;

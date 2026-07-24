@@ -17,11 +17,9 @@ public:
 		_float				fCullMargin = { 0.f };
 	};
 
-	static constexpr _uint CULLING_PLANE_MASK_LEFT = (1u << ETOUI(CULLING_PLANE::LEFT));
-	static constexpr _uint CULLING_PLANE_MASK_RIGHT = (1u << ETOUI(CULLING_PLANE::RIGHT));
-	static constexpr _uint CULLING_PLANE_MASK_TOP = (1u << ETOUI(CULLING_PLANE::TOP));
-	static constexpr _uint CULLING_PLANE_MASK_BOTTOM = (1u << ETOUI(CULLING_PLANE::BOTTOM));
-	static constexpr _uint CULLING_PLANE_MASK_MAIN_SIDE = CULLING_PLANE_MASK_LEFT | CULLING_PLANE_MASK_RIGHT | CULLING_PLANE_MASK_TOP | CULLING_PLANE_MASK_BOTTOM;
+	static constexpr _uint CULLING_PLANE_MASK_MAIN_SIDE =
+		(1u << ETOUI(CULLING_PLANE::LEFT)) | (1u << ETOUI(CULLING_PLANE::RIGHT))
+		| (1u << ETOUI(CULLING_PLANE::TOP)) | (1u << ETOUI(CULLING_PLANE::BOTTOM));
 
 private:
 	CCulling_Manager();
@@ -32,8 +30,6 @@ public:
 	void	Update();
 
 	_bool	Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc);
-	void	Invalidate_View(CULLING_VIEW eView);
-	void	Invalidate_All();
 
 	_bool	Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
 
@@ -46,6 +42,7 @@ private:
 	FRUSTUM_VIEW_STATE		m_ViewStates[ETOUI(CULLING_VIEW::END)] = {};
 
 private:
+	void	Invalidate_All();
 	_float  Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const;
 	CULLING_FADE_RESULT Evaluate_DistanceFade(_float fSurfaceDistance, _float fCullDistance, _float fFadeWidth) const;
 

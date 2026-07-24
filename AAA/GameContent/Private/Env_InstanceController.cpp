@@ -24,21 +24,13 @@ ENV_INSTANCE_BATCH_HANDLE CEnv_InstanceController::Register_BatchesForDesc(const
 
 	if (tDesc.tRender.bIsDecal)
 	{
-		ENV_INSTANCE_KEY tDecalKey{};
-		tDecalKey.iModelProtoLevel = tDesc.iModelProtoLevel;
-		tDecalKey.wstrModelProtoTag = tDesc.wstrModelProtoTag;
-		tDecalKey.eRenderID = RENDERID::DECAL;
+		ENV_INSTANCE_KEY tDecalKey{ tDesc.iModelProtoLevel, tDesc.wstrModelProtoTag, RENDERID::DECAL };
 		tHandle.iDecalBatchIndex = FindOrCreate_BatchIndex(tDecalKey);
-
 		return tHandle;
 	}
 
-	ENV_INSTANCE_KEY tMainKey{};
-	tMainKey.iModelProtoLevel = tDesc.iModelProtoLevel;
-	tMainKey.wstrModelProtoTag = tDesc.wstrModelProtoTag;
-	tMainKey.eRenderID = RENDERID::NONBLEND;
+	ENV_INSTANCE_KEY tMainKey{ tDesc.iModelProtoLevel, tDesc.wstrModelProtoTag, RENDERID::NONBLEND };
 	tHandle.iMainBatchIndex = FindOrCreate_BatchIndex(tMainKey);
-
 	return tHandle;
 }
 
@@ -47,67 +39,26 @@ _uint CEnv_InstanceController::Register_ShadowBatch(const ENV_OBJECT_DESC& tDesc
 	if (tDesc.wstrModelProtoTag.empty() || tDesc.tRender.bIsDecal)
 		return INVALID_INDEX;
 
-	ENV_INSTANCE_KEY tShadowKey{};
-	tShadowKey.iModelProtoLevel = tDesc.iModelProtoLevel;
-	tShadowKey.wstrModelProtoTag = tDesc.wstrModelProtoTag;
-	tShadowKey.eRenderID = RENDERID::SHADOW;
-
+	ENV_INSTANCE_KEY tShadowKey{ tDesc.iModelProtoLevel, tDesc.wstrModelProtoTag, RENDERID::SHADOW };
 	return FindOrCreate_BatchIndex(tShadowKey);
 }
 
 _bool CEnv_InstanceController::Submit_Main(_uint iBatchIndex, CEnvObject_Static* pObj)
 {
-	if (nullptr == pObj)
-		return false;
-
-	if (INVALID_INDEX == iBatchIndex || iBatchIndex >= m_Batches.size())
-		return false;
-
-	CEnv_InstanceBatch* pBatch = m_Batches[iBatchIndex];
-	if (nullptr == pBatch)
-		return false;
-
-	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
-	pBatch->Submit(pObj, iCurrentFrame);
-	PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_SUBMITTED, 1);
-
-	if (!pBatch->Is_RegisteredThisFrame())
-	{
-		pBatch->Set_RegisteredThisFrame(true);
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, pBatch);
-		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_BATCH_SUBMITTED, 1);
-	}
-
-	return true;
+	return Submit_Internal(iBatchIndex, pObj, RENDERID::NONBLEND);
 }
 
 _bool CEnv_InstanceController::Submit_Shadow(_uint iBatchIndex, CEnvObject_Static* pObj)
 {
-	if (nullptr == pObj)
-		return false;
-
-	if (INVALID_INDEX == iBatchIndex || iBatchIndex >= m_Batches.size())
-		return false;
-
-	CEnv_InstanceBatch* pBatch = m_Batches[iBatchIndex];
-	if (nullptr == pBatch)
-		return false;
-
-	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
-	pBatch->Submit(pObj, iCurrentFrame);
-	PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_SUBMITTED, 1);
-
-	if (!pBatch->Is_RegisteredThisFrame())
-	{
-		pBatch->Set_RegisteredThisFrame(true);
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pBatch);
-		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_BATCH_SUBMITTED, 1);
-	}
-
-	return true;
+	return Submit_Internal(iBatchIndex, pObj, RENDERID::SHADOW);
 }
 
 _bool CEnv_InstanceController::Submit_Decal(_uint iBatchIndex, CEnvObject_Static* pObj)
+{
+	return Submit_Internal(iBatchIndex, pObj, RENDERID::DECAL);
+}
+
+_bool CEnv_InstanceController::Submit_Internal(_uint iBatchIndex, CEnvObject_Static* pObj, RENDERID eRenderID)
 {
 	if (nullptr == pObj)
 		return false;
@@ -119,14 +70,13 @@ _bool CEnv_InstanceController::Submit_Decal(_uint iBatchIndex, CEnvObject_Static
 	if (nullptr == pBatch)
 		return false;
 
-	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
-	pBatch->Submit(pObj, iCurrentFrame);
+	pBatch->Submit(pObj, m_pGameInstance_Proxy->Get_FrameIndex());
 	PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_SUBMITTED, 1);
 
 	if (!pBatch->Is_RegisteredThisFrame())
 	{
 		pBatch->Set_RegisteredThisFrame(true);
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::DECAL, pBatch);
+		m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pBatch);
 		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_BATCH_SUBMITTED, 1);
 	}
 

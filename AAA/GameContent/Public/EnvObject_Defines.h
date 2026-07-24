@@ -69,16 +69,6 @@ enum class ENV_COLLIDER_KIND
 	END
 };
 
-struct ENV_BOUNDS_DESC
-{
-	_bool	bUseCullBounds = { false };
-	_bool	bUseCustomBounds = { false };
-	_float3 vCullBoundsCenter = {};
-	_float3 vCullBoundsSize = {};
-	_float3 vCustomBoundsCenter = {};
-	_float3 vCustomBoundsSize = {};
-};
-
 struct ENV_COLLISION_DESC
 {
 	_bool   bInvalidCollision = { false };
@@ -201,7 +191,6 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	_uint	iModelProtoLevel = {};
 
 	_uint	iUid = {};
-	_int	iGroupId = { -1 };
 	_int	iTargetLandGroupIndex = { -1 };
 
 	_bool	bHasWorldMatrix = { false };
@@ -210,12 +199,6 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	_float4 vRotation = { 0.f, 0.f, 0.f, 1.f };
 	_float3 vScale = { 1.f, 1.f, 1.f };
 
-	wstring strLevel;
-	wstring strSizeType;
-	wstring strRepopType;
-	wstring strInitCarryoverSettingType;
-
-	ENV_BOUNDS_DESC	tBounds;
 	ENV_COLLISION_DESC tCollision;
 	ENV_RENDER_DESC tRender;
 	ENV_EFFECT_DESC tEffect;

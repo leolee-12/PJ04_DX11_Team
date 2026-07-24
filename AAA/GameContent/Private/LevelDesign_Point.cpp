@@ -7,6 +7,8 @@
 
 namespace
 {
+	constexpr _bool s_bMovePointToPlayerOnPickup = false;
+
 	constexpr const _tchar* POINTSTAR_PICKUP_SOUND = L"ItemPointStar_YellowCatched.wav";
 	constexpr _float s_fPointRotationPerSec = 360.f;
 	constexpr _float s_fPointPickupDuration = 0.75f;
@@ -275,13 +277,7 @@ HRESULT CLevelDesign_Point::Ready_RenderComponents()
 
 HRESULT CLevelDesign_Point::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+	if (FAILED(MeshLayerBinder::Bind_WorldViewProj(m_pShaderCom, m_pTransformCom, m_pGameInstance_Proxy, m_eProjType)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
@@ -300,22 +296,19 @@ HRESULT CLevelDesign_Point::Render_Model()
 		const _bool bUseColorPass = (0u == m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::DIFFUSE));
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pCullingState = m_pCullingState;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 		Ctx.iFallbackPass = bUseColorPass ? ETOUI(WORLD_PASS::COLOR_CONST_MRA) : ETOUI(WORLD_PASS::DMN);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-		if (Result.bSkipMesh)
-			continue;
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  continue;
+
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
@@ -389,10 +382,14 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 	Desc.iAmount = static_cast<_uint>(m_tPointDesc.iValue);
 	m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
 
+	if (m_bRotate && s_bMovePointToPlayerOnPickup)
+		m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vStartPosition), 1.f));
+
 	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 	m_pGameInstance_Proxy->Play_SFX3D(POINTSTAR_PICKUP_SOUND, vPos, 0.5f);
 
-	const _float3 vEffectPosition = { vStartPosition.x + s_vPickupEffectOffset.x, vStartPosition.y + s_vPickupEffectOffset.y, vStartPosition.z + s_vPickupEffectOffset.z };
+	_float3 vEffectPosition{};
+	XMStoreFloat3(&vEffectPosition, vPos + XMLoadFloat3(&s_vPickupEffectOffset));
 	CEffect_Loader::GetInstance()->Spawn(TEXT("PickUpEffect"), m_iLevelIndex, vEffectPosition);
 
 	if (m_pHurtBox)
@@ -404,13 +401,13 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 		return;
 	}
 
-	Begin_Pickup(vStartPosition);
+	Begin_Pickup();
 }
 
-void CLevelDesign_Point::Begin_Pickup(const _float3& vPickupStartPos)
+void CLevelDesign_Point::Begin_Pickup()
 {
 	const _float3 vScale = m_pTransformCom->Get_Scaled();
-	const _vector vStartPos = XMVectorSetW(XMLoadFloat3(&vPickupStartPos), 1.f);
+	const _vector vStartPos = XMVectorSetW(m_pTransformCom->Get_State(STATE::POSITION), 1.f);
 	const _vector vTargetPos = vStartPos + XMVectorSet(0.f, s_fPointPickupHeight, 0.f, 0.f);
 
 	XMStoreFloat3(&m_vPickupStartPos, vStartPos);
@@ -419,7 +416,6 @@ void CLevelDesign_Point::Begin_Pickup(const _float3& vPickupStartPos)
 	m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(vScale.x, 0.f, 0.f, 0.f));
 	m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, vScale.y, 0.f, 0.f));
 	m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, vScale.z, 0.f));
-	m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
 
 	m_fPickupElapsed = 0.f;
 }

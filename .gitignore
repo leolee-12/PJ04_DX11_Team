@@ -448,7 +448,10 @@ AAA/*.zip
 !AAA/GameContent/ThirdPartyLib/debug/
 !AAA/GameContent/ThirdPartyLib/release/
 
+# AI Agents
 .claude/
+.agents/
+skills-lock.json
 
 # Shader
 !/AAA/Editor/[Bb]in/

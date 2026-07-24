@@ -27,12 +27,7 @@ public:
 	_bool BeginCpuSection(EPROFILE_CPU_SECTION eSection);
 	void EndCpuSection(EPROFILE_CPU_SECTION eSection);
 
-	void Set_CurrentPass(EPROFILE_RENDER_PASS ePass);
-	EPROFILE_RENDER_PASS Get_CurrentPass() const;
-
 	void AddCounter(EPROFILE_COUNTER eCounter, _uint iValue = 1);
-	void Record_DrawIndexed(_uint iIndexCount);
-	void Record_DrawIndexedInstanced(_uint iIndexCount, _uint iInstanceCount);
 
 	void Set_TextureHubStats(const TEXTURE_HUB_STATS& Stats);
 	const PROFILER_FRAME_SNAPSHOT& Get_Snapshot() const;
@@ -54,7 +49,6 @@ private:
 	double m_CpuStartSec[ETOUI(EPROFILE_CPU_SECTION::END)] = {};
 	_bool m_bCpuSectionRunning[ETOUI(EPROFILE_CPU_SECTION::END)] = {};
 
-	EPROFILE_RENDER_PASS m_eCurrentPass = EPROFILE_RENDER_PASS::NONE;
 	PROFILER_FRAME_SNAPSHOT m_WorkingSnapshot = {};
 	PROFILER_FRAME_SNAPSHOT m_Snapshot = {};
 	TEXTURE_HUB_STATS m_PrevTextureHubStats = {};
@@ -83,18 +77,12 @@ private:
 #define PROFILE_TEXTURE_HUB_STATS(STATS) do { if (auto* p = Engine::CProfiler_Manager::Get()) p->Set_TextureHubStats(STATS); } while (0)
 #define PROFILE_CPU_SCOPE(SECTION) Engine::CScopedCpuProfile PROFILE_CONCAT(_cpuProfile_, __LINE__)(SECTION)
 #define PROFILE_COUNTER_ADD(ID, V) do { if (auto* p = Engine::CProfiler_Manager::Get()) p->AddCounter(ID, V); } while (0)
-#define PROFILE_SET_PASS(PASS) do { if (auto* p = Engine::CProfiler_Manager::Get()) p->Set_CurrentPass(PASS); } while (0)
-#define PROFILE_DRAW_INDEXED(IDX) do { if (auto* p = Engine::CProfiler_Manager::Get()) p->Record_DrawIndexed(IDX); } while (0)
-#define PROFILE_DRAW_INDEXED_INSTANCED(IDX, INST) do { if (auto* p = Engine::CProfiler_Manager::Get()) p->Record_DrawIndexedInstanced(IDX, INST); } while (0)
 #else
 #define PROFILE_FRAME_BEGIN(DT, IDX)
 #define PROFILE_FRAME_END()
 #define PROFILE_TEXTURE_HUB_STATS(STATS)
 #define PROFILE_CPU_SCOPE(SECTION)
 #define PROFILE_COUNTER_ADD(ID, V)
-#define PROFILE_SET_PASS(PASS)
-#define PROFILE_DRAW_INDEXED(IDX)
-#define PROFILE_DRAW_INDEXED_INSTANCED(IDX, INST)
 #endif
 
 NS_END

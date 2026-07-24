@@ -205,9 +205,12 @@ HRESULT CEffect_Mesh::Ready_Components()
 
 HRESULT CEffect_Mesh::Bind_ShaderResources()
 {
-    const _float4x4 WorldMatrix = m_bBillboard == true
-        ? Make_BillboardWorldMatrix(m_CombinedWorldMatrix)
-        : m_CombinedWorldMatrix;
+    _float4x4 WorldMatrix = m_CombinedWorldMatrix;
+    if (m_bBillboard == true)
+    {
+        WorldMatrix = Make_BillboardWorldMatrix(m_CombinedWorldMatrix);
+        EffectMesh::Apply_BillboardRoll(WorldMatrix, m_fRoll);
+    }
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
         return E_FAIL;

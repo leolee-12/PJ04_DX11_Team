@@ -1,5 +1,6 @@
 #include "WaddleDee.h"
 #include "WaddleDee_Body.h"
+#include "WaddleDee_Hat.h"
 #include "LevelDesign_LoadTypes.h"
 #include "GameContent_Events.h"
 #include "GameContent_const.h"
@@ -38,9 +39,42 @@ namespace
 			{ L"Talk3AWait", L"Talk3A" },
 			{ L"Talk3BWait", L"Talk3B" },
 			{ L"Talk3ListenWait", L"Talk3Listen" },
-			{ L"WorryWait", L"ShopSadWait" }
+			{ L"WorryWait", L"ShopSadWait" },
+			{ L"WaitA", L"VassalWaitA" },
+			{ L"WaitB", L"VassalWaitB" },
 	};
 
+	struct WADDLEDEE_NPC_DESC
+	{
+		const _tchar* szObjectName;
+		const _tchar* szHatModelProtoTag;
+		const _char* szSocketBone;
+		const _tchar* szDefaultFixedAnim;
+	};
+
+	constexpr WADDLEDEE_NPC_DESC s_WaddleDeeNpcDescs[] =
+	{
+			{ L"PharmacyClerk",        L"Prototype_Component_Model_TownHat_Pharmacy",        "HatL", nullptr },
+			{ L"FoodShopClerk",        L"Prototype_Component_Model_TownHat_FoodShop",        "HatL", nullptr },
+			{ L"MgameFoodClerk",       L"Prototype_Component_Model_TownHat_FoodShop",        "HatL", nullptr },
+			{ L"MgameBallClerk",       L"Prototype_Component_Model_TownHat_RollingBall",     "HatL", nullptr },
+			{ L"DeliveryServiceClerk", L"Prototype_Component_Model_TownHat_DeliveryService", "HatL", nullptr },
+			{ L"ArenaClerk",           L"Prototype_Component_Model_TownHat_Arena",           "HatL", nullptr },
+			{ L"KnowledgeWaddleDee",   L"Prototype_Component_Model_TownHat_Knowledge",       "HatL", L"KnowledgeResearch" }
+	};
+
+	const WADDLEDEE_NPC_DESC* Find_NpcDesc(const _wstring& strObjectName)
+	{
+		for (const WADDLEDEE_NPC_DESC& Desc : s_WaddleDeeNpcDescs)
+		{
+			if (JsonUtils::Equals_NoCase(strObjectName.c_str(), Desc.szObjectName))
+				return &Desc;
+		}
+
+		return nullptr;
+	}
+
+	constexpr _float s_fAnimationSpeed = 1.5f;
 	constexpr _float s_fBlendDuration = 0.2f;
 	constexpr const _char* s_strIdleClip = "Wait";
 	constexpr const _char* s_strWalkClip = "Walk";
@@ -107,8 +141,14 @@ namespace
 	constexpr _float s_fHurtBoxRadius = 0.6f;
 	constexpr _float s_fHurtBoxHeight = 0.25f;
 
+	constexpr _float s_fCCT_Radius = 0.4f;
+	constexpr _float s_fCCT_Height = 0.25f;
+
 	static_assert(s_fBlendDuration > 0.f);
+	static_assert(s_fAnimationSpeed > 0.f);
 	static_assert(s_fRotationPerSec > 0.f);
+	static_assert(s_fCCT_Radius > 0.f);
+	static_assert(s_fCCT_Height >= 0.f);
 	static_assert(s_fHurtBoxRadius > 0.f);
 	static_assert(s_fHurtBoxHeight >= 0.f);
 	static_assert(s_iNormalHitAnimSetCount > 0);
@@ -132,6 +172,8 @@ CWaddleDee::CWaddleDee(const CWaddleDee& Prototype)
 	, m_bWander(Prototype.m_bWander)
 	, m_fWanderRadius(Prototype.m_fWanderRadius)
 	, m_fWalkSpeed(Prototype.m_fWalkSpeed)
+	, m_strObjectName(Prototype.m_strObjectName)
+	, m_bUseMovement(Prototype.m_bUseMovement)
 {
 }
 
@@ -145,11 +187,21 @@ HRESULT CWaddleDee::Initialize(void* pArg)
 	if (nullptr != pArg)
 	{
 		const LD_OBJECT_DESC* pDesc = static_cast<const LD_OBJECT_DESC*>(pArg);
+		m_strObjectName = pDesc->strObjectName;
+		m_bUseMovement = !JsonUtils::Equals_NoCase(m_strObjectName.c_str(), L"ArenaSpectator");
+
 		if (!pDesc->strAIVariation.empty())
 			m_strFixedAnim = pDesc->strAIVariation;
+
+		const WADDLEDEE_NPC_DESC* pNpcDesc = Find_NpcDesc(m_strObjectName);
+		if (m_strFixedAnim.empty() && nullptr != pNpcDesc && nullptr != pNpcDesc->szDefaultFixedAnim)
+			m_strFixedAnim = pNpcDesc->szDefaultFixedAnim;
 	}
 
 	if (FAILED(Ready_PartObjects()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Movement()))
 		return E_FAIL;
 
 	if (FAILED(Ready_AnimEvents()))
@@ -174,6 +226,9 @@ void CWaddleDee::Update(_float fTimeDelta)
 	__super::Update(fTimeDelta);
 
 	const _bool bEditMode = m_pGameInstance_Proxy->Is_EditMode();
+
+	if (bEditMode && m_bUseMovement)
+		m_pMovement->Sync_To_Controller();
 
 	if (!bEditMode && !m_bBasePosCaptured)
 	{
@@ -256,8 +311,10 @@ void CWaddleDee::Set_Active(_bool bActive)
 {
 	__super::Set_Active(bActive);
 
-	if (nullptr != m_pHurtBox)
-		m_pHurtBox->Set_Enabled(bActive);
+	m_pHurtBox->Set_Enabled(bActive);
+
+	if (m_bUseMovement)
+		m_pController->Set_Enabled(bActive);
 }
 
 void CWaddleDee::On_Deserialized()
@@ -285,6 +342,12 @@ void CWaddleDee::On_Deserialized()
 	m_strAppliedFixedAnim.clear();
 
 	Change_State(WADDLEDEE_STATE::IDLE);
+
+	if (m_bUseMovement)
+	{
+		Sync_MovementStats();
+		m_pMovement->Sync_To_Controller();
+	}
 }
 
 HRESULT CWaddleDee::Ready_PartObjects()
@@ -302,6 +365,57 @@ HRESULT CWaddleDee::Ready_PartObjects()
 	m_pBody = dynamic_cast<CWaddleDee_Body*>(iter->second);
 	if (nullptr == m_pBody)
 		return E_FAIL;
+
+	const WADDLEDEE_NPC_DESC* pNpcDesc = Find_NpcDesc(m_strObjectName);
+	if (nullptr == pNpcDesc || nullptr == pNpcDesc->szHatModelProtoTag || nullptr == pNpcDesc->szSocketBone)
+		return S_OK;
+
+	const _float4x4* pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr(pNpcDesc->szSocketBone);
+	if (nullptr == pSocketBoneMatrix)
+		return S_OK;
+
+	CWaddleDee_Hat::WADDLEDEE_HAT_DESC HatDesc{};
+	HatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	HatDesc.pSocketBoneMatrix = pSocketBoneMatrix;
+	HatDesc.szModelProtoTag = pNpcDesc->szHatModelProtoTag;
+
+	if (SUCCEEDED(Add_PartObject(m_iPrototypeLevel, CWaddleDee_Hat::PROTOTYPE_TAG, CWaddleDee_Hat::PART_TAG, &HatDesc)))
+	{
+		auto HatIter = m_PartObjects.find(CWaddleDee_Hat::PART_TAG);
+		if (HatIter != m_PartObjects.end())
+			m_pHat = dynamic_cast<CWaddleDee_Hat*>(HatIter->second);
+	}
+
+	return S_OK;
+}
+
+HRESULT CWaddleDee::Ready_Movement()
+{
+	if (!m_bUseMovement)
+		return S_OK;
+
+	_float3 vFootPos{};
+	XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	m_pController = Add_Component<CController>(TEXT("Com_Controller"), CController::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pController)
+		return E_FAIL;
+
+	CController::CONTROLLER_DESC ControllerDesc{};
+	ControllerDesc.vFootPos = vFootPos;
+	ControllerDesc.fRadius = s_fCCT_Radius;
+	ControllerDesc.fHeight = s_fCCT_Height;
+	ControllerDesc.pOwner = this;
+
+	if (FAILED(m_pController->Initialize(&ControllerDesc)))
+		return E_FAIL;
+
+	m_pMovement = Add_Component<CMovement>(TEXT("Com_Movement"), CMovement::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pMovement)
+		return E_FAIL;
+
+	m_pMovement->Set_Refs(m_pTransformCom, m_pController->Get_Raw());
+	Sync_MovementStats();
 
 	return S_OK;
 }
@@ -418,6 +532,12 @@ HRESULT CWaddleDee::Validate_Initialized()
 	return S_OK;
 }
 
+void CWaddleDee::Sync_MovementStats()
+{
+	m_pMovement->Set_MoveSpeed(m_fWalkSpeed);
+	m_pMovement->Set_RotSpeed(s_fRotationPerSec);
+}
+
 _bool CWaddleDee::Is_Sitting() const
 {
 	for (const _tchar* pFixedAnim : s_SittingFixedAnims)
@@ -444,11 +564,11 @@ void CWaddleDee::Change_State(WADDLEDEE_STATE eState)
 	case WADDLEDEE_STATE::WALK:
 		m_fStateTimer = s_fWalkTimeLimit;
 		Pick_WalkTarget();
-		m_pBody->Get_Animator()->Play(s_strWalkClip, true, true, 0.f);
+		m_pBody->Get_Animator()->Play(s_strWalkClip, true, true, 0.f, s_fAnimationSpeed);
 		break;
 
 	case WADDLEDEE_STATE::GREET:
-		m_pBody->Get_Animator()->Play(m_strInteractClip, false, true);
+		m_pBody->Get_Animator()->Play(m_strInteractClip, false, true, s_fBlendDuration, s_fAnimationSpeed);
 		break;
 
 	case WADDLEDEE_STATE::HIT:
@@ -464,6 +584,7 @@ void CWaddleDee::Change_State(WADDLEDEE_STATE eState)
 		CAnimator::ANI_PLAY_INFO AnimInfo{};
 		AnimInfo.bLoop = false;
 		AnimInfo.bRestart = true;
+		AnimInfo.fSpeed = s_fAnimationSpeed;
 
 		AnimInfo.strAniName = pHitAnimSet->szStart;
 		m_pBody->Get_Animator()->Play(&AnimInfo);
@@ -491,7 +612,7 @@ void CWaddleDee::Change_State(WADDLEDEE_STATE eState)
 		}
 
 		XMStoreFloat3(&m_vLookTarget, XMVector3Normalize(vFixedLook));
-		m_pBody->Get_Animator()->Play(s_strAngryClip, false, true);
+		m_pBody->Get_Animator()->Play(s_strAngryClip, false, true, s_fBlendDuration, s_fAnimationSpeed);
 		break;
 	}
 	}
@@ -557,7 +678,7 @@ void CWaddleDee::Update_Idle(_float fTimeDelta)
 		return;
 	}
 
-	if (!m_bWander || !m_strFixedAnim.empty())
+	if (!m_bUseMovement || !m_bWander || !m_strFixedAnim.empty())
 		return;
 
 	m_fStateTimer -= fTimeDelta;
@@ -566,12 +687,11 @@ void CWaddleDee::Update_Idle(_float fTimeDelta)
 		Change_State(WADDLEDEE_STATE::WALK);
 }
 
-
 void CWaddleDee::Play_Idle()
 {
 	const _string strClip = m_strFixedAnim.empty() ? s_strIdleClip : WstrToStr(m_strFixedAnim);
 
-	m_pBody->Get_Animator()->Play(strClip, true, true, s_fBlendDuration);
+	m_pBody->Get_Animator()->Play(strClip, true, true, s_fBlendDuration, s_fAnimationSpeed);
 	m_strAppliedFixedAnim = m_strFixedAnim;
 }
 
@@ -601,9 +721,9 @@ void CWaddleDee::Update_Walk(_float fTimeDelta)
 
 	m_fStateTimer -= fTimeDelta;
 
-	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
-	_vector vTarget = XMLoadFloat3(&m_vWalkTarget);
-	_vector vToTarget = XMVectorSetY(vTarget - vPosition, 0.f);
+	const _vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	const _vector vTarget = XMLoadFloat3(&m_vWalkTarget);
+	const _vector vToTarget = XMVectorSetY(vTarget - vPosition, 0.f);
 	const _float fDistanceSq = XMVectorGetX(XMVector3LengthSq(vToTarget));
 
 	if (fDistanceSq <= s_fArriveDistance * s_fArriveDistance || m_fStateTimer <= 0.f)
@@ -612,16 +732,7 @@ void CWaddleDee::Update_Walk(_float fTimeDelta)
 		return;
 	}
 
-	m_pTransformCom->LookAt_Smooth(vTarget, fTimeDelta);
-
-	const _float fDistance = sqrtf(fDistanceSq);
-	const _float fMoveDistance = min(m_fWalkSpeed * fTimeDelta, fDistance);
-	vPosition += XMVectorScale(vToTarget, fMoveDistance / fDistance);
-	vPosition = XMVectorSetY(vPosition, m_vBasePos.y);
-	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vPosition, 1.f));
-
-	if (fMoveDistance >= fDistance)
-		Change_State(WADDLEDEE_STATE::IDLE);
+	m_pMovement->Move(vToTarget, fTimeDelta);
 }
 
 void CWaddleDee::Update_Greet(_float fTimeDelta)

@@ -53,8 +53,6 @@ public:
 	void Set_EditData(const MAP_EDIT_DATA& Desc);
 	void Set_EditMeta(const MAP_EDIT_DATA& Desc);
 
-	_bool Is_LoadStageEnabled() const { return m_tEditData.bLoadStage; }
-	_bool Is_LoadEnvEnabled() const { return m_tEditData.bLoadEnv; }
 	void Set_LoadStageEnabled(_bool bEnable);
 	void Set_LoadEnvEnabled(_bool bEnable);
 
@@ -78,13 +76,8 @@ public:
 	_bool Clear_EditedMapSection(const _wstring& strSectionKey);
 	_bool Try_GetEditedMapSection(const _wstring& strSectionKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
 	_bool Track_EditedLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
-	_bool Clear_EditedLevelDesignObject(CGameObject* pObject);
 	_bool Try_GetEditedLevelDesignObject(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
 
-	_uint Get_EditedMapSectionCount() const { return static_cast<_uint>(m_tEditData.OverrideDesc.EditedMapSections.size()); }
-
-	const MAP_EDIT_CHANGE& Get_Change() const { return m_tEditData.OverrideDesc; }
-	void Set_Change(const MAP_EDIT_CHANGE& Desc);
 	MAP_EDIT_CHANGE Build_ChangeSnapShot() const;
 	MAP_EDIT_DATA Build_EditDataSnapShot() const;
 
