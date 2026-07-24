@@ -330,13 +330,12 @@ HRESULT CLevelDesignObject::Render_ShadowMesh(CShader* pShader, CModel* pModel, 
 	Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
 	Ctx.iFallbackPass = ETOUI(WORLD_PASS::SHADOW);
 
-	MESH_LAYER_BIND_RESULT Result{};
-	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-		return E_FAIL;
-	if (Result.bSkipMesh)
-		return S_OK;
+	_uint iPass = 0u;
+	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+	if (FAILED(hrBind))     return E_FAIL;
+	if (S_FALSE == hrBind)  return S_OK;
 
-	if (FAILED(pShader->Begin(Result.iPass)))
+	if (FAILED(pShader->Begin(iPass)))
 		return E_FAIL;
 	if (FAILED(pModel->Render(iMeshIndex)))
 		return E_FAIL;

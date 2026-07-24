@@ -466,6 +466,9 @@ HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex, MES
 		if (EVENTOBJECT_ANIM_DEFAULT_PASS != iAnimPassIndex)
 			return E_FAIL;
 
+		if (FAILED(Bind_BoneMatrices(iMeshIndex)))
+			return E_FAIL;
+
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 		Ctx.iMesh = iMeshIndex;
@@ -474,17 +477,12 @@ HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex, MES
 		Ctx.eKind = eKind;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  return S_OK;
 
-		if (Result.bSkipMesh)
-			return S_OK;
-
-		if (FAILED(Bind_BoneMatrices(iMeshIndex)))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 	}
 	else
@@ -500,14 +498,12 @@ HRESULT CLD_EventObject::Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex, MES
 		Ctx.eKind = eKind;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  return S_OK;
 
-		if (Result.bSkipMesh)
-			return S_OK;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 	}
 

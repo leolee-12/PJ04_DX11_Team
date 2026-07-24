@@ -3,6 +3,7 @@
 #include "GameInstance_Proxy.h"
 #include "Model.h"
 #include "Shader.h"
+#include "Transform.h"
 #include "CullingState.h"
 
 NS_BEGIN(Client)
@@ -49,6 +50,40 @@ HRESULT MeshLayerBinder::Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIN
 	default:
 		return E_FAIL;
 	}
+}
+
+HRESULT MeshLayerBinder::Bind_OrSkip(const MESH_LAYER_BIND_CONTEXT& Ctx, _uint* pOutPass)
+{
+	if (nullptr == pOutPass)
+		return E_FAIL;
+
+	MESH_LAYER_BIND_RESULT Result{};
+	const HRESULT hrBind = Bind(Ctx, &Result);
+	if (FAILED(hrBind))
+		return hrBind;
+
+	if (Result.bSkipMesh)
+		return S_FALSE;
+
+	*pOutPass = Result.iPass;
+	return S_OK;
+}
+
+HRESULT MeshLayerBinder::Bind_WorldViewProj(CShader* pShader, CTransform* pTransform, CGameInstance_Proxy* pGI_Proxy, PROJ_TYPE eProjType)
+{
+	if (nullptr == pShader || nullptr == pTransform || nullptr == pGI_Proxy)
+		return E_FAIL;
+
+	if (FAILED(pTransform->Bind_ShaderResource(pShader, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_Matrix("g_ViewMatrix", pGI_Proxy->Get_Matrix(D3DTS::VIEW, eProjType))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_Matrix("g_ProjMatrix", pGI_Proxy->Get_Matrix(D3DTS::PROJ, eProjType))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT MeshLayerBinder::Bind_TextureSafe(CShader* pShader, CModel* pModel, CGameInstance_Proxy* pGI_Proxy,

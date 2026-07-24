@@ -306,14 +306,12 @@ HRESULT CEnv_InstanceBatch::Render_Instanced()
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  continue;
 
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))
@@ -398,13 +396,12 @@ HRESULT CEnv_InstanceBatch::Render_Decal_Instanced()
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::DECAL;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DECAL);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-		if (Result.bSkipMesh)
-			continue;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  continue;
 
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))
 			return E_FAIL;
@@ -453,14 +450,12 @@ HRESULT CEnv_InstanceBatch::Render_Shadow_Instanced()
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::SHADOW);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  continue;
 
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))

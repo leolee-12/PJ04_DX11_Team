@@ -23,6 +23,11 @@ namespace
 	constexpr _float s_fInhaleMouthUp = 0.6f;
 	constexpr _float s_fInhaleActivationGraceTime = 0.25f;
 
+	constexpr _float s_fHealAmountLv1 = 10.f;
+	constexpr _float s_fHealAmountLv2 = 20.f;
+	constexpr _float s_fHealAmountLv3 = 30.f;
+
+
 	constexpr const _tchar* ITEM_EFFECT_ID = L"ItemEffect";
 
 	struct LD_FOOD_CATALOG
@@ -35,12 +40,24 @@ namespace
 
 	static const LD_FOOD_CATALOG g_FoodCatalog[] =
 	{
-		{ L"EnergyDrink", CLevelDesign_Food::ENERGY_DRINK_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/EnergyDrink.ysh", 10.f },
-		{ L"DinnerRoastChicken", CLevelDesign_Food::DINNER_ROAST_CHICKEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/RoastChicken.ysh", 10.f },
-		{ L"FruitCherry", CLevelDesign_Food::FRUIT_CHERRY_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Cherry.ysh", 10.f },
-		{ L"VegetableCarrot", CLevelDesign_Food::VEGETABLE_CARROT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Carrot.ysh", 10.f },
-		{ L"SweetsDoughnut", CLevelDesign_Food::SWEETS_DOUGHNUT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Doughnut.ysh", 10.f },
-		{ L"FruitBanana", CLevelDesign_Food::FRUIT_BANANA_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Banana.ysh", 10.f }
+		{ L"EnergyDrink", L"Proto_Component_Model_Food_EnergyDrink", "../../Resources/Map/Gimmick/NonAnim/Food/EnergyDrink.ysh", s_fHealAmountLv3 },
+		{ L"DinnerRoastChicken", L"Proto_Component_Model_Food_RoastChicken", "../../Resources/Map/Gimmick/NonAnim/Food/RoastChicken.ysh", s_fHealAmountLv3 },
+		{ L"FruitCherry", L"Proto_Component_Model_Food_Cherry", "../../Resources/Map/Gimmick/NonAnim/Food/Cherry.ysh", s_fHealAmountLv1 },
+		{ L"VegetableCarrot", L"Proto_Component_Model_Food_Carrot", "../../Resources/Map/Gimmick/NonAnim/Food/Carrot.ysh", s_fHealAmountLv1 },
+		{ L"SweetsDoughnut", L"Proto_Component_Model_Food_Doughnut", "../../Resources/Map/Gimmick/NonAnim/Food/Doughnut.ysh", s_fHealAmountLv2 },
+		{ L"FruitBanana", L"Proto_Component_Model_Food_Banana", "../../Resources/Map/Gimmick/NonAnim/Food/Banana.ysh", s_fHealAmountLv1 },
+		{ L"VegetablePumpkin", L"Proto_Component_Model_Food_Pumpkin", "../../Resources/Map/Gimmick/NonAnim/Food/Pumpkin.ysh", s_fHealAmountLv1 },
+		{ L"DinnerSushi", L"Proto_Component_Model_Food_Sushi", "../../Resources/Map/Gimmick/NonAnim/Food/Sushi.ysh", s_fHealAmountLv3 },
+		{ L"FruitMelon", L"Proto_Component_Model_Food_Melon", "../../Resources/Map/Gimmick/NonAnim/Food/Melon.ysh", s_fHealAmountLv2 },
+		{ L"LightFriedegg", L"Proto_Component_Model_Food_Friedegg", "../../Resources/Map/Gimmick/NonAnim/Food/Friedegg.ysh", s_fHealAmountLv2 },
+		{ L"DinnerSteak", L"Proto_Component_Model_Food_Steak", "../../Resources/Map/Gimmick/NonAnim/Food/Steak.ysh", s_fHealAmountLv3 },
+		{ L"VegetableGreenpepper", L"Proto_Component_Model_Food_Greenpepper", "../../Resources/Map/Gimmick/NonAnim/Food/Greenpepper.ysh", s_fHealAmountLv1 },
+		{ L"SweetsIceCandy", L"Proto_Component_Model_Food_IceCandy", "../../Resources/Map/Gimmick/NonAnim/Food/IceCandy.ysh", s_fHealAmountLv2 },
+		{ L"CupJuiceMall", L"Proto_Component_Model_Food_CupJuiceMall", "../../Resources/Map/Gimmick/NonAnim/Food/CupJuiceMall.ysh", s_fHealAmountLv2 },
+		{ L"CupJuicePark", L"Proto_Component_Model_Food_CupJuicePark", "../../Resources/Map/Gimmick/NonAnim/Food/CupJuicePark.ysh", s_fHealAmountLv2 },
+		{ L"SweetsSoftCream", L"Proto_Component_Model_Food_SoftCream", "../../Resources/Map/Gimmick/NonAnim/Food/SoftCream.ysh", s_fHealAmountLv3 },
+		{ L"DinnerOnigiri", L"Proto_Component_Model_Food_Onigiri", "../../Resources/Map/Gimmick/NonAnim/Food/Onigiri.ysh", s_fHealAmountLv2 },
+		{ L"JunkPopcorn", L"Proto_Component_Model_Food_Popcorn", "../../Resources/Map/Gimmick/NonAnim/Food/Popcorn.ysh", s_fHealAmountLv2 }
 	};
 
 	static const LD_FOOD_CATALOG* Find_FoodCatalog(const _wstring& wstrObjName)
@@ -348,13 +365,7 @@ void CLevelDesign_Food::Release_Effect()
 
 HRESULT CLevelDesign_Food::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+	if (FAILED(MeshLayerBinder::Bind_WorldViewProj(m_pShaderCom, m_pTransformCom, m_pGameInstance_Proxy, m_eProjType)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
@@ -383,14 +394,12 @@ HRESULT CLevelDesign_Food::Render_Model()
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
+		_uint iPass = 0u;
+		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+		if (FAILED(hrBind))     return E_FAIL;
+		if (S_FALSE == hrBind)  continue;
 
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;

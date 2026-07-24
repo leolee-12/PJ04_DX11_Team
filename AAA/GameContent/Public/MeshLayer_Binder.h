@@ -4,6 +4,7 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
+class CTransform;
 class CCullingState; 
 class CGameInstance_Proxy;
 NS_END
@@ -61,6 +62,11 @@ struct MESH_LAYER_BIND_RESULT
 namespace MeshLayerBinder
 {
 	HRESULT Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
+
+	// S_OK: *pOutPass 유효 / S_FALSE: 메시 스킵 / 실패: 바인딩 실패
+	HRESULT Bind_OrSkip(const MESH_LAYER_BIND_CONTEXT& Ctx, _uint* pOutPass);
+
+	HRESULT Bind_WorldViewProj(CShader* pShader, CTransform* pTransform, CGameInstance_Proxy* pGI_Proxy, PROJ_TYPE eProjType);
 
 	HRESULT Bind_TextureSafe(CShader* pShader, CModel* pModel, CGameInstance_Proxy* pGI_Proxy,
 		_uint iMesh, const _char* pConstantName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefaultKind);

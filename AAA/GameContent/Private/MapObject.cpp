@@ -125,14 +125,12 @@ HRESULT CMapObject::Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride)
 	Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 	Ctx.iFallbackPass = ETOI(MAP_DEFAULT_PASS);
 
-	MESH_LAYER_BIND_RESULT Result{};
-	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-		return E_FAIL;
+	_uint iPass = 0u;
+	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+	if (FAILED(hrBind))     return E_FAIL;
+	if (S_FALSE == hrBind)  return S_OK;
 
-	if (Result.bSkipMesh)
-		return S_OK;
-
-	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+	if (FAILED(m_pShaderCom->Begin(iPass)))
 		return E_FAIL;
 	if (FAILED(m_pModelCom->Render(iMesh)))
 		return E_FAIL;

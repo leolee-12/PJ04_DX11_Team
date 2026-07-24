@@ -1,6 +1,7 @@
 #include "LD_WaterArea.h"
 #include "GameContent_const.h"
 #include "LevelDesign_Registry.h"
+#include "MeshLayer_Binder.h"
 #include "Water_RenderBinder.h"
 
 #include "GameInstance.h"
@@ -340,13 +341,7 @@ HRESULT CLD_WaterArea::Ready_RenderComponents()
 
 HRESULT CLD_WaterArea::Bind_ShaderResources()
 {
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+    if (FAILED(MeshLayerBinder::Bind_WorldViewProj(m_pShaderCom, m_pTransformCom, m_pGameInstance_Proxy, m_eProjType)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))

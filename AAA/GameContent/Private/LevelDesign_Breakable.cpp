@@ -232,6 +232,9 @@ HRESULT CLevelDesign_Breakable::Render()
 
 		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
 		{
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+
 			MESH_LAYER_BIND_CONTEXT Ctx{};
 			Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
 			Ctx.iMesh = i;
@@ -240,17 +243,12 @@ HRESULT CLevelDesign_Breakable::Render()
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
-			MESH_LAYER_BIND_RESULT Result{};
-			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-				return E_FAIL;
+			_uint iPass = 0u;
+			const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+			if (FAILED(hrBind))     return E_FAIL;
+			if (S_FALSE == hrBind)  continue;
 
-			if (Result.bSkipMesh)
-				continue;
-
-			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-				return E_FAIL;
-
-			if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+			if (FAILED(m_pShaderCom->Begin(iPass)))
 				return E_FAIL;
 		}
 		else
@@ -263,14 +261,12 @@ HRESULT CLevelDesign_Breakable::Render()
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
-			MESH_LAYER_BIND_RESULT Result{};
-			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-				return E_FAIL;
+			_uint iPass = 0u;
+			const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+			if (FAILED(hrBind))     return E_FAIL;
+			if (S_FALSE == hrBind)  continue;
 
-			if (Result.bSkipMesh)
-				continue;
-
-			if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+			if (FAILED(m_pShaderCom->Begin(iPass)))
 				return E_FAIL;
 		}
 
@@ -587,13 +583,7 @@ void CLevelDesign_Breakable::Release_RigidStatic()
 
 HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+	if (FAILED(MeshLayerBinder::Bind_WorldViewProj(m_pShaderCom, m_pTransformCom, m_pGameInstance_Proxy, m_eProjType)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))

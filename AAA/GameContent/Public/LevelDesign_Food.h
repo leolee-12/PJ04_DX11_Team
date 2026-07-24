@@ -17,12 +17,6 @@ class CLevelDesign_Food : public CLevelDesignObject
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Food";
-	static constexpr const _tchar* ENERGY_DRINK_MODEL_PROTO_TAG = L"Proto_Component_Model_Food_EnergyDrink";
-	static constexpr const _tchar* DINNER_ROAST_CHICKEN_MODEL_PROTO_TAG = L"Proto_Component_Model_Food_RoastChicken";
-	static constexpr const _tchar* FRUIT_CHERRY_MODEL_PROTO_TAG = L"Proto_Component_Model_Food_Cherry";
-	static constexpr const _tchar* VEGETABLE_CARROT_MODEL_PROTO_TAG = L"Proto_Component_Model_Food_Carrot";
-	static constexpr const _tchar* SWEETS_DOUGHNUT_MODEL_PROTO_TAG = L"Proto_Component_Model_Food_Doughnut";
-	static constexpr const _tchar* FRUIT_BANANA_MODEL_PROTO_TAG = L"Proto_Component_Model_Food_Banana";
 
 private:
 	CLevelDesign_Food(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
