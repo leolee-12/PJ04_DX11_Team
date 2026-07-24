@@ -29,9 +29,28 @@ HRESULT CKirby_ToyHammer::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    if (FAILED(Ready_HitBox()))
+        return E_FAIL;
+
     m_pAnimatorCom->Play("Reset", true, true);
 
     return S_OK;
+}
+
+void CKirby_ToyHammer::Late_Update(_float fTimeDelta)
+{
+    __super::Late_Update(fTimeDelta);
+
+    if (!m_bOn)
+        return;
+
+    if (m_pHitBox && m_pHitBox->Is_Enabled())
+    {
+        m_pHitBox->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+#ifdef _DEBUG
+        m_pGameInstance_Proxy->Add_DebugComponent(m_pHitBox);
+#endif
+    }
 }
 
 HRESULT CKirby_ToyHammer::Render()
@@ -88,6 +107,94 @@ void CKirby_ToyHammer::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
     }
 }
 
+void CKirby_ToyHammer::Begin_Hit(const ATTACK_INFO& tInfo, _bool bResetHitList)
+{
+    m_tAttackInfo = tInfo;
+
+    if (m_tAttackInfo.pAttacker == nullptr)
+        m_tAttackInfo.pAttacker = this;
+
+    if (bResetHitList)
+        Reset_DamagedList();
+
+    Set_HitBox(true);
+}
+
+void CKirby_ToyHammer::End_Hit(_bool bResetHitList)
+{
+    if (bResetHitList)
+        Reset_DamagedList();
+
+    Set_HitBox(false);
+}
+
+void CKirby_ToyHammer::Set_HitBox(_bool bOn)
+{
+    m_pHitBox->Set_Enabled(bOn);
+}
+
+void CKirby_ToyHammer::Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType)
+{
+    CCollider::COLLIDER_DESC tDesc{};
+    tDesc.pOwner = this;
+    tDesc.vRadians = { 0.f, 0.f, XMConvertToRadians(-90.f) };
+
+    switch (eHitBoxType)
+    {
+        case TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK:
+            tDesc.vCenter = { -1.105f, -0.002f, -1.843f };
+            tDesc.fRadius = 1.11f;
+            tDesc.fHeight = 0.f;
+            break;
+
+        case TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK_FINAL:
+            tDesc.vCenter = { -1.183f, -0.004f, -1.761f };
+            tDesc.fRadius = 1.18f;
+            tDesc.fHeight = 0.f;
+            break;
+
+        case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_1:
+            tDesc.vCenter = { -0.912f, -0.002f, -1.006f };
+            tDesc.fRadius = 0.63f;
+            tDesc.fHeight = 0.58f;
+            break;
+
+        case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_2:
+            tDesc.vCenter = { -1.131f, -0.002f, -1.497f };
+            tDesc.fRadius = 0.79f;
+            tDesc.fHeight = 0.68f;
+            break;
+
+        case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_3:
+            tDesc.vCenter = { -1.809f, -0.012f, -2.163f };
+            tDesc.fRadius = 1.26f;
+            tDesc.fHeight = 1.1f;
+            break;
+
+        case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_4:
+            tDesc.vCenter = { -0.68f, -0.001f, -0.5f };
+            tDesc.fRadius = 0.63f;
+            tDesc.fHeight = 0.1f;
+            break;
+
+        case TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER:
+            tDesc.vCenter = { -1.315f, -0.004f, -1.682f };
+            tDesc.fRadius = 0.94f;
+            tDesc.fHeight = 0.87f;
+            break;
+
+        case TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER_FALL:
+            tDesc.vCenter = { -1.31f, -0.002f, -1.618f };
+            tDesc.fRadius = 0.91f;
+            tDesc.fHeight = 0.8f;
+            break;
+        default:
+            return;
+    }
+
+    m_pHitBox->Reset_Bounding(tDesc);
+}
+
 HRESULT CKirby_ToyHammer::Ready_Components()
 {
     KIRBY_PART_COMPONENT_DESC tDesc{};
@@ -99,6 +206,57 @@ HRESULT CKirby_ToyHammer::Ready_Components()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CKirby_ToyHammer::Ready_HitBox()
+{
+    CCollider::COLLIDER_DESC desc{};
+    desc.pOwner = this;
+    desc.vCenter = { -1.81f, -0.01f, -2.f };
+    desc.fRadius = 1.1f;
+    desc.fHeight = 1.1f;
+    desc.vRadians = { 0.f, 0.f, XMConvertToRadians(-90.f) };
+
+    m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("HitBox_Com"), &desc);
+
+    if (m_pHitBox == nullptr)
+        return E_FAIL;
+
+    SetUp_HitBox_Callback();
+    m_pHitBox->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::PLAYER_HIT));
+
+    return S_OK;
+}
+
+void CKirby_ToyHammer::SetUp_HitBox_Callback()
+{
+    m_pHitBox->Set_OnEnter([this](CCollider* pOther)
+        {
+            CGameObject* pTarget = pOther->Get_Owner();
+            if (pTarget == nullptr)
+                return;
+
+            if (m_DamagedTargets.count(pTarget) > 0)
+                return;
+
+            IDamageable* pDamageable = dynamic_cast<IDamageable*>(pTarget);
+            if (pDamageable == nullptr)
+                return;
+
+            ATTACK_INFO tDesc = m_tAttackInfo;
+            tDesc.pAttacker = this;
+            tDesc.vAttackerPos = {
+                m_pParentMatrix->_41,
+                m_pParentMatrix->_42,
+                m_pParentMatrix->_43
+            };
+
+            pDamageable->Damaged(tDesc);
+
+            m_DamagedTargets.insert(pTarget);
+        }
+    );
 }
 
 CKirby_ToyHammer* CKirby_ToyHammer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -28,7 +28,7 @@ void CMonster_State_Death::Enter(MONSTER_STATE_TYPE ePrevState)
 	}
 
 	// 죽음 진입 -> 히트박스/컨트롤러 off
-	m_pOwner->Enable_Colliders(false);
+	//m_pOwner->Enable_Colliders(false);
 }
 
 void CMonster_State_Death::Update(_float fTimeDelta)

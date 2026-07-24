@@ -216,9 +216,6 @@ void CKirby_Sword::SetUp_HitBox_Callback()
             pDamageable->Damaged(tDesc);
 
             m_DamagedTargets.insert(pTarget);   
-#ifdef _DEBUG
-            OutputDebugStringA("[Kirby_Sword] HIT Somthing!\n");
-#endif
         }
     );
 }

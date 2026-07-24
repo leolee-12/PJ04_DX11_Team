@@ -19,7 +19,6 @@ private:
 
     enum class CHARGE_LEVEL { LV1, LV2, LV3, LV4 };
 
-private:
     enum class CHARGE_ANI_STATE { NONE, WAIT, MOVE, JUMP_START, AIR, JUMP_END };
 
 private:
@@ -44,6 +43,8 @@ public:
 
 public:
     virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+    virtual _bool Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase) override;
 
 private:
     TOY_HAMMER_STATE m_eToyHammerState{ TOY_HAMMER_STATE::TOY_HAMER_STATE_END };

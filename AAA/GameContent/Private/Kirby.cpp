@@ -987,6 +987,9 @@ HRESULT CKirby::SetUp_Collider_Callback()
                 if (pMonster == nullptr)
                     return;
 
+                if(pMonster->IsDead())
+                    return;
+
                 if (!pMonster->Is_Touch_Harmful())
                     return;
 
