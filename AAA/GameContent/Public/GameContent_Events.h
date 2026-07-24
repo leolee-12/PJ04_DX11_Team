@@ -177,7 +177,7 @@ namespace Client
 #pragma endregion
 
 #pragma region 카메라관련 
-    enum class ECutsceneCam { Cutscene, Boss, Area };
+    enum class ECutsceneCam { Cutscene, Boss, Area, Coaster };
 
     struct CAMERA_SHAKE_DESC
     {

@@ -45,6 +45,10 @@ void CKirby_Deform_RollerCoaster::Enter_Deform(CKirby* pKirby)
     tHurtDesc.fRadius = fRadius + CKirby::s_fHurtBoxRadiusPadding;
     tHurtDesc.fHeight = fHeight;
     pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
+
+    CUTSCENE_CAMERA_DESC camDesc{};
+    camDesc.eCam = ECutsceneCam::Coaster;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &camDesc);
 }
 
 void CKirby_Deform_RollerCoaster::Exit_Deform(CKirby* pKirby)
@@ -56,6 +60,10 @@ void CKirby_Deform_RollerCoaster::Exit_Deform(CKirby* pKirby)
     tHurtDesc.fRadius = CKirby::s_fCCT_Radius + CKirby::s_fHurtBoxRadiusPadding;
     tHurtDesc.fHeight = CKirby::s_fCCT_Height;
     pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
+
+    CUTSCENE_CAMERA_DESC camDesc{};
+    camDesc.eCam = ECutsceneCam::Area;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &camDesc);
 }
 
 void CKirby_Deform_RollerCoaster::Enter_AttackState(CKirby* pKirby, _int iFlag)

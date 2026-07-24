@@ -39,6 +39,17 @@ public:
         if (fFovyRad > 0.f)
             m_fFovCurDeg = XMConvertToDegrees(fFovyRad);  
     }
+    void Snap()
+    {
+        m_bInit = false;
+        m_lastArea = -1;
+        m_blendTimer = 0.f;
+        m_eyeVel = {};
+        m_atVel = {};
+        m_fFovCurDeg = -1.f;
+        m_transWeight = 0.f;
+        m_solver.Snap();
+    }
 
     void Rearrange(const wstring& strDataPath);
 

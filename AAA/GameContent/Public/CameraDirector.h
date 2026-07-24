@@ -8,6 +8,7 @@ class CCamera_AreaCam;
 class CCamera_Cutscene;
 class CCamera_Boss;
 class CCamera_Dialogue;
+class CCamera_Coaster;
 
 class CLIENT_DLL CCameraDirector final : public CGameObject
 {
@@ -43,6 +44,7 @@ private:
     CCamera_Cutscene* m_pCutCam = { nullptr };
     CCamera_Boss* m_pBossCam = { nullptr };
     CCamera_Dialogue* m_pDlgCam = { nullptr };
+    CCamera_Coaster* m_pCoasterCam = { nullptr };
 
     static CCameraDirector* s_pActiveDirector;
 

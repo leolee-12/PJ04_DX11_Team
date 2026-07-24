@@ -1818,6 +1818,9 @@
     <ClInclude Include="..\public\Camera_Boss.h">
       <Filter>00. GameObject\00. Camera\Shakeable\BossCam</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_Coaster.h">
+      <Filter>00. GameObject\00. Camera\Shakeable\CoasterCam</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Camera_Cutscene.h">
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClInclude>
@@ -3319,6 +3322,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Boss.cpp">
       <Filter>00. GameObject\00. Camera\Shakeable\BossCam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Coaster.cpp">
+      <Filter>00. GameObject\00. Camera\Shakeable\CoasterCam</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Cutscene.cpp">
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>

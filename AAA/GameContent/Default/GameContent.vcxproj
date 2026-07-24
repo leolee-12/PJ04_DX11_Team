@@ -49,6 +49,7 @@
     <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h" />
     <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
+    <ClInclude Include="..\public\Camera_Coaster.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
     <ClInclude Include="..\Public\Dekabu_Brain.h" />
@@ -554,6 +555,7 @@
     <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp" />
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\private\Camera_Coaster.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
     <ClCompile Include="..\private\Excalibur.cpp" />
