@@ -49,6 +49,7 @@
     <ClInclude Include="..\public\Boss_Metaknight_ReplicaSword.h" />
     <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
+    <ClInclude Include="..\public\Camera_Coaster.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
     <ClInclude Include="..\Public\Dekabu_Brain.h" />
@@ -313,7 +314,11 @@
     <ClInclude Include="..\public\Projectile_Boulder.h" />
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
+    <ClInclude Include="..\public\UI_AbilityDiscard.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
+    <ClInclude Include="..\public\UI_CurtainFadeOut.h" />
+    <ClInclude Include="..\public\UI_CurtainStamp.h" />
+    <ClInclude Include="..\public\UI_CurtainStatic.h" />
     <ClInclude Include="..\public\UI_CutFade.h" />
     <ClInclude Include="..\public\UI_Dialogue.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
@@ -509,6 +514,7 @@
     <ClInclude Include="..\Public\UI_Title.h" />
     <ClInclude Include="..\public\UI_LetterBox.h" />
     <ClInclude Include="..\public\UI_TitleLogo.h" />
+    <ClInclude Include="..\public\UI_UIFadeOut.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\VanishEffect.h" />
@@ -551,6 +557,7 @@
     <ClCompile Include="..\private\Boss_Metaknight_ReplicaSword.cpp" />
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\private\Camera_Coaster.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
     <ClCompile Include="..\private\Excalibur.cpp" />
@@ -811,7 +818,11 @@
     <ClCompile Include="..\private\Projectile_Boulder.cpp" />
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
+    <ClCompile Include="..\private\UI_AbilityDiscard.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
+    <ClCompile Include="..\private\UI_CurtainFadeOut.cpp" />
+    <ClCompile Include="..\private\UI_CurtainStamp.cpp" />
+    <ClCompile Include="..\private\UI_CurtainStatic.cpp" />
     <ClCompile Include="..\private\UI_CutFade.cpp" />
     <ClCompile Include="..\private\UI_Dialogue.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
@@ -983,6 +994,7 @@
     <ClCompile Include="..\Private\UI_Title.cpp" />
     <ClCompile Include="..\Private\UI_LetterBox.cpp" />
     <ClCompile Include="..\Private\UI_TitleLogo.cpp" />
+    <ClCompile Include="..\private\UI_UIFadeOut.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\VanishEffect.cpp" />

@@ -75,6 +75,17 @@ void CUI_MissionPanel::Play_Success()
     m_eSuccess = ESUCCESS::SHAKING;
 }
 
+_bool CUI_MissionPanel::Is_Busy() const
+{
+    if (m_eSuccess == ESUCCESS::SHAKING)
+        return true;
+
+    if (auto* pAnim = Get_UIAnimatorCom())
+        return pAnim->Is_Bouncing(PART_WADDLE) || pAnim->Is_Fading(PART_WADDLE);
+
+    return false;
+}
+
 void CUI_MissionPanel::On_Deserialized()
 {
     __super::On_Deserialized();

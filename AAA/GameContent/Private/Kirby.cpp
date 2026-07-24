@@ -422,11 +422,28 @@ void CKirby::Apply_ChangeKirbyAbility()
 
 void CKirby::Update_DumpCool(_float fTimeDelta)
 {
-    if (m_bDecreaseDumpCool == true)
+    if (m_bCurDecreaseDumpCool != m_bPreDecreaseDumpCool)
+    {
+        if (m_bCurDecreaseDumpCool)
+        {
+            ABILITY_DISCARD_BIND_DESC d{};
+            d.pCoolTime = &m_fAccDumpCoolTime;
+            d.fMaxCoolTime = m_fMaxDumpCoolTime;
+
+            if(Has_Deform())
+                d.bIsAbility = false;
+
+            m_pGameInstance_Proxy->Publish(EventTag::AbilityDiscardUI_Bind, &d);
+        }
+
+        m_bPreDecreaseDumpCool = m_bCurDecreaseDumpCool;
+    }
+
+    if (m_bCurDecreaseDumpCool == true)
     {
         m_fAccDumpCoolTime -= fTimeDelta;
 
-        m_bDecreaseDumpCool = false;
+        m_bCurDecreaseDumpCool = false;
     }
     else
     {

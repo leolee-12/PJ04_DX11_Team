@@ -189,6 +189,15 @@ void CPanel_UICanvas::Render()
         if (sel.pContainer && ImGui::MenuItem("CurtainTexture"))
             AddPart(UI_PART_TYPE::TEXTURECURTAIN);
 
+        if (sel.pContainer && ImGui::MenuItem("CurtainStatic"))
+            AddPart(UI_PART_TYPE::STATICCURTAIN);
+
+        if (sel.pContainer && ImGui::MenuItem("CurtainStamp"))
+            AddPart(UI_PART_TYPE::STAMPCURTAIN);
+
+        if (sel.pContainer && ImGui::MenuItem("CurtainFadeOut"))
+            AddPart(UI_PART_TYPE::FADEOUTCURTAIN);
+
         ImGui::EndPopup();
     }
 

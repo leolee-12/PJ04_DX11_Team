@@ -73,6 +73,7 @@ public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_UI_GaugeFill";
     static constexpr _uint SHADER_PASS_GAUGE_FILL_COLOR = { ETOUI(UI_EFFECT_PASS::GAUGE_FILL_COLOR) };
     static constexpr _uint SHADER_PASS_GAUGE_FILL_TEXTURE = { ETOUI(UI_EFFECT_PASS::GAUGE_FILL_TEXTURE) };
+    static constexpr _uint SHADER_PASS_GAUGE_FILL_RADIAL = { ETOUI(UI_EFFECT_PASS::GAUGE_FILL_RADIAL) };
 
 protected:
     CUI_GaugeFill(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

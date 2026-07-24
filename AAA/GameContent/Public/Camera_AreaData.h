@@ -57,6 +57,7 @@ public:
     const vector<CAM_RAIL>& Rails() const { return m_rails; }
     const vector<CAM_AREA>& Areas() const { return m_areas; }
     void Clear() { m_rails.clear(); m_areas.clear(); m_curArea = -1; m_scrollInit = false; }
+    void Snap() { m_scrollInit = false; m_curArea = -1; m_curT = 0.f; }
 
     void   Set_GazeOverride(_fvector vPos, _bool bValid) {
         XMStoreFloat3(&m_gazeOverride, vPos); 

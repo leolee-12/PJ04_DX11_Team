@@ -24,6 +24,8 @@
 #include "UI_CutFade.h"
 #include "UI_Dialogue.h"
 #include "UI_QTE.h"
+#include "UI_UIFadeOut.h"
+#include "UI_AbilityDiscard.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -36,6 +38,9 @@
 #include "UI_Eraser.h"
 #include "UI_SpriteAnimCurtain.h"
 #include "UI_CurtainTexture.h"
+#include "UI_CurtainStatic.h"
+#include "UI_CurtainStamp.h"
+#include "UI_CurtainFadeOut.h"
 
 // Kirby
 #include "Kirby.h"
@@ -410,6 +415,9 @@ void CGameObject_Factory::Register_UI()
     Register(CUI_Eraser::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_Eraser), LOADER());
     Register(CUI_SpriteAnimCurtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_SpriteAnimCurtain), LOADER());
     Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainTexture), LOADER());
+    Register(CUI_CurtainStatic::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainStatic), LOADER());
+    Register(CUI_CurtainStamp::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainStamp), LOADER());
+    Register(CUI_CurtainFadeOut::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainFadeOut), LOADER());
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -861,6 +869,8 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_CutFade::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_CutFade), LOADER());
     Register(CUI_Dialogue::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_Dialogue), LOADER());
     Register(CUI_QTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_QTE), LOADER());
+    Register(CUI_UIFadeOut::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_UIFadeOut), LOADER());
+    Register(CUI_AbilityDiscard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_AbilityDiscard), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
