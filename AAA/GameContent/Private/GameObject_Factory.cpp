@@ -252,6 +252,8 @@
 #include "LeoJump_Smoke.h"
 #include "Assault_Smoke.h"
 
+#include "Meta_IntroLocking.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
@@ -436,9 +438,9 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CTestContainer::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_ChargeNoise.iLevelID, Texture_ChargeNoise.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_ChargeNoise.szFileTag,
-                    Texture_ChargeNoise.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_TestNormal.iLevelID, Texture_TestNormal.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_TestNormal.szFileTag,
+                    Texture_TestNormal.iNumTex));
         )
     );
 }
@@ -1593,6 +1595,7 @@ void CGameObject_Factory::Register_BossEffect()
     Gorilla_Effect();
     Armadillo_Effect();
     Leopard_Effect();
+    Metaknight_Effect();
 }
 
 void CGameObject_Factory::Register_Bubble()
@@ -2130,6 +2133,24 @@ void CGameObject_Factory::Leopard_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CAssault_Smoke::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
+        )
+    );
+}
+
+void CGameObject_Factory::Metaknight_Effect()
+{
+    Register(CMeta_IntroLocking::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_IntroLocking),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Flash1.iLevelID, Texture_Meta_Flash1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Flash1.szFileTag, Texture_Meta_Flash1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Ring1.iLevelID, Texture_Meta_Ring1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Ring1.szFileTag, Texture_Meta_Ring1.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_IntroLocking::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_IntroLocking::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
         )
     );
 }

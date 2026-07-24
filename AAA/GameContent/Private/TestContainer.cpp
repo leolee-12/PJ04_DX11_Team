@@ -57,8 +57,8 @@ HRESULT CTestContainer::Ready_EffectPartObjects()
 	DistortionDesc.iModelLevel = m_iPrototypeLevel;
 	DistortionDesc.wstrModelTag = MODEL_PROTO_TAG;
 	DistortionDesc.bUseTextureCom = true;
-	DistortionDesc.iTextureLevel = Texture_ChargeNoise.iLevelID;
-	DistortionDesc.wstrTextureTag = Texture_ChargeNoise.szProtoTag;
+	DistortionDesc.iTextureLevel = Texture_TestNormal.iLevelID;
+	DistortionDesc.wstrTextureTag = Texture_TestNormal.szProtoTag;
 
 	if (FAILED(Add_Effect_PartObject(
 		m_iPrototypeLevel,
