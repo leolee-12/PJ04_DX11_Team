@@ -33,6 +33,7 @@ namespace Client
         inline constexpr const _tchar* Kirby_Name_Updated = L"Kirby.NameUpdated";
         inline constexpr const _tchar* Kirby_Ability_Changed = L"Kirby.AbilityChanged";
         inline constexpr const _tchar* Swallowed = L"OnSwallowed";
+        inline constexpr const _tchar* AbilityDiscardUI_Bind = L"AbilityDiscardUI.Bind";
 
         // º¸½º
         inline constexpr const _tchar* Boss_HP_Appeared = L"Boss.HPAppeared";
@@ -245,6 +246,13 @@ namespace Client
         _float fMaxHP = { 100.f };
         _float fCurrHp = { 100.f };
         _bool  bSnap = { false };
+    };
+
+    struct ABILITY_DISCARD_BIND_DESC
+    {
+        const _float* pCoolTime = { nullptr };
+        _float        fMaxCoolTime = { 0.5f };
+        _bool bIsAbility = { true };
     };
 #pragma endregion
 

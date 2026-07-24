@@ -315,6 +315,7 @@
     <ClInclude Include="..\public\Projectile_Boulder.h" />
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
+    <ClInclude Include="..\public\UI_AbilityDiscard.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
     <ClInclude Include="..\public\UI_CurtainFadeOut.h" />
     <ClInclude Include="..\public\UI_CurtainStamp.h" />
@@ -817,6 +818,7 @@
     <ClCompile Include="..\private\Projectile_Boulder.cpp" />
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
+    <ClCompile Include="..\private\UI_AbilityDiscard.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
     <ClCompile Include="..\private\UI_CurtainFadeOut.cpp" />
     <ClCompile Include="..\private\UI_CurtainStamp.cpp" />

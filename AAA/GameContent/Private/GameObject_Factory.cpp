@@ -25,6 +25,7 @@
 #include "UI_Dialogue.h"
 #include "UI_QTE.h"
 #include "UI_UIFadeOut.h"
+#include "UI_AbilityDiscard.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -851,6 +852,7 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_Dialogue::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_Dialogue), LOADER());
     Register(CUI_QTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_QTE), LOADER());
     Register(CUI_UIFadeOut::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_UIFadeOut), LOADER());
+    Register(CUI_AbilityDiscard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_AbilityDiscard), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
