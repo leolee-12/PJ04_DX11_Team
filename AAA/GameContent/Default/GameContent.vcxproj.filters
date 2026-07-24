@@ -19,6 +19,9 @@
     <Filter Include="00. GameObject\00. Camera\Shakeable\BossCam">
       <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\00. Camera\Shakeable\CoasterCam">
+      <UniqueIdentifier>{79f99876-4cde-4405-b10a-22fab52ea304}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\00. Camera\Shakeable\Cutscene">
       <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
     </Filter>
