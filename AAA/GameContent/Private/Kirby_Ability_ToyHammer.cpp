@@ -14,6 +14,7 @@ namespace
 {
      constexpr _float fHammerMaxHorizontalSpeed = 2.f;
      constexpr _float fAttackFinalMaxHorizontalSpeed = 12.f;
+     constexpr _float fChargeAttack3MaxHorizontalSpeed = 12.f;
 
      constexpr _float fChargeLevel2Time = 0.58f;
      constexpr _float fChargeLevel3Time = 1.4933333f;
@@ -569,11 +570,8 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                     CMovement_Child* pMovement = pKirby->Get_Movement();
                     pMovement->Set_MaxHorizontalSpeed(fAttackFinalMaxHorizontalSpeed);
 
-                    _vector vDir = pKirby->Get_Transform()->Get_State(STATE::LOOK);
-                    vDir = XMVector3Normalize(XMVectorSetY(vDir, 0.f));
+                    MoveLookDir(pKirby, 30.f);
 
-                    constexpr _float fSpeed = 30.f;
-                    pMovement->Add_Velocity(vDir * fSpeed);
                     m_bAttackFinalAddVelocity = true;
                 }
             }
@@ -655,7 +653,17 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
         {
-            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            if (AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END))
+                break;
+
+            const _float fRatio = pAnimator->Get_Progress();
+            if (fRatio >= 0.27f && fRatio <= 0.39f)
+            {
+                CMovement_Child* pMovement = pKirby->Get_Movement();
+                pMovement->Set_MaxHorizontalSpeed(fChargeAttack3MaxHorizontalSpeed);
+                MoveLookDir(pKirby, 30.f);
+            }
+
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_4:
@@ -715,7 +723,13 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
         case TOY_HAMMER_STATE::ATTACK:
         case TOY_HAMMER_STATE::ATTACK_END:
         case TOY_HAMMER_STATE::ATTACK_MISS:
+            break;
         case TOY_HAMMER_STATE::ATTACK_FINAL:
+        {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+            break;
+        }
         case TOY_HAMMER_STATE::CHARGE_START:
             break;
         case TOY_HAMMER_STATE::CHARGING:
@@ -725,8 +739,16 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_1:
         case TOY_HAMMER_STATE::CHARGE_ATTACK_2:
+        {
+            Change_ChargeAniState(pKirby, CHARGE_ANI_STATE::NONE);
+            m_fChargeTime = 0.f;
+            break;
+        }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
         {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+
             Change_ChargeAniState(pKirby, CHARGE_ANI_STATE::NONE);
             m_fChargeTime = 0.f;
             break;
@@ -782,7 +804,9 @@ void CKirby_Ability_ToyHammer::Change_ChargeAniState(CKirby* pKirby, CHARGE_ANI_
             tLayerInfo.tAnim.strAniName = "OnigorosiHammerMove";
             tLayerInfo.tAnim.bLoop = true;
             break;
-        case CHARGE_ANI_STATE::JUMP_START:
+        case CHARGE_ANI_STATE::JUMP_START:            
+            // Overlay Anim Event ¾È ºÒ¸²
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiJump.wav", 0.1f);
             tLayerInfo.tAnim.strAniName = "OnigorosiHammerJumpStart";
             tLayerInfo.tAnim.bLoop = false;
             break;
@@ -838,6 +862,14 @@ void CKirby_Ability_ToyHammer::Update_ChargeOverlayAni(CKirby* pKirby, _bool bUs
     }
 
     Change_ChargeAniState(pKirby, eNextGroundAnimation);
+}
+
+void CKirby_Ability_ToyHammer::MoveLookDir(CKirby* pKirby, _float fSpeed)
+{
+    _vector vDir = pKirby->Get_Transform()->Get_State(STATE::LOOK);
+    vDir = XMVector3Normalize(XMVectorSetY(vDir, 0.f));
+
+    pKirby->Get_Movement()->Add_Velocity(vDir * fSpeed);
 }
 
 CKirby_Ability_ToyHammer* CKirby_Ability_ToyHammer::Create()

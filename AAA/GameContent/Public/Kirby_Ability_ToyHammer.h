@@ -76,6 +76,8 @@ private:
     void Change_ChargeAniState(CKirby* pKirby, CHARGE_ANI_STATE eState);
     void Update_ChargeOverlayAni(CKirby* pKirby, _bool bUseMoveAni, _float fTimeDelta);
 
+    void MoveLookDir(CKirby* pKirby, _float fSpeed);
+
 public:
     static CKirby_Ability_ToyHammer* Create();
 private:
