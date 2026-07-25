@@ -5,6 +5,11 @@
 
 #include "Movement_Child.h"
 
+namespace
+{
+    constexpr _float fHeal = 10.f;
+}
+
 CKirby_Ability_Sleep::CKirby_Ability_Sleep()
 {
 }
@@ -136,6 +141,7 @@ void CKirby_Ability_Sleep::Enter_SleepState(CKirby* pKirby, SLEEP_STATE eState)
         {
             pAnimator->Play("Sleep", false, true, 0.1f, 1.5f);
             --m_iSleepAniCount;
+            pKirby->Add_HP(fHeal);
             break;
         }
         case SLEEP_STATE::SLEEP_END_WAKE_UP:
@@ -199,6 +205,7 @@ void CKirby_Ability_Sleep::Update_SleepState(CKirby* pKirby, _float fTimeDelta)
             {
                 pAnimator->Play("Sleep", false, true, 0.1f, 1.5f);
                 --m_iSleepAniCount;
+                pKirby->Add_HP(fHeal);
             }
             break;
         }

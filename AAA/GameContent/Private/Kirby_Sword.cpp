@@ -1,7 +1,5 @@
 #include "Kirby_Sword.h"
 
-#include "GameInstance.h"
-
 #include "Kirby.h"
 #include "Kirby_Body.h"
 
@@ -111,17 +109,23 @@ HRESULT CKirby_Sword::Render()
     return S_OK;
 }
 
-void CKirby_Sword::Put_OnBack(CKirby* pKirby, _bool bOn)
+void CKirby_Sword::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
 {
-    if (bOn)
+    switch (ePartMode)
     {
-        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("CenterL"));
-        m_pAnimatorCom->Play("Carry", true, true, 0.f);
-    }
-    else
-    {
-        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
-        m_pAnimatorCom->Play("Reset", true, true, 0.f);
+        case KIRBY_PART_MODE::BACK:
+        {
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
+            m_pAnimatorCom->Play("Carry", true, true, 0.f);
+            break;
+        }
+        case KIRBY_PART_MODE::DEFAULT:
+        default:
+        {
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
+            m_pAnimatorCom->Play("Reset", true, true, 0.f);
+            break;
+        }
     }
 }
 
@@ -212,9 +216,6 @@ void CKirby_Sword::SetUp_HitBox_Callback()
             pDamageable->Damaged(tDesc);
 
             m_DamagedTargets.insert(pTarget);   
-#ifdef _DEBUG
-            OutputDebugStringA("[Kirby_Sword] HIT Somthing!\n");
-#endif
         }
     );
 }
