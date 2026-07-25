@@ -86,6 +86,7 @@ private:
     void Gorilla_Effect();
     void Armadillo_Effect();
     void Leopard_Effect();
+    void Metaknight_Effect();
 
 public:
     virtual void Free() override;

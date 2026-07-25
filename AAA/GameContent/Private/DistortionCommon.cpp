@@ -132,6 +132,9 @@ HRESULT CDistortionCommon::Bind_DistortionResources(_float* pOutAlpha)
 		return E_FAIL;
 	if (FAILED(Bind_ViewProjectionMatrices()))
 		return E_FAIL;
+	_bool bViewSpace = !m_bBillboard;
+	m_pShaderCom->Bind_RawValue("g_bViewSpaceNormal", &bViewSpace, sizeof(_bool));
+	m_pShaderCom->Bind_RawValue("g_bFlipGreen", &m_bFlipGreen, sizeof(_bool));
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
 		return E_FAIL;
 
