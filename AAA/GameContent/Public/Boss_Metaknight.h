@@ -168,7 +168,7 @@ public:
     void Set_ParryWindow(_bool bOn);
 
     void Begin_LockingSync();
-    void Sync_LockingProgress(_float fProgress01);
+    void Sync_LockingProgress(_float fGauge01, _float fVisual01);
     void End_LockingSync();
 
     ELockOutcome Consume_LockOutcome()
@@ -270,6 +270,9 @@ private:
     _int   m_iDeathPoseDelay = { 0 };
     _float m_fDeathTimer = { 0.f };
 
+    FX_HANDLE m_SparkFxHandle{};
+    _float4x4 m_SparkAnchor{};
+
     // µð¹ö±×
     static constexpr _bool s_bSkipIntro = true;
 
@@ -279,6 +282,7 @@ private:
     void Hide_AllParts();
     void Update_PhaseTransition(_float fTimeDelta);
     void Update_Attachment();
+    void Update_SparkAnchor();
     void Enter_Locking();
     void Exit_Locking();
     void Detach_FromKirby();
