@@ -474,10 +474,10 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
             Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
             pAnimator->Play("MultiswordAttack", false, false, 0.f, 2.f);
 
-            m_bIsStartEffect[static_cast<_uint>(SWORD_EFFECT::SLASH2_1)] = false;
-            m_bIsStartEffect[static_cast<_uint>(SWORD_EFFECT::SLASH2_2)] = false;
-            m_bIsStartEffect[static_cast<_uint>(SWORD_EFFECT::SLASH2_3)] = false;
-            m_bIsStartEffect[static_cast<_uint>(SWORD_EFFECT::SLASH2_4)] = false;
+            m_bIsStartEffect[ETOUI(SWORD_EFFECT::SLASH2_1)] = false;
+            m_bIsStartEffect[ETOUI(SWORD_EFFECT::SLASH2_2)] = false;
+            m_bIsStartEffect[ETOUI(SWORD_EFFECT::SLASH2_3)] = false;
+            m_bIsStartEffect[ETOUI(SWORD_EFFECT::SLASH2_4)] = false;
             break;
         }
         case SWORD_STATE::SLASH_3:
@@ -487,7 +487,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
 
             pAnimator->Play("DecisiveSlash", false, false, 0.f, 2.f);
 
-            m_bIsStartEffect[static_cast<_uint>(SWORD_EFFECT::SLASH3)] = false;
+            m_bIsStartEffect[ETOUI(SWORD_EFFECT::SLASH3)] = false;
             break;
         }
         case SWORD_STATE::JUMP_SLASH_START:
@@ -501,7 +501,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SWORD_STATE::JUMP_SLASH:
         {
             pAnimator->Play("SwordSpin", false, false, 0.f, 1.5f);
-            m_bIsStartEffect[static_cast<_uint>(SWORD_EFFECT::JUMPSLASH)] = false;
+            m_bIsStartEffect[ETOUI(SWORD_EFFECT::JUMPSLASH)] = false;
             break;
         }
         case SWORD_STATE::SPIN_SLASH_CHARGE:
@@ -520,7 +520,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
             else if (m_eCurSwordMoveState == SWORD_MOVE_STATE::MOVE_RIGHT)
                 pAnimator->Set_Mask("ShuffleRight", szOverlayMasks, std::size(szOverlayMasks), true, 1.0f, 0.1f, 0.2f);
 
-            m_bIsStartEffect[static_cast<_uint>(SWORD_EFFECT::SPINSLASH)] = false;
+            m_bIsStartEffect[ETOUI(SWORD_EFFECT::SPINSLASH)] = false;
 
             CEffect_Loader::GetInstance()->Spawn(L"SwordChargeEffect", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
