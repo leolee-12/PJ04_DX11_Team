@@ -3,6 +3,7 @@
 #include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
+#include "World_BlendCollector.h"
 
 #include "Model.h"
 #include "GameInstance.h"
@@ -37,6 +38,8 @@ HRESULT CLD_Frame::Initialize(void* pArg)
 
 	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
+
+	Cache_BlendMeshIndices();
 
 	if (FAILED(Ready_CullingState(m_pModelCom)))
 		return E_FAIL;
@@ -76,6 +79,7 @@ void CLD_Frame::Late_Update(_float fTimeDelta)
 
 	Check_Visible();
 	Submit_RenderGroups();
+	Submit_BlendMeshes();
 }
 
 HRESULT CLD_Frame::Render()
@@ -83,7 +87,15 @@ HRESULT CLD_Frame::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	return Render_Model();
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(Render_Mesh(i, MESH_LAYER_RENDER_KIND::MAIN)))
+			return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 void CLD_Frame::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -92,6 +104,23 @@ void CLD_Frame::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 		return;
 
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
+}
+
+HRESULT CLD_Frame::Render_BlendMesh(_uint iMeshIndex)
+{
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	return Render_Mesh(iMeshIndex, MESH_LAYER_RENDER_KIND::MAIN_BLEND);
+}
+
+HRESULT CLD_Frame::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	if (FAILED(__super::Apply_EditMeshLayer(iModelSlot, iMesh, Layer)))
+		return E_FAIL;
+
+	Cache_BlendMeshIndices();
+	return S_OK;
 }
 
 void CLD_Frame::Register_LevelDesignSpecs()
@@ -105,16 +134,14 @@ void CLD_Frame::Register_LevelDesignSpecs()
 	Spec.eModelType = MODEL::NONANIM;
 	Spec.pPrototypeFactory = &Create_Prototype;
 	Spec.pBuildDesc = &Build_Desc;
-	Spec.ModelRequirements =
-	{
-			{ MODEL_PROTO_TAG, MODEL_PATH, MODEL::NONANIM, false },
-	};
+	LD_MODEL_REQUIREMENT ModelRequirement{ MODEL_PROTO_TAG, MODEL_PATH, MODEL::NONANIM, false };
+	ModelRequirement.bUseTextureHubLoader = false;
+	Spec.ModelRequirements = { ModelRequirement };
 
 	CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 }
 
-_bool CLD_Frame::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY*
-	pOutEntry)
+_bool CLD_Frame::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
 {
 	UNREFERENCED_PARAMETER(jEntry);
 
@@ -180,39 +207,65 @@ HRESULT CLD_Frame::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CLD_Frame::Render_Model()
+HRESULT CLD_Frame::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind)
 {
+	const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(iMeshIndex);
+	const _bool bUseUnknownPass =
+		0u == m_pModelCom->Get_MeshTextureCount(iMeshIndex, MTEX_TYPE::DIFFUSE)
+		&& 0u < m_pModelCom->Get_MeshTextureCount(iMeshIndex, MTEX_TYPE::UNKNOWN);
+
+	MESH_LAYER_BIND_CONTEXT Ctx{};
+	Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
+	Ctx.iMesh = iMeshIndex;
+	Ctx.pLayer = &Layer;
+	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
+	Ctx.eKind = eKind;
+	Ctx.iFallbackPass = bUseUnknownPass ? ETOUI(WORLD_PASS::UKWN) : ETOUI(WORLD_PASS::DMN);
+
+	_uint iPass = 0u;
+	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+	if (FAILED(hrBind))
+		return E_FAIL;
+	if (S_FALSE == hrBind)
+		return S_OK;
+
+	if (FAILED(m_pShaderCom->Begin(iPass)))
+		return E_FAIL;
+
+	return m_pModelCom->Render(iMeshIndex);
+}
+
+void CLD_Frame::Cache_BlendMeshIndices()
+{
+	m_BlendMeshIndices.clear();
+
+	if (nullptr == m_pModelCom)
+		return;
+
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-		const _bool bUseUnknownPass =
-			0u == m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::DIFFUSE)
-			&& 0u < m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::UNKNOWN);
-
-		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy, m_pCullingState);
-		Ctx.iMesh = i;
-		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-		Ctx.iFallbackPass = bUseUnknownPass ? ETOUI(WORLD_PASS::UKWN) : ETOUI(WORLD_PASS::DMN);
-
-		_uint iPass = 0u;
-		const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
-		if (FAILED(hrBind))
-			return E_FAIL;
-		if (S_FALSE == hrBind)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
+		if (Is_WorldBlendPass(m_pModelCom->Get_MeshLayer(i).iPass))
+			m_BlendMeshIndices.push_back(i);
 	}
+}
 
-	return S_OK;
+void CLD_Frame::Submit_BlendMeshes()
+{
+	if (!m_bVisible || m_BlendMeshIndices.empty() || nullptr == m_pModelCom)
+		return;
+
+	if (nullptr == m_pBlendCollector)
+		m_pBlendCollector = CWorld_BlendCollector::Find(m_pGameInstance_Proxy);
+
+	if (nullptr == m_pBlendCollector)
+		return;
+
+	const _float4x4* pWorld = m_pTransformCom->Get_WorldMatrixPtr();
+
+	for (_uint iMeshIndex : m_BlendMeshIndices)
+		m_pBlendCollector->Submit(this, this, m_pModelCom, pWorld, iMeshIndex);
 }
 
 CLD_Frame* CLD_Frame::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -243,6 +296,9 @@ CGameObject* CLD_Frame::Clone(void* pArg)
 
 void CLD_Frame::Free()
 {
+	m_pBlendCollector = nullptr;
+	m_BlendMeshIndices.clear();
+
 	__super::Free();
 }
 

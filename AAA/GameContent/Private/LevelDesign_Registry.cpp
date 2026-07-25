@@ -32,6 +32,8 @@
 #include "LD_BattleBoundary.h"
 #include "LD_KirbyBed.h"
 #include "LD_Frame.h"
+#include "LD_CamPivot.h"
+
 
 #include "Parsing_Utils.h"
 
@@ -358,6 +360,7 @@ void CLevelDesign_Registry::Register_GuideAudio()
 
 	CLD_AudioArea::Register_LevelDesignSpecs();
 	CLD_LensFlare::Register_LevelDesignSpecs();
+	CLD_CamPivot::Register_LevelDesignSpecs();
 }
 
 void CLevelDesign_Registry::Register_NPCs()
