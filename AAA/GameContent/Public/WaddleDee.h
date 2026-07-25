@@ -3,11 +3,13 @@
 
 NS_BEGIN(Engine)
 class CCollider;
+class CController;
+class CMovement;
 NS_END
 
 NS_BEGIN(Client)
-
 class CWaddleDee_Body;
+class CWaddleDee_Hat;
 
 class CWaddleDee final : public CCharacter
 {
@@ -48,9 +50,11 @@ private:
 	virtual void On_Deserialized() override;
 
 	HRESULT Ready_PartObjects();
+	HRESULT Ready_Movement();
 	HRESULT Ready_AnimEvents();
 	HRESULT Ready_HurtBox();
 	HRESULT Validate_Initialized();
+	void Sync_MovementStats();
 	_bool Is_Sitting() const;
 
 	void Change_State(WADDLEDEE_STATE eState);
@@ -67,11 +71,16 @@ private:
 
 private:
 	CWaddleDee_Body* m_pBody = { nullptr };
+	CWaddleDee_Hat* m_pHat = { nullptr };
 	CCollider* m_pHurtBox = { nullptr };
+	CController* m_pController = { nullptr };
+	CMovement* m_pMovement = { nullptr };
 
 	WADDLEDEE_STATE m_eState = { WADDLEDEE_STATE::IDLE };
 	_float m_fStateTimer = { 0.f };
 	_string m_strInteractClip = {};
+	_wstring m_strObjectName = {};
+	_bool m_bUseMovement = { true };
 	_wstring m_strAppliedFixedAnim = {};
 	_float m_fGreetCooldown = { 0.f };
 

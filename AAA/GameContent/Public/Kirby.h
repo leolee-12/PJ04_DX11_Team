@@ -15,6 +15,7 @@ NS_BEGIN(Client)
 
 enum class KIRBY_STATE_TYPE;
 enum class COPY_ABILITY_TYPE;
+enum class KIRBY_PART_MODE;
 
 class CKirby_InputManager;
 class CKirby_Controller;
@@ -103,7 +104,7 @@ public:
 	CKirby_OnOffPart* Find_WeaponPart(COPY_ABILITY_TYPE eType);
 	CKirby_OnOffPart* Find_HatPart(COPY_ABILITY_TYPE eType);
 
-	void Put_WeaponOnBack(_bool bOn);
+	void Set_OnOffPartMode(KIRBY_PART_MODE ePartMode);
 
 	CKirby_Body* Get_Body() { return m_pBody; }
 	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
@@ -115,6 +116,7 @@ public:
 
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);
+	void Reset_MoveDir() { m_vWishDir = {}; }
 	_bool Has_MoveDir();
 	void Set_RotationLock(_bool RotationLock) { m_RotationLock = RotationLock; }
 

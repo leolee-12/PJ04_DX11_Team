@@ -18,7 +18,11 @@ CEnvObject_Interact::CEnvObject_Interact(const CEnvObject_Interact& Prototype)
 
 HRESULT CEnvObject_Interact::Initialize_Prototype()
 {
-	return __super::Initialize_Prototype();
+	if (FAILED(__super::Initialize_Prototype()))
+		return E_FAIL;
+
+	m_iMaterialID = 0;
+	return S_OK;
 }
 
 HRESULT CEnvObject_Interact::Initialize(void* pArg)

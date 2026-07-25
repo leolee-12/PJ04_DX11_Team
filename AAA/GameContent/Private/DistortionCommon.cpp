@@ -1,6 +1,7 @@
 #include "DistortionCommon.h"
 
 #include "GameContent_const.h"
+#include "Effect_MeshCommon.h"
 #include "GameInstance.h"
 #include "Model.h"
 #include "Shader.h"
@@ -120,9 +121,12 @@ HRESULT CDistortionCommon::Bind_DistortionResources(_float* pOutAlpha)
 		nullptr == m_pModelCom)
 		return E_FAIL;
 
-	const _float4x4 WorldMatrix = m_bBillboard == true
-		? Make_BillboardWorldMatrix(m_CombinedWorldMatrix)
-		: m_CombinedWorldMatrix;
+	_float4x4 WorldMatrix = m_CombinedWorldMatrix;
+	if (m_bBillboard == true)
+	{
+		WorldMatrix = Make_BillboardWorldMatrix(m_CombinedWorldMatrix);
+		EffectMesh::Apply_BillboardRoll(WorldMatrix, m_fRoll);
+	}
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
 		return E_FAIL;

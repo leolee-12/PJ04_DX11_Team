@@ -28,6 +28,7 @@ HRESULT CKirby_ToyHat::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    m_eOffMesh = TOY_HAT_MESH::HOVERING_STRAP;
     m_pAnimatorCom->Play("Deform", true, true);
 
     return S_OK;
@@ -42,6 +43,9 @@ HRESULT CKirby_ToyHat::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        if (i == m_eOffMesh)
+            continue;
+
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
             return E_FAIL;
 
@@ -62,6 +66,25 @@ HRESULT CKirby_ToyHat::Render()
     }
 
     return S_OK;
+}
+
+void CKirby_ToyHat::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
+{
+    switch (ePartMode)
+    {
+        case KIRBY_PART_MODE::HOVERING:
+        {
+            m_eOffMesh = TOY_HAT_MESH::STRAP;
+            break;
+        }
+        case KIRBY_PART_MODE::DEFAULT:
+        default:
+        {
+            m_eOffMesh = TOY_HAT_MESH::HOVERING_STRAP;
+
+            break;
+        }
+    }
 }
 
 HRESULT CKirby_ToyHat::Ready_Components()

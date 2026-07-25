@@ -715,14 +715,6 @@ _bool CLevel_Edit::Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject,
 	return m_pMapPreviewSession->Track_EditedLevelDesignObject(pObject, Edit);
 }
 
-_bool CLevel_Edit::Clear_EditedMapPreviewLevelDesignObject(CGameObject* pObject)
-{
-	if (nullptr == m_pMapPreviewSession)
-		return false;
-
-	return m_pMapPreviewSession->Clear_EditedLevelDesignObject(pObject);
-}
-
 _bool CLevel_Edit::Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == m_pMapPreviewSession || nullptr == pObject || nullptr == pOutEdit)

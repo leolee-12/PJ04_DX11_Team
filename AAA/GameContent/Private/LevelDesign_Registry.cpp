@@ -52,17 +52,20 @@ namespace
 		static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 		Desc.eCategory = Spec.eCategory;
 
-		if (JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"TalkWaddleDee"))
+		const _string strCharaPath = "Chara." + WstrToStr(CommonDesc.strObjectName);
+		_wstring strVariation;
+		const _bool bHasVariation =
+			JsonUtils::Try_ReadString(jEntry, strCharaPath + ".Variation.VariationType", &strVariation)
+			|| JsonUtils::Try_ReadString(jEntry, strCharaPath + ".Variation.Variation", &strVariation)
+			|| JsonUtils::Try_ReadString(jEntry, strCharaPath + ".MainComponent.VariationType", &strVariation)
+			|| JsonUtils::Try_ReadString(jEntry, "Variation", &strVariation);
+
+		if (bHasVariation)
 		{
-			_wstring strVariation;
-			if (JsonUtils::Try_ReadString(jEntry, "Chara.TalkWaddleDee.Variation.VariationType", &strVariation))
-				Desc.strAIVariation = CWaddleDee::Resolve_FixedAnim(strVariation);
-		}
-		else if (JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"ArenaSpectator"))
-		{
-			_wstring strVariation;
-			if (JsonUtils::Try_ReadString(jEntry, "Variation", &strVariation))
-				Desc.strAIVariation = CWaddleDee::Resolve_FixedAnim(strVariation, CommonDesc.iUid);
+			const _uint iSeed = JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"ArenaSpectator")
+				? CommonDesc.iUid
+				: 0u;
+			Desc.strAIVariation = CWaddleDee::Resolve_FixedAnim(strVariation, iSeed);
 		}
 
 		XMStoreFloat4(&Desc.vRight, XMVectorNegate(XMLoadFloat4(&Desc.vRight)));
@@ -358,9 +361,17 @@ void CLevelDesign_Registry::Register_NPCs()
 {
 	const _tchar* ObjectNames[] =
 	{
-			L"MerchantWaddleDee",
-			L"TalkWaddleDee",
-			L"ArenaSpectator"
+		  L"MerchantWaddleDee",
+		  L"TalkWaddleDee",
+		  L"VassalWaddleDee",
+		  L"KnowledgeWaddleDee",
+		  L"PharmacyClerk",
+		  L"FoodShopClerk",
+		  L"MgameFoodClerk",
+		  L"MgameBallClerk",
+		  L"DeliveryServiceClerk",
+		  L"ArenaClerk",
+		  L"ArenaSpectator"
 	};
 
 	for (const _tchar* pObjectName : ObjectNames)

@@ -93,7 +93,8 @@ _bool CKirby_State::Try_Transition_Fall(CKirby* pKirby)
     _float fYVelocity = pMovement->Get_VerticalVelocity();
 
     _bool bIsGround = pMovement->Is_Grounded();
-    if (bIsGround == false && fYVelocity <= CKirby::s_fFallTransitionVelocityY)
+    //if (bIsGround == false && fYVelocity <= CKirby::s_fFallTransitionVelocityY)
+    if (bIsGround == false)
     {  
         pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
         return true;

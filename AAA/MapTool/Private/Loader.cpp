@@ -1,5 +1,4 @@
 ﻿#include "Loader.h"
-#include "Map_Loader.h"
 
 #include "Loader_Prototype.h"
 
@@ -117,11 +116,6 @@ HRESULT CLoader::Ready_Resources_For_Edit()
 		{
 			return Client::Load_Fonts(m_pGameInstance_Proxy);
 		});
-
-	//Add_Work([this]() -> HRESULT
-	//	{
-	//		return CMap_Loader::Ready_TexHub(m_pGameInstance_Proxy);
-	//	});
 
 	return S_OK;
 }

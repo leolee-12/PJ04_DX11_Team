@@ -5,6 +5,7 @@
 #include "Movement_Child.h"
 
 #include "Kirby.h"
+#include "Kirby_OnOffPart.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
@@ -50,6 +51,8 @@ void CKirby_Hovering::Enter(CKirby* pKirby, _int iFlag)
 
     m_eCurMoveState = HOVERING_MOVE_STATE::FALL;
     m_bPlayFlightAni = false;
+
+    pKirby->Set_OnOffPartMode(KIRBY_PART_MODE::HOVERING);
 }
 
 void CKirby_Hovering::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -73,6 +76,8 @@ void CKirby_Hovering::Exit(CKirby* pKirby)
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     Reset_Movement(pMovement);
+
+    pKirby->Set_OnOffPartMode(KIRBY_PART_MODE::DEFAULT);
 }
 
 _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -203,6 +208,8 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
                 pBody->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);
 
                 m_bMoveLock = true;
+
+                pKirby->Set_OnOffPartMode(KIRBY_PART_MODE::DEFAULT);
             }
 
             return true;

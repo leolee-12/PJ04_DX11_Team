@@ -64,7 +64,6 @@ public:
 	void	Set_EditorSoloMeshIndex(_int iMeshIndex);
 	void	Clear_EditorSoloMesh();
 	_int	Get_EditorSoloMeshIndex() const { return m_iEditorSoloMeshIndex; }
-	_bool	Is_EditorSoloMeshEnabled() const { return m_iEditorSoloMeshIndex >= 0; }
 #endif
 
 private:

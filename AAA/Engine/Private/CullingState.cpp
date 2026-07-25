@@ -143,23 +143,10 @@ void CCullingState::Evaluate(const CULLING_EVALUATION_INPUT& Desc)
 		Evaluate_Channel(CHANNEL::SHADOW, Desc.Shadow, bEvaluateShadowDistance && bHasDistanceResult ? &DistanceResult : nullptr);
 }
 
-void CCullingState::Reset_Channel(CHANNEL eChannel)
-{
-	if (ETOUI(eChannel) >= ETOUI(CHANNEL::COUNT))
-		return;
-
-	m_Results[ETOUI(eChannel)] = {};
-}
-
 void CCullingState::Reset_AllResults()
 {
 	for (_uint i = 0; i < ETOUI(CHANNEL::COUNT); ++i)
 		m_Results[i] = {};
-}
-
-_bool CCullingState::Has_Bounds() const
-{
-	return m_bHasBounds;
 }
 
 _bool CCullingState::Is_Culled(CHANNEL eChannel) const
