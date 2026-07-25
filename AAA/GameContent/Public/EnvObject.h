@@ -37,7 +37,6 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
-	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 	virtual HRESULT Render_Decal() override;
@@ -53,7 +52,7 @@ public:
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
 	_float Get_DecalAlpha() const { return m_fDecalAlpha; }
-	_float Get_Dissolve() const { return m_fDissolve; }
+	_float Get_NearDitherLength() const { return m_fNearDitherLength; }
 	_float Get_FinalMainDissolve() const;
 	_float Get_FinalShadowDissolve() const;
 
@@ -95,11 +94,8 @@ protected:
 	_bool			m_bDebugDraw = { false };
 	_bool			m_bUseCollMesh = { false };
 
-	// 디더링관련
-	_bool m_bUseCameraDither = { false }; // 객체 디더 사용 여부
-	_float m_fDitherNear = { 8.f };		  // 이보다 가까우면 완전투명 (1)
-	_float m_fDitherFar = { 12.f };		  // 이보다 멀면 디더 없음 (0)
-	_float m_fDissolve = { 0.f };		  // 계산된 디졸브 값 (0~1)
+	// UseNearDistAlpha: 픽셀 단위 근거리 디더 끝 거리. 0이면 미사용
+	_float m_fNearDitherLength = { 0.f };
 
 private:
 	void Apply_TransformFromDesc();

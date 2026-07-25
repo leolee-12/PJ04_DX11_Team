@@ -27,10 +27,14 @@ float4 g_vUVTransformUnknown = float4(1.f, 1.f, 0.f, 0.f);
 float g_fUVRotate = 0.f;
 
 #define FLAG_DITHER 0x01u
+#define FLAG_NEAR_DITHER 0x02u
 
 uint g_iFlags = 0u;
 uint g_iUseInstanceDissolve = 0u;
 float g_fDissolve = 0.f;
+float g_fNearDitherLength = 0.f;
+
+static const float NEAR_DITHER_FULL_DIST = 1.f;
 
 uint g_iMaterialID = 0u;
 uint g_iShadowAlphaSource = 0u;
@@ -76,7 +80,7 @@ struct PS_IN
     float2 vTexcoord3 : TEXCOORD3;
 
     float4 vProjPos : TEXCOORD4;
-    nointerpolation float fDissolve : TEXCOORD5;
+    nointerpolation float2 vDissolveParams : TEXCOORD5; // x: 오브젝트 dissolve, y: 근거리 디더 길이
     
     float4 vTangent : TANGENT;
     float4 vBinormal : BINORMAL;
@@ -113,6 +117,15 @@ void Apply_Dither(float4 vScreenPos, float fDissolve)
         discard;
 }
 
+float Calc_NearDissolve(float fViewDepth, float fLength)
+{
+      [branch]
+    if (fLength <= 0.f)
+        return 0.f;
+
+    return saturate((fLength - fViewDepth) / max(fLength - NEAR_DITHER_FULL_DIST, 1e-4f));
+}
+
 void Apply_DitherIfNeeded(float4 vScreenPos)
 {
       [branch]
@@ -125,11 +138,13 @@ void Apply_DitherFromPixelInput(PS_IN In)
       [branch]
     if (0u != g_iUseInstanceDissolve)
     {
-        Apply_Dither(In.vPosition, In.fDissolve);
+        Apply_Dither(In.vPosition, max(In.vDissolveParams.x, Calc_NearDissolve(In.vProjPos.w, In.vDissolveParams.y)));
         return;
     }
 
-    Apply_DitherIfNeeded(In.vPosition);
+    float fObjectDissolve = (0u != (g_iFlags & FLAG_DITHER)) ? g_fDissolve : 0.f;
+    float fNearDissolve = (0u != (g_iFlags & FLAG_NEAR_DITHER)) ? Calc_NearDissolve(In.vProjPos.w, g_fNearDitherLength) : 0.f;
+    Apply_Dither(In.vPosition, max(fObjectDissolve, fNearDissolve));
 }
 
 float2 Select_UV(float2 vTexcoord0, float2 vTexcoord1, float2 vTexcoord2, float2 vTexcoord3, uint iUVIndex)
@@ -625,6 +640,29 @@ PS_OUT PS_UKWN2_SAND_OPAQUE(PS_IN In)
                   vNormal,
                   float4(g_vMRA, 1.f),
                   float4(g_vEmissiveColor.rgb, 1.f));
+}
+
+// 세 메쉬 모두 V 0.4639(상단)~0.5347(하단) 로 정규화돼 있어 상수 한 쌍으로 처리된다.
+static const float BARRIER_EDGE_FADE_CLEAR = 0.465f; // 이 V 이하 = 완전 투명
+static const float BARRIER_EDGE_FADE_FULL = 0.490f; // 이 V 이상 = 불투명
+
+float4 PS_BLEND_UKWN_BARRIER(PS_IN In) : SV_TARGET0
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vBaseUV = Select_UV_PS(In, g_iUnknownUVIndex);
+    float fBase = g_UnknownTexture.Sample(LinearSampler, vBaseUV).r;
+
+    float2 vDropUV = Apply_UVTransform(Select_UV_PS(In, g_iExtraR_UVIndex), g_vUVTransformUnknown);
+    float fDrop = g_ExtraRTexture.Sample(LinearSampler, vDropUV).r;
+
+    float fEdgeFade = smoothstep(BARRIER_EDGE_FADE_CLEAR, BARRIER_EDGE_FADE_FULL, vBaseUV.y);
+    float fAlpha = saturate((fBase + fDrop) * fEdgeFade * max(g_MaskStrength, 0.f) * g_vColor.a);
+
+    if (fAlpha < 0.001f)
+        discard;
+
+    return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
 }
 
 
