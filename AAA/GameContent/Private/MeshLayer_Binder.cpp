@@ -231,8 +231,7 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iHasNormalTexture", &iHasNormalTexture, sizeof(_uint))))
 			return E_FAIL;
 
-		if ((ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass ||
-			ETOI(WORLD_PASS::UKWN2_SAND_OPAQUE) == Layer.iPass) &&
+		if (Uses_WorldExtraRSlot(Layer.iPass) &&
 			FAILED(Bind_MapExtraSlotSafe(Ctx, "g_ExtraRTexture", Layer.iExtraBind[0], static_cast<MTEX_TYPE>(Layer.iExtraTexType[0]),
 				DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
@@ -296,8 +295,7 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUnknownUVIndex", &iUnknownUVIndex, sizeof(_uint)))) return E_FAIL;
 
-		if ((ETOI(WORLD_PASS::BLEND_UKWN2_LIGHT) == Layer.iPass ||
-			ETOI(WORLD_PASS::UKWN2_SAND_OPAQUE) == Layer.iPass) &&
+		if (Uses_WorldExtraRSlot(Layer.iPass) &&
 			FAILED(Ctx.pShader->Bind_RawValue("g_iExtraR_UVIndex", &iExtraRUVIndex, sizeof(_uint))))
 			return E_FAIL;
 

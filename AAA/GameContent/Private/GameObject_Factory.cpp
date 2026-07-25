@@ -663,6 +663,14 @@ void CGameObject_Factory::Register_NonAnimObject()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Small/VolcanoRock_S.ysh"));
         )
     );
+
+    Register(CLD_BattleBoundary::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_BattleBoundary),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_BattleBoundary::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, CLD_BattleBoundary::MODEL_PATH, true));));
+
+    Register(CLD_BattleBoundary::PROTOTYPE_TAG_CYLINDRICAL, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_BattleBoundary),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_BattleBoundary::MODEL_PROTO_TAG_CYLINDRICAL,
+            Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, CLD_BattleBoundary::MODEL_PATH_CYLINDRICAL, true));));
 }
 
 void CGameObject_Factory::Register_AnimObject()

@@ -29,6 +29,9 @@
 #include "LD_GarageRadio.h"
 #include "LD_CopyEssence.h"
 #include "LD_MeteorGenerator.h"
+#include "LD_BattleBoundary.h"
+#include "LD_KirbyBed.h"
+#include "LD_Frame.h"
 
 #include "Parsing_Utils.h"
 
@@ -418,6 +421,9 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	CLD_ArrowBoard::Register_LevelDesignSpecs();
 	CLD_CopyEssence::Register_LevelDesignSpecs();
 	CLD_MeteorGenerator::Register_LevelDesignSpecs();
+	CLD_BattleBoundary::Register_LevelDesignSpecs();
+	CLD_KirbyBed::Register_LevelDesignSpecs();
+	CLD_Frame::Register_LevelDesignSpecs();
 }
 
 NS_END

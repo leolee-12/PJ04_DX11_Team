@@ -223,6 +223,7 @@ HRESULT CModel::Initialize_Prototype_WithTextureHub(const CModel::MODEL_LOAD_DES
 	m_strModelPath = Desc.pModelFilePath ? StrToWstr(Desc.pModelFilePath) : L"";
 	m_bCookCollisionMesh = MODEL::MAP == m_eType ? false : Desc.bCookCollisionMesh;
 	m_CollisionCookFilter = Desc.fcCollisionCookFilter;
+	m_iCookExcludePass = Desc.iCookExcludePass;
 
 	//if (MODEL::ANIM == m_eType && m_bCookCollisionMesh)
 	//      return E_FAIL;  // 현재 CookCollMesh는 NonAnimMesh만 지원
@@ -786,6 +787,8 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
 	if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
 		return E_FAIL;
 
+	Load_MeshLayers(pModelFilePath);
+
 	if (MODEL::MAP == m_eType || m_bCookCollisionMesh)
 	{
 		if (FAILED(Cook_CollisionMesh(modelData.Meshes, PreTransformMatrix)))
@@ -794,8 +797,6 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
 
 	if (FAILED(Ready_MaterialsEx(modelData.Materials)))
 		return E_FAIL;
-
-	Load_MeshLayers(pModelFilePath);
 
 	return S_OK;
 }
@@ -916,8 +917,11 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 	}
 }
 
-_bool CModel::Should_CookCollisionMesh(const string& strMeshName) const
+_bool CModel::Should_CookCollisionMesh(_uint iMeshIndex, const string& strMeshName) const
 {
+	if (m_iCookExcludePass >= 0 && iMeshIndex < m_MeshLayers.size() && m_iCookExcludePass == m_MeshLayers[iMeshIndex].iPass)
+		return false;
+
 	if (MODEL::MAP != m_eType)
 		return true;
 
@@ -933,9 +937,13 @@ HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix Pre
 
 	if (m_bCookCollisionMesh)
 	{
+		_uint iMeshIndex = 0;
 		for (const auto& mesh : meshes) {
+			if (!Should_CookCollisionMesh(iMeshIndex++, mesh.strName))
+				continue;
+
 			const _uint iBase = (_uint)Positions.size();
-			for (const auto& v : mesh.NonAnimVertices) {     // 환경은 NonAnimVertices
+			for (const auto& v : mesh.NonAnimVertices) {
 				_float3 p;
 				XMStoreFloat3(&p, XMVector3TransformCoord(XMLoadFloat3(&v.vPosition), PreTransformMatrix));
 				Positions.push_back(p);
@@ -945,12 +953,13 @@ HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix Pre
 	}
 	else
 	{
+		_uint iMeshIndex = 0;
 		for (const auto& mesh : meshes) {
-			if (!Should_CookCollisionMesh(mesh.strName))
+			if (!Should_CookCollisionMesh(iMeshIndex++, mesh.strName))
 				continue;
 
 			const _uint iBase = (_uint)Positions.size();
-			for (const auto& v : mesh.MapVertices) {     // MAP은 MapVertices
+			for (const auto& v : mesh.MapVertices) {
 				_float3 p;
 				XMStoreFloat3(&p, XMVector3TransformCoord(XMLoadFloat3(&v.vPosition), PreTransformMatrix));
 				Positions.push_back(p);

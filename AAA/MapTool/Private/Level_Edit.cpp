@@ -390,6 +390,8 @@ HRESULT CLevel_Edit::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	Client::Set_GameContentLogSink(&Forward_GameContentLog);
+
 	if (FAILED(Ready_EditLights()))
 		return E_FAIL;
 
@@ -2236,6 +2238,8 @@ CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Edit::Free()
 {
+	Client::Set_GameContentLogSink(nullptr);
+
 	m_pMapStage = nullptr;
 
 	Safe_Release(m_pGrid);

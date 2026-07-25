@@ -11,6 +11,7 @@ NS_BEGIN(Client)
 namespace
 {
 	constexpr _bool	ENABLE_ENV_OBJECT_SHADOW = true;
+	constexpr _float ENV_NEAR_DITHER_BASE_LENGTH = 8.f;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{
@@ -84,32 +85,17 @@ HRESULT CEnvObject::Initialize(void* pArg)
 	if (FAILED(Ready_CullingState()))
 		return E_FAIL;
 
-	m_bUseCameraDither = m_tDesc.tRender.bUseNearDistAlpha;
+	m_fNearDitherLength = m_tDesc.tRender.bUseNearDistAlpha
+		? ENV_NEAR_DITHER_BASE_LENGTH * max(m_tDesc.tRender.fNearDistAlphaLengthRate, 0.f)
+		: 0.f;
 	m_bIsDecal = m_tDesc.tRender.bIsDecal;
 
 	return S_OK;
 }
 
-void CEnvObject::Late_Update(_float fTimeDelta)
-{
-	if (!m_bUseCameraDither) { m_fDissolve = 0.f; return; }
-
-	const BoundingBox& WorldBounds = m_pCullingState->Get_WorldBounds();
-	_vector C = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition());
-	_vector E = XMLoadFloat3(&WorldBounds.Center);		// 객체 위치
-	_float  d = XMVectorGetX(XMVector3Length(E - C));	// 객체-카메라 거리
-
-	// near → 1(사라짐),  far → 0(불투명)
-	_float t = (m_fDitherFar - d) / max(m_fDitherFar - m_fDitherNear, 1e-4f);
-	m_fDissolve = t < 0.f ? 0.f : (t > 1.f ? 1.f : t);
-}
-
 HRESULT CEnvObject::Render()
 {
 	if (!m_bRenderable)
-		return S_OK;
-
-	if (m_bUseCameraDither && m_fDissolve >= 0.999f)
 		return S_OK;
 
 	if (FAILED(Bind_ShaderResources()))
@@ -295,7 +281,7 @@ _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pO
 
 _float CEnvObject::Get_FinalMainDissolve() const
 {
-	return max(m_fDissolve, m_pCullingState->Get_Dissolve(CCullingState::CHANNEL::MAIN));
+	return m_pCullingState->Get_Dissolve(CCullingState::CHANNEL::MAIN);
 }
 
 _float CEnvObject::Get_FinalShadowDissolve() const
@@ -371,17 +357,6 @@ HRESULT CEnvObject::On_EditTransformChanged()
 	}
 
 	return Sync_PhysicsActorPose();
-}
-
-const MESH_LAYER_IDX* CEnvObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
-{
-	if (0u != iModelSlot)
-		return nullptr;
-
-	if (nullptr == m_pModelCom || iMesh >= m_pModelCom->Get_NumMeshes())
-		return nullptr;
-
-	return &m_pModelCom->Get_MeshLayer(iMesh);
 }
 
 HRESULT CEnvObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
@@ -533,6 +508,9 @@ HRESULT CEnvObject::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fNearDitherLength", &m_fNearDitherLength, sizeof(_float))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -593,10 +571,9 @@ HRESULT CEnvObject::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind)
 	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 	Ctx.eKind = eKind;
 	Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
-	Ctx.fDissolve = m_fDissolve;
 
-	if (m_bUseCameraDither)
-		Ctx.iExtraFlags |= WorldShaderFlags::Dither;
+	if (m_fNearDitherLength > 0.f)
+		Ctx.iExtraFlags |= WorldShaderFlags::NearDither;
 
 	_uint iPass = 0u;
 	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);

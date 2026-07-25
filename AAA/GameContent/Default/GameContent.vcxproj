@@ -66,8 +66,11 @@
     <ClInclude Include="..\Public\Kirby_Include.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h" />
+    <ClInclude Include="..\Public\LD_Frame.h" />
     <ClInclude Include="..\Public\LD_Include.h" />
+    <ClInclude Include="..\Public\LD_KirbyBed.h" />
     <ClInclude Include="..\Public\MainBoss_Include.h" />
+    <ClInclude Include="..\Public\LD_BattleBoundary.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
     <ClInclude Include="..\public\Meta_DemoUpperAtk.h" />
@@ -598,6 +601,9 @@
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp" />
+    <ClCompile Include="..\Private\LD_BattleBoundary.cpp" />
+    <ClCompile Include="..\Private\LD_Frame.cpp" />
+    <ClCompile Include="..\Private\LD_KirbyBed.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
     <ClCompile Include="..\private\Meta_DemoUpperAtk.cpp" />
