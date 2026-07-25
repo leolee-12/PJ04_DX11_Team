@@ -1914,6 +1914,19 @@ void CGameObject_Factory::Leopard_Effect()
 
 void CGameObject_Factory::Metaknight_Effect()
 {
+    Register(CMoonShot::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMoonShot),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMoonShot::TEXTURE_PROTO_TAG_FIRE_FORM,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MoonShot/fireform01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMoonShot::MODEL_PROTO_TAG_MOON,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/MoonShot/MoonShot.ysh"));
+        )
+    );
+
     Register(CMeta_IntroLocking::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_IntroLocking),
         LOADER(
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));

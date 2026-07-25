@@ -76,7 +76,7 @@ private:
 	void Despawn_BombHitAimEffect();
 
 private:
-	BOMB_STATE m_eBombState{};
+	BOMB_STATE m_eBombState{ BOMB_STATE::BOMB_STATE_END };
 
 	_bool m_bKeyUp{};
 	_bool m_bReserveAttack{};

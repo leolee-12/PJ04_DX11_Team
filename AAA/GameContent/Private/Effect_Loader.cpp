@@ -129,16 +129,20 @@ namespace
         { TEXT("Nail_Smoke"),             TEXT("../../Resources/EffectContainerJSON/YSH/Nail_Smoke.JSON") },
         { TEXT("LeoJump_Smoke"),          TEXT("../../Resources/EffectContainerJSON/YSH/LeoJump_Smoke.JSON") },
 
+        { TEXT("MoonShot"),                   TEXT("../../Resources/YSE/EffectContainer/MoonShot.JSON") },
+
         //Meta
         { TEXT("Meta_IntroLocking"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_IntroLocking.JSON") },
         { TEXT("Meta_AppearFlash"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_AppearFlash.JSON") },
         { TEXT("Meta_Attack1Flash"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Attack1Flash.JSON") },
         { TEXT("Meta_DemoUpperCharge"),       TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge.JSON") },
         { TEXT("Meta_UpperCharge"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_UpperCharge.JSON") },
+
         { TEXT("Meta_DemoUpperUp"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperUp.JSON") },
         { TEXT("Meta_DemoUpperCharge_End"),   TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge_End.JSON") },
         { TEXT("Meta_DemoUpperFinal"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperFinal.JSON") },
         { TEXT("Meta_Locking"),               TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Locking.JSON") },
+        { TEXT("Meta_LockingSpark"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_LockingSpark.JSON") },
 
         { TEXT("Meta_DemoUpperAtk1"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk1.JSON") },
         { TEXT("Meta_DemoUpperAtk2"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk2.JSON") },

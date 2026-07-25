@@ -39,6 +39,9 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
+	virtual void Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode) override;
+
+public:
 	void Begin_Hit(const ATTACK_INFO& tInfo, _bool bResetHitList = true);
 	void End_Hit(_bool bResetHitList = true);
 

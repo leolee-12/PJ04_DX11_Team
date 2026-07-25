@@ -3,6 +3,7 @@
 #include "PartObject.h"
 
 #include "GameContent_const.h"
+#include "Effect_Loader.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -10,7 +11,6 @@ class CModel;
 class CAnimator;
 class CTexture;
 
-class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -90,7 +90,7 @@ protected:
 	unordered_map<_wstring, CSound_Handle> m_SoundHandles;
 
 	// Anim Event Effect
-	unordered_map<_wstring, CEffect_Container*> m_AnimEventEffects;
+	unordered_map<_wstring, FX_HANDLE> m_AnimEventEffects;
 
 protected:
 	static constexpr _float4 s_vBodyColor{ 1.f, 0.1882353f, 0.3764706f, 1.f };
