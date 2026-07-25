@@ -138,6 +138,7 @@ namespace
         { TEXT("Meta_DemoUpperUp"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperUp.JSON") },
         { TEXT("Meta_DemoUpperCharge_End"),   TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge_End.JSON") },
         { TEXT("Meta_DemoUpperFinal"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperFinal.JSON") },
+        { TEXT("Meta_Locking"),               TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Locking.JSON") },
 
         { TEXT("Meta_DemoUpperAtk1"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk1.JSON") },
         { TEXT("Meta_DemoUpperAtk2"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk2.JSON") },
