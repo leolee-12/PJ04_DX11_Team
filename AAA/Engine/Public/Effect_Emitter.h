@@ -118,6 +118,10 @@ PROPERTY(_float3, m_vEmitterRandomRotationMax, L"Rotation Max_E", L"Emitter Rota
 PROPERTY(_bool, m_bEmitterRotationOverLife, L"Rotation Over Life_E", L"Emitter Rotation");
 PROPERTY(_float3, m_vEmitterAngularVelocity, L"Angular Velocity_E", L"Emitter Rotation");
 
+// Emitter Orientation
+PROPERTY(_int, m_iEmitterOrientationMode, L"Orientation Mode_E", L"Emitter Orientation"); // 0 None, 1 Velocity, 2 Radial Outward, 3 Radial Inward, 4 Direction
+PROPERTY(_float3, m_vEmitterOrientationDirection, L"Orientation Direction_E", L"Emitter Orientation - Direction");
+
 public:
     struct EFFECT_EMITTER_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
@@ -142,6 +146,7 @@ protected:
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
+        _float3 vCurrentVelocity{};
         _float3 vSpawnLocalPos{};
 
         _float fFlutterPhase{};
@@ -181,6 +186,16 @@ protected:
         EMITTER_VELOCITY_DIRECTION,
         EMITTER_VELOCITY_FOUNTAIN,
         EMITTER_VELOCITY_END
+    };
+
+    enum EmitterOrientationMode
+    {
+        EMITTER_ORIENTATION_NONE,
+        EMITTER_ORIENTATION_VELOCITY,
+        EMITTER_ORIENTATION_RADIAL_OUTWARD,
+        EMITTER_ORIENTATION_RADIAL_INWARD,
+        EMITTER_ORIENTATION_DIRECTION,
+        EMITTER_ORIENTATION_END
     };
 
 protected:
@@ -229,7 +244,13 @@ protected:
     _bool Can_Emit() const;
     _bool Has_AliveParticle() const;
 
+    _bool Is_EmitterOrientationEnabled() const;
+    _vector Make_EmitterOrientationUp(const EMITTER_PARTICLE& Particle) const;
+
     _float4x4 Make_EmitterParticleWorldMatrix(const EMITTER_PARTICLE& Particle) const;
+    _float4x4 Make_EmitterConstrainedBillboardWorldMatrix(
+        const EMITTER_PARTICLE& Particle,
+        const _float4x4& WorldMatrix) const;
 
 protected:
     vector<EMITTER_PARTICLE> m_EmitterParticles;

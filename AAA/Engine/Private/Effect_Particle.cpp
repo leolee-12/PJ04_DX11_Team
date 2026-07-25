@@ -1,5 +1,6 @@
 #include "Effect_Particle.h"
 
+#include "Effect_OrientationUtils.h"
 #include "GameInstance.h"
 
 CEffect_Particle::CEffect_Particle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -101,6 +102,10 @@ void CEffect_Particle::Init_PropertyValue()
 
     m_bParticleRotationOverLife = false;
     m_vParticleAngularVelocity = { 0.f, 0.f, 0.f };
+
+    // Particle Orientation
+    m_iParticleOrientationMode = PARTICLE_ORIENTATION_NONE;
+    m_vParticleOrientationDirection = { 0.f, 1.f, 0.f };
 
     // Particle Alpha
     m_fParticleAlpha = 1.f;
@@ -219,6 +224,7 @@ void CEffect_Particle::Reset_Particles()
         const _float fSpeed = Make_ParticleRandomSpeed();
 
         XMStoreFloat3(&Particle.vVelocity, vDir * fSpeed);
+        Particle.vCurrentVelocity = Particle.vVelocity;
 
         _float fParticleSize = m_fParticleStartSize;
 
@@ -593,6 +599,13 @@ void CEffect_Particle::Update_ParticleMove(PARTICLE& Particle, _float fRatio, _f
     if (m_bParticleUseAcceleration == true)
         vAcceleration = m_vParticleAcceleration;
 
+    Particle.vCurrentVelocity.x =
+        Particle.vVelocity.x + vAcceleration.x * fElapsedTime;
+    Particle.vCurrentVelocity.y =
+        Particle.vVelocity.y + vAcceleration.y * fElapsedTime;
+    Particle.vCurrentVelocity.z =
+        Particle.vVelocity.z + vAcceleration.z * fElapsedTime;
+
     Particle.vLocalPos.x =
         Particle.vSpawnLocalPos.x +
         Particle.vVelocity.x * fElapsedTime +
@@ -610,13 +623,21 @@ void CEffect_Particle::Update_ParticleMove(PARTICLE& Particle, _float fRatio, _f
 
     if (m_bParticleUseFlutter == true)
     {
+        const _float fFlutterPhase =
+            fElapsedTime * XM_2PI * Particle.fFlutterFrequency + Particle.fFlutterPhase;
         const _float fFlutter =
-            (sinf(fElapsedTime * XM_2PI * Particle.fFlutterFrequency + Particle.fFlutterPhase) -
+            (sinf(fFlutterPhase) -
                 sinf(Particle.fFlutterPhase)) *
+            Particle.fFlutterAmplitude;
+        const _float fFlutterVelocity =
+            cosf(fFlutterPhase) *
+            XM_2PI * Particle.fFlutterFrequency *
             Particle.fFlutterAmplitude;
 
         Particle.vLocalPos.x += Particle.vFlutterDir.x * fFlutter;
         Particle.vLocalPos.z += Particle.vFlutterDir.z * fFlutter;
+        Particle.vCurrentVelocity.x += Particle.vFlutterDir.x * fFlutterVelocity;
+        Particle.vCurrentVelocity.z += Particle.vFlutterDir.z * fFlutterVelocity;
     }
 
     if (m_bParticleRotationOverLife == true)
@@ -688,6 +709,53 @@ void CEffect_Particle::Update_ParticleColor(PARTICLE& Particle, _float fLocalRat
     Particle.vColor = vColor;
 }
 
+_bool CEffect_Particle::Is_ParticleOrientationEnabled() const
+{
+    return
+        m_iParticleOrientationMode > PARTICLE_ORIENTATION_NONE &&
+        m_iParticleOrientationMode < PARTICLE_ORIENTATION_END;
+}
+
+_vector CEffect_Particle::Make_ParticleOrientationUp(const PARTICLE& Particle) const
+{
+    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    switch (m_iParticleOrientationMode)
+    {
+    case PARTICLE_ORIENTATION_VELOCITY:
+        vUp = XMLoadFloat3(&Particle.vCurrentVelocity);
+        break;
+
+    case PARTICLE_ORIENTATION_RADIAL_OUTWARD:
+    case PARTICLE_ORIENTATION_RADIAL_INWARD:
+    {
+        const _vector vPivot = XMLoadFloat3(&m_fPivot);
+        const _vector vPosition = XMLoadFloat3(&Particle.vLocalPos);
+        vUp = vPosition - vPivot;
+
+        if (XMVectorGetX(XMVector3LengthSq(vUp)) <= Helper::fEpsilon)
+            vUp = XMLoadFloat3(&Particle.vCurrentVelocity);
+
+        if (m_iParticleOrientationMode == PARTICLE_ORIENTATION_RADIAL_INWARD)
+            vUp = XMVectorNegate(vUp);
+        break;
+    }
+
+    case PARTICLE_ORIENTATION_DIRECTION:
+        vUp = XMLoadFloat3(&m_vParticleOrientationDirection);
+        break;
+
+    case PARTICLE_ORIENTATION_NONE:
+    default:
+        break;
+    }
+
+    if (XMVectorGetX(XMVector3LengthSq(vUp)) <= Helper::fEpsilon)
+        return XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    return XMVector3Normalize(vUp);
+}
+
 _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) const
 {
     const _float3& vPropertyScale = Get_AppliedPropertyScale();
@@ -700,6 +768,11 @@ _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) c
         XMConvertToRadians(Particle.vRotation.x),
         XMConvertToRadians(Particle.vRotation.y),
         XMConvertToRadians(Particle.vRotation.z));
+
+    if (Is_ParticleOrientationEnabled() == true)
+        matRotation = EffectOrientation::Make_UpAlignedRotation(
+            Make_ParticleOrientationUp(Particle),
+            matRotation);
 
     _matrix matTranslation = XMMatrixTranslation(
         Particle.vLocalPos.x,
@@ -721,4 +794,26 @@ _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) c
     XMStoreFloat4x4(&ParticleWorld, matWorld);
 
     return ParticleWorld;
+}
+
+_float4x4 CEffect_Particle::Make_ParticleConstrainedBillboardWorldMatrix(
+    const PARTICLE& Particle,
+    const _float4x4& WorldMatrix) const
+{
+    if (Is_ParticleOrientationEnabled() == false)
+        return WorldMatrix;
+
+    const _float4x4& ParentWorldMatrix =
+        Particle.bParentDetached == true
+        ? Particle.DetachedParentWorldMatrix
+        : m_CombinedWorldMatrix;
+
+    _vector vWorldUp = XMVector3TransformNormal(
+        Make_ParticleOrientationUp(Particle),
+        XMLoadFloat4x4(&ParentWorldMatrix));
+
+    return EffectOrientation::Make_ConstrainedBillboardWorldMatrix(
+        WorldMatrix,
+        vWorldUp,
+        *m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType));
 }
