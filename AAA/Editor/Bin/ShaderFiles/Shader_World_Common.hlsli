@@ -8,6 +8,9 @@ Texture2D g_NormalTexture;
 Texture2D g_MRATexture;
 Texture2D g_UnknownTexture;
 Texture2D g_ExtraRTexture;
+Texture2D g_FlowTexture;
+uint g_iHasFlowTexture = 0u;
+float g_fWorldTime = 0.f;
 
 float4 g_vColor = float4(1.f, 1.f, 1.f, 1.f);
 float3 g_vMRA = float3(0.f, 1.f, 1.f);
@@ -663,6 +666,58 @@ float4 PS_BLEND_UKWN_BARRIER(PS_IN In) : SV_TARGET0
         discard;
 
     return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
+}
+
+  // g_vMRA.x = 크러스트 임계값, y = 경계 부드러움, z = flow 주기(초)
+  // g_MaskStrength = flow 강도, g_vEmissiveColor.w = 발광 게인
+PS_OUT PS_LAVA_SURFACE(PS_IN In)
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vBaseUV = Get_BaseUV(In);
+    float2 vNormalUV = Get_NormalUV(In);
+    float2 vFlow = float2(0.f, 0.f);
+
+      [branch]
+    if (0u != g_iHasFlowTexture)
+        vFlow = (g_FlowTexture.Sample(LinearSampler, Get_MaterialUV(In)).rg * 2.f - 1.f) * max(g_MaskStrength, 0.f);
+
+    float2 vPhase = float2(0.f, 0.f);
+    float fBlend = 0.f;
+    float fCycle = max(g_vMRA.z, 0.f);
+
+      [branch]
+    if (0.f < fCycle)
+    {
+        float fTime = g_fWorldTime / fCycle;
+        vPhase = float2(frac(fTime), frac(fTime + 0.5f));
+        fBlend = abs(1.f - vPhase.x * 2.f);
+    }
+
+    float2 vFlowOffsetA = vFlow * vPhase.x;
+    float2 vFlowOffsetB = vFlow * vPhase.y;
+
+    float3 vDiffuseA = g_DiffuseTexture.Sample(LinearSampler, vBaseUV + vFlowOffsetA).rgb;
+    float3 vDiffuseB = g_DiffuseTexture.Sample(LinearSampler, vBaseUV + vFlowOffsetB).rgb;
+    float3 vMRAA = g_MRATexture.Sample(LinearSampler, vBaseUV + vFlowOffsetA).rgb;
+    float3 vMRAB = g_MRATexture.Sample(LinearSampler, vBaseUV + vFlowOffsetB).rgb;
+    float3 vNormalA = Get_ShadingNormal(In, vNormalUV + vFlowOffsetA);
+    float3 vNormalB = Get_ShadingNormal(In, vNormalUV + vFlowOffsetB);
+
+    float3 vDiffuse = lerp(vDiffuseA, vDiffuseB, fBlend);
+    float3 vMRA = lerp(vMRAA, vMRAB, fBlend);
+    float3 vNormal = lerp(vNormalA, vNormalB, fBlend);
+
+    float fSoftness = max(g_vMRA.y, 0.0001f);
+    float fHot = 1.f - smoothstep(g_vMRA.x - fSoftness, g_vMRA.x + fSoftness, vMRA.g);
+    float3 vEmissive = g_vEmissiveColor.rgb * fHot * max(g_vEmissiveColor.w, 0.f);
+
+    return Make_GBufferOutput(
+                    In,
+                    float4(vDiffuse * g_vColor.rgb, 1.f),
+                    vNormal,
+                    float4(vMRA, 1.f),
+                    float4(vEmissive, 1.f));
 }
 
 

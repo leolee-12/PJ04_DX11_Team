@@ -160,11 +160,12 @@ enum class WORLD_PASS : _int
 	DMN_OPAQUE,
 	BLEND_UKWN_OVERLAY,
 	DCUT_UMN,
-	BLEND_DMN, // 17 - BLEND_HDR에서 렌더링하는 포워드 반투명 패스
-	BLEND_UKWN_LIGHT, // 18 - UNKNOWN 밝기를 마스크로 사용하는 빛줄기 패스
-	BLEND_UKWN2_LIGHT, // 19 - 두 UNKNOWN 텍스처를 조합하는 빛줄기 패스
-	UKWN2_SAND_OPAQUE, // 20
-	BLEND_UKWN_BARRIER, // 21 - 배틀 경계: 카메라 근접 페이드 + 상승 물방울
+	BLEND_DMN,			// 17 - BLEND_HDR에서 렌더링하는 포워드 반투명 패스
+	BLEND_UKWN_LIGHT,	// 18 - UNKNOWN 밝기를 마스크로 사용하는 빛줄기 패스
+	BLEND_UKWN2_LIGHT,	// 19 - 두 UNKNOWN 텍스처를 조합하는 빛줄기 패스
+	UKWN2_SAND_OPAQUE,	// 20
+	BLEND_UKWN_BARRIER,	// 21 - 배틀 경계: 카메라 근접 페이드 + 상승 물방울
+	LAVA_SURFACE,		// 22 - MRA.G 크러스트 마스크 + flow 왜곡 용암 표면
 
 	COUNT
 };
@@ -173,7 +174,7 @@ struct WORLD_SHADER_PASS_META
 {
 	WORLD_PASS		ePass;
 	const _char*	szName;
-	_uint			iRequiredTextureMask;
+	_uint			iRequiredTextureMask; // 참조용(패스별 요구 텍스처). 런타임 미독 - 최적화용 아님
 };
 
 inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
@@ -200,6 +201,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::BLEND_UKWN2_LIGHT,	"BLEND_UKWN2_LIGHT",	UKWN },
 	{ WORLD_PASS::UKWN2_SAND_OPAQUE,	"UKWN2_SAND_OPAQUE",    UKWN },
 	{ WORLD_PASS::BLEND_UKWN_BARRIER,	"BLEND_UKWN_BARRIER",   UKWN },
+	{ WORLD_PASS::LAVA_SURFACE,			"LAVA_SURFACE",			DIFF | MRA | NORM },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
