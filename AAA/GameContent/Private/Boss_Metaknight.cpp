@@ -845,6 +845,8 @@ void CBoss_Metaknight::Update_Attachment()
     {
         m_Lock.bLockFxFired = true;
 
+        Update_SparkAnchor();
+
         _float3 vPos{}, vLook{};
         XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
         XMStoreFloat3(&vLook,
@@ -852,6 +854,13 @@ void CBoss_Metaknight::Update_Attachment()
 
         CEffect_Loader::GetInstance()->Spawn(
             L"Meta_Locking", Get_LevelIndex(), vPos, vLook);
+
+        CEffect_Container* pSpark = nullptr;
+        CEffect_Loader::GetInstance()->Spawn(
+            L"Meta_LockingSpark", Get_LevelIndex(),
+            _float3{}, _float3{}, _float3{},
+            &m_SparkAnchor,
+            &pSpark, &m_SparkFxHandle);
     }
 }
 
@@ -882,15 +891,6 @@ void CBoss_Metaknight::Enter_Locking()
     m_Lock.bLockFxFired = false;
     
     m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
-
-    Update_SparkAnchor();
-
-    CEffect_Container* pSpark = nullptr;
-    CEffect_Loader::GetInstance()->Spawn(
-        L"Meta_LockingSpark", Get_LevelIndex(),
-        _float3{}, _float3{}, _float3{},
-        & m_SparkAnchor,
-        &pSpark, &m_SparkFxHandle);
 
     Enable_CatchBox(false);
     Set_ParryWindow(false);
