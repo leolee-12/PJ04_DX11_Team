@@ -103,6 +103,7 @@ _bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& 
         return true;
 
     const _wstring wstrEffectKey = StrToWstr(e.strParam);
+    CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
 
     if (ePhase == ANIM_EVENT_PHASE::END)
     {
@@ -110,8 +111,9 @@ _bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& 
 
         if (iter != m_AnimEventEffects.end())
         {
-            if (iter->second != nullptr)
-                iter->second->EffectContainer_StopAfterEmission();
+            FX_HANDLE& hEffect = iter->second;
+            if (pEffectLoader->Is_Current(hEffect))
+                hEffect.p->EffectContainer_StopAfterEmission();
 
             m_AnimEventEffects.erase(iter);
         }
@@ -122,9 +124,17 @@ _bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& 
     if (ePhase != ANIM_EVENT_PHASE::POINT && ePhase != ANIM_EVENT_PHASE::BEGIN)
         return true;
 
-    if (ePhase == ANIM_EVENT_PHASE::BEGIN &&
-        m_AnimEventEffects.find(wstrEffectKey) != m_AnimEventEffects.end())
-        return true;
+    if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+    {
+        auto iter = m_AnimEventEffects.find(wstrEffectKey);
+        if (iter != m_AnimEventEffects.end())
+        {
+            if (pEffectLoader->Is_Current(iter->second))
+                return true;
+
+            m_AnimEventEffects.erase(iter);
+        }
+    }
 
     CTransform* pKirbyTransform = pKirby->Get_Transform();
 
@@ -170,21 +180,21 @@ _bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& 
             vUp * XMVectorGetY(vLocalLook) +
             vForward * XMVectorGetZ(vLocalLook));
 
-        CEffect_Loader::GetInstance()->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(), vPos, vLook);
+        pEffectLoader->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(), vPos, vLook);
         return true;
     }
 
     _float3 vLocalLookFloat{};
     XMStoreFloat3(&vLocalLookFloat, vLocalLook);
 
-    CEffect_Container* pEffect = nullptr;
-    const HRESULT hr = CEffect_Loader::GetInstance()->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(),
-        e.vOffset, vLocalLookFloat, _float3{}, pKirbyTransform->Get_WorldMatrixPtr(), &pEffect);
+    FX_HANDLE hEffect{};
+    const HRESULT hr = pEffectLoader->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(),
+        e.vOffset, vLocalLookFloat, _float3{}, pKirbyTransform->Get_WorldMatrixPtr(), nullptr, &hEffect);
 
-    if (FAILED(hr) || pEffect == nullptr)
+    if (FAILED(hr) || !pEffectLoader->Is_Current(hEffect))
         return true;
 
-    m_AnimEventEffects.emplace(wstrEffectKey, pEffect);
+    m_AnimEventEffects.emplace(wstrEffectKey, hEffect);
 
     return true;
 }

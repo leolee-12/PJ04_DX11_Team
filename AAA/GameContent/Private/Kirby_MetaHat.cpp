@@ -42,6 +42,17 @@ HRESULT CKirby_MetaHat::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        if (m_bIsHovering)
+        {
+            if (i == META_HAT_MESH::MASK || i == META_HAT_MESH::STRAP)
+                continue;
+        }
+        else
+        {
+            if (i == META_HAT_MESH::HOVERING_MASK || i == META_HAT_MESH::HOVERING_STRAP)
+                continue;
+        }
+
         const _bool bMask = (i == 0 || i == 2);   // 가면(눈 오버레이) 메쉬
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
@@ -67,8 +78,27 @@ HRESULT CKirby_MetaHat::Render()
         if (FAILED(m_pModelCom->Render(i)))
             return E_FAIL;
     }
+
     return S_OK;
-    return S_OK;
+}
+
+void CKirby_MetaHat::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
+{
+    switch (ePartMode)
+    {
+        case KIRBY_PART_MODE::HOVERING:
+        {
+            m_bIsHovering = true;
+            break;
+        }
+        case KIRBY_PART_MODE::DEFAULT:
+        default:
+        {
+            m_bIsHovering = false;
+
+            break;
+        }
+    }
 }
 
 HRESULT CKirby_MetaHat::Ready_Components()

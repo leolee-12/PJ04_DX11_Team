@@ -1666,6 +1666,9 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot">
+      <UniqueIdentifier>{f31b3b4a-903f-49e8-913b-26edfdbf7c6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -3252,6 +3255,9 @@
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MoonShot.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -4702,6 +4708,9 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MoonShot.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

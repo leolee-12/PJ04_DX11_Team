@@ -50,6 +50,7 @@
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
 #include "EssenceAura.h"
+#include "MoonShot.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"

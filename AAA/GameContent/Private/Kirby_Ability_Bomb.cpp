@@ -33,12 +33,9 @@ COPY_ABILITY_TYPE CKirby_Ability_Bomb::Get_AbilityType()
 
 void CKirby_Ability_Bomb::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
-    m_bKeyUp = false;
-    m_bReserveAttack = false;
-    m_bReserveKeyUp = false;
-
+    m_bReqEndAttackState = false;
     m_eBombState = BOMB_STATE::BOMB_STATE_END;
-    
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(s_fBombMaxHorizontalSpeed);
 
@@ -50,8 +47,6 @@ void CKirby_Ability_Bomb::Enter_AttackState(CKirby* pKirby, _int iFlag)
         Change_BombState(pKirby, BOMB_STATE::MOVE_THROW);
     else
         Change_BombState(pKirby, BOMB_STATE::CHARGE_START);
-
-    m_bReqEndAttackState = false;
 }
 
 void CKirby_Ability_Bomb::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
@@ -61,14 +56,40 @@ void CKirby_Ability_Bomb::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 
 void CKirby_Ability_Bomb::Exit_AttackState(CKirby* pKirby)
 {
+    if (m_eBombState != BOMB_STATE::BOMB_STATE_END)
+        Exit_BombState(pKirby, m_eBombState);
+
+    m_eBombState = BOMB_STATE::BOMB_STATE_END;
+    m_bReqEndAttackState = true;
+
+    m_bKeyUp = false;
+    m_bReserveAttack = false;
+    m_bReserveKeyUp = false;
+
+    m_bAimRotating = false;
+    m_bPlayingRotAni = false;
+    m_bPredictedHit = false;
+
+    m_vAimInput = {};
+    m_vAimTargetPos = {};
+    m_vAimLaunchVelocity = {};
+    m_vPredictedHitPos = {};
+    m_vPredictedHitNormal = {};
+    m_PredictedPathPoints.clear();
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
 
-    m_bKeyUp = false;
-    m_bReserveAttack = false;
-    m_bReserveKeyUp = false;
+    if (m_pBomb != nullptr)
+    {
+        m_pBomb->Despawn();
+        m_pBomb = nullptr;
+    }
+
+    Despawn_BombHitAimEffect();
+    Despawn_BombAimDots();
 }
 
 _bool CKirby_Ability_Bomb::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -135,9 +156,6 @@ _bool CKirby_Ability_Bomb::Handle_Command(CKirby* pKirby, CKirby_Command* pComma
 _bool CKirby_Ability_Bomb::Enter_Attack_KeyDown(CKirby* pKirby)
 {
     pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
-
-    m_bKeyUp = false;
-
     return true;
 }
 
@@ -156,20 +174,6 @@ _bool CKirby_Ability_Bomb::Enter_Attack_KeyUp(CKirby* pKirby)
 void CKirby_Ability_Bomb::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
     __super::On_Damaged_KirbyState(pKirby, tInfo);
-
-    CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
-    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
-    pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
-
-    if (m_pBomb != nullptr)
-    {
-        m_pBomb->Despawn();
-        m_pBomb = nullptr;
-    }
-
-    Despawn_BombHitAimEffect();
-    Despawn_BombAimDots();
 }
 
 void CKirby_Ability_Bomb::Change_BombState(CKirby* pKirby, BOMB_STATE eNext)
@@ -390,7 +394,9 @@ _bool CKirby_Ability_Bomb::Handle_ReserveAttack(CKirby* pKirby)
     m_bReserveAttack = false;
     m_bReserveKeyUp = false;
 
-    if (pKirby->Has_MoveDir())
+    if (!pKirby->Get_Movement()->Is_Grounded())
+        Change_BombState(pKirby, BOMB_STATE::CHARGE_START_FALL);
+    else if (pKirby->Has_MoveDir())
         Change_BombState(pKirby, BOMB_STATE::MOVE_THROW);
     else
         Change_BombState(pKirby, BOMB_STATE::CHARGE_START);
@@ -709,12 +715,7 @@ void CKirby_Ability_Bomb::Update_BombAimDots(_float fTimeDelta)
 void CKirby_Ability_Bomb::Despawn_BombAimDots()
 {
     for (_uint i = 0; i < s_iBombAimDotCount; ++i)
-    {
-        for (_uint i = 0; i < s_iBombAimDotCount; ++i)
-            Effect_Stop(m_pBombAimDots[i]);
-
-        m_fBombAimDotStep = 0.f;
-    }
+        Effect_Stop(m_pBombAimDots[i]);
 
     m_fBombAimDotStep = 0.f;
 }

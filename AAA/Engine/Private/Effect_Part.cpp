@@ -515,6 +515,13 @@ HRESULT CEffect_Part::Bind_ShaderValue()
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseMaskUVDistortion", &m_bUseMaskUVDistortion, sizeof(m_bUseMaskUVDistortion))))
             return E_FAIL;
+        if (m_bCustomShader == false || m_bUseMaskRGUVDistortion == true || m_bMaskUVDistortionSigned == true)
+        {
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseMaskRGUVDistortion", &m_bUseMaskRGUVDistortion, sizeof(m_bUseMaskRGUVDistortion))))
+                return E_FAIL;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_bMaskUVDistortionSigned", &m_bMaskUVDistortionSigned, sizeof(m_bMaskUVDistortionSigned))))
+                return E_FAIL;
+        }
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskUVDistortionStrength", &m_vMaskUVDistortionStrength, sizeof(m_vMaskUVDistortionStrength))))
             return E_FAIL;
     }
@@ -623,6 +630,8 @@ void CEffect_Part::Init_PropertyValue()
     m_bMaskInvert = false;
     m_fMaskStrength = 1.f;
     m_bUseMaskUVDistortion = false;
+    m_bUseMaskRGUVDistortion = false;
+    m_bMaskUVDistortionSigned = false;
     m_vMaskUVDistortionStrength = { 0.f, 0.f };
 }
 

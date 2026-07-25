@@ -62,7 +62,7 @@ public:
 	virtual _bool Should_ForceEnterAttackState() { return false; }
 
 public:
-	void Clear_Overlay(CKirby* pKirby, _uint iSlot = 1, _float fOverlayBlendTime = 0.1f);
+	void Clear_Overlay(CKirby* pKirby, _uint iSlot = 1, _float fOverlayBlendTime = 0.f);
 	void Effect_Stop(CEffect_Container*& pContainer);
 
 protected:
