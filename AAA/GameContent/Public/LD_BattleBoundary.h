@@ -3,6 +3,10 @@
 #include "BlendRenderable.h"
 #include "MeshLayer_Binder.h"
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
@@ -13,7 +17,9 @@ NS_BEGIN(Client)
 struct LD_SPAWN_SPEC;
 class CWorld_BlendCollector;
 
-class CLD_BattleBoundary final : public CLevelDesignObject, public IBlendRenderable
+class CLD_BattleBoundary final
+	: public CLevelDesignObject
+	, public IBlendRenderable
 {
 	GENERATED_BODY(CLD_BattleBoundary)
 
@@ -45,6 +51,9 @@ public:
 	virtual HRESULT Render_BlendMesh(_uint iMeshIndex) override;
 	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+	virtual _bool   Is_CullingEnabled() const override { return false; }
+	virtual void    Deserialize_Internal(const json& j) override;
+	virtual HRESULT On_EditTransformChanged() override;
 
 	static void Register_LevelDesignSpecs();
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
@@ -58,6 +67,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CWorld_BlendCollector* m_pBlendCollector = { nullptr };
+	physx::PxRigidStatic* m_pRigidStatic = { nullptr };
 
 	LD_BATTLE_BOUNDARY_DESC	m_tBattleBoundaryDesc = {};
 
@@ -71,6 +81,10 @@ private:
 	HRESULT Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind);
 	void	Cache_BlendMeshIndices();
 	void	Submit_BlendMeshes();
+	HRESULT Ready_PhysicsActor();
+	void    Rebuild_PhysicsActor();
+	void    Sync_PhysicsActor();
+	void    Release_PhysicsActor();
 
 public:
 	static CLD_BattleBoundary* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -125,6 +125,7 @@ static DEFAULT_TEXTURE GetLayerExDefaultTexture(_uint iEntry)
 namespace WorldShaderFlags
 {
 	inline constexpr _uint Dither = 1u << 0;
+	inline constexpr _uint NearDither = 1u << 1;
 }
 
 enum class SHADOW_ALPHA_SOURCE : _uint
@@ -163,6 +164,7 @@ enum class WORLD_PASS : _int
 	BLEND_UKWN_LIGHT, // 18 - UNKNOWN 밝기를 마스크로 사용하는 빛줄기 패스
 	BLEND_UKWN2_LIGHT, // 19 - 두 UNKNOWN 텍스처를 조합하는 빛줄기 패스
 	UKWN2_SAND_OPAQUE, // 20
+	BLEND_UKWN_BARRIER, // 21 - 배틀 경계: 카메라 근접 페이드 + 상승 물방울
 
 	COUNT
 };
@@ -197,6 +199,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::BLEND_UKWN_LIGHT,		"BLEND_UKWN_LIGHT",		UKWN },
 	{ WORLD_PASS::BLEND_UKWN2_LIGHT,	"BLEND_UKWN2_LIGHT",	UKWN },
 	{ WORLD_PASS::UKWN2_SAND_OPAQUE,	"UKWN2_SAND_OPAQUE",    UKWN },
+	{ WORLD_PASS::BLEND_UKWN_BARRIER,	"BLEND_UKWN_BARRIER",   UKWN },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -212,6 +215,7 @@ inline _bool Is_WorldBlendPass(_int iPass)
 	case WORLD_PASS::BLEND_DMN:
 	case WORLD_PASS::BLEND_UKWN_LIGHT:
 	case WORLD_PASS::BLEND_UKWN2_LIGHT:
+	case WORLD_PASS::BLEND_UKWN_BARRIER:
 		return true;
 
 	default:
@@ -249,10 +253,25 @@ inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
 	case WORLD_PASS::BLEND_DMN:
 	case WORLD_PASS::BLEND_UKWN_LIGHT:
 	case WORLD_PASS::BLEND_UKWN2_LIGHT:
+	case WORLD_PASS::BLEND_UKWN_BARRIER:
 		return SHADOW_ALPHA_SOURCE::DISCARD_ALL;
 
 	default:
 		return SHADOW_ALPHA_SOURCE::NONE;
+	}
+}
+
+inline _bool Uses_WorldExtraRSlot(_int iPass)
+{
+	switch (static_cast<WORLD_PASS>(iPass))
+	{
+	case WORLD_PASS::BLEND_UKWN2_LIGHT:
+	case WORLD_PASS::UKWN2_SAND_OPAQUE:
+	case WORLD_PASS::BLEND_UKWN_BARRIER:
+		return true;
+
+	default:
+		return false;
 	}
 }
 

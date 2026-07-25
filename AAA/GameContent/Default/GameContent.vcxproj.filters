@@ -1318,6 +1318,9 @@
     <Filter Include="00. GameObject\96. LevelDesign\Visible\09. BattleBoundary">
       <UniqueIdentifier>{1e210c96-3903-4455-aa65-b9158e241a9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\10. Credit">
+      <UniqueIdentifier>{43342a05-c547-4986-8321-381fdad3b11c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject">
       <UniqueIdentifier>{cad72eff-ed18-4366-b3fe-facecee465d1}</UniqueIdentifier>
     </Filter>
@@ -2442,6 +2445,9 @@
     <ClInclude Include="..\Public\LD_EventObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LD_Frame.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\10. Credit</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_GarageRadio.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
@@ -2450,6 +2456,9 @@
     </ClInclude>
     <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_KirbyBed.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\10. Credit</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_LavaArea.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
@@ -3947,11 +3956,17 @@
     <ClCompile Include="..\Private\LD_EventObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LD_Frame.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\10. Credit</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LD_GarageRadio.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_KirbyBed.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\10. Credit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_LavaArea.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>

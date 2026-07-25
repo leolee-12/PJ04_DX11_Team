@@ -88,6 +88,9 @@ HRESULT CLD_BattleBoundary::Initialize(void* pArg)
 	if (FAILED(Ready_CullingState(m_pModelCom)))
 		return E_FAIL;
 
+	if (FAILED(Ready_PhysicsActor()))
+		return E_FAIL;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
@@ -111,6 +114,9 @@ HRESULT CLD_BattleBoundary::Validate_Initialized()
 	if (nullptr == m_pShaderCom || nullptr == m_pModelCom)
 		return E_FAIL;
 
+	if (nullptr == m_pRigidStatic)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -130,7 +136,7 @@ void CLD_BattleBoundary::Update(_float fTimeDelta)
 {
 	if (m_pGameInstance_Proxy->Is_EditMode())
 	{
-		m_fAlpha = 1.f;			// 에디터에서는 항상 보여야 배치가 가능하다
+		m_fAlpha = 1.f;	// 에디터에서는 항상 보여야 배치 가능
 		return;
 	}
 
@@ -139,6 +145,9 @@ void CLD_BattleBoundary::Update(_float fTimeDelta)
 	const _float fStep = fDuration > 0.f ? fTimeDelta / fDuration : 1.f;
 
 	m_fAlpha = bFadeIn ? min(m_fAlphaTarget, m_fAlpha + fStep) : max(m_fAlphaTarget, m_fAlpha - fStep);
+
+	if (m_fAlpha != m_fAlphaTarget)	// 등장/퇴장 중 = 위치가 옮겨지는 구간
+		Sync_PhysicsActor();
 }
 
 void CLD_BattleBoundary::Late_Update(_float fTimeDelta)
@@ -196,6 +205,24 @@ void CLD_BattleBoundary::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = nullptr != pVariant ? pVariant->pPrototypeTag : PROTOTYPE_TAG;
 }
 
+void CLD_BattleBoundary::Deserialize_Internal(const json& j)
+{
+	__super::Deserialize_Internal(j);
+
+	// AddedMapObjects 는 스폰이 끝난 뒤 트랜스폼이 들어온다(Map_Spawner.cpp:488).
+	// Create_StaticActor 가 스케일을 PxMeshScale 로 구워버리므로 여기서 다시 만든다.
+	Rebuild_PhysicsActor();
+}
+
+HRESULT CLD_BattleBoundary::On_EditTransformChanged()
+{
+	if (FAILED(__super::On_EditTransformChanged()))
+		return E_FAIL;
+
+	Rebuild_PhysicsActor();
+	return S_OK;
+}
+
 void CLD_BattleBoundary::Register_LevelDesignSpecs()
 {
 	for (const BATTLE_BOUNDARY_VARIANT& Variant : BATTLE_BOUNDARY_VARIANTS)
@@ -212,7 +239,7 @@ void CLD_BattleBoundary::Register_LevelDesignSpecs()
 		Spec.pMakeDefaultDesc = &Make_DefaultDesc;		// 없으면 MapTool 팔레트에 안 뜬다
 		Spec.ModelRequirements =
 		{
-				{ Variant.pModelProtoTag, Variant.pModelPath, MODEL::NONANIM, false }
+			{ Variant.pModelProtoTag, Variant.pModelPath, MODEL::NONANIM, true }
 		};
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
@@ -306,7 +333,7 @@ HRESULT CLD_BattleBoundary::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND
 	Ctx.pLayer = &Layer;
 	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 	Ctx.eKind = eKind;
-	Ctx.iFallbackPass = ETOUI(WORLD_PASS::UKWN);	// 이 모델은 UNKNOWN 슬롯만 채워져 있다
+	Ctx.iFallbackPass = ETOUI(WORLD_PASS::BLEND_UKWN_BARRIER);
 
 	_uint iPass = 0u;
 	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
@@ -359,6 +386,36 @@ void CLD_BattleBoundary::Submit_BlendMeshes()
 		m_pBlendCollector->Submit(this, this, m_pModelCom, pWorld, iMeshIndex);
 }
 
+HRESULT CLD_BattleBoundary::Ready_PhysicsActor()
+{
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(
+		m_pModelCom->Get_CollisionMesh(), XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+	return (nullptr != m_pRigidStatic) ? S_OK : E_FAIL;
+}
+
+void CLD_BattleBoundary::Rebuild_PhysicsActor()
+{
+	Release_PhysicsActor();
+	Ready_PhysicsActor();
+}
+
+void CLD_BattleBoundary::Sync_PhysicsActor()
+{
+	m_pGameInstance_Proxy->Refresh_StaticActorPose(m_pRigidStatic, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+}
+
+void CLD_BattleBoundary::Release_PhysicsActor()
+{
+	if (nullptr == m_pRigidStatic)
+		return;
+
+	if (nullptr != m_pGameInstance_Proxy)
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
+
+	m_pRigidStatic = nullptr;
+}
+
 CLD_BattleBoundary* CLD_BattleBoundary::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLD_BattleBoundary* pInstance = new CLD_BattleBoundary(pDevice, pContext);
@@ -387,7 +444,9 @@ CGameObject* CLD_BattleBoundary::Clone(void* pArg)
 
 void CLD_BattleBoundary::Free()
 {
-	m_pBlendCollector = nullptr;		// Find()가 AddRef하지 않으므로 Release 금지
+	Release_PhysicsActor();
+
+	m_pBlendCollector = nullptr;	// Find()는 AddRef하지 않으므로 Release 없음
 	m_BlendMeshIndices.clear();
 
 	__super::Free();
