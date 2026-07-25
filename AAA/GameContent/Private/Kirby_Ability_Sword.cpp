@@ -89,35 +89,19 @@ COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
 
 void CKirby_Ability_Sword::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
-    SWORD_STATE eStartState = m_eSwordState;
-
-    if (eStartState == SWORD_STATE::END)
-    {
-        if (pKirby->Get_Movement()->Is_Grounded())
-            eStartState = SWORD_STATE::SLASH_1;
-        else
-            eStartState = SWORD_STATE::JUMP_SLASH_START;
-    }
-
-    m_eSwordState = SWORD_STATE::END;
-
-    m_eCurSwordMoveState = SWORD_MOVE_STATE::NONE_MOVE;
-    m_ePreSwordMoveState = SWORD_MOVE_STATE::NONE_MOVE;
-
     m_bReqEndAttackState = false;
     m_bReserveNextAttack = false;
-    m_bSpinSlashCharge = false;
     m_bMoveLock = false;
 
     m_fAccSuperSpinSlashChargeTime = 0.f;
     m_iSuperSpinSlashCount = 7;
 
-    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
+    m_vSwordWishDir = {};
 
-    CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
-
-    Change_SwordState(pKirby, eStartState);
+    m_eCurSwordMoveState = SWORD_MOVE_STATE::NONE_MOVE;
+    m_ePreSwordMoveState = SWORD_MOVE_STATE::NONE_MOVE;
+    m_eSwordState = SWORD_STATE::END;
+    Change_SwordState(pKirby, m_eStartSwordState);
 }
 
 void CKirby_Ability_Sword::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
@@ -130,7 +114,7 @@ void CKirby_Ability_Sword::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
     if (m_bMoveLock == false)
         pKirby->Add_MoveDir(m_vSwordWishDir);
 
-    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
+    m_vSwordWishDir = { };
 
     m_bSpinSlashCharge = false;
 
@@ -142,7 +126,6 @@ void CKirby_Ability_Sword::Exit_AttackState(CKirby* pKirby)
     Change_SwordState(pKirby, SWORD_STATE::END);
 
     m_eSwordState = SWORD_STATE::END;
-
     m_eCurSwordMoveState = SWORD_MOVE_STATE::NONE_MOVE;
     m_ePreSwordMoveState = SWORD_MOVE_STATE::NONE_MOVE;
 
@@ -150,16 +133,11 @@ void CKirby_Ability_Sword::Exit_AttackState(CKirby* pKirby)
     m_bReserveNextAttack = false;
     m_bSpinSlashCharge = false;
     m_bMoveLock = false;
-
     m_fAccSuperSpinSlashChargeTime = 0.f;
-
-    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
+    m_vSwordWishDir = {};
 
     pKirby->Set_RotationLock(false);
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
-
-    CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -251,9 +229,9 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
 _bool CKirby_Ability_Sword::Enter_Attack_KeyDown(CKirby* pKirby)
 {
     if (pKirby->Get_Movement()->Is_Grounded())
-        m_eSwordState = SWORD_STATE::SLASH_1;
-    else
-        m_eSwordState = SWORD_STATE::JUMP_SLASH_START;
+        m_eStartSwordState = SWORD_STATE::SLASH_1;
+    else 
+        m_eStartSwordState = SWORD_STATE::JUMP_SLASH_START;
 
     pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
 
@@ -262,11 +240,12 @@ _bool CKirby_Ability_Sword::Enter_Attack_KeyDown(CKirby* pKirby)
 
 _bool CKirby_Ability_Sword::Enter_Attack_KeyPress(CKirby* pKirby)
 {
-    m_eSwordState = SWORD_STATE::SPIN_SLASH_CHARGE;
-
-    pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
-
-    m_bSpinSlashCharge = true;
+    if (pKirby->Get_Movement()->Is_Grounded())
+    {
+        m_eStartSwordState = SWORD_STATE::SPIN_SLASH_CHARGE;
+        pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+        m_bSpinSlashCharge = true;
+    }
 
     return true;
 }
@@ -279,12 +258,6 @@ _bool CKirby_Ability_Sword::Enter_Attack_KeyUp(CKirby* pKirby)
 
 void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
-    m_bSpinSlashCharge = false;
-    m_fAccSuperSpinSlashChargeTime = 0.f;
-    m_bReserveNextAttack = false;
-
-    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
-
     End_SpinSlashEffect(m_pSpinSlash, 0.2f);
     End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
 
@@ -453,13 +426,9 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
 void CKirby_Ability_Sword::Update_ChargeTime(_float fTimeDelta)
 {
     if (m_eSwordState == SWORD_STATE::SPIN_SLASH_CHARGE && m_bSpinSlashCharge == true)
-    {
         m_fAccSuperSpinSlashChargeTime += fTimeDelta;
-    }
     else
-    {
         m_fAccSuperSpinSlashChargeTime = 0.f;
-    }
 }
 
 void CKirby_Ability_Sword::MoveLock_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd)

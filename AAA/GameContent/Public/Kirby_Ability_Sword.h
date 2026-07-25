@@ -65,6 +65,7 @@ public:
 
 private:
 	SWORD_STATE m_eSwordState{};
+	SWORD_STATE m_eStartSwordState{};
 
 	SWORD_MOVE_STATE m_eCurSwordMoveState{};
 	SWORD_MOVE_STATE m_ePreSwordMoveState{};
