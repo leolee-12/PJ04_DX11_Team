@@ -73,7 +73,10 @@
     <ClInclude Include="..\Public\LD_BattleBoundary.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
+    <ClInclude Include="..\public\Meta_DemoUpperAtk.h" />
     <ClInclude Include="..\public\Meta_DemoUpperCharge.h" />
+    <ClInclude Include="..\public\Meta_DemoUpperFinal.h" />
+    <ClInclude Include="..\public\Meta_DemoUpperUp.h" />
     <ClInclude Include="..\public\Meta_IntroLocking.h" />
     <ClInclude Include="..\public\Meta_UpperCharge.h" />
     <ClInclude Include="..\Public\MeteorBurst.h" />
@@ -603,7 +606,10 @@
     <ClCompile Include="..\Private\LD_KirbyBed.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
+    <ClCompile Include="..\private\Meta_DemoUpperAtk.cpp" />
     <ClCompile Include="..\private\Meta_DemoUpperCharge.cpp" />
+    <ClCompile Include="..\private\Meta_DemoUpperFinal.cpp" />
+    <ClCompile Include="..\private\Meta_DemoUpperUp.cpp" />
     <ClCompile Include="..\private\Meta_IntroLocking.cpp" />
     <ClCompile Include="..\private\Meta_UpperCharge.cpp" />
     <ClCompile Include="..\Private\MeteorBurst.cpp" />
