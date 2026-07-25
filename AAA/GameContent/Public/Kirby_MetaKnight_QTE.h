@@ -51,6 +51,7 @@ private:
 
     _float m_fQTEProgress{};
     _float m_fQTEAnimationProgress{};
+    _float m_fClashTime{};
     _bool m_bQTEStarted{};
 
     CBoss_Metaknight* m_pMetaKnight{};
