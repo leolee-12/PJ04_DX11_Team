@@ -1618,6 +1618,12 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge">
+      <UniqueIdentifier>{3ceb17f9-42d0-469a-aa8b-a899f361b548}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header">
+      <UniqueIdentifier>{7074ac96-d7ed-4de2-b609-d400cb3a6c62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -3141,6 +3147,18 @@
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Meta_UpperCharge.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossEffect_Include.h">
+      <Filter>00. GameObject\99. Factory\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MainBoss_Include.h">
+      <Filter>00. GameObject\99. Factory\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MiniBoss_Include.h">
+      <Filter>00. GameObject\99. Factory\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -4564,6 +4582,9 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_UpperCharge.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

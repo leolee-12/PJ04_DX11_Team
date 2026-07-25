@@ -191,68 +191,13 @@
 #include "SirKibble_Body.h"
 
 //Miniboss
-#include "GigantEdge.h"
-#include "GigantEdge_Body.h"
-#include "GigantEdge_Shield.h"
-#include "GigantEdge_Sword.h"
+#include "MiniBoss_Include.h"
 
 //MainBoss
-#include "Boss_Gorilla.h"
-#include "Boss_GorillaRush.h"
-#include "Boss_Gorilla_Body.h"
-#include "CutsceneGorilla.h"
-#include "GorillaNamePlate.h"
-#include "Boss_Gorilla_RockHole.h"
-#include "Boss_Cage.h"
-#include "Boss_Cage_Body.h"
-#include "Cage_WaddleDee.h"
-
-#include "Boss_Armadillo.h"
-#include "Boss_Armadillo_Body.h"
-#include "Projectile_Partner.h"
-#include "Boss_Armadillo_Cage.h"
-
-#include "Boss_Leopard.h"
-#include "Boss_Leopard_Body.h"
-#include "Projectile_Nail.h"
-
-#include "Boss_Metaknight.h"
-#include "Boss_Metaknight_Body.h"
-#include "Boss_Metaknight_Sword.h"
-#include "Boss_Metaknight_ReplicaSword.h"
-#include "Boss_Metaknight_Mant.h"
-#include "Boss_Metaknight_EscapeMant.h"
-#include "Projectile_MoonShot.h"
-#include "Excalibur.h"
-#include "Excalibur_Body.h"
-#include "Excalibur_GetIt.h"
-#include "MetaknightNamePlate.h"
-#include "AttackDecal.h"
-#include "Projectile_Rock.h"
+#include "MainBoss_Include.h"
 
 //Boss Effect
-#include "Armadillo_RutA.h"
-#include "Armadillo_RutB.h"
-#include "Armadillo_Dust.h"
-#include "Armadillo_RollWind.h"
-#include "Armadillo_SpinWind.h"
-#include "Armadillo_WallImpact.h"
-
-#include "Leopard_Slash.h"
-#include "Leopard_Meteo.h"
-#include "Nail_Trail.h"
-#include "Leopard_Afterimage_Assault.h"
-#include "Leopard_Afterimage_Jump.h"
-#include "Leopard_ClawAssault.h"
-#include "Leopard_ClawJump.h"
-#include "Leopard_Flash.h"
-#include "Leopard_Floor.h"
-#include "Leopard_Impact.h"
-#include "Nail_Smoke.h"
-#include "LeoJump_Smoke.h"
-#include "Assault_Smoke.h"
-
-#include "Meta_IntroLocking.h"
+#include "BossEffect_Include.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -2151,6 +2096,27 @@ void CGameObject_Factory::Metaknight_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_IntroLocking::MODEL_PROTO_TAG_RING,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+        )
+    );
+
+    Register(CMeta_UpperCharge::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_UpperCharge),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Flash1.iLevelID, Texture_Meta_Flash1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Flash1.szFileTag, Texture_Meta_Flash1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Shine1.iLevelID, Texture_Meta_Shine1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Shine1.szFileTag, Texture_Meta_Shine1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_CircleFlash.iLevelID, Texture_Meta_CircleFlash.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_CircleFlash.szFileTag, Texture_Meta_CircleFlash.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Line1.iLevelID, Texture_Meta_Line1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Line1.szFileTag, Texture_Meta_Line1.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_UpperCharge::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_UpperCharge::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_UpperCharge::MODEL_PROTO_TAG_THUNDER,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Thunder/Metaknight_00_Common_ThunderLine.ysh"));
         )
     );
 }

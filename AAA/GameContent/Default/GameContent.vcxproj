@@ -31,6 +31,7 @@
     <ClInclude Include="..\public\Assault_Smoke.h" />
     <ClInclude Include="..\public\AttackDecal.h" />
     <ClInclude Include="..\Public\BlendRenderable.h" />
+    <ClInclude Include="..\Public\BossEffect_Include.h" />
     <ClInclude Include="..\public\Boss_GorillaRush.h" />
     <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
@@ -62,13 +63,16 @@
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h" />
+    <ClInclude Include="..\Public\MainBoss_Include.h" />
     <ClInclude Include="..\public\MetaknightNamePlate.h" />
     <ClInclude Include="..\Public\LD_MeteorGenerator.h" />
     <ClInclude Include="..\public\Meta_IntroLocking.h" />
+    <ClInclude Include="..\public\Meta_UpperCharge.h" />
     <ClInclude Include="..\Public\MeteorBurst.h" />
     <ClInclude Include="..\Public\MeteorRock.h" />
     <ClInclude Include="..\Public\MeteorRock_Large.h" />
     <ClInclude Include="..\Public\MeteorRock_Small.h" />
+    <ClInclude Include="..\Public\MiniBoss_Include.h" />
     <ClInclude Include="..\Public\OnLadderEffect.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
@@ -583,6 +587,7 @@
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />
     <ClCompile Include="..\Private\LD_MeteorGenerator.cpp" />
     <ClCompile Include="..\private\Meta_IntroLocking.cpp" />
+    <ClCompile Include="..\private\Meta_UpperCharge.cpp" />
     <ClCompile Include="..\Private\MeteorBurst.cpp" />
     <ClCompile Include="..\Private\MeteorRock.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
