@@ -30,7 +30,6 @@ CLD_Stage1BossDemo::CLD_Stage1BossDemo(ID3D11Device* pDevice, ID3D11DeviceContex
 
 CLD_Stage1BossDemo::CLD_Stage1BossDemo(const CLD_Stage1BossDemo& Prototype)
 	: CLD_EventObject(Prototype)
-	, m_eDemoState(Prototype.m_eDemoState)
 {
 }
 
@@ -154,8 +153,6 @@ HRESULT CLD_Stage1BossDemo::Ready_Components()
 
 HRESULT CLD_Stage1BossDemo::Ready_Stage1BossDemo()
 {
-	m_eDemoState = DEMO_STATE::IDLE;
-
 	const LD_ANIM_PLAY_DESC AnimDescs[] =
 	{
 			{ ANIM_APPEAR, false, 1.5f },
@@ -184,7 +181,6 @@ void CLD_Stage1BossDemo::On_Event(const _wstring& strEventTag)
 {
 	UNREFERENCED_PARAMETER(strEventTag);
 
-	m_eDemoState = DEMO_STATE::PLAYING;
 	Play_Anim(ANIM_APPEAR);
 }
 

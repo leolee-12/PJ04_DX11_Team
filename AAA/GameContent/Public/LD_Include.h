@@ -14,3 +14,4 @@
 #include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
 #include "LD_MeteorGenerator.h"
+#include "LD_BattleBoundary.h"

@@ -119,7 +119,21 @@ struct LD_DEFORMOBJECT_DESC : public LD_EVENTOBJECT_DESC
 };
 #pragma endregion
 
-#pragma region Portal
+#pragma region BattleBoundary
+struct LD_BATTLE_BOUNDARY_DESC : public LD_OBJECT_DESC
+{
+	_uint           iModelProtoLevel = {};
+	_wstring        wstrModelProtoTag;
+};
+#pragma endregion
+
+#pragma region StaticModel
+struct LD_STATIC_MODEL_DESC : public LD_OBJECT_DESC
+{
+	_uint           iModelProtoLevel = {};
+	_wstring        wstrModelProtoTag;
+	_bool           bUseCollMesh = { true };
+};
 #pragma endregion
 
 #pragma region Food
@@ -253,6 +267,8 @@ using LD_OBJECT_ENTRY = variant<
 	, LD_DEFORMOBJECT_DESC
 	, LD_SURFACE_AREA_DESC
 	, LD_METEOR_DESC
+	, LD_BATTLE_BOUNDARY_DESC
+	, LD_STATIC_MODEL_DESC
 >;
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)

@@ -9,7 +9,6 @@ class CCamera;
 NS_END
 
 NS_BEGIN(Client)
-class CLumia;
 class CMapStage;
 class CMapSection;
 class CMap_EditSession;

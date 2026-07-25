@@ -397,6 +397,7 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 		ModelDesc.pModelFilePath = wstrModelPath.c_str();
 		XMStoreFloat4x4(&ModelDesc.PreTransformMatrix, XMMatrixIdentity());
 		ModelDesc.bCookCollisionMesh = bCookCollisionMesh;
+		ModelDesc.iCookExcludePass = ETOI(WORLD_PASS::DISCARD);
 
 		if (bEnablePickingData)
 		{

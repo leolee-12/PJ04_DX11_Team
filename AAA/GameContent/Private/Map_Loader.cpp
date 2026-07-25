@@ -772,41 +772,6 @@ HRESULT CMap_Loader::Spawn_Map(
 	return S_OK;
 }
 
-HRESULT CMap_Loader::Load_Map(
-	ID3D11Device* pDevice,
-	ID3D11DeviceContext* pContext,
-	const _wstring& strManifestPath,
-	_uint iRuntimeLevel,
-	MAP_LOAD_RESULT* pOutReport,
-	CMapStage** ppOutStage,
-	const MAP_LOAD_OPTIONS& Options)
-{
-	if (nullptr == pDevice || nullptr == pContext || strManifestPath.empty())
-		return E_FAIL;
-
-	CMap_Loader* pMapLoader = Create(pDevice, pContext);
-	if (nullptr == pMapLoader)
-		return E_FAIL;
-
-	MAP_RUNTIME_LEVELS Levels{};
-	MAP_SPAWN_TARGETS Targets{};
-	Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
-	Build_DefaultRuntimeTargets(iRuntimeLevel, &Targets);
-
-	Levels.bEnableEnvObjectPicking = Options.bEnableEnvObjectPicking;
-
-	const HRESULT hr = pMapLoader->Load_FromManifest(
-		strManifestPath,
-		Levels,
-		Targets,
-		Options,
-		pOutReport,
-		ppOutStage);
-
-	Safe_Release(pMapLoader);
-	return hr;
-}
-
 HRESULT CMap_Loader::Load_MapStage_Runtime(
 	const MAP_RUNTIME_LOAD_CONTEXT& Context,
 	const _wstring& strMapManifestPath,

@@ -27,7 +27,7 @@ PS_IN VS_MAIN(VS_IN In)
     Out.vTexcoord2 = In.vTexcoord2;
     Out.vTexcoord3 = In.vTexcoord3;
     Out.vProjPos = Out.vPosition;
-    Out.fDissolve = In.vDissolveParams.x;
+    Out.vDissolveParams = float2(In.vDissolveParams.x, In.vDissolveParams.z);
     Out.vTangent = float4(normalize(mul(float4(In.vTangent.xyz, 0.f), In.WorldMatrix).xyz), In.vTangent.w);
     Out.vBinormal = float4(normalize(mul(float4(In.vBinormal.xyz, 0.f), In.WorldMatrix).xyz), In.vBinormal.w);
 
