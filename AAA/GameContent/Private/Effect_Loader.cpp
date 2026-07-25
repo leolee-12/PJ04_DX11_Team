@@ -135,6 +135,8 @@ namespace
         { TEXT("Meta_Attack1Flash"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Attack1Flash.JSON") },
         { TEXT("Meta_DemoUpperCharge"),       TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge.JSON") },
         { TEXT("Meta_UpperCharge"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_UpperCharge.JSON") },
+
+        { TEXT("MoonShot"),                   TEXT("../../Resources/YSE/EffectContainer/MoonShot.JSON") },
     };
 }
 
