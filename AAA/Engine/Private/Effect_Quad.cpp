@@ -74,7 +74,11 @@ HRESULT CEffect_Quad::Ready_Components()
 
 HRESULT CEffect_Quad::Bind_ShaderResources()
 {
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+    _float4x4 WorldMatrix = m_CombinedWorldMatrix;
+    if (m_bBillboard == true && Is_NonParticleOrientationEnabled() == true)
+        WorldMatrix = Make_NonParticleConstrainedBillboardWorldMatrix(WorldMatrix);
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
         return E_FAIL;
 
     if (FAILED(Bind_ViewProjectionMatrices()))
@@ -93,7 +97,20 @@ HRESULT CEffect_Quad::Bind_ShaderValue()
         return E_FAIL;
 
     auto Values = Make_RectValues();
-    return EffectRect::Bind_ShaderValues(m_pShaderCom, Values, m_fRoll);
+    if (FAILED(EffectRect::Bind_ShaderValues(m_pShaderCom, Values, m_fRoll)))
+        return E_FAIL;
+
+    if (m_bBillboard == true && Is_NonParticleOrientationEnabled() == true)
+    {
+        const _bool bShaderBillboard = false;
+        if (FAILED(m_pShaderCom->Bind_RawValue(
+            "g_bBillboard",
+            &bShaderBillboard,
+            sizeof(bShaderBillboard))))
+            return E_FAIL;
+    }
+
+    return S_OK;
 }
 
 void CEffect_Quad::Update_Core(const _float fTimeDelta, const _float fRatio)

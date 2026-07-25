@@ -124,6 +124,20 @@ namespace Engine
 		return Items;
 	}
 
+	inline const EFFECTPART_ENUM_ITEMS& Get_PropertyEnum_EffectOrientationMode()
+	{
+		static const EFFECTPART_ENUM_ITEMS Items =
+		{
+			{ 0, L"None" },
+			{ 1, L"Velocity" },
+			{ 2, L"Radial Outward" },
+			{ 3, L"Radial Inward" },
+			{ 4, L"Direction" },
+		};
+
+		return Items;
+	}
+
 	inline const EFFECTPART_ENUM_ITEMS& Get_PropertyEnum_UVAxis()
 	{
 		static const EFFECTPART_ENUM_ITEMS Items =
@@ -198,6 +212,13 @@ namespace Engine
 			return &Get_PropertyEnum_EffectVelocityMode();
 		if (Name == L"Velocity Mode_E" && Category == L"Emitter Velocity")
 			return &Get_PropertyEnum_EffectVelocityMode();
+
+		if (Name == L"Orientation Mode_P" && Category == L"Particle Orientation")
+			return &Get_PropertyEnum_EffectOrientationMode();
+		if (Name == L"Orientation Mode_E" && Category == L"Emitter Orientation")
+			return &Get_PropertyEnum_EffectOrientationMode();
+		if (Name == L"Orientation Mode_N" && Category == L"Orientation")
+			return &Get_PropertyEnum_EffectOrientationMode();
 
 		if ((Name == L"Linear Axis_T" && Category == L"Texture Com") ||
 			(Name == L"Linear Axis_M" && Category == L"Mask Com") ||

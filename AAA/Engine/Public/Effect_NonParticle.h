@@ -78,6 +78,9 @@ class ENGINE_DLL CEffect_NonParticle abstract : public CEffect_Part
     PROPERTY(_float, m_fRot_Start_Ratio, L"Start_R",              L"Rot");
     PROPERTY(_float, m_fRot_End_Ratio,   L"End_R",                L"Rot");
 
+    // Orientation
+    PROPERTY(_int, m_iOrientationMode, L"Orientation Mode_N", L"Orientation"); // 0 None, 1 Velocity, 2 Radial Outward, 3 Radial Inward, 4 Direction
+    PROPERTY(_float3, m_vOrientationDirection, L"Orientation Direction_N", L"Orientation - Direction");
 
     // Move
     PROPERTY(_bool, m_bMoveChange,          L"Move Change_M",     L"Move");
@@ -100,12 +103,23 @@ public:
     };
 
 protected:
+    enum OrientationMode
+    {
+        ORIENTATION_NONE,
+        ORIENTATION_VELOCITY,
+        ORIENTATION_RADIAL_OUTWARD,
+        ORIENTATION_RADIAL_INWARD,
+        ORIENTATION_DIRECTION,
+        ORIENTATION_END
+    };
+
     CEffect_NonParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CEffect_NonParticle(const CEffect_NonParticle& Prototype);
     virtual ~CEffect_NonParticle() = default;
 
 public:
     virtual void Effect_Start() override;
+    virtual void On_EffectLoop() override;
 
     // Color
     void Set_Color(const _float3& vColor) { m_vColor = vColor; }
@@ -125,6 +139,12 @@ protected:
     void Update_Rot(const _float fTimeDelta, const _float fRatio);
     void Update_Move(const _float fTimeDelta, const _float fRatio);
     void Update_MoveSin(const _float fTimeDelta, const _float fRatio);
+    void Update_Orientation();
+
+    _bool Is_NonParticleOrientationEnabled() const;
+    _vector Make_NonParticleOrientationUp() const;
+    _float4x4 Make_NonParticleConstrainedBillboardWorldMatrix(
+        const _float4x4& WorldMatrix) const;
 
 protected:
     _float              m_fRoll{};
@@ -133,6 +153,11 @@ protected:
 private:
     void Init_PropertyValue();
     void Resolve_BaseRotation();
+    void Reset_OrientationTracking();
+
+    _float3 m_vOrientationVelocity{};
+    _float3 m_vPreviousOrientationPosition{};
+    _bool m_bHasPreviousOrientationPosition{};
 };
 
 NS_END

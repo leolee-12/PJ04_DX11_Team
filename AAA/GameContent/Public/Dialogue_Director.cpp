@@ -35,7 +35,7 @@ HRESULT CDialogue_Director::Ready_Events()
 
     Subscribe_Event(EventTag::CutFade_OutDone, [this](void*)
         {
-            if (ESEQ::FADEOUT != m_eSeq)
+            if (ESEQ::FADEOUT != m_eSeq && ESEQ::IDLE != m_eSeq)
                 return;
 
             m_pGameInstance_Proxy->Publish(EventTag::Dialogue_Arrange, nullptr);

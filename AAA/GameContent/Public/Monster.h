@@ -68,6 +68,7 @@ public:
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
 
 	_int						Get_AIType() const { return m_iAIType; }
+	_bool						IsDead() { return m_fCurHP <= 0.f; }
 
 public: // Inhalable
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;

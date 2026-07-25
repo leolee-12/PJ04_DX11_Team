@@ -520,6 +520,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\05. Kirby_Ability_ToyHammer">
       <UniqueIdentifier>{e1d72b0f-6ab1-4eb5-aab7-4e8860d63f25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\06. Kirby_Ability_MetaSword">
+      <UniqueIdentifier>{5b8d35f5-998b-48f9-9c6c-6ff56d93d4c0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform">
       <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
     </Filter>
@@ -1117,6 +1120,18 @@
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Brain">
       <UniqueIdentifier>{97870331-6bd9-4123-bc30-69a39f54fa88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect">
+      <UniqueIdentifier>{02456022-b37f-4155-b1ac-563ab86b468f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperCharge">
+      <UniqueIdentifier>{fb120236-c8e3-4bd8-b6da-b8a36261d9ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking">
+      <UniqueIdentifier>{b0d99798-cd56-46ca-b795-9dcd57643831}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge">
+      <UniqueIdentifier>{3ceb17f9-42d0-469a-aa8b-a899f361b548}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Excalibur">
       <UniqueIdentifier>{b67a9060-0fc8-470b-a905-12bee6759a64}</UniqueIdentifier>
     </Filter>
@@ -1465,6 +1480,30 @@
     <Filter Include="00. GameObject\99. Factory">
       <UniqueIdentifier>{5114196d-bc6c-4998-93e1-18fd4a2e81f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header">
+      <UniqueIdentifier>{7074ac96-d7ed-4de2-b609-d400cb3a6c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header\Boss/UI">
+      <UniqueIdentifier>{38b1954e-91a9-441a-a5df-1d85582974d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header\Effect">
+      <UniqueIdentifier>{c61d3e44-fa13-4d8a-a36e-f74458abf33e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header\Kirby">
+      <UniqueIdentifier>{69ab4fe2-0782-45da-9864-a254a5d6035e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header\LD/Env">
+      <UniqueIdentifier>{0e64c1db-5c89-4f43-aa32-4d09899714f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header\Monster">
+      <UniqueIdentifier>{f45979c9-b21f-4e6c-a6fc-a392c08829a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header\NPC/CutScene/System">
+      <UniqueIdentifier>{6ef26905-2a3c-4a71-b14a-bf632c4f1082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory\Header\Projectile">
+      <UniqueIdentifier>{82d2ee9e-0405-474c-a344-ba1668765869}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\Test">
       <UniqueIdentifier>{89f71a9d-8abf-42de-96db-ec93db453c6f}</UniqueIdentifier>
     </Filter>
@@ -1764,6 +1803,9 @@
     <ClInclude Include="..\public\BossBase.h">
       <Filter>00. GameObject\07. Boss</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BossEffect_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Boss/UI</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\BossNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
     </ClInclude>
@@ -1977,6 +2019,9 @@
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Effect</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Effect_Loader.h">
       <Filter>97. DataSystem\EffectLoader</Filter>
     </ClInclude>
@@ -1985,6 +2030,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Env_CollisionCatalog.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Env_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\LD/Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Env_InstanceBatch.h">
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
@@ -2176,7 +2224,7 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_MetaKnightSword.h">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\06. Kirby_Ability_MetaSword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Normal.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
@@ -2289,6 +2337,9 @@
     <ClInclude Include="..\Public\Kirby_IceHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Kirby</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_InputManager.h">
       <Filter>00. GameObject\05. Kirby\00. System\01. Kirby_InputManager</Filter>
     </ClInclude>
@@ -2393,6 +2444,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\LD_GarageRadio.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\LD/Env</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
@@ -2523,6 +2577,9 @@
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MainBoss_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Boss/UI</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Map_Builder.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
@@ -2586,6 +2643,15 @@
     <ClInclude Include="..\Public\MeshParticleCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Meta_DemoUpperCharge.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperCharge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Meta_IntroLocking.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Meta_UpperCharge.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\MetaknightNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
     </ClInclude>
@@ -2604,6 +2670,9 @@
     <ClInclude Include="..\public\MiniBoss.h">
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MiniBoss_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Boss/UI</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Mission_Manager.h">
       <Filter>03. SystemObject\MissionManager</Filter>
     </ClInclude>
@@ -2618,6 +2687,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster_Brain_FSM.h">
       <Filter>00. GameObject\06. Monster\00. System\Brain\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_Movement.h">
       <Filter>02. Component\01. Monster_Movement</Filter>
@@ -2742,6 +2814,9 @@
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h">
       <Filter>00. GameObject\06. Monster\08. NormalEnemy_Wild\Parts\Body</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NPC_CutScene_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\NPC/CutScene/System</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\ObjectData.h">
       <Filter>97. DataSystem\Header</Filter>
     </ClInclude>
@@ -2780,6 +2855,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Boulder.h">
       <Filter>01. Projectile\00. PhysicsProjectile\00. Boulder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Projectile_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Projectile</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Manager.h">
       <Filter>01. Projectile\Manager</Filter>
@@ -2973,6 +3051,9 @@
     <ClInclude Include="..\Public\SwordTrail_BK.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SystemObject_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\NPC/CutScene/System</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\TestContainer.h">
       <Filter>00. GameObject\Test</Filter>
     </ClInclude>
@@ -3056,6 +3137,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\UI_Image.h">
       <Filter>00. GameObject\97. UI\UIPart\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Include.h">
+      <Filter>00. GameObject\99. Factory\Header\Boss/UI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_KirbyStatus.h">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\KirbyStatus</Filter>
@@ -3657,7 +3741,7 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_MetaKnightSword.cpp">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\06. Kirby_Ability_MetaSword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
@@ -4039,6 +4123,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\MeshParticleCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_DemoUpperCharge.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperCharge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_IntroLocking.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_UpperCharge.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MetaknightNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>

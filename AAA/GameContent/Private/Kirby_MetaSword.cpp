@@ -102,20 +102,6 @@ HRESULT CKirby_MetaSword::Render()
     return S_OK;
 }
 
-void CKirby_MetaSword::Put_OnBack(CKirby* pKirby, _bool bOn)
-{
-    if (bOn)
-    {
-        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("CenterL"));
-        m_pAnimatorCom->Play("Carry", true, true, 0.f);
-    }
-    else
-    {
-        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
-        m_pAnimatorCom->Play("Reset", true, true, 0.f);
-    }
-}
-
 void CKirby_MetaSword::Begin_Hit(const ATTACK_INFO& tInfo, _bool bResetHitList)
 {
     m_tAttackInfo = tInfo;
