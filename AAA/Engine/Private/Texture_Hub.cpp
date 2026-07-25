@@ -261,11 +261,6 @@ _bool CTexture_Hub::Is_Valid(TEXTURE_HANDLE Handle) const
 	return Handle < m_SRVs.size() && nullptr != m_SRVs[Handle];
 }
 
-_bool CTexture_Hub::Is_CompatibleDevice(ID3D11Device* pDevice) const
-{
-	return nullptr != pDevice && pDevice == m_pDevice;
-}
-
 TEXTURE_HUB_STATS CTexture_Hub::Get_Stats() const
 {
 	shared_lock<shared_mutex> Lock(m_Mutex);

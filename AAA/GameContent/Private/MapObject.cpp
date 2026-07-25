@@ -118,24 +118,19 @@ HRESULT CMapObject::Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride)
 	const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(iMesh);
 
 	MESH_LAYER_BIND_CONTEXT Ctx{};
-	Ctx.pShader = m_pShaderCom;
-	Ctx.pModel = m_pModelCom;
-	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.Set_Renderer(m_pShaderCom, m_pModelCom, m_pGameInstance_Proxy);
 	Ctx.iMesh = iMesh;
 	Ctx.pLayer = &Layer;
 	Ctx.eProfile = MESH_LAYER_PROFILE::MAP;
 	Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 	Ctx.iFallbackPass = ETOI(MAP_DEFAULT_PASS);
-	Ctx.bUseLayerEx = true;
 
-	MESH_LAYER_BIND_RESULT Result{};
-	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-		return E_FAIL;
+	_uint iPass = 0u;
+	const HRESULT hrBind = MeshLayerBinder::Bind_OrSkip(Ctx, &iPass);
+	if (FAILED(hrBind))     return E_FAIL;
+	if (S_FALSE == hrBind)  return S_OK;
 
-	if (Result.bSkipMesh)
-		return S_OK;
-
-	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+	if (FAILED(m_pShaderCom->Begin(iPass)))
 		return E_FAIL;
 	if (FAILED(m_pModelCom->Render(iMesh)))
 		return E_FAIL;

@@ -25,6 +25,9 @@
 #include "Map_Loader.h"
 #include "LD_DeformObject.h"
 #include "DropStar_Manager.h"
+#include "UI_CurtainStatic.h"
+#include "UI_CurtainStamp.h"
+#include "UI_CurtainFadeOut.h"
 
 NS_BEGIN(Client)
 
@@ -220,6 +223,9 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
         return E_FAIL;
     if (FAILED(pProxy->Add_Prototype(Shader_Ring.iLevelID, Shader_Ring.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_Ring.szFileTag, VTXEFFECTMESH::Elements, VTXEFFECTMESH::iNumElements))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(Shader_Distortion.iLevelID, Shader_Distortion.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Distortion.szFileTag, VTXEFFECTMESH::Elements, VTXEFFECTMESH::iNumElements))))
         return E_FAIL;
 
     if (FAILED(pProxy->Add_Prototype(Shader_Monster.iLevelID, Shader_Monster.szProtoTag,
@@ -444,9 +450,27 @@ HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID
             return E_FAIL;
     }
 
+    if (!pProxy->Has_Prototype(iLevel, CUI_CurtainStatic::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_CurtainStatic::PROTOTYPE_TAG, CUI_CurtainStatic::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
     if (!pProxy->Has_Prototype(iLevel, CUI_CurtainTexture::PROTOTYPE_TAG))
     {
         if (FAILED(pProxy->Add_Prototype(iLevel, CUI_CurtainTexture::PROTOTYPE_TAG, CUI_CurtainTexture::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_CurtainStamp::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_CurtainStamp::PROTOTYPE_TAG, CUI_CurtainStamp::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_CurtainFadeOut::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_CurtainFadeOut::PROTOTYPE_TAG, CUI_CurtainFadeOut::Create(pDevice, pContext))))
             return E_FAIL;
     }
 

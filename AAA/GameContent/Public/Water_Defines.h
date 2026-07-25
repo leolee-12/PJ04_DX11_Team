@@ -52,6 +52,10 @@ struct WATER_RENDER_DESC
 	_float  fCausticNoiseStrength = { 0.6f };
 	_float  fCausticBlur = { 0.f };
 
+	// Wave (surface height)
+	_float  fWaveAmplitude = { 0.f };
+	_float  fWaveSpeed = { 1.f };
+
 	// Runtime only; do not serialize.
 	_float  fVisibility = { 1.f };
 };

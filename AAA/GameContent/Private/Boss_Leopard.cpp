@@ -97,6 +97,8 @@ HRESULT CBoss_Leopard::Ready_AnimEvents()
             return;
         if (Handle_FxAnimEvent(e, phase))
             return;
+        if (Handle_DropStarsAnimEvent(e, phase))
+            return;
 
         if (phase != ANIM_EVENT_PHASE::POINT)
             return;
@@ -255,6 +257,7 @@ void CBoss_Leopard::Spotlight_Off()
     m_eSpotTarget = SPOT_LEOPARD;
     m_pSpotRig->Set_Enabled(false);
     m_pSpotRig->Push();
+    Play_OneShotSFX(SND_LIGHT_OFF, 0.15f);
 }
 
 void CBoss_Leopard::Spotlight_On_Snap()
@@ -265,6 +268,7 @@ void CBoss_Leopard::Spotlight_On_Snap()
     m_pSpotRig->Snap();
     m_pSpotRig->Set_Enabled(true);
     m_pSpotRig->Push();
+    Play_OneShotSFX(SND_LIGHT_ON, 0.15f);
 }
 
 void CBoss_Leopard::Spotlight_TrackKirby()

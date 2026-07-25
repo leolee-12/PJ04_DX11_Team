@@ -32,6 +32,7 @@ private:
 	unordered_map<ENV_INSTANCE_KEY, unordered_map<_uint, MESH_LAYER_IDX>, ENV_INSTANCE_KEY_HASH> m_MeshLayerOverridesByModel;
 
 private:
+	_bool Submit_Internal(_uint iBatchIndex, CEnvObject_Static* pObj, RENDERID eRenderID);
 	CEnv_InstanceBatch* Find_Batch(const ENV_INSTANCE_KEY& tKey);
 	_uint FindOrCreate_BatchIndex(const ENV_INSTANCE_KEY& tKey);
 	HRESULT Apply_CachedMeshLayers(const ENV_INSTANCE_KEY& tBatchKey, CEnv_InstanceBatch* pBatch);

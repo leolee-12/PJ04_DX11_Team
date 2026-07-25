@@ -427,11 +427,28 @@ void CKirby::Apply_ChangeKirbyAbility()
 
 void CKirby::Update_DumpCool(_float fTimeDelta)
 {
-    if (m_bDecreaseDumpCool == true)
+    if (m_bCurDecreaseDumpCool != m_bPreDecreaseDumpCool)
+    {
+        if (m_bCurDecreaseDumpCool)
+        {
+            ABILITY_DISCARD_BIND_DESC d{};
+            d.pCoolTime = &m_fAccDumpCoolTime;
+            d.fMaxCoolTime = m_fMaxDumpCoolTime;
+
+            if(Has_Deform())
+                d.bIsAbility = false;
+
+            m_pGameInstance_Proxy->Publish(EventTag::AbilityDiscardUI_Bind, &d);
+        }
+
+        m_bPreDecreaseDumpCool = m_bCurDecreaseDumpCool;
+    }
+
+    if (m_bCurDecreaseDumpCool == true)
     {
         m_fAccDumpCoolTime -= fTimeDelta;
 
-        m_bDecreaseDumpCool = false;
+        m_bCurDecreaseDumpCool = false;
     }
     else
     {
@@ -551,6 +568,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROPPED_BUBBLE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROP_STAR));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::LD_ITEM));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
@@ -564,28 +582,32 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::LD_ITEM));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_RELEASE_AREA));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::EXCALIBUR));
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_INTERACT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_PROJECTILE));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
 
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::PLAYER_BOMB));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
 
     // Kirby_DeformCar_Main
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BREAKERABLE), ETOUI(COLLISION_LAYER::ENV_INTERACT_KICKPROP));
 
     // 호준 추가
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::ENV_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_TRIGGER));

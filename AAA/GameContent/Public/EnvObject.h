@@ -1,7 +1,7 @@
 #pragma once
 #include "EnvObject_Defines.h"
 #include "Editable.h"
-#include "MeshLayer_Profile.h"
+#include "MeshLayer_Binder.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -48,10 +48,6 @@ public:
 	const BoundingBox& Get_LocalBounds() const;
 	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
 
-	_bool   Is_ProfileRenderable() const { return m_bRenderable && Has_RenderModel(); }
-	_bool   Is_ShadowCaster() const { return m_bCastShadow; }
-	_bool   Is_Visible_Main() const { return m_bVisible; }
-	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 	_bool   Is_Decal() const { return m_bIsDecal; }
 	_bool   Is_UseCollMesh() const { return m_bUseCollMesh; }
 

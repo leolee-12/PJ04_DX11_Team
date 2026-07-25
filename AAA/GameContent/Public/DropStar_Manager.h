@@ -36,6 +36,10 @@ public:
         ARMADILLO_TWINDANCE,
         ARMADILLO_PARTNER_DESTROY,
 
+        // Leopard
+        LEOPARD_LANDING,
+        LEOPARD_ASSAULTSLASH,
+
         PRESET_END
     };
 

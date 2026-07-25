@@ -40,7 +40,7 @@ private:
     _float m_fShoulderOffset = { -1.8f };   // 음수=왼쪽 어깨
     _float m_fAimBias = { 0.65f };   // 0=커비 / 1=보스 쪽을 봄
     _float m_fAimHeight = { 6.f };    // 시선 높이(보스가 크니 위로)
-    _float m_fSmoothTime = { 0.9f };
+    _float m_fSmoothTime = { 0.18f };
     _float m_fFovDeg = { 50.f };
 
     _float3 m_eyeCur = {}, m_atCur = {}, m_eyeVel = {}, m_atVel = {};

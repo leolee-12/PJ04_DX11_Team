@@ -41,6 +41,8 @@ enum class MAP_PASS : _uint
 	UKWN,
 	DISCARD,
 
+	EDGEDITHER,   // 10 - 경계에 Dither 적용
+
 	_COUNT
 };
 
@@ -55,16 +57,17 @@ struct MAP_SHADER_PASS_META
 
 inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =
 {
-	{ MAP_PASS::SHADOW,		"Shadow",	0 },
-	{ MAP_PASS::WHITE,		"White",	0 },
-	{ MAP_PASS::DIFF,		"DIFF",		DIFF },
-	{ MAP_PASS::DN,			"DN",		DIFF | NORM },
-	{ MAP_PASS::DMN,		"DMN",		DIFF | NORM | MRA },
-	{ MAP_PASS::DMNU,		"DMNU",		DIFF | NORM | MRA | UKWN },
-	{ MAP_PASS::TOP,		"FRONT",	DIFF | NORM | MRA },
-	{ MAP_PASS::MASK,		"MASK",		DIFF | NORM | MRA },
-	{ MAP_PASS::UKWN,		"UKWN",		UKWN },
-	{ MAP_PASS::DISCARD,	"DISCARD",	0 },
+	{ MAP_PASS::SHADOW,		"Shadow",		0 },
+	{ MAP_PASS::WHITE,		"White",		0 },
+	{ MAP_PASS::DIFF,		"DIFF",			DIFF },
+	{ MAP_PASS::DN,			"DN",			DIFF | NORM },
+	{ MAP_PASS::DMN,		"DMN",			DIFF | NORM | MRA },
+	{ MAP_PASS::DMNU,		"DMNU",			DIFF | NORM | MRA | UKWN },
+	{ MAP_PASS::TOP,		"FRONT",		DIFF | NORM | MRA },
+	{ MAP_PASS::MASK,		"MASK",			DIFF | NORM | MRA },
+	{ MAP_PASS::UKWN,		"UKWN",			UKWN },
+	{ MAP_PASS::DISCARD,	"DISCARD",		0 },
+	{ MAP_PASS::EDGEDITHER,  "EDGEDITHER",	DIFF | NORM | MRA },
 };
 
 static const char* kLayerExTextureNames[MESH_LAYER_EX_GROUP_COUNT][MESH_LAYER_EX_ENTRY_COUNT] =
@@ -79,17 +82,6 @@ static const char* kLayerExTextureNames[MESH_LAYER_EX_GROUP_COUNT][MESH_LAYER_EX
 inline _bool Is_ValidMapPassValue(_int iPass)
 {
 	return 0 <= iPass && iPass < ETOI(MAP_PASS::_COUNT);
-}
-
-inline const MAP_SHADER_PASS_META* Find_MapShaderPassMeta(_int iPass)
-{
-	for (const auto& Meta : g_MapShaderPassMetas)
-	{
-		if (ETOI(Meta.ePass) == iPass)
-			return &Meta;
-	}
-
-	return &g_MapShaderPassMetas[static_cast<_uint>(MAP_DEFAULT_PASS)];
 }
 
 inline _int Get_MapShaderPassComboIndex(_int iPass)
@@ -170,6 +162,7 @@ enum class WORLD_PASS : _int
 	BLEND_DMN, // 17 - BLEND_HDR에서 렌더링하는 포워드 반투명 패스
 	BLEND_UKWN_LIGHT, // 18 - UNKNOWN 밝기를 마스크로 사용하는 빛줄기 패스
 	BLEND_UKWN2_LIGHT, // 19 - 두 UNKNOWN 텍스처를 조합하는 빛줄기 패스
+	UKWN2_SAND_OPAQUE, // 20
 
 	COUNT
 };
@@ -203,6 +196,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::BLEND_DMN,			"BLEND_DMN",			DIFF | MRA | NORM },
 	{ WORLD_PASS::BLEND_UKWN_LIGHT,		"BLEND_UKWN_LIGHT",		UKWN },
 	{ WORLD_PASS::BLEND_UKWN2_LIGHT,	"BLEND_UKWN2_LIGHT",	UKWN },
+	{ WORLD_PASS::UKWN2_SAND_OPAQUE,	"UKWN2_SAND_OPAQUE",    UKWN },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -223,17 +217,6 @@ inline _bool Is_WorldBlendPass(_int iPass)
 	default:
 		return false;
 	}
-}
-
-inline const WORLD_SHADER_PASS_META* Find_WorldShaderPassMeta(_int iPass)
-{
-	for (const auto& Meta : g_WorldShaderPassMetas)
-	{
-		if (ETOI(Meta.ePass) == iPass)
-			return &Meta;
-	}
-
-	return &g_WorldShaderPassMetas[0];
 }
 
 inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
@@ -258,6 +241,7 @@ inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
 		return SHADOW_ALPHA_SOURCE::DIFFUSE_R;
 
 	case WORLD_PASS::DMN_OPAQUE:
+	case WORLD_PASS::UKWN2_SAND_OPAQUE:
 		return SHADOW_ALPHA_SOURCE::NONE;
 
 	case WORLD_PASS::DISCARD:
@@ -311,6 +295,8 @@ enum class ANIM_MESH_PASS : _uint
 	COUNT
 };
 #pragma endregion
+
+
 
 #pragma region NonAnim Mesh Pass
 //enum class NONANIM_MESH_PASS : _uint

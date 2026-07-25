@@ -4,7 +4,7 @@
 NS_BEGIN(Client)
 
 // 회전+축소하며 색칠 텍스처를 커튼 RT에 그림(노란 별 등). pass 8 CurtainFill.
-class CLIENT_DLL CUI_CurtainTexture final : public CUI_CurtainAnimBase
+class CLIENT_DLL CUI_CurtainTexture : public CUI_CurtainAnimBase
 {
     GENERATED_BODY(CUI_CurtainTexture)
 

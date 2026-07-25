@@ -11,6 +11,7 @@ enum class UI_EFFECT_PASS : _int
     BRUSH_REVEAL = 5,
     GAUGE_FILL_COLOR = 6,
     GAUGE_FILL_TEXTURE = 7,
+    GAUGE_FILL_RADIAL = 13,
     END
 };
 

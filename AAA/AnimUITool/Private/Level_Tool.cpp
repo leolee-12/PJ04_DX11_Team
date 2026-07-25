@@ -30,6 +30,10 @@
 #include "UI_Eraser.h"
 #include "UI_SpriteAnimCurtain.h"
 #include "UI_CurtainTexture.h"
+#include "UI_CurtainStatic.h"
+#include "UI_CurtainStamp.h"
+#include "UI_CurtainFadeOut.h"
+
 #include "PhysX_Manager.h"
 
 #include "UI_CoordinatorContainer.h"
@@ -655,6 +659,15 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         case UI_PART_TYPE::TEXTURECURTAIN:
             strProtoTag = Client::CUI_CurtainTexture::PROTOTYPE_TAG;
             break;
+        case UI_PART_TYPE::STATICCURTAIN:
+            strProtoTag = Client::CUI_CurtainStatic::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::STAMPCURTAIN:                          
+            strProtoTag = Client::CUI_CurtainStamp::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::FADEOUTCURTAIN:
+            strProtoTag = Client::CUI_CurtainFadeOut::PROTOTYPE_TAG;
+            break;
 
         default:
             break;
@@ -832,6 +845,46 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         desc.iTextureLevel = iTextureLevel;
         desc.szTextureProtoTag = { nullptr };
         desc.vPosition = { 0.f, 0.f };
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+    case UI_PART_TYPE::STATICCURTAIN:
+    {
+        Client::CUI_CurtainStatic::UI_CURTAINSTATIC_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+
+    case UI_PART_TYPE::STAMPCURTAIN:
+    {
+        Client::CUI_CurtainStamp::UI_CURTAINSTAMP_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
+        desc.fStartDelay = 1.f;      // 1초 대기
+        desc.fShrinkDuration = 0.25f;    // 펀치 속도
+        desc.fPunchScale = 1.4f;     // 시작 배율
+        desc.fEndDelay = 1.f;      // 착지 후 1초 홀드
+        desc.fBounce = 2.5f;
+        desc.bDisableOnFinish = false;    // 완료 후에도 표시(안전하게 명시)
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+
+    case UI_PART_TYPE::FADEOUTCURTAIN:
+    {
+        Client::CUI_CurtainFadeOut::UI_CURTAINFADEOUT_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
+        desc.fFadeDelay = 1.f;
+        desc.fFadeDuration = 0.5f;
 
         hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;

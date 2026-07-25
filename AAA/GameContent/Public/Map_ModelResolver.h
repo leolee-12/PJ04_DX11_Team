@@ -17,9 +17,6 @@ public:
 	HRESULT Resolve_MapSection(const _wstring& strStageFolderName, const _wstring& strSectionName, _wstring* pOutModelPath, _wstring* pOutModelProtoTag) const;
 	HRESULT Build_EnvModelCache();
 	_bool Resolve_EnvObject(ENV_OBJECT_DESC* pDesc);
-	void Clear_EnvModelCache();
-
-	static void Invalidate_EnvModelCache(const _wstring& strMapRoot = L"../../Resources/Map");
 
 private:
 	void Build_MapSectionCandidates(const _wstring& strSectionName, vector<_wstring>* pOutCandidates) const;

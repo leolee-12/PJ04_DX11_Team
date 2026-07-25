@@ -66,6 +66,8 @@ float g_fSaturation = 0.88f;
 
 Texture2D<uint> g_MaterialIDTexture; // R8_UINT, matID Àü¿ë
 
+Texture2D g_DistortionTexture;
+
 float g_fSpotlightDarken;
 
     //============================ Common VS ============================
@@ -462,6 +464,12 @@ float4 PS_ESM_RESOLVE(PS_IN In) : SV_TARGET0
     return float4(exp(g_fESMConst * d), 0.f, 0.f, 1.f);
 }
 
+float4 PS_DISTORTION_APPLY(PS_IN In) : SV_TARGET
+{
+    float2 off = g_DistortionTexture.Sample(ClampSampler, In.vTexcoord).rg;
+    return g_SceneTexture.Sample(ClampSampler, In.vTexcoord + off);
+}
+
 
     //============================ Technique ============================
 technique11 DefaultTechnique
@@ -586,5 +594,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_ESM_RESOLVE();
+    }
+    pass DistortionApply // 13
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DISTORTION_APPLY();
     }
 }

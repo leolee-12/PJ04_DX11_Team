@@ -24,6 +24,8 @@
 #include "UI_CutFade.h"
 #include "UI_Dialogue.h"
 #include "UI_QTE.h"
+#include "UI_UIFadeOut.h"
+#include "UI_AbilityDiscard.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -36,6 +38,9 @@
 #include "UI_Eraser.h"
 #include "UI_SpriteAnimCurtain.h"
 #include "UI_CurtainTexture.h"
+#include "UI_CurtainStatic.h"
+#include "UI_CurtainStamp.h"
+#include "UI_CurtainFadeOut.h"
 
 // Kirby
 #include "Kirby.h"
@@ -56,6 +61,7 @@
 #include "Kirby_ToyHat.h"
 
 // Effect_Container
+#include "TestContainer.h"
 #include "WalkSmoke.h"
 #include "SwordSlash1.h"
 #include "InhaleContainer.h"
@@ -87,6 +93,7 @@
 #include "Split_Cylinder.h"
 #include "LensFlare.h"
 #include "ItemEffect.h"
+#include "VanishEffect.h"
 #include "BombHitAim.h"
 #include "BombAimDot.h"
 #include "BreakWallEffect.h"
@@ -144,6 +151,7 @@
 #include "MeshParticleCommon.h"
 #include "RectEmitterCommon.h"
 #include "TrailCommon.h"
+#include "DistortionCommon.h"
 #include "EssenceCrown.h"
 
 //sky
@@ -300,6 +308,7 @@
 // NPC
 #include "WaddleDee.h"
 #include "WaddleDee_Body.h"
+#include "WaddleDee_Hat.h"
 
 #include "DropStar.h"
 #include "DropStar_Body.h"
@@ -408,6 +417,9 @@ void CGameObject_Factory::Register_UI()
     Register(CUI_Eraser::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_Eraser), LOADER());
     Register(CUI_SpriteAnimCurtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_SpriteAnimCurtain), LOADER());
     Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainTexture), LOADER());
+    Register(CUI_CurtainStatic::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainStatic), LOADER());
+    Register(CUI_CurtainStamp::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainStamp), LOADER());
+    Register(CUI_CurtainFadeOut::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainFadeOut), LOADER());
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -418,6 +430,19 @@ void CGameObject_Factory::Register_Camera()
 
 void CGameObject_Factory::Register_Test()
 {
+    Register(CTestContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CTestContainer),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG,
+                CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestContainer::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_ChargeNoise.iLevelID, Texture_ChargeNoise.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ChargeNoise.szFileTag,
+                    Texture_ChargeNoise.iNumTex));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Container()
@@ -795,8 +820,33 @@ void CGameObject_Factory::Register_Container()
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::PROTOTYPE_TAG, CWaddleDee_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Hat::PROTOTYPE_TAG, CWaddleDee_Hat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh", XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_Pharmacy"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/Pharmacy.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_FoodShop"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/FoodShop.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_Knowledge"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/Knowledge.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_RollingBall"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/RollingBall.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_DeliveryService"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/DeliveryService.ysh", XMMatrixTranslation(0.f, 0.5f, 0.f)));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TownHat_Arena"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/TownHat/Arena.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYE_TEX_PROTO, 
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEye.%02d.dds", CWaddleDee_Body::EYE_COUNT));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::EYEMASK_TEX_PROTO,
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/WaddleDee/Body/DeeEyeMask.%02d.dds", CWaddleDee_Body::EYE_COUNT));
         )
     );
 
@@ -837,6 +887,8 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_CutFade::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_CutFade), LOADER());
     Register(CUI_Dialogue::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_Dialogue), LOADER());
     Register(CUI_QTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_QTE), LOADER());
+    Register(CUI_UIFadeOut::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_UIFadeOut), LOADER());
+    Register(CUI_AbilityDiscard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_AbilityDiscard), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
@@ -1424,6 +1476,18 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle01"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle01.png"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle02"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle02.png"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle04"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle04.png"), 1));
+        ));
+
+    // VanishEffect
+    Register(CVanishEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CVanishEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
         ));
 
     // 0. WalkSmoke

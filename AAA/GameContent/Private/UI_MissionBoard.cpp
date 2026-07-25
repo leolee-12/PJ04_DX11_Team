@@ -64,6 +64,15 @@ void CUI_MissionBoard::Start_Intro()
     m_eBoard = EBOARD::INTRO;
 }
 
+_bool CUI_MissionBoard::Any_PanelBusy() const
+{
+    for (const _wstring& tag : Get_ChildOrder())
+        if (auto* p = dynamic_cast<CUI_MissionPanel*>(Find_Child(tag)))
+            if (p->Is_Busy())
+                return true;
+    return false;
+}
+
 void CUI_MissionBoard::Update(_float dt)
 {
     if (!m_bActive) return;
@@ -111,7 +120,20 @@ void CUI_MissionBoard::Update(_float dt)
                     c->Play_Success();
                 ++m_iSuccessIdx;
             }
-            else m_eBoard = EBOARD::DONE;
+            else m_eBoard = EBOARD::WAIT_INPUT;
+        }
+    }
+    else if (m_eBoard == EBOARD::WAIT_INPUT)
+    {
+        if (Any_PanelBusy())
+            return;
+
+        if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE) ||
+            m_pGameInstance_Proxy->Key_Down(DIK_RETURN) ||
+            m_pGameInstance_Proxy->Mouse_Down(DIMB::LBUTTON))
+        {
+            m_eBoard = EBOARD::DONE;
+            m_pGameInstance_Proxy->Publish(EventTag::FadeOut_Start, nullptr);
         }
     }
 }

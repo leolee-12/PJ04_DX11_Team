@@ -56,6 +56,8 @@ float g_fCausticStrength = 0.5f;
 float g_fCausticNoiseStrength = 0.6f;
 float g_fCausticBlur = 0.f;
 
+float g_fWaveHeight = 0.f;
+
 float g_fVisibility = 1.f;
 float g_fGameTime = 0.f;
 
@@ -87,6 +89,7 @@ PS_IN VS_MAIN(VS_IN In)
     PS_IN Out = (PS_IN) 0;
 
     float4 vWorldPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    vWorldPosition.y += g_fWaveHeight;
     float4 vViewPosition = mul(vWorldPosition, g_ViewMatrix);
     float4 vProjPosition = mul(vViewPosition, g_ProjMatrix);
 
