@@ -2445,6 +2445,9 @@
     <ClInclude Include="..\Public\LD_BattleBoundary.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\09. BattleBoundary</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LD_CamPivot.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\10. Credit</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_CopyEssence.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClInclude>
@@ -3967,6 +3970,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LD_BattleBoundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\09. BattleBoundary</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_CamPivot.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\10. Credit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_CopyEssence.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>

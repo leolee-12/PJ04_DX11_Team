@@ -66,6 +66,7 @@
     <ClInclude Include="..\Public\Kirby_Include.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h" />
+    <ClInclude Include="..\Public\LD_CamPivot.h" />
     <ClInclude Include="..\Public\LD_Frame.h" />
     <ClInclude Include="..\Public\LD_Include.h" />
     <ClInclude Include="..\Public\LD_KirbyBed.h" />
@@ -603,6 +604,7 @@
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp" />
     <ClCompile Include="..\Private\LD_BattleBoundary.cpp" />
+    <ClCompile Include="..\Private\LD_CamPivot.cpp" />
     <ClCompile Include="..\Private\LD_Frame.cpp" />
     <ClCompile Include="..\Private\LD_KirbyBed.cpp" />
     <ClCompile Include="..\private\MetaknightNamePlate.cpp" />

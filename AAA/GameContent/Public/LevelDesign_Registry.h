@@ -15,6 +15,7 @@ struct LD_MODEL_REQUIREMENT
 	MODEL eModelType = { MODEL::NONANIM };
 	_bool bCookCollisionMesh = { false };
 	_float4x4 PreTransformMatrix = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f };
+	_bool bUseTextureHubLoader = { true };
 };
 
 struct LD_SPAWN_SPEC

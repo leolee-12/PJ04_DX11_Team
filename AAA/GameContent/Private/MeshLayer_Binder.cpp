@@ -1,6 +1,7 @@
 #include "MeshLayer_Binder.h"
 
 #include "GameInstance_Proxy.h"
+#include "Math_Utils.h"
 #include "Model.h"
 #include "Shader.h"
 #include "Transform.h"
@@ -236,6 +237,20 @@ namespace
 				DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 
+		if (ETOI(WORLD_PASS::LAVA_SURFACE) == Layer.iPass)
+		{
+			const _uint iFlowCount = Ctx.pModel->Get_MeshTextureCount(Ctx.iMesh, MTEX_TYPE::EMISSIVE);
+			_uint iHasFlowTexture = 0u;
+
+			if (0u < iFlowCount && SUCCEEDED(Ctx.pModel->Bind_Material(Ctx.pShader, "g_FlowTexture", Ctx.iMesh, MTEX_TYPE::EMISSIVE, 0u)))
+				iHasFlowTexture = 1u;
+			else if (FAILED(Ctx.pGI_Proxy->Bind_DefaultTextureFromHub(Ctx.pShader, "g_FlowTexture", DEFAULT_TEXTURE::BLACK)))
+				return E_FAIL;
+
+			if (FAILED(Ctx.pShader->Bind_RawValue("g_iHasFlowTexture", &iHasFlowTexture, sizeof(_uint))))
+				return E_FAIL;
+		}
+
 		return S_OK;
 	}
 
@@ -310,6 +325,16 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUseInstanceDissolve", &iUseInstanceDissolve, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iFlags", &iFlags, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float)))) return E_FAIL;
+
+		if (ETOI(WORLD_PASS::LAVA_SURFACE) == Layer.iPass)
+		{
+			const _double dWrappedWorldTime = MathUtils::Wrap_FiniteDouble(
+				Ctx.pGI_Proxy->Get_GameTime(), static_cast<_double>(Layer.vMRA.z));
+			const _float fWorldTime = static_cast<_float>(dWrappedWorldTime);
+
+			if (FAILED(Ctx.pShader->Bind_RawValue("g_fWorldTime", &fWorldTime, sizeof(_float))))
+				return E_FAIL;
+		}
 
 		return S_OK;
 	}
