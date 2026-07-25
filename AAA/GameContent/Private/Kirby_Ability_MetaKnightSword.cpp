@@ -144,7 +144,7 @@ void CKirby_Ability_MetaKnightSword::Exit_AttackState(CKirby* pKirby)
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
     pAnimator->Resume_Mask(iSwordOverlaySlot);
-    Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
+    Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
 
     pKirby->Set_RotationLock(false);
 
@@ -410,33 +410,33 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, SWORD_STAT
         case SWORD_STATE::SLASH_1:
         {
             // Sword Have Clear
-            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
-            pAnimator->Play("SideSlash", false, false, 0.1f, 1.5f);
+            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
+            pAnimator->Play("Meta_Attack1", false, false, 0.f, 1.5f);
             break;
         }
         case SWORD_STATE::SLASH_1_END:
         {
-            pAnimator->Play("SideSlashEnd", false, false, 0.1f, 2.f);
+            pAnimator->Play("SideSlashEnd", false, false, 0.05f, 1.5f);
             break;
         }
         case SWORD_STATE::SLASH_2:
         {
             // Sword Have Clear
-            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
-            pAnimator->Play("MultiswordAttack", false, false, 0.1f, 2.f);
+            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
+            pAnimator->Play("Meta_Attack2", false, false, 0.f, 1.5f);
             break;
         }
         case SWORD_STATE::SLASH_3:
         {
             // Sword Have Clear
-            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
-            pAnimator->Play("DecisiveSlash", false, false, 0.1f, 2.f);
+            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
+            pAnimator->Play("Meta_Attack3", false, false, 0.f, 2.f);
             break;
         }
         case SWORD_STATE::JUMP_SLASH_START:
         {
             // Sword Have Clear
-            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
+            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
             pAnimator->Play("SwordSpinStart", false, false, 0.05f, 10.f);
             pKirby->Set_RotationLock(true);
             break;
@@ -449,7 +449,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, SWORD_STAT
         case SWORD_STATE::SPIN_SLASH_CHARGE:
         {
             // Sword Have Clear
-            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
+            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
             pKirby->Set_RotationLock(true);
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
@@ -467,7 +467,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, SWORD_STAT
         case SWORD_STATE::SPIN_SLASH:
         {
             // Shuffle Clear
-            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
+            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
             pAnimator->Play("SpinSlash", false, false, 0.1f, 2.f);
             break;
         }
@@ -493,7 +493,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, SWORD_STAT
         case SWORD_STATE::SUPER_SPIN_SLASH_START:
         {
             // Shuffle Clear
-            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.1f);
+            Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
             pAnimator->Play("SuperSpinSlashStart", false, false, 0.1f, 2.f);
             break;
         }
