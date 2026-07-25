@@ -2152,6 +2152,25 @@ void CGameObject_Factory::Metaknight_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Thunder/Metaknight_00_Common_ThunderLine.ysh"));
         )
     );
+
+    Register(CMeta_DemoUpperCharge::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_DemoUpperCharge),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Flash1.iLevelID, Texture_Meta_Flash1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Flash1.szFileTag, Texture_Meta_Flash1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_CircleFlash.iLevelID, Texture_Meta_CircleFlash.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_CircleFlash.szFileTag, Texture_Meta_CircleFlash.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Line1.iLevelID, Texture_Meta_Line1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Line1.szFileTag, Texture_Meta_Line1.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperCharge::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperCharge::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperCharge::MODEL_PROTO_TAG_THUNDER,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Thunder/Metaknight_00_Common_ThunderLine.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Free()

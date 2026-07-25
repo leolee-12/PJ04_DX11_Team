@@ -22,3 +22,4 @@
 
 #include "Meta_IntroLocking.h"
 #include "Meta_UpperCharge.h"
+#include "Meta_DemoUpperCharge.h"
