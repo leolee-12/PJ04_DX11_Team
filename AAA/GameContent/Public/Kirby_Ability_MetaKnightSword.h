@@ -11,7 +11,7 @@ class CMovement_Child;
 class CLIENT_DLL CKirby_Ability_MetaKnightSword final : public CKirby_Ability
 {
 private:
-	enum SWORD_STATE
+	enum class META_SWORD_STATE
 	{
 		SLASH_1, SLASH_1_END, SLASH_2, SLASH_3,
 		JUMP_SLASH_START, JUMP_SLASH,
@@ -25,7 +25,7 @@ private:
 		SWORD_STATE_END
 	};
 
-	enum SWORD_MOVE_STATE { NONE_MOVE, MOVE_FRONT, MOVE_RIGHT };
+	enum class META_SWORD_MOVE_STATE { NONE_MOVE, MOVE_FRONT, MOVE_RIGHT };
 
 private:
 	CKirby_Ability_MetaKnightSword();
@@ -57,8 +57,8 @@ public:
 
 private:
 	// State
-	SWORD_STATE m_eSwordState{ SWORD_STATE::SWORD_STATE_END };
-	SWORD_STATE m_eStartSwordState{ SWORD_STATE::SWORD_STATE_END };
+	META_SWORD_STATE m_eSwordState{ META_SWORD_STATE::SWORD_STATE_END };
+	META_SWORD_STATE m_eStartSwordState{ META_SWORD_STATE::SWORD_STATE_END };
 
 	// Attack
 	_bool m_bReserveNextAttack{};
@@ -67,16 +67,16 @@ private:
 	_uint m_iSuperSpinSlashCount{};
 
 	// Move
-	SWORD_MOVE_STATE m_eCurSwordMoveState{};
-	SWORD_MOVE_STATE m_ePreSwordMoveState{};
+	META_SWORD_MOVE_STATE m_eCurSwordMoveState{};
+	META_SWORD_MOVE_STATE m_ePreSwordMoveState{};
 	_float3 m_vSwordWishDir{};
 	_bool m_bMoveLock{};
 
 private:
-	void Change_SwordState(CKirby* pKirby, SWORD_STATE eNext);
-	void Enter_SwordState(CKirby* pKirby, SWORD_STATE eState);
+	void Change_SwordState(CKirby* pKirby, META_SWORD_STATE eNext);
+	void Enter_SwordState(CKirby* pKirby, META_SWORD_STATE eState);
 	void Update_SwordState(CKirby* pKirby, _float fTimeDelta);
-	void Exit_SwordState(CKirby* pKirby, SWORD_STATE eState);
+	void Exit_SwordState(CKirby* pKirby, META_SWORD_STATE eState);
 
 	void Update_SuperSpinSlashChargeTime(_float fTimeDelta);
 	void Update_ChargeAnimationOverlay(CKirby* pKirby);

@@ -17,7 +17,7 @@ class CMovement_Child;
 class CLIENT_DLL CKirby_Ability_Sword final : public CKirby_Ability
 {
 private:
-	enum SWORD_STATE
+	enum class SWORD_STATE
 	{
 		SLASH_1, SLASH_1_END, SLASH_2, SLASH_3,
 		JUMP_SLASH_START, JUMP_SLASH,
@@ -31,9 +31,9 @@ private:
 		SWORD_STATE_END
 	};
 
-	enum SWORD_MOVE_STATE { NONE_MOVE, MOVE_FRONT, MOVE_RIGHT};
+	enum class SWORD_MOVE_STATE { NONE_MOVE, MOVE_FRONT, MOVE_RIGHT};
 
-	enum SWORD_EFFECT
+	enum class SWORD_EFFECT
 	{
 		SLASH1, SLASH2_1, SLASH2_2, SLASH2_3, SLASH2_4, SLASH3, SPINSLASH, 
 		JUMPSLASH, EFFECT_END
@@ -85,7 +85,7 @@ private:
 	_bool m_bMoveLock{};
 
 	// Effect
-	_bool m_bIsStartEffect[SWORD_EFFECT::EFFECT_END]{};
+	_bool m_bIsStartEffect[ETOUI(SWORD_EFFECT::EFFECT_END)]{};
 	CEffect_Container* m_pSpinSlash{};
 	CEffect_Container* m_pSpinSlashTrail{};
 	CEffect_Container* m_pSwordChargeEffect{};
