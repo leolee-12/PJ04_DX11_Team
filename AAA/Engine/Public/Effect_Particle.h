@@ -65,6 +65,10 @@ PROPERTY(_float3, m_vParticleRandomRotationMax, L"Rotation Max_P", L"Particle Ro
 PROPERTY(_bool, m_bParticleRotationOverLife, L"Rotation Over Life_P", L"Particle Rotation");
 PROPERTY(_float3, m_vParticleAngularVelocity, L"Angular Velocity_P", L"Particle Rotation");
 
+// Particle Orientation
+PROPERTY(_int, m_iParticleOrientationMode, L"Orientation Mode_P", L"Particle Orientation"); // 0 None, 1 Velocity, 2 Radial Outward, 3 Radial Inward, 4 Direction
+PROPERTY(_float3, m_vParticleOrientationDirection, L"Orientation Direction_P", L"Particle Orientation - Direction");
+
 // Particle Alpha
 PROPERTY(_float, m_fParticleAlpha, L"Alpha_P", L"Particle Alpha");
 
@@ -145,6 +149,7 @@ protected:
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
+        _float3 vCurrentVelocity{};
         _float3 vSpawnLocalPos{};
 
         _float fFlutterPhase{};
@@ -188,6 +193,16 @@ protected:
         PARTICLE_VELOCITY_END
     };
 
+    enum ParticleOrientationMode
+    {
+        PARTICLE_ORIENTATION_NONE,
+        PARTICLE_ORIENTATION_VELOCITY,
+        PARTICLE_ORIENTATION_RADIAL_OUTWARD,
+        PARTICLE_ORIENTATION_RADIAL_INWARD,
+        PARTICLE_ORIENTATION_DIRECTION,
+        PARTICLE_ORIENTATION_END
+    };
+
 protected:
     CEffect_Particle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CEffect_Particle(const CEffect_Particle& Prototype);
@@ -224,7 +239,13 @@ protected:
     void Update_ParticleSize(PARTICLE& Particle, _float fLocalRatio);
     void Update_ParticleColor(PARTICLE& Particle, _float fLocalRatio);
 
+    _bool Is_ParticleOrientationEnabled() const;
+    _vector Make_ParticleOrientationUp(const PARTICLE& Particle) const;
+
     _float4x4 Make_ParticleWorldMatrix(const PARTICLE& Particle) const;
+    _float4x4 Make_ParticleConstrainedBillboardWorldMatrix(
+        const PARTICLE& Particle,
+        const _float4x4& WorldMatrix) const;
 
 protected:
     vector<PARTICLE> m_Particles;

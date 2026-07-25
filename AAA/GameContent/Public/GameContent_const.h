@@ -130,6 +130,12 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_NailTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_NailTrail"), TEXT("../../Resources/YSH/Boss/Leopard/Nail/Trail.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_ImpactRing = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ImpactRing"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Ring/common_ringnofrip01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_ImpactCircle = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ImpactCircle"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Circle/common_shinecircle01.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_TestNormal = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_TestNormal"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/indirectwarpcirkle_normal.dds"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_Flash1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Flash1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Flash1.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_Ring1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Ring1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Ring1.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_CircleFlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_CircleFlash"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/CircleFlash.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_Line1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Line1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Line1.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_Shine1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Shine1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Shine1.png"), 1 };
 
 
 	//sky

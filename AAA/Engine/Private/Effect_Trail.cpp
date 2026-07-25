@@ -107,6 +107,7 @@ void CEffect_Trail::Effect_Start()
 
 void CEffect_Trail::On_EffectLoop()
 {
+    __super::On_EffectLoop();
     Begin_NewSegment();
 }
 

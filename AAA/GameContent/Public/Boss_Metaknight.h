@@ -65,8 +65,8 @@ public:
     static constexpr _float s_fDodgeCooldown = 4.f;
     static constexpr _float s_fGigaCooldown = 30.f;
     static constexpr _float s_fRockCooldown = 60.f;
-    static constexpr _float s_fUpperCooldown = 90.f;
-    //static constexpr _float s_fUpperCooldown = 3.f;
+    //static constexpr _float s_fUpperCooldown = 90.f;
+    static constexpr _float s_fUpperCooldown = 3.f;
 
     // »ç¸Á
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;

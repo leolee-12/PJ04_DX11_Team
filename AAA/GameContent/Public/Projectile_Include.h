@@ -1,0 +1,10 @@
+#pragma once
+#include "Projectile_Boulder.h"
+#include "EnemyBomb.h"
+#include "KirbyBomb.h"
+#include "Spit_Projectile.h"
+#include "KoKabu.h"
+#include "GigatzoBullet.h"
+#include "MeteorRock.h"
+#include "MeteorRock_Large.h"
+#include "MeteorRock_Small.h"

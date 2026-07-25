@@ -1,5 +1,6 @@
 #include "Effect_NonParticle.h"
 
+#include "Effect_OrientationUtils.h"
 #include "GameInstance.h"
 
 CEffect_NonParticle::CEffect_NonParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -34,13 +35,20 @@ void CEffect_NonParticle::Effect_Start()
 {
     __super::Effect_Start();
     Resolve_BaseRotation();
+    Reset_OrientationTracking();
     Update_Size(0.f, 0.f);
+}
+
+void CEffect_NonParticle::On_EffectLoop()
+{
+    Reset_OrientationTracking();
 }
 
 void CEffect_NonParticle::On_Deserialized()
 {
     __super::On_Deserialized();
     Resolve_BaseRotation();
+    Reset_OrientationTracking();
     Update_Size(0.f, 0.f);
 }
 
@@ -107,6 +115,10 @@ void CEffect_NonParticle::Init_PropertyValue()
     m_fRot_Start_Ratio = { 0.f };
     m_fRot_End_Ratio = { 1.f };
 
+    // Orientation
+    m_iOrientationMode = ORIENTATION_NONE;
+    m_vOrientationDirection = { 0.f, 1.f, 0.f };
+
     //Move
     m_bMoveChange = { false };
 
@@ -120,6 +132,8 @@ void CEffect_NonParticle::Init_PropertyValue()
     m_bMoveSin = { false };
     m_fSinCyclePerDuration = 1.f;
     m_fAmplitude = 1.f;
+
+    Reset_OrientationTracking();
 }
 
 void CEffect_NonParticle::Update_Core(const _float fTimeDelta, const _float fRatio)
@@ -132,9 +146,10 @@ void CEffect_NonParticle::Update_Core(const _float fTimeDelta, const _float fRat
     Update_Color(fTimeDelta, fRatio);
     Update_Rot(fTimeDelta, fRatio);
 
-    Update_Move(fTimeDelta, fRatio);       // Move관련 가장 먼저
+    Update_Move(fTimeDelta, fRatio); // Apply base movement first.
     Update_MoveSin(fTimeDelta, fRatio);
     Update_Orbit(fRatio);
+    Update_Orientation();
 }
 
 void CEffect_NonParticle::Update_Alpha(const _float fTimeDelta, const _float fRatio)
@@ -256,6 +271,130 @@ void CEffect_NonParticle::Update_MoveSin(const _float fTimeDelta, const _float f
     m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fCurOffsetY, 0.f, 0.f));
 }
 
+void CEffect_NonParticle::Update_Orientation()
+{
+    const _vector vCurrentPosition =
+        XMVectorSetW(m_pTransformCom->Get_State(STATE::POSITION), 0.f);
+
+    _float3 vCurrentPositionFloat3{};
+    XMStoreFloat3(&vCurrentPositionFloat3, vCurrentPosition);
+
+    if (m_bHasPreviousOrientationPosition == true)
+    {
+        const _vector vPreviousPosition =
+            XMLoadFloat3(&m_vPreviousOrientationPosition);
+        const _vector vVelocity = vCurrentPosition - vPreviousPosition;
+
+        if (XMVectorGetX(XMVector3LengthSq(vVelocity)) > Helper::fEpsilon)
+            XMStoreFloat3(&m_vOrientationVelocity, vVelocity);
+    }
+
+    m_vPreviousOrientationPosition = vCurrentPositionFloat3;
+    m_bHasPreviousOrientationPosition = true;
+
+    if (Is_NonParticleOrientationEnabled() == false)
+        return;
+
+    _matrix BaseRotation = XMMatrixIdentity();
+    BaseRotation.r[0] = XMVectorSetW(
+        XMVector3Normalize(m_pTransformCom->Get_State(STATE::RIGHT)),
+        0.f);
+    BaseRotation.r[1] = XMVectorSetW(
+        XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP)),
+        0.f);
+    BaseRotation.r[2] = XMVectorSetW(
+        XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK)),
+        0.f);
+
+    const _matrix OrientationRotation =
+        EffectOrientation::Make_UpAlignedRotation(
+            Make_NonParticleOrientationUp(),
+            BaseRotation);
+    const _float3 vScale = m_pTransformCom->Get_Scaled();
+
+    m_pTransformCom->Set_State(
+        STATE::RIGHT,
+        XMVector3Normalize(OrientationRotation.r[0]) * vScale.x);
+    m_pTransformCom->Set_State(
+        STATE::UP,
+        XMVector3Normalize(OrientationRotation.r[1]) * vScale.y);
+    m_pTransformCom->Set_State(
+        STATE::LOOK,
+        XMVector3Normalize(OrientationRotation.r[2]) * vScale.z);
+}
+
+_bool CEffect_NonParticle::Is_NonParticleOrientationEnabled() const
+{
+    return
+        m_iOrientationMode > ORIENTATION_NONE &&
+        m_iOrientationMode < ORIENTATION_END;
+}
+
+_vector CEffect_NonParticle::Make_NonParticleOrientationUp() const
+{
+    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    switch (m_iOrientationMode)
+    {
+    case ORIENTATION_VELOCITY:
+        vUp = XMLoadFloat3(&m_vOrientationVelocity);
+
+        if (XMVectorGetX(XMVector3LengthSq(vUp)) <= Helper::fEpsilon)
+            vUp = XMLoadFloat3(&m_vMoveDir);
+        break;
+
+    case ORIENTATION_RADIAL_OUTWARD:
+    case ORIENTATION_RADIAL_INWARD:
+    {
+        const _vector vPosition =
+            XMVectorSetW(m_pTransformCom->Get_State(STATE::POSITION), 0.f);
+        const _vector vPivot = m_bOrbitChange == true
+            ? XMLoadFloat3(&m_vOrbitPivot)
+            : XMVectorZero();
+        vUp = vPosition - vPivot;
+
+        if (XMVectorGetX(XMVector3LengthSq(vUp)) <= Helper::fEpsilon)
+            vUp = XMLoadFloat3(&m_vOrientationVelocity);
+
+        if (m_iOrientationMode == ORIENTATION_RADIAL_INWARD)
+            vUp = XMVectorNegate(vUp);
+        break;
+    }
+
+    case ORIENTATION_DIRECTION:
+        vUp = XMLoadFloat3(&m_vOrientationDirection);
+        break;
+
+    case ORIENTATION_NONE:
+    default:
+        break;
+    }
+
+    if (XMVectorGetX(XMVector3LengthSq(vUp)) <= Helper::fEpsilon)
+        return XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    return XMVector3Normalize(vUp);
+}
+
+_float4x4 CEffect_NonParticle::Make_NonParticleConstrainedBillboardWorldMatrix(
+    const _float4x4& WorldMatrix) const
+{
+    if (Is_NonParticleOrientationEnabled() == false)
+        return WorldMatrix;
+
+    const _matrix ParentWorldMatrix = m_pParentMatrix != nullptr
+        ? XMLoadFloat4x4(m_pParentMatrix)
+        : XMMatrixIdentity();
+    const _vector vWorldUp = XMVector3TransformNormal(
+        Make_NonParticleOrientationUp(),
+        ParentWorldMatrix);
+
+    return EffectOrientation::Make_ConstrainedBillboardWorldMatrix(
+        WorldMatrix,
+        vWorldUp,
+        *m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType));
+}
+
 void CEffect_NonParticle::Resolve_BaseRotation()
 {
     m_vResolvedBaseRotationDegree = m_vBaseRotationDegree;
@@ -276,4 +415,11 @@ void CEffect_NonParticle::Resolve_BaseRotation()
     m_vResolvedBaseRotationDegree.x = m_pGameInstance_Proxy->RandomFloat(vMin.x, vMax.x);
     m_vResolvedBaseRotationDegree.y = m_pGameInstance_Proxy->RandomFloat(vMin.y, vMax.y);
     m_vResolvedBaseRotationDegree.z = m_pGameInstance_Proxy->RandomFloat(vMin.z, vMax.z);
+}
+
+void CEffect_NonParticle::Reset_OrientationTracking()
+{
+    m_vOrientationVelocity = m_vMoveDir;
+    m_vPreviousOrientationPosition = {};
+    m_bHasPreviousOrientationPosition = false;
 }

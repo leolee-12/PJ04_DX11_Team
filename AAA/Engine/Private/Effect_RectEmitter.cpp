@@ -54,7 +54,12 @@ HRESULT CEffect_RectEmitter::Render()
         if (Particle.bAlive == false)
             continue;
 
-        const _float4x4 ParticleWorld = Make_EmitterParticleWorldMatrix(Particle);
+        _float4x4 ParticleWorld = Make_EmitterParticleWorldMatrix(Particle);
+        if (m_bBillboard == true && Is_EmitterOrientationEnabled() == true)
+            ParticleWorld = Make_EmitterConstrainedBillboardWorldMatrix(
+                Particle,
+                ParticleWorld);
+
         if (FAILED(EffectRect::Bind_ParticleDrawValues(
             m_pShaderCom, ParticleWorld, Particle.fAlpha, Particle.vColor)))
             return E_FAIL;
@@ -104,6 +109,16 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue()
         FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &bUseTextureFrame, sizeof(_bool))) ||
         FAILED(EffectRect::Bind_Roll(m_pShaderCom, 0.f)))
         return E_FAIL;
+
+    if (m_bBillboard == true && Is_EmitterOrientationEnabled() == true)
+    {
+        const _bool bShaderBillboard = false;
+        if (FAILED(m_pShaderCom->Bind_RawValue(
+            "g_bBillboard",
+            &bShaderBillboard,
+            sizeof(bShaderBillboard))))
+            return E_FAIL;
+    }
 
     return S_OK;
 }

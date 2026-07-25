@@ -21,6 +21,8 @@ HRESULT CTown_Step2::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
+    m_pGameInstance_Proxy->Publish(EventTag::CutFade_Out, nullptr);
+
     return S_OK;
 }
 

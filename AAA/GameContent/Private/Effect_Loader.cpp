@@ -129,6 +129,12 @@ namespace
         { TEXT("Nail_Smoke"),             TEXT("../../Resources/EffectContainerJSON/YSH/Nail_Smoke.JSON") },
         { TEXT("LeoJump_Smoke"),          TEXT("../../Resources/EffectContainerJSON/YSH/LeoJump_Smoke.JSON") },
 
+        //Meta
+        { TEXT("Meta_IntroLocking"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_IntroLocking.JSON") },
+        { TEXT("Meta_AppearFlash"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_AppearFlash.JSON") },
+        { TEXT("Meta_Attack1Flash"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Attack1Flash.JSON") },
+        { TEXT("Meta_DemoUpperCharge"),       TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge.JSON") },
+        { TEXT("Meta_UpperCharge"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_UpperCharge.JSON") },
     };
 }
 

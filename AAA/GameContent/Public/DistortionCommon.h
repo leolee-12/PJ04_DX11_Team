@@ -18,6 +18,7 @@ class CDistortionCommon final : public CEffect_NonParticle
 	PROPERTY(_bool, m_bBillboard, L"Billboard", L"Distortion");
 	PROPERTY(_bool, m_bRadialFromUV, L"Radial From UV", L"Distortion");
 	PROPERTY(_float, m_fDistortionStrength, L"Strength", L"Distortion");
+	PROPERTY(_bool, m_bFlipGreen, L"Flip Green", L"Distortion");
 
 public:
 	struct DISTORTION_COMMON_DESC : public CEffect_NonParticle::EFFECT_NONEPARTICLE_DESC
