@@ -210,6 +210,7 @@ private:
         const _float4x4* pAttachBone = { nullptr };
         const _float4x4* pAttachAnchor = { nullptr };
         _float3          vSaveScale = { 1.f, 1.f, 1.f };
+        _bool            bLockFxFired = { false };
     };
 
     struct ROCK_FIELD

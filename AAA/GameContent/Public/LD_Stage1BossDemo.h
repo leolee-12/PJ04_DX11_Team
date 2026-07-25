@@ -16,9 +16,6 @@ public:
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
 
 private:
-	enum class DEMO_STATE { IDLE, PLAYING };
-
-private:
 	CLD_Stage1BossDemo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CLD_Stage1BossDemo(const CLD_Stage1BossDemo& Prototype);
 	virtual ~CLD_Stage1BossDemo() = default;
@@ -31,9 +28,6 @@ public:
 	static void Register_LevelDesignSpecs();
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-
-private:
-	DEMO_STATE m_eDemoState = { DEMO_STATE::IDLE };
 
 private:
 	virtual HRESULT Ready_Events() override;

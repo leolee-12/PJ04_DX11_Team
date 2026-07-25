@@ -28,7 +28,7 @@ namespace
 		{ "BossMap1", L"BossMap1", },
 
 		{ "Town", L"Town", },
-		{ "WMap", L"WMap", },
+		{ "Ending", L"Ending", },
 		{ "Town2", L"Town2", },
 
 		{ "Arena", L"Arena", },

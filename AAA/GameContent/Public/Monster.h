@@ -1,5 +1,6 @@
 #pragma once
 #include "GameContent_Defines.h"
+#include "LevelDesign_LoadTypes.h"
 #include "Character.h"
 #include "Monster_BlackBoard.h"
 #include "Inhalable.h"
@@ -67,6 +68,7 @@ public:
 	const _float3&				Get_BasePos() const { return m_vBasePos; }
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
 
+	const LD_OBJECT_DESC&		Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
 	_int						Get_AIType() const { return m_iAIType; }
 	_bool						IsDead() { return m_fCurHP <= 0.f; }
 
@@ -130,6 +132,8 @@ public:
 	void						Stop_LaunchSmokeFx(_bool bImmediate = false);
 
 protected:
+	LD_OBJECT_DESC				m_tLevelDesignDesc = {};
+
 	CController*				m_pController = { nullptr };
 	CMonster_Movement*			m_pMovement = { nullptr };
 

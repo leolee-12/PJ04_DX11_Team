@@ -21,7 +21,7 @@ technique11 DefaultTechnique
     }
     pass White_Pass // 1
     {
-        SetRasterizerState(RS_Cull_None);
+        SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -218,5 +218,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_UKWN2_SAND_OPAQUE();
+    }
+    pass BLEND_UKWN_BARRIER_Pass // 21
+    {
+        SetRasterizerState(RS_Default); // 양면 벽이라 백페이스 컬링 필수. 안팎 뒤집히면 RS_Cull_CW
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BLEND_UKWN_BARRIER();
     }
 }

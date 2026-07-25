@@ -218,7 +218,7 @@ inline _bool EnvObject_NeedsModel(const ENV_OBJECT_DESC& Desc)
 struct ENV_INSTANCE_DATA
 {
 	_float4x4 matWorld = {};
-	_float4 vDissolveParams = {}; // x: Main, y: Shadow, z/w: reserved
+	_float4 vDissolveParams = {}; // x: Main, y: Shadow, z: NearDither ±Ê¿Ã, w: reserved
 };
 
 static_assert(sizeof(ENV_INSTANCE_DATA) == 80, "ENV_INSTANCE_DATA must match the instance input layout.");

@@ -28,6 +28,7 @@ public:
 		MeshNameFilter fcPickableFilter = { nullptr };
 		_bool bCookCollisionMesh = { false };
 		MeshNameFilter fcCollisionCookFilter = { nullptr };
+		_int iCookExcludePass = { -1 }; // -1 = ¹Ì»ç¿ë
 
 		MODEL_LOAD_DESC()
 		{
@@ -118,6 +119,7 @@ private:
 	_wstring					m_strModelPath = {};
 	PickableFilter              m_PickableFilter = { nullptr };
 	PickableFilter              m_CollisionCookFilter = { nullptr };
+	_int                        m_iCookExcludePass = { -1 };
 
 private:
 	size_t						m_iNumMeshes = {};
@@ -163,7 +165,7 @@ private:
 
 private:
 	void Load_MeshLayers(const _char* pModelFilePath);
-	_bool Should_CookCollisionMesh(const string& strMeshName) const;
+	_bool Should_CookCollisionMesh(_uint iMeshIndex, const string& strMeshName) const;
 	HRESULT Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 	HRESULT Cook_CollisionAnimMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 

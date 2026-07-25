@@ -161,17 +161,6 @@ HRESULT CMapSection::On_EditTransformChanged()
 	return S_OK;
 }
 
-const MESH_LAYER_IDX* CMapSection::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
-{
-	if (0u != iModelSlot)
-		return nullptr;
-
-	if (nullptr == m_pModelCom || iMesh >= m_pModelCom->Get_NumMeshes())
-		return nullptr;
-
-	return &m_pModelCom->Get_MeshLayer(iMesh);
-}
-
 HRESULT CMapSection::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
 {
 	if (0u != iModelSlot)
