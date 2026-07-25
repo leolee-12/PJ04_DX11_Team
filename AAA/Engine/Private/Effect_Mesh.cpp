@@ -208,8 +208,16 @@ HRESULT CEffect_Mesh::Bind_ShaderResources()
     _float4x4 WorldMatrix = m_CombinedWorldMatrix;
     if (m_bBillboard == true)
     {
-        WorldMatrix = Make_BillboardWorldMatrix(m_CombinedWorldMatrix);
-        EffectMesh::Apply_BillboardRoll(WorldMatrix, m_fRoll);
+        if (Is_NonParticleOrientationEnabled() == true)
+        {
+            WorldMatrix = Make_NonParticleConstrainedBillboardWorldMatrix(
+                m_CombinedWorldMatrix);
+        }
+        else
+        {
+            WorldMatrix = Make_BillboardWorldMatrix(m_CombinedWorldMatrix);
+            EffectMesh::Apply_BillboardRoll(WorldMatrix, m_fRoll);
+        }
     }
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
