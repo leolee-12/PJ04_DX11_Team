@@ -1123,8 +1123,17 @@
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect">
       <UniqueIdentifier>{02456022-b37f-4155-b1ac-563ab86b468f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperAtk">
+      <UniqueIdentifier>{e7d85034-3cad-4b88-88ec-4b9dcaec2d5c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperCharge">
       <UniqueIdentifier>{fb120236-c8e3-4bd8-b6da-b8a36261d9ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperFinal">
+      <UniqueIdentifier>{b5e8ea68-a596-43b2-9bd3-6374660e036b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperUp">
+      <UniqueIdentifier>{3245430f-383f-424d-a53e-26fc18116e0c}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking">
       <UniqueIdentifier>{b0d99798-cd56-46ca-b795-9dcd57643831}</UniqueIdentifier>
@@ -2637,8 +2646,17 @@
     <ClInclude Include="..\Public\MeshParticleCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Meta_DemoUpperAtk.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperAtk</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Meta_DemoUpperCharge.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperCharge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Meta_DemoUpperFinal.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperFinal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Meta_DemoUpperUp.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperUp</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Meta_IntroLocking.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking</Filter>
@@ -4115,8 +4133,17 @@
     <ClCompile Include="..\Private\MeshParticleCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Meta_DemoUpperAtk.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperAtk</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Meta_DemoUpperCharge.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperCharge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_DemoUpperFinal.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperFinal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_DemoUpperUp.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\DemoUpperUp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Meta_IntroLocking.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking</Filter>

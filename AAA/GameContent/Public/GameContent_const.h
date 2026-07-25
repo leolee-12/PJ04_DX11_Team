@@ -135,7 +135,10 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Meta_Ring1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Ring1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Ring1.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Meta_CircleFlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_CircleFlash"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/CircleFlash.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Meta_Line1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Line1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Line1.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_Line2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Line2"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Line2.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Meta_Shine1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Shine1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Shine1.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_HitFire1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_HitFire1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/HitFire1.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_HitFire2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_HitFire2"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/HitFire2.png"), 1 };
 
 
 	//sky
