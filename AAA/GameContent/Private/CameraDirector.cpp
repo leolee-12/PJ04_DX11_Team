@@ -86,7 +86,7 @@ void CCameraDirector::On_CameraChange(void* p)
 
     _bool bReady = false;
     if (bCut)
-        bReady = m_pCutCam->Play_Track(d->szTrack, d->pProgress, d->pAnchorWorld);
+        bReady = m_pCutCam->Play_Track(d->szTrack, d->pProgress, d->pAnchorWorld, d->fSpeed);
 
     if (bArea)
     {
