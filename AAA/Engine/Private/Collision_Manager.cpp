@@ -101,6 +101,58 @@ void CCollision_Manager::ImmediateUnregister(CCollider* pCollider, _uint Group)
 	}
 }
 
+void CCollision_Manager::Query_Overlap(CCollider* pQuery, _uint Group, vector<CCollider*>* pOut)
+{
+	if (nullptr == pQuery || nullptr == pOut)
+		return;
+
+	auto iter = m_hmapCollisionGroup.find(Group);
+	if (iter == m_hmapCollisionGroup.end())
+		return;
+
+	for (auto* pDst : iter->second)
+	{
+		if (nullptr == pDst || pDst == pQuery)
+			continue;
+
+		if (!pDst->Is_Enabled())
+			continue;
+
+		if (nullptr != pQuery->Get_Owner() && pQuery->Get_Owner() == pDst->Get_Owner())
+			continue;
+
+		if (pQuery->Intersect(pDst))
+			pOut->push_back(pDst);
+	}
+}
+
+void CCollision_Manager::Query_Overlap(CCollider* pQuery, const vector<_uint>& Groups, vector<CCollider*>* pOut)
+{
+	for (_uint Group : Groups)
+		Query_Overlap(pQuery, Group, pOut);
+}
+
+void CCollision_Manager::Query_OverlapOwners(CCollider* pQuery, const vector<_uint>& Groups, vector<CGameObject*>* pOut)
+{
+	if (nullptr == pOut)
+		return;
+
+	vector<CCollider*> Hits;
+	Query_Overlap(pQuery, Groups, &Hits);
+
+	for (auto* pHit : Hits)
+	{
+		CGameObject* pOwner = pHit->Get_Owner();
+		if (nullptr == pOwner)
+			continue;
+
+		if (find(pOut->begin(), pOut->end(), pOwner) != pOut->end())
+			continue;
+
+		pOut->push_back(pOwner);
+	}
+}
+
 void CCollision_Manager::RequestUnregister(CCollider* pCollider, _uint Group)
 {
 	if (pCollider == nullptr) { return; }

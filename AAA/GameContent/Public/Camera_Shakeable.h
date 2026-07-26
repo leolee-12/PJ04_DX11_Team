@@ -19,12 +19,35 @@ virtual ~CCamera_Shakeable() = default;
 public:
     void Add_Shake(_float fTrauma, _float fDuration = 0.f, _bool bIgnoreTimeScale = false)
     {
+        if (!m_bActive)
+            return;
+
         m_fTrauma = min(1.f, m_fTrauma + fTrauma);
         m_fTraumaDecay = (fDuration > 0.f) ? (m_fTrauma / fDuration) : DEFAULT_TRAUMA_DECAY;
         m_bShakeRawTime = bIgnoreTimeScale;
     }
-    void Set_Rumble(_float fLevel) { m_fRumble = max(0.f, min(1.f, fLevel)); }
-    void Stop_Rumble() { Add_Shake(m_fRumble); m_fRumble = 0.f; }
+    void Set_Rumble(_float fLevel) 
+    { 
+        if (!m_bActive)
+            return;
+
+        m_fRumble = max(0.f, min(1.f, fLevel)); 
+    }
+    void Stop_Rumble() 
+    { 
+        if (!m_bActive)
+            return;
+
+        Add_Shake(m_fRumble); 
+        m_fRumble = 0.f; 
+    }
+
+    void Reset_Shake()
+    {
+        m_fTrauma = 0.f;
+        m_fRumble = 0.f;
+        m_fShakeTime = 0.f;
+    }
 
 protected:
     void    Tick_Shake(_float fTimeDelta);     // 파생 Priority_Update 초입에서 호출

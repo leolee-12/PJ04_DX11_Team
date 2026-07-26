@@ -67,6 +67,7 @@ void CLD_CamPivot::Priority_Update(_float fTimeDelta)
 		cam.eCam = ECutsceneCam::Cutscene;
 		cam.szTrack = L"Ending_Cut1_camera1";
 		cam.pAnchorWorld = Get_PivotWorldMatrixPtr();
+		cam.fSpeed = 1.5f;
 		m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 		m_bShotCam = true;
 	}

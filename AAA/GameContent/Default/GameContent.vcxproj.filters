@@ -1405,6 +1405,9 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\HelpUI">
       <UniqueIdentifier>{3129b019-37b4-434d-a7f9-b49f78201594}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\HelpUI\ClickQTE">
+      <UniqueIdentifier>{d4f5a841-20b8-45fc-88c9-3a0061ea9243}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\HelpUI\QTE">
       <UniqueIdentifier>{1caed732-02f9-405a-8cf4-37f1442462c3}</UniqueIdentifier>
     </Filter>
@@ -1446,6 +1449,9 @@
     </Filter>
     <Filter Include="00. GameObject\97. UI\UICoordinator">
       <UniqueIdentifier>{94825e98-ac74-4d04-aabf-a212f289715e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UICoordinator\CreditCoordinator">
+      <UniqueIdentifier>{f44b29bb-d444-4b1e-b64f-149ebf99f5d6}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI\UICoordinator\MissionBoard">
       <UniqueIdentifier>{ef82744d-c3ac-46ff-9468-ccdb35864dda}</UniqueIdentifier>
@@ -3120,8 +3126,14 @@
     <ClInclude Include="..\public\UI_BossStatus.h">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_ClickQTE.h">
+      <Filter>00. GameObject\97. UI\UIContainer\HelpUI\ClickQTE</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\UI_CoordinatorContainer.h">
       <Filter>00. GameObject\97. UI\UICoordinator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_CreditCoordinator.h">
+      <Filter>00. GameObject\97. UI\UICoordinator\CreditCoordinator</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_Curtain.h">
       <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\BG</Filter>
@@ -4595,8 +4607,14 @@
     <ClCompile Include="..\private\UI_BossStatus.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UI_ClickQTE.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\HelpUI\ClickQTE</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp">
       <Filter>00. GameObject\97. UI\UICoordinator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_CreditCoordinator.cpp">
+      <Filter>00. GameObject\97. UI\UICoordinator\CreditCoordinator</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_Curtain.cpp">
       <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\BG</Filter>
