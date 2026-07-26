@@ -65,6 +65,14 @@ void    CGameInstance_Proxy::Clear_Resources(_int iLevelIndex)
 	m_pOwner->Clear_Resources(iLevelIndex);
 }
 
+void CGameInstance_Proxy::Register_LevelClearCallback(function<void(_uint)> cb)
+{
+	if (m_pOwner == nullptr)
+		return;
+
+	m_pOwner->Register_LevelClearCallBack(move(cb));
+}
+
 _float CGameInstance_Proxy::RandomFloat(_float fMin, _float fMax) const
 {
 	if (!IsConnected())

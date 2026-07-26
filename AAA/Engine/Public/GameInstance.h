@@ -66,6 +66,12 @@ private:
 	HRESULT End_Draw();
 	void Clear_Resources(_int iLevelIndex);
 
+	using LevelClearCallback = function<void(_uint)>;
+	void  Register_LevelClearCallBack(LevelClearCallback cb)
+	{
+		m_LevelClearCallbacks.push_back(move(cb));
+	}
+
 	_float RandomFloat(_float fMin, _float fMax) const;
 	_int   RandomInt(_int iMin, _int iMax) const;
 	
@@ -280,6 +286,8 @@ private:
 	CCulling_Manager*			m_pCulling_Manager = { nullptr };
 	CTexture_Hub*				m_pTexture_Hub = { nullptr };
 	CProfiler_Manager*			m_pProfiler_Manager = { nullptr };
+
+	vector<LevelClearCallback>  m_LevelClearCallbacks;
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

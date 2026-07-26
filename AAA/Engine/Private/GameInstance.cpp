@@ -224,6 +224,9 @@ void CGameInstance::Clear_Resources(_int iLevelIndex)
     if (-1 == iLevelIndex)
         return;
 
+    for (auto& cb : m_LevelClearCallbacks)
+        cb(static_cast<_uint>(iLevelIndex));
+
     m_pEffect_Manager->Clear_Level(iLevelIndex);
     m_pObject_Manager->Clear(iLevelIndex);
     m_pPrototype_Manager->Clear(iLevelIndex);

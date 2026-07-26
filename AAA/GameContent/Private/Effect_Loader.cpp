@@ -247,7 +247,7 @@ HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
         pFx->Get_Transform()->Set_State(STATE::LOOK, XMVector3Normalize(matRot.r[2]) * vScale.z);
     }
 
-    m_Epochs[pFx] = ++m_iEpochCounter;
+    m_Epochs[pFx] = { ++m_iEpochCounter, iTargetLevel };
 
     if (ppOut)
         *ppOut = pFx;
@@ -258,13 +258,20 @@ HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
     return S_OK;
 }
 
+void CEffect_Loader::Clear_Epochs(_uint iLevel)
+{
+    for (auto it = m_Epochs.begin(); it != m_Epochs.end(); )
+        it = (it->second.iLevel == iLevel)
+        ? m_Epochs.erase(it) : next(it);
+}
+
 _bool CEffect_Loader::Is_Current(const FX_HANDLE& h) const
 {
     if (nullptr == h.p)
         return false;
 
     auto it = m_Epochs.find(h.p);
-    return it != m_Epochs.end() && it->second == h.iEpoch;
+    return it != m_Epochs.end() && it->second.iEpoch == h.iEpoch;
 }
 
 void CEffect_Loader::Free()
