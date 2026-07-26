@@ -79,9 +79,6 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash">
       <UniqueIdentifier>{553f3de7-862e-424a-87ee-191f43044a21}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail">
-      <UniqueIdentifier>{f480169f-cb17-4713-8f02-aa942d07a565}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer">
       <UniqueIdentifier>{5c7dcb8c-5052-4597-972e-075193a50383}</UniqueIdentifier>
     </Filter>
@@ -207,12 +204,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\08. Common_Ring03">
       <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\10. Common_SpinSlash">
-      <UniqueIdentifier>{5ab4f5f3-211a-454f-82c1-c91e908decbf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail">
-      <UniqueIdentifier>{7d7b3904-b384-435a-9f16-5d9eaf0cb573}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect">
       <UniqueIdentifier>{dd57bfb0-711b-4c59-a37c-801cd5dcb276}</UniqueIdentifier>
@@ -1956,12 +1947,6 @@
     <ClInclude Include="..\Public\Common_SphereNoise.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\16. Common_SphereNoise</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Common_SpinSlash.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\10. Common_SpinSlash</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Common_SpinSlashTrail.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\CommonHit.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClInclude>
@@ -3063,12 +3048,6 @@
     <ClInclude Include="..\public\Swing_Smoke.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SwingEffect</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Sword_SpinSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Sword_SpinSlashTrail.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\SwordCharge.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\96. SwordCharge</Filter>
     </ClInclude>
@@ -3094,6 +3073,15 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordJumpSpin.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordSuperSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MetaSuperSpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
@@ -3544,12 +3532,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Common_SphereNoise.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\16. Common_SphereNoise</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Common_SpinSlash.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\10. Common_SpinSlash</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CommonHit.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
@@ -4547,12 +4529,6 @@
     <ClCompile Include="..\private\Swing_Smoke.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SwingEffect</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Sword_SpinSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\SwordCharge.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\96. SwordCharge</Filter>
     </ClCompile>
@@ -4575,6 +4551,15 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordJumpSpin.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordSpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">
