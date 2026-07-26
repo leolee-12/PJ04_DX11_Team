@@ -24,6 +24,7 @@
 #include "Stage1_Step3.h"
 
 #include "Arena.h"
+#include "Ending.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -90,6 +91,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
             break;
         case LEVEL::ARENA:
             pNextLevel = CArena::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::ENDING:
+            pNextLevel = CEnding::Create(m_pDevice, m_pContext);
             break;
         }
 
