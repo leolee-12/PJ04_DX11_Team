@@ -28,7 +28,7 @@ namespace
 
     const LEVEL_LIGHT ENDING_LIGHT = {
         { 0.557f, -0.766f, 0.321f, 0.f },   // vDir
-        { 6.2f,   6.15f,   5.76f,  1.f },   // vDiffuse
+        { 3.1f,   3.075f,   2.78f,  1.f },   // vDiffuse
         { 0.f,    0.f,     0.f,    1.f },   // vAmbient
         { 1.f,    1.f,     1.f,    1.f },   // vSpecular
         TEXT("Ending"),
