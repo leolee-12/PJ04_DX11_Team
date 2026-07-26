@@ -802,6 +802,10 @@ namespace
 				return E_FAIL;
 			if (FAILED(Load_OptionalFloat(jClassOverride, "NormalStrength", &Desc.fNormalStrength)))
 				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "NormalWarpStrength", &Desc.fNormalWarpStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "NormalSwayStrength", &Desc.fNormalSwayStrength)))
+				return E_FAIL;
 
 			if (FAILED(Load_OptionalFloat(jClassOverride, "FresnelPower", &Desc.fFresnelPower)))
 				return E_FAIL;
@@ -814,6 +818,8 @@ namespace
 			if (FAILED(Load_OptionalFloat(jClassOverride, "SpecularPower", &Desc.fSpecularPower)))
 				return E_FAIL;
 			if (FAILED(Load_OptionalFloat(jClassOverride, "SpecularStrength", &Desc.fSpecularStrength)))
+				return E_FAIL;
+			if (FAILED(Load_OptionalFloat(jClassOverride, "SpecularScatter", &Desc.fSpecularScatter)))
 				return E_FAIL;
 
 			if (FAILED(Load_OptionalFloat(jClassOverride, "FoamWidth", &Desc.fFoamWidth)))

@@ -745,6 +745,34 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
+    Register(CHammerSwing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerSwing),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG,
+                CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerSwing::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/00_HammerSwing/SwingTorus3.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID,
+                Texture_HammerSwing_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext,
+                    Texture_HammerSwing_Distortion.szFileTag,
+                    Texture_HammerSwing_Distortion.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID,
+                Texture_HammerSwing_Shape.szProtoTag,
+                CTexture::Create(pDevice, pContext,
+                    Texture_HammerSwing_Shape.szFileTag,
+                    Texture_HammerSwing_Shape.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID,
+                Texture_HammerSwing_Edge.szProtoTag,
+                CTexture::Create(pDevice, pContext,
+                    Texture_HammerSwing_Edge.szFileTag,
+                    Texture_HammerSwing_Edge.iNumTex));
+        )
+    );
+
     Register(CCoasterWind::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCoasterWind),
         LOADER
         (

@@ -142,6 +142,8 @@ json CLD_WaterArea::Serialize() const
     jWaterMaterial["NormalTiling1"] = { m_tWaterRenderDesc.vNormalTiling1.x, m_tWaterRenderDesc.vNormalTiling1.y };
     jWaterMaterial["NormalSpeed1"] = { m_tWaterRenderDesc.vNormalSpeed1.x, m_tWaterRenderDesc.vNormalSpeed1.y };
     jWaterMaterial["NormalStrength"] = m_tWaterRenderDesc.fNormalStrength;
+    jWaterMaterial["NormalWarpStrength"] = m_tWaterRenderDesc.fNormalWarpStrength;
+    jWaterMaterial["NormalSwayStrength"] = m_tWaterRenderDesc.fNormalSwayStrength;
 
     jWaterMaterial["FresnelPower"] = m_tWaterRenderDesc.fFresnelPower;
     jWaterMaterial["ReflectionStrength"] = m_tWaterRenderDesc.fReflectionStrength;
@@ -149,6 +151,7 @@ json CLD_WaterArea::Serialize() const
     jWaterMaterial["LightReceiveStrength"] = m_tWaterRenderDesc.fLightReceiveStrength;
     jWaterMaterial["SpecularPower"] = m_tWaterRenderDesc.fSpecularPower;
     jWaterMaterial["SpecularStrength"] = m_tWaterRenderDesc.fSpecularStrength;
+    jWaterMaterial["SpecularScatter"] = m_tWaterRenderDesc.fSpecularScatter;
 
     jWaterMaterial["FoamWidth"] = m_tWaterRenderDesc.fFoamWidth;
     jWaterMaterial["FoamStrength"] = m_tWaterRenderDesc.fFoamStrength;
@@ -192,6 +195,8 @@ void CLD_WaterArea::Deserialize_Internal(const json& j)
     JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "NormalTiling1", &Desc.vNormalTiling1);
     JsonUtils::Try_ReadFloat2Array(jWaterMaterial, "NormalSpeed1", &Desc.vNormalSpeed1);
     JsonUtils::Try_ReadFloat(jWaterMaterial, "NormalStrength", &Desc.fNormalStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "NormalWarpStrength", &Desc.fNormalWarpStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "NormalSwayStrength", &Desc.fNormalSwayStrength);
 
     JsonUtils::Try_ReadFloat(jWaterMaterial, "FresnelPower", &Desc.fFresnelPower);
     JsonUtils::Try_ReadFloat(jWaterMaterial, "ReflectionStrength", &Desc.fReflectionStrength);
@@ -199,6 +204,7 @@ void CLD_WaterArea::Deserialize_Internal(const json& j)
     JsonUtils::Try_ReadFloat(jWaterMaterial, "LightReceiveStrength", &Desc.fLightReceiveStrength);
     JsonUtils::Try_ReadFloat(jWaterMaterial, "SpecularPower", &Desc.fSpecularPower);
     JsonUtils::Try_ReadFloat(jWaterMaterial, "SpecularStrength", &Desc.fSpecularStrength);
+    JsonUtils::Try_ReadFloat(jWaterMaterial, "SpecularScatter", &Desc.fSpecularScatter);
 
     JsonUtils::Try_ReadFloat(jWaterMaterial, "FoamWidth", &Desc.fFoamWidth);
     JsonUtils::Try_ReadFloat(jWaterMaterial, "FoamStrength", &Desc.fFoamStrength);

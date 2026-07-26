@@ -49,8 +49,8 @@ void CStage0_Step1::Update(_float fTimeDelta)
 #ifdef  _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
     {
-        //m_pGameInstance_Proxy->Publish(TEXT("Arena_FadeOut_Start"), nullptr);
-        m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
+        m_pGameInstance_Proxy->Publish(TEXT("Arena_FadeOut_Start"), nullptr);
+        //m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
     }
     if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
     {
