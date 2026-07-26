@@ -21,7 +21,7 @@ HRESULT CStage1_Step1::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    //m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Grassland1.marker.wav", 5.f, 0.15f);
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_VolcanoGrassland.marker.wav", 3.f, 0.15f);
 
     return S_OK;
 }

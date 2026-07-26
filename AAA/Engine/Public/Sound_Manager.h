@@ -50,6 +50,8 @@ public:
     void Set_ListenerPos(const _float3& v) { m_vListenerPos = v; }
     void Set_ListenerPos(const _float4& v) { m_vListenerPos = { v.x, v.y, v.z }; }
 
+    _wstring Get_Current_BGM_Key() const;
+
 private:
     FMOD::Channel* PlayInternal(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus, bool bLoop);
     FMOD::Sound* Find_Sound(const TCHAR* pSoundKey) const;
