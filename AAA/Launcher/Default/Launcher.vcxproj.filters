@@ -58,6 +58,9 @@
     <Filter Include="01. Levels\02. Stage\Town\Step2">
       <UniqueIdentifier>{1b8c9dca-188a-4f78-8570-33b958d68890}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\03. Ending">
+      <UniqueIdentifier>{fd5aebcc-ee09-4f5f-a13d-ab5fe1f1378b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01. Levels\99. Test">
       <UniqueIdentifier>{5b60027e-bb0a-4b40-ae62-1996f862b6a5}</UniqueIdentifier>
     </Filter>
@@ -67,9 +70,6 @@
     <Filter Include="99. Defines">
       <UniqueIdentifier>{dd6aa0aa-c4c2-46b8-b52c-7511d9ad0e05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\03. Ending">
-      <UniqueIdentifier>{fd5aebcc-ee09-4f5f-a13d-ab5fe1f1378b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Arena.h">
@@ -77,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss_Stage1.h">
       <Filter>01. Levels\02. Stage\Boss\BossStage1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Ending.h">
+      <Filter>01. Levels\03. Ending</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Launcher_Defines.h">
       <Filter>99. Defines</Filter>
@@ -138,9 +141,6 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Ending.h">
-      <Filter>01. Levels\03. Ending</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Launcher.ico">
@@ -161,6 +161,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Stage1.cpp">
       <Filter>01. Levels\02. Stage\Boss\BossStage1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Ending.cpp">
+      <Filter>01. Levels\03. Ending</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_ArenaLoading.cpp">
       <Filter>01. Levels\00. Loading</Filter>
@@ -203,9 +206,6 @@
     </ClCompile>
     <ClCompile Include="Launcher.cpp">
       <Filter>98. Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Ending.cpp">
-      <Filter>01. Levels\03. Ending</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

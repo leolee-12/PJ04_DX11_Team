@@ -124,6 +124,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\10. Kirby_SwordTrail">
       <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot">
+      <UniqueIdentifier>{f31b3b4a-903f-49e8-913b-26edfdbf7c6e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\11. CarLanding">
       <UniqueIdentifier>{b817f195-327b-4c7f-957f-56e368b950d2}</UniqueIdentifier>
     </Filter>
@@ -411,6 +414,9 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState">
       <UniqueIdentifier>{3ca1c2dd-321f-4630-b372-d441537bdff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote">
+      <UniqueIdentifier>{a6e69362-4eb2-451e-a5f8-b304fda5399e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall">
       <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
@@ -1666,12 +1672,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot">
-      <UniqueIdentifier>{f31b3b4a-903f-49e8-913b-26edfdbf7c6e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote">
-      <UniqueIdentifier>{a6e69362-4eb2-451e-a5f8-b304fda5399e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2187,6 +2187,9 @@
     <ClInclude Include="..\public\GorillaNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HammerSwing.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\HitMark.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
     </ClInclude>
@@ -2336,6 +2339,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Dodge.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Emote.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Fall.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall</Filter>
@@ -2793,6 +2799,9 @@
     <ClInclude Include="..\public\MonsterPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MoonShot.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Movement_Child.h">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClInclude>
@@ -3093,9 +3102,6 @@
     <ClInclude Include="..\Public\TestContainer.h">
       <Filter>00. GameObject\Test</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HammerSwing.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClInclude>
@@ -3263,12 +3269,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\MoonShot.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_Emote.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3737,6 +3737,9 @@
     <ClCompile Include="..\private\GorillaNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\HammerSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\HitMark.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
     </ClCompile>
@@ -3874,6 +3877,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Dodge.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Emote.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Fall.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall</Filter>
@@ -4292,6 +4298,9 @@
     <ClCompile Include="..\private\MonsterPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\MoonShot.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Movement_Child.cpp">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClCompile>
@@ -4571,9 +4580,6 @@
     <ClCompile Include="..\Private\TestContainer.cpp">
       <Filter>00. GameObject\Test</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HammerSwing.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClCompile>
@@ -4726,12 +4732,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\MoonShot.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Emote.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

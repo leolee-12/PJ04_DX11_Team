@@ -126,6 +126,7 @@ namespace WorldShaderFlags
 {
 	inline constexpr _uint Dither = 1u << 0;
 	inline constexpr _uint NearDither = 1u << 1;
+	inline constexpr _uint LavaEdgeDither = 1u << 2;
 }
 
 enum class SHADOW_ALPHA_SOURCE : _uint
@@ -166,6 +167,7 @@ enum class WORLD_PASS : _int
 	UKWN2_SAND_OPAQUE,	// 20
 	BLEND_UKWN_BARRIER,	// 21 - 배틀 경계: 카메라 근접 페이드 + 상승 물방울
 	LAVA_SURFACE,		// 22 - MRA.G 크러스트 마스크 + flow 왜곡 용암 표면
+	CUT_CROSSFADE,		// 23 - UNKNOWN(Src) <-> ExtraR(Dst) 크로스페이드. 엔딩 크레딧 액자 사진
 
 	COUNT
 };
@@ -202,6 +204,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::UKWN2_SAND_OPAQUE,	"UKWN2_SAND_OPAQUE",    UKWN },
 	{ WORLD_PASS::BLEND_UKWN_BARRIER,	"BLEND_UKWN_BARRIER",   UKWN },
 	{ WORLD_PASS::LAVA_SURFACE,			"LAVA_SURFACE",			DIFF | MRA | NORM },
+	{ WORLD_PASS::CUT_CROSSFADE,		"CUT_CROSSFADE",		UKWN },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -270,6 +273,7 @@ inline _bool Uses_WorldExtraRSlot(_int iPass)
 	case WORLD_PASS::BLEND_UKWN2_LIGHT:
 	case WORLD_PASS::UKWN2_SAND_OPAQUE:
 	case WORLD_PASS::BLEND_UKWN_BARRIER:
+	case WORLD_PASS::CUT_CROSSFADE:
 		return true;
 
 	default:
