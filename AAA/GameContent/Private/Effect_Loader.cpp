@@ -49,6 +49,8 @@ namespace
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/EffectContainerJSON/YSE/CarMilkyWay_Final2.json") },
         { TEXT("CarThinGas"),             TEXT("../../Resources/EffectContainerJSON/YSE/CarThinGas.JSON") },
         { TEXT("CoasterWind"),            TEXT("../../Resources/YSE/EffectContainer/CoasterWind.json") },
+        { TEXT("HammerSwing"),            TEXT("../../Resources/YSE/EffectContainer/HammerSwing.JSON") },
+        { TEXT("HammerSwingFinal"),       TEXT("../../Resources/YSE/EffectContainer/HammerSwingFinal.JSON") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/EffectContainerJSON/YSE/GetAbilityEffect.JSON") },
         { TEXT("GetDeformEffect"),        TEXT("../../Resources/EffectContainerJSON/YSE/GetDeformEffect .JSON") },

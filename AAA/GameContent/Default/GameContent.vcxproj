@@ -252,6 +252,7 @@
     <ClInclude Include="..\Public\DistortionCommon.h" />
     <ClInclude Include="..\Public\SystemObject_Include.h" />
     <ClInclude Include="..\Public\TestContainer.h" />
+    <ClInclude Include="..\Public\HammerSwing.h" />
     <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
@@ -775,6 +776,7 @@
     <ClCompile Include="..\private\Projectile_Partner.cpp" />
     <ClCompile Include="..\Private\DistortionCommon.cpp" />
     <ClCompile Include="..\Private\TestContainer.cpp" />
+    <ClCompile Include="..\Private\HammerSwing.cpp" />
     <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
