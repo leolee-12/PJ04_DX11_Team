@@ -11,13 +11,16 @@ namespace
 	// 2. Clone에서 AnimEvent json 경로 추가
 
 	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Bridge.CutSceneStart";
+	inline constexpr const _tchar* ENDING_EVENT_TAG = L"Temp.Ending";
 
 	inline constexpr const _char* GARAGE_RADIO_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio.ysh";
 	inline constexpr const _tchar* GARAGE_RADIO_ANIM_EVENT_FILE = L"../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio_Animevents.json";
 
 	inline constexpr const _char* ANIM_CUT1 = "Cut1";
 	inline constexpr const _char* ANIM_WAIT = "Wait";
-	inline constexpr const _char* GARAGE_RADIO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1, ANIM_WAIT };
+	inline constexpr const _char* ANIM_PERFORM = "PerformanceAnim";
+	inline constexpr const _char* ANIM_SPEAKERBIG = "SpeakerBig";
+	inline constexpr const _char* GARAGE_RADIO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1, ANIM_PERFORM, ANIM_SPEAKERBIG, ANIM_WAIT };
 	inline constexpr _float GARAGE_RADIO_ANIM_SPEED = 1.5f;
 }
 
@@ -42,6 +45,8 @@ HRESULT CLD_GarageRadio::Initialize(void* pArg)
 	const LD_ANIM_PLAY_DESC AnimDescs[] =
 	{
 		{ ANIM_CUT1, false, GARAGE_RADIO_ANIM_SPEED },
+		{ ANIM_PERFORM, true, GARAGE_RADIO_ANIM_SPEED },
+		{ ANIM_SPEAKERBIG, true, GARAGE_RADIO_ANIM_SPEED },
 		{ ANIM_WAIT, false, GARAGE_RADIO_ANIM_SPEED },
 	};
 
@@ -76,6 +81,12 @@ HRESULT CLD_GarageRadio::Validate_Initialized()
 		return E_FAIL;
 
 	if (m_tEventObjectDesc.strAnimNames[1] != GARAGE_RADIO_ANIM_NAMES[1])
+		return E_FAIL;
+
+	if (m_tEventObjectDesc.strAnimNames[2] != GARAGE_RADIO_ANIM_NAMES[2])
+		return E_FAIL;
+
+	if (m_tEventObjectDesc.strAnimNames[3] != GARAGE_RADIO_ANIM_NAMES[3])
 		return E_FAIL;
 
 	return S_OK;
@@ -118,8 +129,7 @@ void CLD_GarageRadio::Register_LevelDesignSpecs()
 	CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 }
 
-_bool CLD_GarageRadio::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec,
-	LD_OBJECT_ENTRY* pOutEntry)
+_bool CLD_GarageRadio::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
 {
 	UNREFERENCED_PARAMETER(jEntry);
 
@@ -145,6 +155,8 @@ _bool CLD_GarageRadio::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 
 	Desc.strAnimNames[0] = GARAGE_RADIO_ANIM_NAMES[0];
 	Desc.strAnimNames[1] = GARAGE_RADIO_ANIM_NAMES[1];
+	Desc.strAnimNames[2] = GARAGE_RADIO_ANIM_NAMES[2];
+	Desc.strAnimNames[3] = GARAGE_RADIO_ANIM_NAMES[3];
 
 	*pOutEntry = Desc;
 	return true;
@@ -169,6 +181,12 @@ HRESULT CLD_GarageRadio::Ready_Events()
 				m_pTransformCom->Set_WorldMatrix(fixMat);
 				On_Event();
 			}
+		});
+
+	Subscribe_Event(ENDING_EVENT_TAG, [this](void*)
+		{
+			Play_Anim(ANIM_PERFORM);
+			m_eState = STATE::PLAYING;
 		});
 
 	return S_OK;

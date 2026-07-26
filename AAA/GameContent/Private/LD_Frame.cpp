@@ -11,12 +11,18 @@ NS_BEGIN(Client)
 
 CLD_Frame::CLD_Frame(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevelDesignObject(pDevice, pContext)
+	, m_fCutHold{ 2.f }
+	, m_fCutFade{ 1.f }
+	, m_bCutReset{ false }
 {
 }
 
 CLD_Frame::CLD_Frame(const CLD_Frame& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tStaticModelDesc(Prototype.m_tStaticModelDesc)
+	, m_fCutHold{ Prototype.m_fCutHold }
+	, m_fCutFade{ Prototype.m_fCutFade }
+	, m_bCutReset{ false }
 {
 }
 
@@ -74,7 +80,14 @@ void CLD_Frame::Late_Update(_float fTimeDelta)
 	if (!m_bActive || Is_Dead())
 		return;
 
-	m_fCutCursor = min(m_fCutCursor + fTimeDelta / CUT_DURATION, static_cast<_float>(CUT_TEXTURE_COUNT - 1u));
+	if (m_bCutReset)
+	{
+		m_bCutReset = false;
+		m_fCutCursor = 0.f;
+	}
+
+	const _float fCutPeriod = max(max(m_fCutHold, 0.f) + max(m_fCutFade, 0.f), 0.0001f);
+	m_fCutCursor = min(m_fCutCursor + fTimeDelta / fCutPeriod, static_cast<_float>(CUT_TEXTURE_COUNT - 1u));
 
 	Check_Visible();
 	Submit_RenderGroups();
@@ -282,7 +295,11 @@ HRESULT CLD_Frame::Bind_CutTextures()
 
 	const _uint iSrc = min(static_cast<_uint>(m_fCutCursor), CUT_TEXTURE_COUNT - 1u);
 	const _uint iDst = min(iSrc + 1u, CUT_TEXTURE_COUNT - 1u);
-	const _float fBlend = m_fCutCursor - static_cast<_float>(iSrc);
+
+	const _float fHold = max(m_fCutHold, 0.f);
+	const _float fFade = max(m_fCutFade, 0.f);
+	const _float fElapsed = (m_fCutCursor - static_cast<_float>(iSrc)) * max(fHold + fFade, 0.0001f);
+	const _float fBlend = min(max((fElapsed - fHold) / max(fFade, 0.0001f), 0.f), 1.f);
 
 	if (FAILED(m_pCutTextureCom->Bind_ShaderResource(m_pShaderCom, "g_UnknownTexture", iSrc)))
 		return E_FAIL;
