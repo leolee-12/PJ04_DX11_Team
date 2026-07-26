@@ -26,6 +26,7 @@ private:
 	virtual HRESULT Validate_Initialized() override;
 
 public:
+	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
@@ -37,6 +38,7 @@ public:
 
 private:
 	_float4x4 m_matPivotWorld = {};
+	_bool	  m_bShotCam = { false };
 
 #ifdef _DEBUG
 	CCollider* m_pDebugCollider = { nullptr };

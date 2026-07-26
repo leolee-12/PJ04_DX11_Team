@@ -67,6 +67,9 @@
     <Filter Include="99. Defines">
       <UniqueIdentifier>{dd6aa0aa-c4c2-46b8-b52c-7511d9ad0e05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\03. Ending">
+      <UniqueIdentifier>{fd5aebcc-ee09-4f5f-a13d-ab5fe1f1378b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Arena.h">
@@ -135,6 +138,9 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Ending.h">
+      <Filter>01. Levels\03. Ending</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Launcher.ico">
@@ -197,6 +203,9 @@
     </ClCompile>
     <ClCompile Include="Launcher.cpp">
       <Filter>98. Default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Ending.cpp">
+      <Filter>01. Levels\03. Ending</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
