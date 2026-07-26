@@ -89,11 +89,11 @@ namespace
         { TEXT("Split_Cylinder"),         TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Cylinder_1.JSON") },
         { TEXT("BreakWallEffect"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_BreakWallEffect_0.JSON") },
         { TEXT("ItemEffect"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_ItemEffect_0.JSON") },
-        { TEXT("VanishEffect"),           TEXT("../../Resources/LevelData/Proto_VanishEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/EffectContainerJSON/CHJ/BubbleAura.JSON") },
         { TEXT("LaunchSmoke"),            TEXT("../../Resources/EffectContainerJSON/CHJ/LaunchSmoke.JSON") },
         { TEXT("MoveSmoke"),              TEXT("../../Resources/EffectContainerJSON/CHJ/MoveSmoke.JSON") },
         { TEXT("MonsterLandingSmoke"),    TEXT("../../Resources/EffectContainerJSON/CHJ/MonsterLandingSmoke.JSON") },
+        { TEXT("VanishEffect"),           TEXT("../../Resources/Map/Effect/Proto_VanishEffect_0.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/EffectContainerJSON/CHJ/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/EffectContainerJSON/CHJ/Tornado_BK.JSON") },
@@ -142,6 +142,7 @@ namespace
         { TEXT("Meta_DemoUpperCharge_End"),   TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge_End.JSON") },
         { TEXT("Meta_DemoUpperFinal"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperFinal.JSON") },
         { TEXT("Meta_Locking"),               TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Locking.JSON") },
+        { TEXT("Meta_LockingSpark"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_LockingSpark.JSON") },
 
         { TEXT("Meta_DemoUpperAtk1"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk1.JSON") },
         { TEXT("Meta_DemoUpperAtk2"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk2.JSON") },

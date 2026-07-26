@@ -89,13 +89,27 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(const LD_RUNTIME_LEVELS& Le
 		if (m_pProxy->Has_Prototype(iModelPrototypeLevel, Requirement.strPrototypeTag))
 			continue;
 
-		CModel::MODEL_LOAD_DESC ModelDesc{};
-		ModelDesc.eType = Requirement.eModelType;
-		ModelDesc.pModelFilePath = Requirement.strFilePath.c_str();
-		ModelDesc.bCookCollisionMesh = Requirement.bCookCollisionMesh;
-		ModelDesc.PreTransformMatrix = Requirement.PreTransformMatrix;
+		CBase* pModel = nullptr;
 
-		CBase* pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, ModelDesc);
+		if (Requirement.bUseTextureHubLoader)
+		{
+			CModel::MODEL_LOAD_DESC ModelDesc{};
+			ModelDesc.eType = Requirement.eModelType;
+			ModelDesc.pModelFilePath = Requirement.strFilePath.c_str();
+			ModelDesc.bCookCollisionMesh = Requirement.bCookCollisionMesh;
+			ModelDesc.PreTransformMatrix = Requirement.PreTransformMatrix;
+
+			pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, ModelDesc);
+		}
+		else
+		{
+			if (Requirement.bCookCollisionMesh)
+				return E_FAIL;
+
+			pModel = CModel::Create(m_pDevice, m_pContext, Requirement.eModelType,
+				Requirement.strFilePath.c_str(), XMLoadFloat4x4(&Requirement.PreTransformMatrix));
+		}
+
 		if (nullptr == pModel)
 			return E_FAIL;
 
