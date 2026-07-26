@@ -88,9 +88,12 @@ private:
 	_bool m_bIsStartEffect[ETOUI(SWORD_EFFECT::EFFECT_END)]{};
 	CEffect_Container* m_pSpinSlash{};
 	CEffect_Container* m_pSpinSlashTrail{};
+	CEffect_Container* m_pUpwardSlash{};
+
 	CEffect_Container* m_pSwordChargeEffect{};
 	CEffect_Container* m_pSwordSuperChargeEffect{};
-	CEffect_Container* m_pUpwardSlash{};
+	CEffect_Container* m_pSwordJumpSpinTrail1{};
+	CEffect_Container* m_pSwordJumpSpinTrail2{};
 
 private:
 	void Change_SwordState(CKirby* pKirby, SWORD_STATE eNext);

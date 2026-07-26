@@ -157,6 +157,8 @@ void CKirby_Ability_Sword::Exit_AttackState(CKirby* pKirby)
     FadeOut_SpinSlashEffect(m_pSpinSlashTrail, fSpinSlashTrailFadeOutDuration);
     Effect_Stop(m_pSwordChargeEffect);
     Effect_Stop(m_pSwordSuperChargeEffect);
+    Effect_StopImmediately(m_pSwordJumpSpinTrail1);
+    Effect_StopImmediately(m_pSwordJumpSpinTrail2);
 
     CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
     pSword->End_Hit();
@@ -721,9 +723,21 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
 
             if (CanPlayEffect(SWORD_EFFECT::JUMPSLASH, pAnimator, 0.01f))
             {
-                CEffect_Loader::GetInstance()->Spawn(L"JumpSlash_1", pKirby->Get_LevelIndex(),
+                CEffect_Loader::GetInstance()->Spawn(L"SwordJumpSpin", pKirby->Get_LevelIndex(),
                     _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 90.f, 0.f),
                     pKirby->Get_Transform()->Get_WorldMatrixPtr());
+
+                CKirby_Sword* pSword = static_cast<CKirby_Sword*>(
+                    pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
+                if (pSword != nullptr)
+                {
+                    CEffect_Loader::GetInstance()->Spawn(L"SwordJumpSpinTrail1", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                        pSword->Get_CombinedWorldMatrixPtr(), &m_pSwordJumpSpinTrail1);
+                    CEffect_Loader::GetInstance()->Spawn(L"SwordJumpSpinTrail2", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                        pSword->Get_CombinedWorldMatrixPtr(), &m_pSwordJumpSpinTrail2);
+                }
             }
 
             break;
@@ -855,6 +869,8 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
             break;
         case SWORD_STATE::JUMP_SLASH:
             pKirby->Set_RotationLock(false);
+            Effect_StopImmediately(m_pSwordJumpSpinTrail1);
+            Effect_StopImmediately(m_pSwordJumpSpinTrail2);
             break;
         case SWORD_STATE::SPIN_SLASH_CHARGE:
         {

@@ -58,6 +58,15 @@ void CKirby_AttackMode::Effect_Stop(CEffect_Container*& pContainer)
     }
 }
 
+void CKirby_AttackMode::Effect_StopImmediately(CEffect_Container*& pContainer)
+{
+    if (pContainer != nullptr)
+    {
+        pContainer->EffectContainer_Stop();
+        pContainer = nullptr;
+    }
+}
+
 void CKirby_AttackMode::Free()
 {
     Safe_Release(m_pGameInstance_Proxy);
