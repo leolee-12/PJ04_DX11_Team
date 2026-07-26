@@ -743,21 +743,21 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
-    Register(CMetaSwordSpin::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMetaSwordSpin),
+    Register(CSwordJumpSpin::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordJumpSpin),
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
                 CMeshCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSwordSpin::MODEL_PROTO_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSE/Effect/MetaKnightSword/00_MetaSwordSpin/Common_Curve03.ysh",
+                    "../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/Common_Curve03.ysh",
                     XMMatrixRotationY(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSwordSpin::TAIL_TEXTURE_PROTO_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::TAIL_TEXTURE_PROTO_TAG,
                 CTexture::Create(pDevice, pContext,
-                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/00_MetaSwordSpin/common_tail.dds"), 1));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSwordSpin::SCROLL_TEXTURE_PROTO_TAG,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_tail.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::SCROLL_TEXTURE_PROTO_TAG,
                 CTexture::Create(pDevice, pContext,
-                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/00_MetaSwordSpin/common_scroll06.dds"), 1));
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_scroll06.dds"), 1));
         )
     );
 
@@ -1341,29 +1341,6 @@ void CGameObject_Factory::Register_Effect()
 
             TRY_ADD_PROTO(pProxy, Texture_SwordSlash2.iLevelID, Texture_SwordSlash2.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_SwordSlash2.szFileTag, Texture_SwordSlash2.iNumTex));
-        )
-    );
-
-    // 3. JumpSlash
-    Register(CSword_JumpSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_JumpSlash),
-        LOADER
-        (
-            // Common_JumpSlash
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_JumpSlash::PROTOTYPE_TAG,
-                CCommon_JumpSlash::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_JumpSlash"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_JumpSlash/Model_Common_JumpSlash.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_Common_JumpSlash.iLevelID, Texture_Common_JumpSlash.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_JumpSlash.szFileTag, Texture_Common_JumpSlash.iNumTex));
-
-            // Common_Curve03
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Curve03::PROTOTYPE_TAG,
-                CCommon_Curve03::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Curve03"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
         )
     );
 

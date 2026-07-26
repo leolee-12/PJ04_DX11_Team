@@ -153,8 +153,8 @@ void CKirby_Ability_MetaKnightSword::Exit_AttackState(CKirby* pKirby)
 
     Effect_Stop(m_pSwordChargeEffect);
     Effect_Stop(m_pSwordSuperChargeEffect);
-    Effect_StopImmediately(m_pMetaKnightSpinTrail1);
-    Effect_StopImmediately(m_pMetaKnightSpinTrail2);
+    Effect_StopImmediately(m_pMetaSwordJumpSpinTrail1);
+    Effect_StopImmediately(m_pMetaSwordJumpSpinTrail2);
 
     CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
     pMetaSword->End_Hit();
@@ -447,19 +447,19 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
         {
             pAnimator->Play("SwordSpin", false, false, 0.f, 1.5f);
 
-            CEffect_Loader::GetInstance()->Spawn(L"MetaSwordSpin", pKirby->Get_LevelIndex(),
+            CEffect_Loader::GetInstance()->Spawn(L"MetaSwordJumpSpin", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 90.f, 0.f),
                 pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
             CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
             if (pMetaSword != nullptr)
             {
-                CEffect_Loader::GetInstance()->Spawn(L"MetaKnightSpinTrail1", pKirby->Get_LevelIndex(),
+                CEffect_Loader::GetInstance()->Spawn(L"MetaSwordJumpSpinTrail1", pKirby->Get_LevelIndex(),
                     _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                    pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pMetaKnightSpinTrail1);
-                CEffect_Loader::GetInstance()->Spawn(L"MetaKnightSpinTrail2", pKirby->Get_LevelIndex(),
+                    pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pMetaSwordJumpSpinTrail1);
+                CEffect_Loader::GetInstance()->Spawn(L"MetaSwordJumpSpinTrail2", pKirby->Get_LevelIndex(),
                     _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                    pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pMetaKnightSpinTrail2);
+                    pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pMetaSwordJumpSpinTrail2);
             }
 
             break;
@@ -725,8 +725,8 @@ void CKirby_Ability_MetaKnightSword::Exit_SwordState(CKirby* pKirby, META_SWORD_
             break;
         case META_SWORD_STATE::JUMP_SLASH:
             pKirby->Set_RotationLock(false);
-            Effect_StopImmediately(m_pMetaKnightSpinTrail1);
-            Effect_StopImmediately(m_pMetaKnightSpinTrail2);
+            Effect_StopImmediately(m_pMetaSwordJumpSpinTrail1);
+            Effect_StopImmediately(m_pMetaSwordJumpSpinTrail2);
             break;
         case META_SWORD_STATE::SPIN_SLASH_CHARGE:
         {

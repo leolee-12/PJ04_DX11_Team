@@ -1,23 +1,23 @@
-#include "MetaSwordSpin.h"
+#include "SwordJumpSpin.h"
 
 #include "MeshCommon.h"
 
-CMetaSwordSpin::CMetaSwordSpin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSwordJumpSpin::CSwordJumpSpin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
 {
 }
 
-CMetaSwordSpin::CMetaSwordSpin(const CMetaSwordSpin& Prototype)
+CSwordJumpSpin::CSwordJumpSpin(const CSwordJumpSpin& Prototype)
 	: CEffect_Container{ Prototype }
 {
 }
 
-HRESULT CMetaSwordSpin::Initialize_Prototype()
+HRESULT CSwordJumpSpin::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CMetaSwordSpin::Initialize(void* pArg)
+HRESULT CSwordJumpSpin::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -28,27 +28,27 @@ HRESULT CMetaSwordSpin::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CMetaSwordSpin::Priority_Update(_float fTimeDelta)
+void CSwordJumpSpin::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 }
 
-void CMetaSwordSpin::Update(_float fTimeDelta)
+void CSwordJumpSpin::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 }
 
-void CMetaSwordSpin::Late_Update(_float fTimeDelta)
+void CSwordJumpSpin::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 }
 
-HRESULT CMetaSwordSpin::Render()
+HRESULT CSwordJumpSpin::Render()
 {
 	return __super::Render();
 }
 
-HRESULT CMetaSwordSpin::Ready_EffectPartObjects()
+HRESULT CSwordJumpSpin::Ready_EffectPartObjects()
 {
 	CMeshCommon::MESH_COMMON_DESC Desc{};
 	Desc.iModelLevel = m_iPrototypeLevel;
@@ -78,35 +78,35 @@ HRESULT CMetaSwordSpin::Ready_EffectPartObjects()
 	return S_OK;
 }
 
-CMetaSwordSpin* CMetaSwordSpin::Create(
+CSwordJumpSpin* CSwordJumpSpin::Create(
 	ID3D11Device* pDevice,
 	ID3D11DeviceContext* pContext)
 {
-	CMetaSwordSpin* pInstance = new CMetaSwordSpin(pDevice, pContext);
+	CSwordJumpSpin* pInstance = new CSwordJumpSpin(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created: CMetaSwordSpin");
+		MSG_BOX("Failed to Created: CSwordJumpSpin");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CMetaSwordSpin::Clone(void* pArg)
+CGameObject* CSwordJumpSpin::Clone(void* pArg)
 {
-	CMetaSwordSpin* pInstance = new CMetaSwordSpin(*this);
+	CSwordJumpSpin* pInstance = new CSwordJumpSpin(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned: CMetaSwordSpin");
+		MSG_BOX("Failed to Cloned: CSwordJumpSpin");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CMetaSwordSpin::Free()
+void CSwordJumpSpin::Free()
 {
 	__super::Free();
 }

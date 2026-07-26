@@ -4,22 +4,22 @@
 
 NS_BEGIN(Client)
 
-class CMetaSwordSpin final : public CEffect_Container
+class CSwordJumpSpin final : public CEffect_Container
 {
-	GENERATED_BODY(CMetaSwordSpin)
+	GENERATED_BODY(CSwordJumpSpin)
 
 public:
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_MetaSwordSpin";
-	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_MetaSword_Common_Curve03";
-	static constexpr const _tchar* TAIL_TEXTURE_PROTO_TAG = L"Prototype_Component_Texture_MetaSword_CommonTail";
-	static constexpr const _tchar* SCROLL_TEXTURE_PROTO_TAG = L"Prototype_Component_Texture_MetaSword_CommonScroll06";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_SwordJumpSpin";
+	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_SwordJumpSpin_Common_Curve03";
+	static constexpr const _tchar* TAIL_TEXTURE_PROTO_TAG = L"Prototype_Component_Texture_SwordJumpSpin_CommonTail";
+	static constexpr const _tchar* SCROLL_TEXTURE_PROTO_TAG = L"Prototype_Component_Texture_SwordJumpSpin_CommonScroll06";
 	static constexpr const _tchar* OUTER_PART_TAG = L"CurveOuter";
 	static constexpr const _tchar* CORE_PART_TAG = L"CurveCore";
 
 private:
-	CMetaSwordSpin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CMetaSwordSpin(const CMetaSwordSpin& Prototype);
-	virtual ~CMetaSwordSpin() = default;
+	CSwordJumpSpin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSwordJumpSpin(const CSwordJumpSpin& Prototype);
+	virtual ~CSwordJumpSpin() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;
@@ -39,7 +39,7 @@ private:
 	HRESULT Ready_EffectPartObjects();
 
 public:
-	static CMetaSwordSpin* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSwordJumpSpin* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:

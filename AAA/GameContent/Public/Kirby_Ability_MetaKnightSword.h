@@ -79,8 +79,8 @@ private:
 	// Effect
 	CEffect_Container* m_pSwordChargeEffect{};
 	CEffect_Container* m_pSwordSuperChargeEffect{};
-	CEffect_Container* m_pMetaKnightSpinTrail1{};
-	CEffect_Container* m_pMetaKnightSpinTrail2{};
+	CEffect_Container* m_pMetaSwordJumpSpinTrail1{};
+	CEffect_Container* m_pMetaSwordJumpSpinTrail2{};
 
 private:
 	void Change_SwordState(CKirby* pKirby, META_SWORD_STATE eNext);
