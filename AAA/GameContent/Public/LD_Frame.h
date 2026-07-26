@@ -27,8 +27,8 @@ public:
 	static constexpr const _tchar* MODEL_PROTO_TAG = L"Proto_Component_Model_Frame";
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
 	static constexpr const _char* MODEL_PATH = "../../Resources/Map/Gimmick/NonAnim/CreditKirbyHouseFrame/CreditKirbyHouseFrame.ysh";
-	static constexpr const _tchar * CUT_TEXTURE_PATH = L"../../Resources/Map/Gimmick/NonAnim/CreditKirbyHouseFrame/_TP_TexturePattern_1.%02d.dds";
-	static constexpr _uint CUT_TEXTURE_COUNT = 13u;	//	_1.00 ~ _1.12
+	static constexpr const _tchar * CUT_TEXTURE_PATH = L"../../Resources/YSH/EndingTexture/Ending%02d.dds";
+	static constexpr _uint CUT_TEXTURE_COUNT = 10u;
 
 	static constexpr _float START_TIMMER = 27.f;
 
