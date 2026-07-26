@@ -5,7 +5,6 @@
 #include "GameContent_const.h"
 #include "World_BlendCollector.h"
 
-#include "Model.h"
 #include "GameInstance.h"
 
 NS_BEGIN(Client)
@@ -72,10 +71,10 @@ HRESULT CLD_Frame::Validate_Initialized()
 
 void CLD_Frame::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
-
 	if (!m_bActive || Is_Dead())
 		return;
+
+	m_fCutCursor = min(m_fCutCursor + fTimeDelta / CUT_DURATION, static_cast<_float>(CUT_TEXTURE_COUNT - 1u));
 
 	Check_Visible();
 	Submit_RenderGroups();
@@ -193,6 +192,11 @@ HRESULT CLD_Frame::Ready_RenderComponents()
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
+	m_pCutTextureCom = Add_Component<CTexture>(TEXT("Com_CutTexture"), CTexture::Create(m_pDevice, m_pContext, CUT_TEXTURE_PATH, CUT_TEXTURE_COUNT));
+
+	if (nullptr == m_pCutTextureCom)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -228,6 +232,9 @@ HRESULT CLD_Frame::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind)
 		return E_FAIL;
 	if (S_FALSE == hrBind)
 		return S_OK;
+
+	if (ETOI(WORLD_PASS::CUT_CROSSFADE) == Layer.iPass && FAILED(Bind_CutTextures()))
+		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Begin(iPass)))
 		return E_FAIL;
@@ -268,6 +275,24 @@ void CLD_Frame::Submit_BlendMeshes()
 		m_pBlendCollector->Submit(this, this, m_pModelCom, pWorld, iMeshIndex);
 }
 
+HRESULT CLD_Frame::Bind_CutTextures()
+{
+	if (nullptr == m_pCutTextureCom)
+		return E_FAIL;
+
+	const _uint iSrc = min(static_cast<_uint>(m_fCutCursor), CUT_TEXTURE_COUNT - 1u);
+	const _uint iDst = min(iSrc + 1u, CUT_TEXTURE_COUNT - 1u);
+	const _float fBlend = m_fCutCursor - static_cast<_float>(iSrc);
+
+	if (FAILED(m_pCutTextureCom->Bind_ShaderResource(m_pShaderCom, "g_UnknownTexture", iSrc)))
+		return E_FAIL;
+
+	if (FAILED(m_pCutTextureCom->Bind_ShaderResource(m_pShaderCom, "g_ExtraRTexture", iDst)))
+		return E_FAIL;
+
+	return m_pShaderCom->Bind_RawValue("g_fCutBlend", &fBlend, sizeof(_float));
+}
+
 CLD_Frame* CLD_Frame::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLD_Frame* pInstance = new CLD_Frame(pDevice, pContext);
@@ -296,6 +321,7 @@ CGameObject* CLD_Frame::Clone(void* pArg)
 
 void CLD_Frame::Free()
 {
+	m_pCutTextureCom = nullptr;
 	m_pBlendCollector = nullptr;
 	m_BlendMeshIndices.clear();
 

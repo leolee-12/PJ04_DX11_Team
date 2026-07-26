@@ -6,6 +6,7 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
+class CTexture;
 NS_END
 
 NS_BEGIN(Client)
@@ -24,6 +25,9 @@ public:
 	static constexpr const _tchar* MODEL_PROTO_TAG = L"Proto_Component_Model_Frame";
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
 	static constexpr const _char* MODEL_PATH = "../../Resources/Map/Gimmick/NonAnim/CreditKirbyHouseFrame/CreditKirbyHouseFrame.ysh";
+	static constexpr const _tchar * CUT_TEXTURE_PATH = L"../../Resources/Map/Gimmick/NonAnim/CreditKirbyHouseFrame/_TP_TexturePattern_1.%02d.dds";
+	static constexpr _uint CUT_TEXTURE_COUNT = 13u;	//	_1.00 ~ _1.12
+	static constexpr _float CUT_DURATION = 3.f;		// ƒ∆ 1¿Â¥Á ¿¸»Ø Ω√∞£(√ ). √— 12 * 3 = 36√ 
 
 private:
 	CLD_Frame(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -49,10 +53,12 @@ public:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CTexture* m_pCutTextureCom = { nullptr };
 	CWorld_BlendCollector* m_pBlendCollector = { nullptr };
 
 	LD_STATIC_MODEL_DESC m_tStaticModelDesc = {};
 	vector<_uint> m_BlendMeshIndices;
+	_float m_fCutCursor = { 0.f };
 
 private:
 	HRESULT Ready_RenderComponents();
@@ -60,6 +66,7 @@ private:
 	HRESULT Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind);
 	void Cache_BlendMeshIndices();
 	void Submit_BlendMeshes();
+	HRESULT Bind_CutTextures();
 
 public:
 	static CLD_Frame* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
