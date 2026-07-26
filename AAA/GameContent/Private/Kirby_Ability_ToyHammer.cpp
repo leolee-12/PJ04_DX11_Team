@@ -15,6 +15,7 @@ namespace
      constexpr _float fHammerMaxHorizontalSpeed = 2.f;
      constexpr _float fAttackFinalMaxHorizontalSpeed = 12.f;
      constexpr _float fChargeAttack3MaxHorizontalSpeed = 12.f;
+     constexpr _float fAttackRot_Speed_Degree = 30.f;
 
      constexpr _float fChargeLevel2Time = 0.58f;
      constexpr _float fChargeLevel3Time = 1.4933333f;
@@ -122,6 +123,7 @@ void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+    pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
 
     m_bIsCharging = false;
     m_fChargeTime = 0.f;
@@ -370,6 +372,9 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
     {
         case TOY_HAMMER_STATE::ATTACK_START:
         {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_RotationSpeed(fAttackRot_Speed_Degree);
+
             Change_ChargeAniState(pKirby, CHARGE_ANI_STATE::NONE);
 
             pAnimator->Play("HammerAttackStartToy", false, true, 0.1f, 2.5f);

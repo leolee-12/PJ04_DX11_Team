@@ -1,18 +1,18 @@
-#include "Kirby_Wait.h"
+#include "Kirby_Emote.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Movement_Child.h"
+
 #include "Kirby_Deform.h"
 
-#include "Kirby_Emote.h"
-
-CKirby_Wait::CKirby_Wait()
+CKirby_Emote::CKirby_Emote()
 {
 }
 
-HRESULT CKirby_Wait::Initialize()
+HRESULT CKirby_Emote::Initialize()
 {
     if (FAILED(__super::Initialize()))
         return E_FAIL;
@@ -20,38 +20,62 @@ HRESULT CKirby_Wait::Initialize()
     return S_OK;
 }
 
-KIRBY_STATE_TYPE CKirby_Wait::Get_StateType()
+KIRBY_STATE_TYPE CKirby_Emote::Get_StateType()
 {
-    return KIRBY_STATE_TYPE::WAIT;
+    return KIRBY_STATE_TYPE::EMOTE;
 }
 
-void CKirby_Wait::Enter(CKirby* pKirby, _int iFlag)
+void CKirby_Emote::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
-    if (pKirby->Has_Deform())
-        pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::WAIT);
-    else
-        pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::WAIT);
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+    switch (iFlag)
+    {
+        case EMOTE_STATE_FLAG::EMOTE_TOP:
+            pAnimator->Play("EmoteWaveHand", false, true, 0.1f, 1.5f);
+            break;
+        case EMOTE_STATE_FLAG::EMOTE_DOWN:
+            pAnimator->Play("WaitSit", false, true, 0.1f, 1.5f);
+            break;
+        case EMOTE_STATE_FLAG::EMOTE_LEFT:
+            pAnimator->Play("WaitYay", false, true, 0.1f, 1.5f);
+            break;
+        case EMOTE_STATE_FLAG::EMOTE_RIGHT:
+            pAnimator->Play("LookAround", false, true, 0.1f, 1.5f);
+            break;
+        default:
+            MSG_BOX("Bug: CKirby_Emote");
+            Transition_Fall_OR_Wait_OR_Run(pKirby);
+            return;
+    }
 }
 
-void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
+void CKirby_Emote::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
-    // Fall
-    if (Try_Transition_Fall(pKirby) == true)
+    if (!pKirby->Get_Movement()->Is_Grounded())
+    {
+        pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
         return;
+    }
+
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    if (pAnimator->Is_Finished())
+    {
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
+        return;
+    }
 }
 
-void CKirby_Wait::Exit(CKirby* pKirby)
+void CKirby_Emote::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
-
-    pKirby->Get_CurrentDeformModel()->Stop_SoundHandle();
 }
 
-_bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
+_bool CKirby_Emote::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
         return true;
@@ -93,7 +117,7 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
             Handle_MoveCommand(pKirby, pCommand);
             pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
-            return true; 
+            return true;
         }
         // Jump Down
         case KIRBY_COMMAND_TYPE::JUMP:
@@ -132,46 +156,25 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);
             return true;
         }
-        // Emote
-        case KIRBY_COMMAND_TYPE::EMOTE_TOP:
-            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_TOP);
-        case KIRBY_COMMAND_TYPE::EMOTE_DOWN:
-            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_DOWN);
-        case KIRBY_COMMAND_TYPE::EMOTE_LEFT:
-            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_LEFT);
-        case KIRBY_COMMAND_TYPE::EMOTE_RIGHT:
-            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_RIGHT);
     }
 
     return false;
 }
 
-_bool CKirby_Wait::Handle_Emote(CKirby* pKirby, CKirby_Command* pCommand, EMOTE_STATE_FLAG eFlag)
+CKirby_Emote* CKirby_Emote::Create()
 {
-    if (!pCommand->IsDown())
-        return false;
-
-    if (pKirby->Has_Deform())
-        return true;
-
-    pKirby->Change_State(KIRBY_STATE_TYPE::EMOTE, eFlag);
-    return true;
-}
-
-CKirby_Wait* CKirby_Wait::Create()
-{
-    CKirby_Wait* pInstance = new CKirby_Wait();
+    CKirby_Emote* pInstance = new CKirby_Emote();
 
     if (FAILED(pInstance->Initialize()))
     {
-        MSG_BOX("Failed to Created: CKirby_Wait");
+        MSG_BOX("Failed to Created: CKirby_Emote");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CKirby_Wait::Free()
+void CKirby_Emote::Free()
 {
     __super::Free();
 }

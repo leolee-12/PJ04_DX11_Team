@@ -33,6 +33,12 @@ HRESULT CMainApp::Initialize()
 	m_pGameInstance_Proxy = CGameInstance::GetProxy();
 	m_pGameInstance_Proxy->Enable_InputDeveice();
 
+	m_pGameInstance_Proxy->Register_LevelClearCallback(
+		[](_uint iLevel)
+		{
+			CSingleton_Destroyer::Clear_LevelRegisteries(iLevel);
+		});
+
 	CGameObject_Factory::GetInstance()->RegisterAll();
 
 	if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))

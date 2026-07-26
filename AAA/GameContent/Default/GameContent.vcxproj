@@ -63,6 +63,7 @@
     <ClInclude Include="..\public\Excalibur.h" />
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
+    <ClInclude Include="..\Public\Kirby_Emote.h" />
     <ClInclude Include="..\Public\Kirby_Include.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h" />
@@ -251,6 +252,7 @@
     <ClInclude Include="..\Public\DistortionCommon.h" />
     <ClInclude Include="..\Public\SystemObject_Include.h" />
     <ClInclude Include="..\Public\TestContainer.h" />
+    <ClInclude Include="..\Public\HammerSwing.h" />
     <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
@@ -601,6 +603,7 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\Kirby_Emote.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp" />
     <ClCompile Include="..\Private\LD_BattleBoundary.cpp" />
@@ -773,6 +776,7 @@
     <ClCompile Include="..\private\Projectile_Partner.cpp" />
     <ClCompile Include="..\Private\DistortionCommon.cpp" />
     <ClCompile Include="..\Private\TestContainer.cpp" />
+    <ClCompile Include="..\Private\HammerSwing.cpp" />
     <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />

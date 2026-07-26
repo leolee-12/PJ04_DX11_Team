@@ -22,6 +22,8 @@
 #include "Kirby_GetDeform.h"
 #include "Kirby_DeformDump.h"
 
+#include "Kirby_Emote.h"
+
 #include "Kirby_CutSceneGrabbed.h"
 #include "Kirby_QTE_Grabbed.h"
 #include "Kirby_CarFirstBreakWall.h"
@@ -287,6 +289,8 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))                   return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                       return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_DUMP, CKirby_DeformDump::Create())))                     return E_FAIL;
+
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::EMOTE, CKirby_Emote::Create())))                                return E_FAIL;
 
     if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))                    return E_FAIL;
 

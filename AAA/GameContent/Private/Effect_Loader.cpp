@@ -49,6 +49,8 @@ namespace
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/EffectContainerJSON/YSE/CarMilkyWay_Final2.json") },
         { TEXT("CarThinGas"),             TEXT("../../Resources/EffectContainerJSON/YSE/CarThinGas.JSON") },
         { TEXT("CoasterWind"),            TEXT("../../Resources/YSE/EffectContainer/CoasterWind.json") },
+        { TEXT("HammerSwing"),            TEXT("../../Resources/YSE/EffectContainer/HammerSwing.JSON") },
+        { TEXT("HammerSwingFinal"),       TEXT("../../Resources/YSE/EffectContainer/HammerSwingFinal.JSON") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/EffectContainerJSON/YSE/GetAbilityEffect.JSON") },
         { TEXT("GetDeformEffect"),        TEXT("../../Resources/EffectContainerJSON/YSE/GetDeformEffect .JSON") },
@@ -247,7 +249,7 @@ HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
         pFx->Get_Transform()->Set_State(STATE::LOOK, XMVector3Normalize(matRot.r[2]) * vScale.z);
     }
 
-    m_Epochs[pFx] = ++m_iEpochCounter;
+    m_Epochs[pFx] = { ++m_iEpochCounter, iTargetLevel };
 
     if (ppOut)
         *ppOut = pFx;
@@ -258,13 +260,20 @@ HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
     return S_OK;
 }
 
+void CEffect_Loader::Clear_Epochs(_uint iLevel)
+{
+    for (auto it = m_Epochs.begin(); it != m_Epochs.end(); )
+        it = (it->second.iLevel == iLevel)
+        ? m_Epochs.erase(it) : next(it);
+}
+
 _bool CEffect_Loader::Is_Current(const FX_HANDLE& h) const
 {
     if (nullptr == h.p)
         return false;
 
     auto it = m_Epochs.find(h.p);
-    return it != m_Epochs.end() && it->second == h.iEpoch;
+    return it != m_Epochs.end() && it->second.iEpoch == h.iEpoch;
 }
 
 void CEffect_Loader::Free()
