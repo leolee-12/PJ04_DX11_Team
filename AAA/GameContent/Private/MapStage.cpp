@@ -207,8 +207,17 @@ HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 	if (nullptr == pDesc)
 		return E_FAIL;
 
+	unordered_set<_wstring> SectionNames;
+
 	for (const MAP_SECTION_DESC& SectionDesc : pDesc->SectionDescs)
 	{
+		if (!SectionNames.emplace(SectionDesc.strSectionName).second)
+		{
+			Log_GameContentWarning("MapStage duplicated section name: "
+				+ WstrToStr(m_strStageName)
+				+ "/" + WstrToStr(SectionDesc.strSectionName));
+		}
+
 		CBase* pBase = m_pGameInstance_Proxy->Clone_Prototype(
 			PROTOTYPE::GAMEOBJECT,
 			pDesc->iSectionProtoLevel,

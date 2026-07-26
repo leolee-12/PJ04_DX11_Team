@@ -25,8 +25,9 @@ protected:
 	virtual HRESULT	Validate_Initialized();
 
 public:
-	virtual void    Late_Update(_float fTimeDelta) override;
+	virtual void    Late_Update(_float fTimeDelta) override = 0;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Shadow() override = 0;
 
 protected:
 	CShader* m_pShaderCom = { nullptr };

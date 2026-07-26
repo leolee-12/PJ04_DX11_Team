@@ -565,6 +565,65 @@ namespace
 		return Desc;
 	}
 
+	_bool Merge_LegacyStageRenderableOverrides(const json& jStage, MAP_EDIT_CHANGE* pInOutChange)
+	{
+		if (nullptr == pInOutChange || !jStage.is_object())
+			return false;
+
+		const auto IterStageName = jStage.find("StageName");
+		const auto IterSections = jStage.find("Sections");
+		if (IterStageName == jStage.end() || !IterStageName->is_string()
+			|| IterSections == jStage.end() || !IterSections->is_array())
+		{
+			return false;
+		}
+
+		const _wstring strStageName = StrToWstr(IterStageName->get<string>());
+		if (strStageName.empty())
+			return false;
+
+		_bool bMerged = false;
+
+		for (const auto& jSection : *IterSections)
+		{
+			if (!jSection.is_object())
+				continue;
+
+			const auto IterSectionName = jSection.find("SectionName");
+			const auto IterRenderable = jSection.find("Renderable");
+			if (IterSectionName == jSection.end() || !IterSectionName->is_string()
+				|| IterRenderable == jSection.end() || !IterRenderable->is_boolean())
+			{
+				continue;
+			}
+
+			const _wstring strSectionName = StrToWstr(IterSectionName->get<string>());
+			const _wstring strKey = CMap_EditFile::Make_SectionKey(strStageName, strSectionName);
+			if (strKey.empty())
+				continue;
+
+			auto [Iter, bInserted] = pInOutChange->EditedMapSections.try_emplace(strKey);
+			EDIT_OBJECT_OVERRIDE_DESC& Edit = Iter->second;
+
+			if (bInserted)
+			{
+				Edit.eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
+				Edit.strStableKey = strKey;
+			}
+
+			if (EDITABLE_OBJECT_KIND::MAP_SECTION != Edit.eKind
+				|| 0u != (Edit.Common.iPolicyMask & EDIT_CAP_RENDERABLE))
+			{
+				continue;
+			}
+
+			Set_CommonPolicyOverride(&Edit.Common, EDIT_CAP_RENDERABLE, IterRenderable->get<bool>());
+			bMerged = true;
+		}
+
+		return bMerged;
+	}
+
 	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyLDEditToOverride(const MAP_LD_EDITED_DESC& Edit)
 	{
 		EDIT_OBJECT_OVERRIDE_DESC Desc{};
@@ -1335,13 +1394,17 @@ HRESULT CMap_EditFile::Load_EditFile(
 			pInOutMapContentDesc->OverrideDesc = SavedMapContentDesc.OverrideDesc;
 		}
 
-		if (nullptr != pOutMapStageOverride
-			&& nullptr != pOutHasMapStageOverride
-			&& jRoot.contains("MapStage")
-			&& jRoot["MapStage"].is_object())
+		const auto IterMapStage = jRoot.find("MapStage");
+		if (IterMapStage != jRoot.end() && IterMapStage->is_object())
 		{
-			*pOutMapStageOverride = jRoot["MapStage"];
-			*pOutHasMapStageOverride = true;
+			if (Merge_LegacyStageRenderableOverrides(*IterMapStage, &pInOutMapContentDesc->OverrideDesc))
+				pInOutMapContentDesc->bHasMapContent = true;
+
+			if (nullptr != pOutMapStageOverride && nullptr != pOutHasMapStageOverride)
+			{
+				*pOutMapStageOverride = *IterMapStage;
+				*pOutHasMapStageOverride = true;
+			}
 		}
 	}
 	catch (const json::exception&)

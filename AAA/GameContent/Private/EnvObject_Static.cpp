@@ -84,53 +84,46 @@ HRESULT CEnvObject_Static::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, co
 
 void CEnvObject_Static::Set_InstanceController(CEnv_InstanceController* pCtrl)
 {
+	if (m_pInstanceController == pCtrl)
+		return;
+
 	Safe_Release(m_pInstanceController);
 	m_pInstanceController = pCtrl;
 	Safe_AddRef(m_pInstanceController);
 
 	m_InstanceBatchHandle = {};
-
-	if (nullptr != m_pInstanceController && Can_RenderInstance())
-	{
-		m_InstanceBatchHandle = m_pInstanceController->Register_BatchesForDesc(m_tDesc);
-	}
-}
-
-_bool CEnvObject_Static::Can_RenderInstance() const
-{
-	if (!m_bRenderable)
-		return false;
-
-	if (!Has_RenderModel())
-		return false;
-
-	if (m_tDesc.wstrModelProtoTag.empty())
-		return false;
-
-	return true;
 }
 
 void CEnvObject_Static::Submit_RenderGroups()
 {
+	const _bool bCanInstance = nullptr != m_pInstanceController && m_bRenderable;
+
 	if (m_bVisible)
 	{
 		if (m_bIsDecal)
 		{
 			_bool bSubmitted = false;
-			if (Can_RenderInstance() && nullptr != m_pInstanceController)
+
+			if (bCanInstance)
 			{
+				if (INVALID_INDEX == m_InstanceBatchHandle.iDecalBatchIndex)
+					m_InstanceBatchHandle.iDecalBatchIndex = m_pInstanceController->Register_DecalBatch(m_tDesc);
+
 				bSubmitted = m_pInstanceController->Submit_Decal(m_InstanceBatchHandle.iDecalBatchIndex, this);
 			}
-			
+
 			if (!bSubmitted)
 				m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::DECAL, this);
 		}
 		else
 		{
 			_bool bSubmitted = false;
-			const _bool bBypassMainInstance = Should_BypassMainInstance();
-			if (!bBypassMainInstance && Can_RenderInstance() && nullptr != m_pInstanceController)
+
+			if (bCanInstance && !Should_BypassMainInstance())
 			{
+				if (INVALID_INDEX == m_InstanceBatchHandle.iMainBatchIndex)
+					m_InstanceBatchHandle.iMainBatchIndex = m_pInstanceController->Register_MainBatch(m_tDesc);
+
 				bSubmitted = m_pInstanceController->Submit_Main(m_InstanceBatchHandle.iMainBatchIndex, this);
 			}
 
@@ -143,12 +136,10 @@ void CEnvObject_Static::Submit_RenderGroups()
 	{
 		_bool bSubmittedShadow = false;
 
-		if (Can_RenderInstance() && nullptr != m_pInstanceController)
+		if (bCanInstance)
 		{
 			if (INVALID_INDEX == m_InstanceBatchHandle.iShadowBatchIndex)
-			{
 				m_InstanceBatchHandle.iShadowBatchIndex = m_pInstanceController->Register_ShadowBatch(m_tDesc);
-			}
 
 			bSubmittedShadow = m_pInstanceController->Submit_Shadow(m_InstanceBatchHandle.iShadowBatchIndex, this);
 		}
