@@ -52,6 +52,7 @@
 #include "EssenceAura.h"
 #include "MoonShot.h"
 #include "HammerSwing.h"
+#include "MetaSwordSpin.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"

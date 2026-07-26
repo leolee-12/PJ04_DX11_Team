@@ -41,8 +41,11 @@ namespace
         { TEXT("SpinSlashTrail_Super"),   TEXT("../../Resources/EffectContainerJSON/YSE/SpinSlashTrail_Super.json") },
         { TEXT("SwordChargeEffect"),      TEXT("../../Resources/EffectContainerJSON/YSE/SwordChargeEffect.json") },
         { TEXT("SwordSuperChargeEffect"), TEXT("../../Resources/EffectContainerJSON/YSE/SwordSuperChargeEffect.json") },
-        { TEXT("MetaChargeEffect"),       TEXT("../../Resources/YSE/EffectContainer/MetaChargeEffect.JSON") },
-        { TEXT("MetaSuperChargeEffect"),  TEXT("../../Resources/YSE/EffectContainer/MetaSuperChargeEffect.JSON") },
+        { TEXT("MetaChargeEffect"),       TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaChargeEffect.JSON") },
+        { TEXT("MetaSuperChargeEffect"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperChargeEffect.JSON") },
+        { TEXT("MetaSwordSpin"),          TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordSpin.JSON") },
+        { TEXT("MetaKnightSpinTrail1"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaKnightSpinTrail1.JSON") },
+        { TEXT("MetaKnightSpinTrail2"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaKnightSpinTrail2.JSON") },
         {TEXT("UpwardsSlash"),            TEXT("../../Resources/EffectContainerJSON/YSE/UpwardsSlash.JSON")},
         { TEXT("RockFloor"),              TEXT("../../Resources/EffectContainerJSON/YSH/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/BoostGas.json") },
@@ -133,7 +136,7 @@ namespace
         { TEXT("Nail_Smoke"),             TEXT("../../Resources/EffectContainerJSON/YSH/Nail_Smoke.JSON") },
         { TEXT("LeoJump_Smoke"),          TEXT("../../Resources/EffectContainerJSON/YSH/LeoJump_Smoke.JSON") },
 
-        { TEXT("MoonShot"),                   TEXT("../../Resources/YSE/EffectContainer/MoonShot.JSON") },
+        { TEXT("MoonShot"),                   TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MoonShot.JSON") },
 
         //Meta
         { TEXT("Meta_IntroLocking"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_IntroLocking.JSON") },

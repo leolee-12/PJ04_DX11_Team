@@ -3096,6 +3096,9 @@
     <ClInclude Include="..\Public\HammerSwing.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MetaSwordSpin.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClInclude>
@@ -4572,6 +4575,9 @@
       <Filter>00. GameObject\Test</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaSwordSpin.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">

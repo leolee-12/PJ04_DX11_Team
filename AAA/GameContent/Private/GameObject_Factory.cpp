@@ -743,6 +743,24 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
+    Register(CMetaSwordSpin::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMetaSwordSpin),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSwordSpin::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/00_MetaSwordSpin/Common_Curve03.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSwordSpin::TAIL_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/00_MetaSwordSpin/common_tail.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSwordSpin::SCROLL_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/00_MetaSwordSpin/common_scroll06.dds"), 1));
+        )
+    );
+
     Register(CHammerSwing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerSwing),
         LOADER
         (
