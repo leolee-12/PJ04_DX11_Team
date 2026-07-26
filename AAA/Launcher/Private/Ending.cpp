@@ -35,6 +35,8 @@ void CEnding::Update(_float fTimeDelta)
     {
         m_pGameInstance_Proxy->Toggle_DebugRender();
     }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
+        m_pGameInstance_Proxy->Publish(EventTag::Credits_Next, nullptr);
 #endif //  _DEBUG
 }
 

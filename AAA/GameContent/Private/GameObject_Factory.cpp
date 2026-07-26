@@ -625,6 +625,8 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_QTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_QTE), LOADER());
     Register(CUI_UIFadeOut::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_UIFadeOut), LOADER());
     Register(CUI_AbilityDiscard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_AbilityDiscard), LOADER());
+    Register(CUI_ClickQTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_ClickQTE), LOADER());
+    Register(CUI_CreditCoordinator::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_CreditCoordinator), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

@@ -90,6 +90,9 @@ namespace Client
         inline constexpr const _tchar* HUD_SetVisible = L"HUD.SetVisible";
         inline constexpr const _tchar* TitleLogo_Show = L"TitleLogo.Show";
 
+        inline constexpr const _tchar* Credits_Next = L"Credits.Next";
+        inline constexpr const _tchar* Credits_Finished = L"Credits.Finished";
+
         // 대화 이벤트
         inline constexpr const _tchar* Dialogue_Start = L"Dialogue.Start";
         inline constexpr const _tchar* Dialogue_Finished = L"Dialogue.Finished";
