@@ -34,8 +34,10 @@ void Client::Sanitize_WaterRenderDesc(WATER_RENDER_DESC* pDesc)
 
 	pDesc->vNormalSpeed0 = MathUtils::Sanitize_FiniteFloat2(pDesc->vNormalSpeed0, Default.vNormalSpeed0);
 	pDesc->vNormalSpeed1 = MathUtils::Sanitize_FiniteFloat2(pDesc->vNormalSpeed1, Default.vNormalSpeed1);
-
 	pDesc->fNormalStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fNormalStrength, Default.fNormalStrength, 0.f, 4.f);
+	pDesc->fNormalWarpStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fNormalWarpStrength, Default.fNormalWarpStrength, 0.f, 1.f);
+	pDesc->fNormalSwayStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fNormalSwayStrength, Default.fNormalSwayStrength, -1.f, 1.f);
+
 	pDesc->fFresnelPower = MathUtils::Sanitize_ClampedFloat(pDesc->fFresnelPower, Default.fFresnelPower, 0.1f, 16.f);
 	pDesc->fReflectionStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fReflectionStrength, Default.fReflectionStrength, 0.f, 4.f);
 	pDesc->fRefractionStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fRefractionStrength, Default.fRefractionStrength, 0.f, 0.1f);
@@ -43,6 +45,7 @@ void Client::Sanitize_WaterRenderDesc(WATER_RENDER_DESC* pDesc)
 	pDesc->fLightReceiveStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fLightReceiveStrength, Default.fLightReceiveStrength, 0.f, 1.f);
 	pDesc->fSpecularPower = MathUtils::Sanitize_ClampedFloat(pDesc->fSpecularPower, Default.fSpecularPower, 1.f, 256.f);
 	pDesc->fSpecularStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fSpecularStrength, Default.fSpecularStrength, 0.f, 8.f);
+	pDesc->fSpecularScatter = MathUtils::Sanitize_ClampedFloat(pDesc->fSpecularScatter, Default.fSpecularScatter, 0.f, 8.f);
 
 	pDesc->fFoamWidth = MathUtils::Sanitize_ClampedFloat(pDesc->fFoamWidth, Default.fFoamWidth, 0.f, 5.f);
 	pDesc->fFoamStrength = MathUtils::Sanitize_ClampedFloat(pDesc->fFoamStrength, Default.fFoamStrength, 0.f, 4.f);
@@ -97,6 +100,10 @@ HRESULT Client::Bind_WaterRenderDesc(CShader* pShader, const WATER_RENDER_DESC& 
 		return E_FAIL;
 	if (FAILED(pShader->Bind_RawValue("g_fNormalStrength", &SafeDesc.fNormalStrength, sizeof(_float))))
 		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fNormalWarpStrength", &SafeDesc.fNormalWarpStrength, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fNormalSwayStrength", &SafeDesc.fNormalSwayStrength, sizeof(_float))))
+		return E_FAIL;
 
 	if (FAILED(pShader->Bind_RawValue("g_fFresnelPower", &SafeDesc.fFresnelPower, sizeof(_float))))
 		return E_FAIL;
@@ -110,6 +117,8 @@ HRESULT Client::Bind_WaterRenderDesc(CShader* pShader, const WATER_RENDER_DESC& 
 	if (FAILED(pShader->Bind_RawValue("g_fSpecularPower", &SafeDesc.fSpecularPower, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(pShader->Bind_RawValue("g_fSpecularStrength", &SafeDesc.fSpecularStrength, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_fSpecularScatter", &SafeDesc.fSpecularScatter, sizeof(_float))))
 		return E_FAIL;
 
 	if (FAILED(pShader->Bind_RawValue("g_fFoamWidth", &SafeDesc.fFoamWidth, sizeof(_float))))
@@ -139,12 +148,13 @@ HRESULT Client::Bind_WaterRenderDesc(CShader* pShader, const WATER_RENDER_DESC& 
 		return E_FAIL;
 
 	const _float fWavePhase = fGameTime * SafeDesc.fWaveSpeed;
-	const _float fWaveHeight = SafeDesc.fWaveAmplitude *
-		(0.6f * sinf(fWavePhase) + 0.4f * sinf(fWavePhase * 0.618f + 1.3f));
+	const _float fWaveOscillation = 0.6f * sinf(fWavePhase) + 0.4f * sinf(fWavePhase * 0.618f + 1.3f);
+	const _float fWaveHeight = SafeDesc.fWaveAmplitude * fWaveOscillation;
 
 	if (FAILED(pShader->Bind_RawValue("g_fWaveHeight", &fWaveHeight, sizeof(_float))))
 		return E_FAIL;
-
+	if (FAILED(pShader->Bind_RawValue("g_fWaveOscillation", &fWaveOscillation, sizeof(_float))))
+		return E_FAIL;
 	if (FAILED(pShader->Bind_RawValue("g_fGameTime", &fGameTime, sizeof(_float))))
 		return E_FAIL;
 

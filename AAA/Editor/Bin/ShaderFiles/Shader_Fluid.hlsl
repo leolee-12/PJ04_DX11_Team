@@ -34,6 +34,8 @@ float2 g_vNormalSpeed0 = float2(0.02f, 0.01f);
 float2 g_vNormalTiling1 = float2(0.14f, 0.14f);
 float2 g_vNormalSpeed1 = float2(-0.012f, 0.018f);
 float g_fNormalStrength = 1.f;
+float g_fNormalWarpStrength = 0.f;
+float g_fNormalSwayStrength = 0.f;
 
 float g_fFresnelPower = 5.f;
 float g_fReflectionStrength = 0.8f;
@@ -42,6 +44,7 @@ float g_fRefractionStrength = 0.015f;
 float g_fLightReceiveStrength = 1.f;
 float g_fSpecularPower = 64.f;
 float g_fSpecularStrength = 1.f;
+float g_fSpecularScatter = 0.f;
 
 float g_fFoamWidth = 0.4f;
 float g_fFoamStrength = 0.7f;
@@ -57,6 +60,7 @@ float g_fCausticNoiseStrength = 0.6f;
 float g_fCausticBlur = 0.f;
 
 float g_fWaveHeight = 0.f;
+float g_fWaveOscillation = 0.f; // [-1, 1], g_fWaveHeight와 같은 위상
 
 float g_fVisibility = 1.f;
 float g_fGameTime = 0.f;
@@ -130,18 +134,41 @@ float3 Decode_BC5_SNORM(float2 vNormalRG)
     return normalize(float3(vNormalRG, fNormalZ));
 }
 
+// g_WaterNoiseTexture는 BC4_UNORM(R 단일 채널) -> 2D 오프셋 만들려면 2탭 필요
+float2 Get_NormalFlowOffset(float2 vWorldXZ)
+{
+    float2 vWarpUV = vWorldXZ * g_vNormalTiling0 * 0.06f + g_fGameTime * g_vNormalSpeed0 * 0.25f;
+    float fWarpU = g_WaterNoiseTexture.Sample(LinearSampler, vWarpUV).r;
+    float fWarpV = g_WaterNoiseTexture.Sample(LinearSampler, vWarpUV * 0.83f + 0.41f).r;
+    float2 vWarp = (float2(fWarpU, fWarpV) - 0.5f) * (2.f * g_fNormalWarpStrength);
+
+    // 파고와 동일 위상. 마루(+1)에서 최대로 밀려들어오고 골(-1)에서 빠져나감
+    float2 vFlowDir = g_vNormalSpeed0 / max(length(g_vNormalSpeed0), 1e-4f);
+    float2 vSway = vFlowDir * (g_fWaveOscillation * g_fNormalSwayStrength);
+
+    return vWarp + vSway;
+}
+
 float3 Build_WaterNormal(PS_IN In, float fFaceSign)
 {
     float3 vGeometryNormal = normalize(In.vWorldNormal) * fFaceSign;
     float3 vTangent = normalize(In.vWorldTangent);
     float3 vBinormal = normalize(In.vWorldBinormal) * fFaceSign;
 
-    float2 vNormalUV0 = In.vWorldPosition.xz * g_vNormalTiling0 + g_fGameTime * g_vNormalSpeed0;
-    float2 vNormalUV1 = In.vWorldPosition.xz * g_vNormalTiling1 + g_fGameTime * g_vNormalSpeed1;
+    float2 vWorldXZ = In.vWorldPosition.xz;
+    float2 vFlowOffset = Get_NormalFlowOffset(vWorldXZ);
+
+    // 레이어1만 35도 회전 -> 두 레이어가 격자 축을 공유하지 않게
+    float2 vRotatedXZ = float2(vWorldXZ.x * 0.8192f - vWorldXZ.y * 0.5736f,
+                               vWorldXZ.x * 0.5736f + vWorldXZ.y * 0.8192f);
+
+    float2 vNormalUV0 = vWorldXZ * g_vNormalTiling0 + g_fGameTime * g_vNormalSpeed0 + vFlowOffset;
+    float2 vNormalUV1 = vRotatedXZ * g_vNormalTiling1 + g_fGameTime * g_vNormalSpeed1 - vFlowOffset * 0.6f;
 
     float2 vNormalRG0 = g_WaterNormalTexture1.Sample(LinearSampler, vNormalUV0).rg;
     float2 vNormalRG1 = g_WaterNormalTexture2.Sample(LinearSampler, vNormalUV1).rg;
     float2 vCombinedNormalRG = (vNormalRG0 + vNormalRG1) * 0.5f * g_fNormalStrength;
+    vCombinedNormalRG *= 0.98f / max(0.98f, length(vCombinedNormalRG)); // z가 0으로 스냅되며 생기는 평탄 경계 제거
 
     float3 vTangentNormal = Decode_BC5_SNORM(vCombinedNormalRG);
 
@@ -200,8 +227,13 @@ float4 PS_MAIN(PS_IN In, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
 
     float3 vLightDirection = normalize(-g_vLightDir.xyz);
     float3 vHalfDirection = normalize(vViewDirection + vLightDirection);
-    float fSpecular = pow(saturate(dot(vWaterNormal, vHalfDirection)), g_fSpecularPower);
-    fSpecular *= saturate(dot(vWaterNormal, vLightDirection));
+
+    // 스펙큘러 전용 노멀: 파도 기울기만 과장 -> 광원 정면 밖에서도 드문드문 반짝
+    // (반사/굴절/프레넬은 원본 vWaterNormal 그대로라 전체 룩은 유지)
+    float3 vSpecNormal = normalize(vWaterNormal + (vWaterNormal - vGeometryNormal) * g_fSpecularScatter);
+
+    float fSpecular = pow(saturate(dot(vSpecNormal, vHalfDirection)), g_fSpecularPower);
+    fSpecular *= saturate(dot(vGeometryNormal, vLightDirection));
     fSpecular *= g_fSpecularStrength;
 
     // Caustic
