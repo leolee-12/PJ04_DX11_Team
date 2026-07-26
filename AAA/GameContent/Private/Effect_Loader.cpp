@@ -89,11 +89,11 @@ namespace
         { TEXT("Split_Cylinder"),         TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Cylinder_1.JSON") },
         { TEXT("BreakWallEffect"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_BreakWallEffect_0.JSON") },
         { TEXT("ItemEffect"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_ItemEffect_0.JSON") },
-        { TEXT("VanishEffect"),           TEXT("../../Resources/LevelData/Proto_VanishEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/EffectContainerJSON/CHJ/BubbleAura.JSON") },
         { TEXT("LaunchSmoke"),            TEXT("../../Resources/EffectContainerJSON/CHJ/LaunchSmoke.JSON") },
         { TEXT("MoveSmoke"),              TEXT("../../Resources/EffectContainerJSON/CHJ/MoveSmoke.JSON") },
         { TEXT("MonsterLandingSmoke"),    TEXT("../../Resources/EffectContainerJSON/CHJ/MonsterLandingSmoke.JSON") },
+        { TEXT("VanishEffect"),           TEXT("../../Resources/Map/Effect/Proto_VanishEffect_0.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/EffectContainerJSON/CHJ/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/EffectContainerJSON/CHJ/Tornado_BK.JSON") },
@@ -128,6 +128,35 @@ namespace
         { TEXT("Assault_Smoke"),          TEXT("../../Resources/EffectContainerJSON/YSH/Assault_Smoke.JSON") },
         { TEXT("Nail_Smoke"),             TEXT("../../Resources/EffectContainerJSON/YSH/Nail_Smoke.JSON") },
         { TEXT("LeoJump_Smoke"),          TEXT("../../Resources/EffectContainerJSON/YSH/LeoJump_Smoke.JSON") },
+
+        { TEXT("MoonShot"),                   TEXT("../../Resources/YSE/EffectContainer/MoonShot.JSON") },
+
+        //Meta
+        { TEXT("Meta_IntroLocking"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_IntroLocking.JSON") },
+        { TEXT("Meta_AppearFlash"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_AppearFlash.JSON") },
+        { TEXT("Meta_Attack1Flash"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Attack1Flash.JSON") },
+        { TEXT("Meta_DemoUpperCharge"),       TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge.JSON") },
+        { TEXT("Meta_UpperCharge"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_UpperCharge.JSON") },
+
+        { TEXT("Meta_DemoUpperUp"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperUp.JSON") },
+        { TEXT("Meta_DemoUpperCharge_End"),   TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperCharge_End.JSON") },
+        { TEXT("Meta_DemoUpperFinal"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperFinal.JSON") },
+        { TEXT("Meta_Locking"),               TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Locking.JSON") },
+        { TEXT("Meta_LockingSpark"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_LockingSpark.JSON") },
+
+        { TEXT("Meta_DemoUpperAtk1"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk1.JSON") },
+        { TEXT("Meta_DemoUpperAtk2"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk2.JSON") },
+        { TEXT("Meta_DemoUpperAtk3"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk3.JSON") },
+        { TEXT("Meta_DemoUpperAtk4"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk4.JSON") },
+        { TEXT("Meta_DemoUpperAtk5"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk5.JSON") },
+        { TEXT("Meta_DemoUpperAtk6"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk6.JSON") },
+        { TEXT("Meta_DemoUpperAtk7"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk7.JSON") },
+        { TEXT("Meta_DemoUpperAtk8"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk8.JSON") },
+        { TEXT("Meta_DemoUpperAtk9"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk9.JSON") },
+        { TEXT("Meta_DemoUpperAtk10"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk10.JSON") },
+        { TEXT("Meta_DemoUpperAtk11"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk11.JSON") },
+        { TEXT("Meta_DemoUpperAtk12"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk12.JSON") },
+        { TEXT("Meta_DemoUpperAtk13"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk13.JSON") },
 
     };
 }

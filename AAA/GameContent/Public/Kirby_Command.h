@@ -14,6 +14,7 @@ enum class KIRBY_COMMAND_TYPE
 	ATTACK, // B
 	DUMP, // Y
 	GUARD, // L, R
+	EMOTE_TOP, EMOTE_DOWN, EMOTE_LEFT, EMOTE_RIGHT,
 };
 
 enum class KEY_STATE_TYPE { DOWN, PRESS, UP };
@@ -147,4 +148,47 @@ private:
 	virtual void Free() { __super::Free(); }
 };
 
+class CLIENT_DLL EmoteTop_Command final : public CKirby_Command
+{
+public:
+	EmoteTop_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
+	virtual ~EmoteTop_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::EMOTE_TOP; }
+
+private:
+	virtual void Free() { __super::Free(); }
+};
+
+class CLIENT_DLL EmoteDown_Command final : public CKirby_Command
+{
+public:
+	EmoteDown_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
+	virtual ~EmoteDown_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::EMOTE_DOWN; }
+
+private:
+	virtual void Free() { __super::Free(); }
+};
+
+class CLIENT_DLL EmoteLeft_Command final : public CKirby_Command
+{
+public:
+	EmoteLeft_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
+	virtual ~EmoteLeft_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::EMOTE_LEFT; }
+
+private:
+	virtual void Free() { __super::Free(); }
+};
+
+class CLIENT_DLL EmoteRight_Command final : public CKirby_Command
+{
+public:
+	EmoteRight_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
+	virtual ~EmoteRight_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::EMOTE_RIGHT; }
+
+private:
+	virtual void Free() { __super::Free(); }
+};
 NS_END

@@ -8,6 +8,9 @@ NS_END
 NS_BEGIN(Client)
 
 class CKirby;
+class CKirby_Command;
+
+enum EMOTE_STATE_FLAG;
 
 class CLIENT_DLL CKirby_Wait final : public CKirby_ControllableState
 {
@@ -28,6 +31,9 @@ public:
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
+
+private:
+	_bool Handle_Emote(CKirby* pKirby, CKirby_Command* pCommand, EMOTE_STATE_FLAG eFlag);
 
 public:
 	static CKirby_Wait* Create();

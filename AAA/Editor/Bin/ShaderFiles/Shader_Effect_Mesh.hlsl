@@ -63,6 +63,8 @@ int g_iMaskChannel = { 0 };
 bool g_bMaskInvert = { false };
 float g_fMaskStrength = { 1.f };
 bool g_bUseMaskUVDistortion = { false };
+bool g_bUseMaskRGUVDistortion = { false };
+bool g_bMaskUVDistortionSigned = { false };
 float2 g_vMaskUVDistortionStrength = { 0.f, 0.f };
 
 float3 g_vColor = { 1.f, 1.f, 1.f };
@@ -316,7 +318,15 @@ float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
         vMaskValue = ResolveMaskValue(g_Mask.Sample(EffectSampler, vUV));
 
         if (g_bUseMaskUVDistortion == true)
-            vUVDistortion = (vMaskValue.rr * 2.f - 1.f) * g_vMaskUVDistortionStrength;
+        {
+            float2 vDistortionVector = g_bUseMaskRGUVDistortion == true
+                ? vMaskValue.rg : vMaskValue.rr;
+
+            if (g_bMaskUVDistortionSigned == false)
+                vDistortionVector = vDistortionVector * 2.f - 1.f;
+
+            vUVDistortion = vDistortionVector * g_vMaskUVDistortionStrength;
+        }
     }
 
     if (g_bUseTexture == true)

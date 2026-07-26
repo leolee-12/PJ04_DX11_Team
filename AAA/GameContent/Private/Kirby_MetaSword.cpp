@@ -102,17 +102,23 @@ HRESULT CKirby_MetaSword::Render()
     return S_OK;
 }
 
-void CKirby_MetaSword::Put_OnBack(CKirby* pKirby, _bool bOn)
+void CKirby_MetaSword::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
 {
-    if (bOn)
+    switch (ePartMode)
     {
-        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("CenterL"));
-        m_pAnimatorCom->Play("Carry", true, true, 0.f);
-    }
-    else
-    {
-        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
-        m_pAnimatorCom->Play("Reset", true, true, 0.f);
+        case KIRBY_PART_MODE::BACK:
+        {
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
+            m_pAnimatorCom->Play("Carry", true, true, 0.f);
+            break;
+        }
+        case KIRBY_PART_MODE::DEFAULT:
+        default:
+        {
+            Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
+            m_pAnimatorCom->Play("Reset", true, true, 0.f);
+            break;
+        }
     }
 }
 
@@ -163,8 +169,7 @@ HRESULT CKirby_MetaSword::Ready_HitBox()
     desc.fRadius = { 1.f };
     desc.fHeight = { 1.f };
     desc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f };
-    m_pHitBox = Add_Component<CCollider>(
-        Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("HitBox_Com"), &desc);
+    m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("HitBox_Com"), &desc);
 
     if (m_pHitBox == nullptr)
         return E_FAIL;
@@ -203,9 +208,6 @@ void CKirby_MetaSword::SetUp_HitBox_Callback()
             pDamageable->Damaged(tDesc);
 
             m_DamagedTargets.insert(pTarget);
-#ifdef _DEBUG
-            OutputDebugStringA("[Kirby_MetaSword] HIT Something!\n");
-#endif
         }
     );
 }

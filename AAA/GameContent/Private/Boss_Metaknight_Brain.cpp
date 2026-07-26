@@ -885,24 +885,20 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_BackStep()
 CBTNode* CBoss_Metaknight_Brain::Make_UC_Charge()
 {
     auto bOn = make_shared<bool>(false);
-    auto fT = make_shared<_float>(0.f);
 
     return CBTAction::Create(
-        [this, bOn, fT](CBlackboard*, _float dt) -> BT_STATUS {
+        [this, bOn](CBlackboard*, _float dt) -> BT_STATUS {
             auto* mv = m_pOwner->Get_Movement();
             if (!*bOn)
             {
-                Anim()->Play("UpperCaliburRaisingCharge", true, true, 0.15f, SPD);
+                Anim()->Play("UpperCaliburRaisingCharge", false, true, 0.15f, SPD);
                 mv->Set_LockFacing(true);
-                *fT = 0.f;
                 *bOn = true;
             }
 
-            // 차지하는 동안 계속 커비를 조준
             RotateYawTo(Dir_ToTargetXZ(), TURN_DEG, dt);
 
-            *fT += dt;
-            if (*fT >= UC_CHARGE_TIME)
+            if (Anim()->Is_Finished())
             {
                 mv->Set_LockFacing(false);
                 *bOn = false;
@@ -910,8 +906,8 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Charge()
             }
             return BT_STATUS::RUNNING;
         },
-        [this, bOn, fT] {
-            *bOn = false; *fT = 0.f;
+        [this, bOn] {
+            *bOn = false;
             m_pOwner->Get_Movement()->Set_LockFacing(false);
         });
 }

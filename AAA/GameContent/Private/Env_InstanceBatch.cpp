@@ -34,10 +34,10 @@ void CEnv_InstanceBatch::Submit(CEnvObject_Static* pObj, _uint64 iCurrentFrame)
 
 	tData.InstanceData.matWorld = *pObj->Get_Transform()->Get_WorldMatrixPtr();
 	tData.InstanceData.vDissolveParams = {
-			pObj->Get_FinalMainDissolve(),
-			pObj->Get_FinalShadowDissolve(),
-			0.f,
-			0.f
+		pObj->Get_FinalMainDissolve(),
+		pObj->Get_FinalShadowDissolve(),
+		pObj->Get_NearDitherLength(),
+		0.f
 	};
 
 	m_Submitted.push_back(tData);

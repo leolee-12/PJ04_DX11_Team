@@ -3,292 +3,37 @@
 #include "GameInstance.h"
 #include "GameObject.h"
 #include "Camera_Free.h"
-
-//UI Container
-#include "UI_Title.h"
-#include "UI_GenericContainer.h"
-#include "UI_PointStar.h"
-#include "UI_KirbyStatus.h"
-#include "UI_FadeOut.h"
-#include "UI_LoadingCurtain.h"
-#include "UI_FadeIn.h"
-#include "UI_BossStatus.h"
-#include "UI_FlashCurtain.h"
-#include "UI_MovableContainer.h"
-#include "UI_StageClear.h"
-#include "UI_CoordinatorContainer.h"
-#include "UI_MissionBoard.h"
-#include "UI_MissionPanel.h"
-#include "UI_LetterBox.h"
-#include "UI_TitleLogo.h"
-#include "UI_CutFade.h"
-#include "UI_Dialogue.h"
-#include "UI_QTE.h"
-#include "UI_UIFadeOut.h"
-#include "UI_AbilityDiscard.h"
-
-// UI Parts
-#include "UI_Image.h"
-#include "UI_SpriteAnim.h"
-#include "UI_Text.h"
-#include "UI_Effect.h"
-#include "UI_GaugeFill.h"
-
-#include "UI_Curtain.h"
-#include "UI_Eraser.h"
-#include "UI_SpriteAnimCurtain.h"
-#include "UI_CurtainTexture.h"
-#include "UI_CurtainStatic.h"
-#include "UI_CurtainStamp.h"
-#include "UI_CurtainFadeOut.h"
+#include "UI_Include.h"
 
 // Kirby
-#include "Kirby.h"
-#include "Kirby_Body.h"
-#include "Kirby_DeformCar_Demo.h"
-#include "Kirby_DeformCar_Main.h"
-#include "Kirby_DeformCylinder_Demo.h"
-#include "Kirby_DeformCylinder_Main.h"
-#include "Kirby_DeformRollerCoaster_Main.h"
-#include "Kirby_BombHat.h"
-#include "Kirby_IceHat.h"
-#include "Kirby_SleepHat.h"
-#include "Kirby_Sword.h"
-#include "Kirby_SwordHat.h"
-#include "Kirby_MetaSword.h"
-#include "Kirby_MetaHat.h"
-#include "Kirby_ToyHammer.h"
-#include "Kirby_ToyHat.h"
+#include "Kirby_Include.h"
 
-// Effect_Container
-#include "TestContainer.h"
-#include "WalkSmoke.h"
-#include "SwordSlash1.h"
-#include "InhaleContainer.h"
-#include "Sword_JumpSlash.h"
-#include "Sword_SpinSlash.h"
-#include "Sword_SpinSlashTrail.h"
-#include "RockBurst.h"
-#include "DeathSmoke.h"
-#include "RockBounce.h"
-#include "RockPull.h"
-#include "RockPush.h"
-#include "Gorilla_Swing.h"
-#include "Gorilla_Ring.h"
-#include "DespawnEffect.h"
-#include "GetAbilityEffect.h"
-#include "SwordChargeEffect.h"
-#include "BombExplosion.h"
-#include "BoostGas.h"
-#include "CoasterWind.h"
-#include "CarMilkyWay.h"
-#include "CommonHit.h"
-#include "SpitObject.h"
-#include "BombFuseEffect.h"
-#include "FlowerPetals.h"
-#include "Split_Starblock.h"
-#include "Split_Stone.h"
-#include "Split_Bush.h"
-#include "Split_Coaster.h"
-#include "Split_Cylinder.h"
-#include "LensFlare.h"
-#include "ItemEffect.h"
-#include "VanishEffect.h"
-#include "BombHitAim.h"
-#include "BombAimDot.h"
-#include "BreakWallEffect.h"
-#include "BubbleAura.h"
-#include "LaunchSmoke.h"
-#include "Kirby_SwordTrail.h"
-#include "SmokeCollection.h"
-#include "LandingSmoke.h"
-#include "MoveSmoke.h"
-#include "CarLanding.h"
-#include "CarThinGas.h"
-#include "PickUpEffect.h"
-#include "DropStarEffect.h"
-#include "OnLadderEffect.h"
-#include "SmokeSphereOriginalEmitter.h"
-#include "SwordTrail_BK.h"
-#include "Tornado_BK.h"
-#include "EssenceAura.h"
-
-// Effect_Part
-#include "SmokeSphereOriginal.h"
-#include "SmokeLowPoly.h"
-#include "SmokeTail.h"
-#include "Common_Curve03.h"
-#include "Common_Circle01.h"
-#include "InhaleEffect.h"
-#include "Vacuum.h"
-#include "TornadoSpinReverse.h"
-#include "Common_Ring03.h"
-#include "Common_JumpSlash.h"
-#include "Common_SpinSlash.h"
-#include "Common_SpinSlashTrail.h"
-#include "RockEffect.h"
-#include "RockFloorEffect.h"
-#include "SmokeParticle.h"
-#include "SmokeEmitter.h"
-#include "SpinWind.h"
-#include "Car_00_MilkyWay.h"
-#include "StarParticle.h"
-#include "Star2DParticle.h"
-#include "SwordCharge.h"
-#include "Swing_Smoke.h"
-#include "Shockwave.h"
-#include "SphereParticle.h"
-#include "SphereMesh.h"
-#include "Common_SphereNoise.h"
-#include "HitMark.h"
-#include "Bubble.h"
-#include "StarEmitter.h"
-#include "Sparkle.h"
-#include "MeshEmitterCommon.h"
-#include "RectCommon.h"
-#include "MeshCommon.h"
-#include "RectParticleCommon.h"
-#include "MeshParticleCommon.h"
-#include "RectEmitterCommon.h"
-#include "TrailCommon.h"
-#include "DistortionCommon.h"
-#include "EssenceCrown.h"
+// Effect
+#include "Effect_Include.h"
 
 //sky
 #include "SkySphere.h"
 
 // Monster
-#include "BladeKnight.h"
-#include "NormalEnemy.h"
-#include "Kabu.h"
-#include "BrontoBurt.h"
-#include "PoppyBrosJr.h"
-#include "Cappy.h"
-#include "NormalEnemyWild.h"
-#include "Dekabu.h"
-#include "Bouncy.h"
-#include "RabbitEnemy.h"
-#include "Gigatzo.h"
-#include "Noddy.h"
-#include "RangerEnemy.h"
-#include "SirKibble.h"
-
-// MonsterPart
-#include "BladeKnight_Body.h"
-#include "BladeKnight_Sword.h"
-#include "NormalEnemy_Body.h"
-#include "Kabu_Body.h"
-#include "BrontoBurt_Body.h"
-#include "PoppyBrosJr_Body.h"
-#include "Cappy_Body.h"
-#include "Cappy_Hat.h"
-#include "NormalEnemyWild_Body.h"
-#include "Dekabu_Body.h"
-#include "Bouncy_Body.h"
-#include "RabbitEnemy_Body.h"
-#include "Gigatzo_Body.h"
-#include "Noddy_Body.h"
-#include "RangerEnemy_Body.h"
-#include "SirKibble_Body.h"
+#include "Monster_Include.h"
 
 //Miniboss
-#include "GigantEdge.h"
-#include "GigantEdge_Body.h"
-#include "GigantEdge_Shield.h"
-#include "GigantEdge_Sword.h"
+#include "MiniBoss_Include.h"
 
 //MainBoss
-#include "Boss_Gorilla.h"
-#include "Boss_GorillaRush.h"
-#include "Boss_Gorilla_Body.h"
-#include "CutsceneGorilla.h"
-#include "GorillaNamePlate.h"
-#include "Boss_Gorilla_RockHole.h"
-#include "Boss_Cage.h"
-#include "Boss_Cage_Body.h"
-#include "Cage_WaddleDee.h"
-
-#include "Boss_Armadillo.h"
-#include "Boss_Armadillo_Body.h"
-#include "Projectile_Partner.h"
-#include "Boss_Armadillo_Cage.h"
-
-#include "Boss_Leopard.h"
-#include "Boss_Leopard_Body.h"
-#include "Projectile_Nail.h"
-
-#include "Boss_Metaknight.h"
-#include "Boss_Metaknight_Body.h"
-#include "Boss_Metaknight_Sword.h"
-#include "Boss_Metaknight_ReplicaSword.h"
-#include "Boss_Metaknight_Mant.h"
-#include "Boss_Metaknight_EscapeMant.h"
-#include "Projectile_MoonShot.h"
-#include "Excalibur.h"
-#include "Excalibur_Body.h"
-#include "Excalibur_GetIt.h"
-#include "MetaknightNamePlate.h"
-#include "AttackDecal.h"
-#include "Projectile_Rock.h"
+#include "MainBoss_Include.h"
 
 //Boss Effect
-#include "Armadillo_RutA.h"
-#include "Armadillo_RutB.h"
-#include "Armadillo_Dust.h"
-#include "Armadillo_RollWind.h"
-#include "Armadillo_SpinWind.h"
-#include "Armadillo_WallImpact.h"
-
-#include "Leopard_Slash.h"
-#include "Leopard_Meteo.h"
-#include "Nail_Trail.h"
-#include "Leopard_Afterimage_Assault.h"
-#include "Leopard_Afterimage_Jump.h"
-#include "Leopard_ClawAssault.h"
-#include "Leopard_ClawJump.h"
-#include "Leopard_Flash.h"
-#include "Leopard_Floor.h"
-#include "Leopard_Impact.h"
-#include "Nail_Smoke.h"
-#include "LeoJump_Smoke.h"
-#include "Assault_Smoke.h"
+#include "BossEffect_Include.h"
 
 // LevelDesign
-#include "LevelDesign_Unsupported.h"
-#include "LevelDesign_Starblock.h"
-#include "LevelDesign_Rail.h"
-#include "LD_AudioArea.h"
-#include "LD_LensFlare.h"
-#include "LD_WaterArea.h"
-#include "LD_Stage1BossDemo.h"
-#include "LD_SlopeBoardA.h"
-#include "LD_SlopeBoardB.h"
-#include "LD_SlopeBoardC.h"
-#include "LD_DeformCarBreakWall.h"
-#include "LD_GarageRadio.h"
-#include "LD_DeformObject.h"
-#include "LD_CopyEssence.h"
-#include "LD_MeteorGenerator.h"
+#include "LD_Include.h"
 
 // EnvObject
-#include "EnvTrigger_Generic.h"
-#include "EnvTrigger_RenderGlobals.h"
-#include "EnvTrigger_EventPublisher.h"
-#include "EnvVolume_Effect.h"
-#include "EnvVolume_Culling.h"
-#include "EnvVolume_Light.h"
-#include "Env_SpotLight.h"
+#include "Env_Include.h"
 
 // Projectile
-#include "Projectile_Boulder.h"
-#include "EnemyBomb.h"
-#include "KirbyBomb.h"
-#include "Spit_Projectile.h"
-#include "KoKabu.h"
-#include "GigatzoBullet.h"
-#include "MeteorRock.h"
-#include "MeteorRock_Large.h"
-#include "MeteorRock_Small.h"
+#include "Projectile_Include.h"
 
 // Ability Bubble
 #include "EssenceBubble.h"
@@ -297,18 +42,9 @@
 #include "Ability_Model.h"
 
 //System Object
-#include "KirbySpawnPoint.h"
-#include "CameraDirector.h"
-#include "Dialogue_Director.h"
-#include "Dialogue_Arranger.h"
+#include "SystemObject_Include.h"
 
-// CutSceneActor
-#include "DialogueDee.h"
-
-// NPC
-#include "WaddleDee.h"
-#include "WaddleDee_Body.h"
-#include "WaddleDee_Hat.h"
+#include "NPC_CutScene_Include.h"
 
 #include "DropStar.h"
 #include "DropStar_Body.h"
@@ -438,9 +174,9 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CTestContainer::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_ChargeNoise.iLevelID, Texture_ChargeNoise.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_ChargeNoise.szFileTag,
-                    Texture_ChargeNoise.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_TestNormal.iLevelID, Texture_TestNormal.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_TestNormal.szFileTag,
+                    Texture_TestNormal.iNumTex));
         )
     );
 }
@@ -927,6 +663,14 @@ void CGameObject_Factory::Register_NonAnimObject()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Small/VolcanoRock_S.ysh"));
         )
     );
+
+    Register(CLD_BattleBoundary::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_BattleBoundary),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_BattleBoundary::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, CLD_BattleBoundary::MODEL_PATH, true));));
+
+    Register(CLD_BattleBoundary::PROTOTYPE_TAG_CYLINDRICAL, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_BattleBoundary),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_BattleBoundary::MODEL_PROTO_TAG_CYLINDRICAL,
+            Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, CLD_BattleBoundary::MODEL_PATH_CYLINDRICAL, true));));
 }
 
 void CGameObject_Factory::Register_AnimObject()
@@ -1626,6 +1370,7 @@ void CGameObject_Factory::Register_BossEffect()
     Gorilla_Effect();
     Armadillo_Effect();
     Leopard_Effect();
+    Metaknight_Effect();
 }
 
 void CGameObject_Factory::Register_Bubble()
@@ -2163,6 +1908,125 @@ void CGameObject_Factory::Leopard_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CAssault_Smoke::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Smoke/BossLeopard_00_SmokeSphereOriginal.ysh"));
+        )
+    );
+}
+
+void CGameObject_Factory::Metaknight_Effect()
+{
+    Register(CMoonShot::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMoonShot),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMoonShot::TEXTURE_PROTO_TAG_FIRE_FORM,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MoonShot/fireform01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMoonShot::MODEL_PROTO_TAG_MOON,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/MoonShot/MoonShot.ysh"));
+        )
+    );
+
+    Register(CMeta_IntroLocking::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_IntroLocking),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Flash1.iLevelID, Texture_Meta_Flash1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Flash1.szFileTag, Texture_Meta_Flash1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Ring1.iLevelID, Texture_Meta_Ring1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Ring1.szFileTag, Texture_Meta_Ring1.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_IntroLocking::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_IntroLocking::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+        )
+    );
+
+    Register(CMeta_UpperCharge::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_UpperCharge),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Flash1.iLevelID, Texture_Meta_Flash1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Flash1.szFileTag, Texture_Meta_Flash1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Shine1.iLevelID, Texture_Meta_Shine1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Shine1.szFileTag, Texture_Meta_Shine1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_CircleFlash.iLevelID, Texture_Meta_CircleFlash.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_CircleFlash.szFileTag, Texture_Meta_CircleFlash.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Line1.iLevelID, Texture_Meta_Line1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Line1.szFileTag, Texture_Meta_Line1.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_UpperCharge::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_UpperCharge::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_UpperCharge::MODEL_PROTO_TAG_THUNDER,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Thunder/Metaknight_00_Common_ThunderLine.ysh"));
+        )
+    );
+
+    Register(CMeta_DemoUpperCharge::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_DemoUpperCharge),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Flash1.iLevelID, Texture_Meta_Flash1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Flash1.szFileTag, Texture_Meta_Flash1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_CircleFlash.iLevelID, Texture_Meta_CircleFlash.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_CircleFlash.szFileTag, Texture_Meta_CircleFlash.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Line1.iLevelID, Texture_Meta_Line1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Line1.szFileTag, Texture_Meta_Line1.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperCharge::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperCharge::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperCharge::MODEL_PROTO_TAG_THUNDER,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Thunder/Metaknight_00_Common_ThunderLine.ysh"));
+        )
+    );
+
+    Register(CMeta_DemoUpperUp::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_DemoUpperUp),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Flash1.iLevelID, Texture_Meta_Flash1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Flash1.szFileTag, Texture_Meta_Flash1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_HitFire1.iLevelID, Texture_Meta_HitFire1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_HitFire1.szFileTag, Texture_Meta_HitFire1.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperUp::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+        )
+    );
+
+    Register(CMeta_DemoUpperAtk::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_DemoUpperAtk),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Ring1.iLevelID, Texture_Meta_Ring1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Ring1.szFileTag, Texture_Meta_Ring1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_HitFire1.iLevelID, Texture_Meta_HitFire1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_HitFire1.szFileTag, Texture_Meta_HitFire1.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_HitFire2.iLevelID, Texture_Meta_HitFire2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_HitFire2.szFileTag, Texture_Meta_HitFire2.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Line2.iLevelID, Texture_Meta_Line2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Line2.szFileTag, Texture_Meta_Line2.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperAtk::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperAtk::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+        )
+    );
+
+    Register(CMeta_DemoUpperFinal::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_DemoUpperFinal),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Line2.iLevelID, Texture_Meta_Line2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Line2.szFileTag, Texture_Meta_Line2.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperFinal::MODEL_PROTO_TAG_CIRCLE,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperFinal::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperFinal::MODEL_PROTO_TAG_ROCK,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/RockEffectModel.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_DemoUpperFinal::MODEL_PROTO_TAG_THUNDER,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Thunder/Metaknight_00_Common_ThunderLine.ysh"));
         )
     );
 }

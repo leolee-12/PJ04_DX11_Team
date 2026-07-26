@@ -8,6 +8,9 @@ Texture2D g_NormalTexture;
 Texture2D g_MRATexture;
 Texture2D g_UnknownTexture;
 Texture2D g_ExtraRTexture;
+Texture2D g_FlowTexture;
+uint g_iHasFlowTexture = 0u;
+float g_fWorldTime = 0.f;
 
 float4 g_vColor = float4(1.f, 1.f, 1.f, 1.f);
 float3 g_vMRA = float3(0.f, 1.f, 1.f);
@@ -27,10 +30,14 @@ float4 g_vUVTransformUnknown = float4(1.f, 1.f, 0.f, 0.f);
 float g_fUVRotate = 0.f;
 
 #define FLAG_DITHER 0x01u
+#define FLAG_NEAR_DITHER 0x02u
 
 uint g_iFlags = 0u;
 uint g_iUseInstanceDissolve = 0u;
 float g_fDissolve = 0.f;
+float g_fNearDitherLength = 0.f;
+
+static const float NEAR_DITHER_FULL_DIST = 1.f;
 
 uint g_iMaterialID = 0u;
 uint g_iShadowAlphaSource = 0u;
@@ -76,7 +83,7 @@ struct PS_IN
     float2 vTexcoord3 : TEXCOORD3;
 
     float4 vProjPos : TEXCOORD4;
-    nointerpolation float fDissolve : TEXCOORD5;
+    nointerpolation float2 vDissolveParams : TEXCOORD5; // x: 오브젝트 dissolve, y: 근거리 디더 길이
     
     float4 vTangent : TANGENT;
     float4 vBinormal : BINORMAL;
@@ -113,6 +120,15 @@ void Apply_Dither(float4 vScreenPos, float fDissolve)
         discard;
 }
 
+float Calc_NearDissolve(float fViewDepth, float fLength)
+{
+      [branch]
+    if (fLength <= 0.f)
+        return 0.f;
+
+    return saturate((fLength - fViewDepth) / max(fLength - NEAR_DITHER_FULL_DIST, 1e-4f));
+}
+
 void Apply_DitherIfNeeded(float4 vScreenPos)
 {
       [branch]
@@ -125,11 +141,13 @@ void Apply_DitherFromPixelInput(PS_IN In)
       [branch]
     if (0u != g_iUseInstanceDissolve)
     {
-        Apply_Dither(In.vPosition, In.fDissolve);
+        Apply_Dither(In.vPosition, max(In.vDissolveParams.x, Calc_NearDissolve(In.vProjPos.w, In.vDissolveParams.y)));
         return;
     }
 
-    Apply_DitherIfNeeded(In.vPosition);
+    float fObjectDissolve = (0u != (g_iFlags & FLAG_DITHER)) ? g_fDissolve : 0.f;
+    float fNearDissolve = (0u != (g_iFlags & FLAG_NEAR_DITHER)) ? Calc_NearDissolve(In.vProjPos.w, g_fNearDitherLength) : 0.f;
+    Apply_Dither(In.vPosition, max(fObjectDissolve, fNearDissolve));
 }
 
 float2 Select_UV(float2 vTexcoord0, float2 vTexcoord1, float2 vTexcoord2, float2 vTexcoord3, uint iUVIndex)
@@ -625,6 +643,81 @@ PS_OUT PS_UKWN2_SAND_OPAQUE(PS_IN In)
                   vNormal,
                   float4(g_vMRA, 1.f),
                   float4(g_vEmissiveColor.rgb, 1.f));
+}
+
+// 세 메쉬 모두 V 0.4639(상단)~0.5347(하단) 로 정규화돼 있어 상수 한 쌍으로 처리된다.
+static const float BARRIER_EDGE_FADE_CLEAR = 0.465f; // 이 V 이하 = 완전 투명
+static const float BARRIER_EDGE_FADE_FULL = 0.490f; // 이 V 이상 = 불투명
+
+float4 PS_BLEND_UKWN_BARRIER(PS_IN In) : SV_TARGET0
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vBaseUV = Select_UV_PS(In, g_iUnknownUVIndex);
+    float fBase = g_UnknownTexture.Sample(LinearSampler, vBaseUV).r;
+
+    float2 vDropUV = Apply_UVTransform(Select_UV_PS(In, g_iExtraR_UVIndex), g_vUVTransformUnknown);
+    float fDrop = g_ExtraRTexture.Sample(LinearSampler, vDropUV).r;
+
+    float fEdgeFade = smoothstep(BARRIER_EDGE_FADE_CLEAR, BARRIER_EDGE_FADE_FULL, vBaseUV.y);
+    float fAlpha = saturate((fBase + fDrop) * fEdgeFade * max(g_MaskStrength, 0.f) * g_vColor.a);
+
+    if (fAlpha < 0.001f)
+        discard;
+
+    return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
+}
+
+  // g_vMRA.x = 크러스트 임계값, y = 경계 부드러움, z = flow 주기(초)
+  // g_MaskStrength = flow 강도, g_vEmissiveColor.w = 발광 게인
+PS_OUT PS_LAVA_SURFACE(PS_IN In)
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vBaseUV = Get_BaseUV(In);
+    float2 vNormalUV = Get_NormalUV(In);
+    float2 vFlow = float2(0.f, 0.f);
+
+      [branch]
+    if (0u != g_iHasFlowTexture)
+        vFlow = (g_FlowTexture.Sample(LinearSampler, Get_MaterialUV(In)).rg * 2.f - 1.f) * max(g_MaskStrength, 0.f);
+
+    float2 vPhase = float2(0.f, 0.f);
+    float fBlend = 0.f;
+    float fCycle = max(g_vMRA.z, 0.f);
+
+      [branch]
+    if (0.f < fCycle)
+    {
+        float fTime = g_fWorldTime / fCycle;
+        vPhase = float2(frac(fTime), frac(fTime + 0.5f));
+        fBlend = abs(1.f - vPhase.x * 2.f);
+    }
+
+    float2 vFlowOffsetA = vFlow * vPhase.x;
+    float2 vFlowOffsetB = vFlow * vPhase.y;
+
+    float3 vDiffuseA = g_DiffuseTexture.Sample(LinearSampler, vBaseUV + vFlowOffsetA).rgb;
+    float3 vDiffuseB = g_DiffuseTexture.Sample(LinearSampler, vBaseUV + vFlowOffsetB).rgb;
+    float3 vMRAA = g_MRATexture.Sample(LinearSampler, vBaseUV + vFlowOffsetA).rgb;
+    float3 vMRAB = g_MRATexture.Sample(LinearSampler, vBaseUV + vFlowOffsetB).rgb;
+    float3 vNormalA = Get_ShadingNormal(In, vNormalUV + vFlowOffsetA);
+    float3 vNormalB = Get_ShadingNormal(In, vNormalUV + vFlowOffsetB);
+
+    float3 vDiffuse = lerp(vDiffuseA, vDiffuseB, fBlend);
+    float3 vMRA = lerp(vMRAA, vMRAB, fBlend);
+    float3 vNormal = lerp(vNormalA, vNormalB, fBlend);
+
+    float fSoftness = max(g_vMRA.y, 0.0001f);
+    float fHot = 1.f - smoothstep(g_vMRA.x - fSoftness, g_vMRA.x + fSoftness, vMRA.g);
+    float3 vEmissive = g_vEmissiveColor.rgb * fHot * max(g_vEmissiveColor.w, 0.f);
+
+    return Make_GBufferOutput(
+                    In,
+                    float4(vDiffuse * g_vColor.rgb, 1.f),
+                    vNormal,
+                    float4(vMRA, 1.f),
+                    float4(vEmissive, 1.f));
 }
 
 

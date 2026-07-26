@@ -65,15 +65,6 @@ public:
 		CMapStage** ppOutStage = nullptr,
 		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
 
-	static HRESULT Load_Map(
-		ID3D11Device* pDevice,
-		ID3D11DeviceContext* pContext,
-		const _wstring& strManifestPath,
-		_uint iRuntimeLevel,
-		MAP_LOAD_RESULT* pOutReport = nullptr,
-		CMapStage** ppOutStage = nullptr,
-		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
-
 	static HRESULT Load_MapStage_Runtime(
 		const MAP_RUNTIME_LOAD_CONTEXT& Context,
 		const _wstring& strMapManifestPath,

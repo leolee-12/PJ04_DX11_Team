@@ -16,6 +16,8 @@ namespace
     constexpr _float fQTEProgressFollowSpeed = 6.f;
     constexpr _float fQTESuccessProgress = 0.9f;
     constexpr _float fQTEFailProgress = 0.005f;
+    constexpr _float fQTETrembleFreq = 30.f;
+    constexpr _float fQTETrembleAmp = 0.005f;
 }
 
 CKirby_MetaKnight_QTE::CKirby_MetaKnight_QTE()
@@ -201,6 +203,7 @@ void CKirby_MetaKnight_QTE::Enter_MetaKnightState(CKirby* pKirby, METAKNIGHT_QTE
                     m_pMetaKnight = dynamic_cast<CBoss_Metaknight*>(tQuery.pBoss);
 
                     m_bQTEStarted = true;
+                    m_fClashTime = 0.f;
                 }
             );
 
@@ -238,10 +241,22 @@ void CKirby_MetaKnight_QTE::Update_MetaKnightState(CKirby* pKirby, _float fTimeD
             Helper::FloatClamp(fFollowRatio, 0.f, 1.f);
             m_fQTEAnimationProgress += (m_fQTEProgress - m_fQTEAnimationProgress) * fFollowRatio;
 
-            pAnimator->Seek(m_fQTEAnimationProgress);
+            m_fClashTime += fTimeDelta;
+
+            _float tremble =
+                (sinf(m_fClashTime * fQTETrembleFreq) * 0.7f +
+                    sinf(m_fClashTime * fQTETrembleFreq * 2.3f) * 0.3f) * fQTETrembleAmp;
+
+            _float strain = 1.f - fabsf(m_fQTEAnimationProgress - 0.5f) * 2.f;
+            tremble *= strain;
+
+            _float fVisual = m_fQTEAnimationProgress + tremble;
+            Helper::FloatClamp(fVisual, 0.f, 1.f);
+
+            pAnimator->Seek(fVisual);
 
             if (m_pMetaKnight != nullptr)
-                m_pMetaKnight->Sync_LockingProgress(m_fQTEAnimationProgress);
+                m_pMetaKnight->Sync_LockingProgress(m_fQTEAnimationProgress, fVisual);
 
             if (m_fQTEAnimationProgress >= fQTESuccessProgress)
             {

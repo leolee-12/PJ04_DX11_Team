@@ -1,12 +1,12 @@
 #include "Kirby_Wait.h"
 
-#include "GameInstance.h"
-
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
 #include "Kirby_Deform.h"
+
+#include "Kirby_Emote.h"
 
 CKirby_Wait::CKirby_Wait()
 {
@@ -132,9 +132,30 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);
             return true;
         }
+        // Emote
+        case KIRBY_COMMAND_TYPE::EMOTE_TOP:
+            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_TOP);
+        case KIRBY_COMMAND_TYPE::EMOTE_DOWN:
+            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_DOWN);
+        case KIRBY_COMMAND_TYPE::EMOTE_LEFT:
+            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_LEFT);
+        case KIRBY_COMMAND_TYPE::EMOTE_RIGHT:
+            return Handle_Emote(pKirby, pCommand, EMOTE_STATE_FLAG::EMOTE_RIGHT);
     }
 
     return false;
+}
+
+_bool CKirby_Wait::Handle_Emote(CKirby* pKirby, CKirby_Command* pCommand, EMOTE_STATE_FLAG eFlag)
+{
+    if (!pCommand->IsDown())
+        return false;
+
+    if (pKirby->Has_Deform())
+        return true;
+
+    pKirby->Change_State(KIRBY_STATE_TYPE::EMOTE, eFlag);
+    return true;
 }
 
 CKirby_Wait* CKirby_Wait::Create()

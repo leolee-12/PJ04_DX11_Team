@@ -181,9 +181,6 @@ void CEnvObject_Static::Submit_BlendMeshes()
 	if (!m_bVisible || m_bIsDecal || m_BlendMeshIndices.empty())
 		return;
 
-	if (m_bUseCameraDither && m_fDissolve >= 0.999f)
-		return;
-
 	const _float4x4* pWorld = m_pTransformCom->Get_WorldMatrixPtr();
 
 	for (_uint iMeshIndex : m_BlendMeshIndices)

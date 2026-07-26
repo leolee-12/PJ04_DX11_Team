@@ -14,6 +14,8 @@
 #include "Projectile_MoonShot.h"
 #include "Projectile_Rock.h"
 
+#include "Effect_Loader.h"
+
 const _float3 CBoss_Metaknight::s_vGigaPoints[CBoss_Metaknight::GIGA_POINT_COUNT] = {
     { 20.5f, 7.23f, 15.f },
     { 20.5f, 7.23f, -15.f },
@@ -115,6 +117,10 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
 void CBoss_Metaknight::Late_Update(_float fTimeDelta)
 {
     Update_Attachment();
+
+    if (m_Lock.bActive)
+        Update_SparkAnchor();
+
     __super::Late_Update(fTimeDelta);
 }
 
@@ -736,16 +742,18 @@ void CBoss_Metaknight::Begin_LockingSync()
     m_Lock.bSyncing = true;
 }
 
-void CBoss_Metaknight::Sync_LockingProgress(_float fProgress01)
+void CBoss_Metaknight::Sync_LockingProgress(_float fGauge01, _float fVisual01)
 {
     if (!m_Lock.bSyncing)
         return;
 
-    fProgress01 = fProgress01 < 0.f ? 0.f : (fProgress01 > 1.f ? 1.f : fProgress01);
-    m_Lock.fGauge = fProgress01;
+    fGauge01 = fGauge01 < 0.f ? 0.f : (fGauge01 > 1.f ? 1.f : fGauge01);
+    fVisual01 = fVisual01 < 0.f ? 0.f : (fVisual01 > 1.f ? 1.f : fVisual01);
+
+    m_Lock.fGauge = fGauge01;
 
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Seek(fProgress01);
+        pAnim->Seek(fVisual01);
 }
 
 void CBoss_Metaknight::End_LockingSync()
@@ -832,6 +840,42 @@ void CBoss_Metaknight::Update_Attachment()
     matAttach.r[2] *= m_Lock.vSaveScale.z;
 
     m_pTransformCom->Set_WorldMatrix(matAttach);
+
+    if (!m_Lock.bLockFxFired)
+    {
+        m_Lock.bLockFxFired = true;
+
+        Update_SparkAnchor();
+
+        _float3 vPos{}, vLook{};
+        XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+        XMStoreFloat3(&vLook,
+            XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+        CEffect_Loader::GetInstance()->Spawn(
+            L"Meta_Locking", Get_LevelIndex(), vPos, vLook);
+
+        CEffect_Container* pSpark = nullptr;
+        CEffect_Loader::GetInstance()->Spawn(
+            L"Meta_LockingSpark", Get_LevelIndex(),
+            _float3{}, _float3{}, _float3{},
+            &m_SparkAnchor,
+            &pSpark, &m_SparkFxHandle);
+    }
+}
+
+void CBoss_Metaknight::Update_SparkAnchor()
+{
+    const _float4x4* pBoneLocal = m_pBody->Get_BoneMatrixPtr("RHaveL");
+    if (nullptr == pBoneLocal)
+        return;
+
+    _matrix matBoneWorld =
+        XMLoadFloat4x4(pBoneLocal) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+    //matBoneWorld = Strip_Scale(matBoneWorld);
+
+    XMStoreFloat4x4(&m_SparkAnchor, matBoneWorld);
 }
 
 void CBoss_Metaknight::Enter_Locking()
@@ -844,12 +888,15 @@ void CBoss_Metaknight::Enter_Locking()
     m_Lock.bCamFired = false;
     m_Lock.bJudged = false;
     m_Lock.fGauge = LOCK_GAUGE_START;
+    m_Lock.bLockFxFired = false;
+    
+    m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
 
     Enable_CatchBox(false);
     Set_ParryWindow(false);
 
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("LockingSword", false, true, 0.1f, s_fDefaultAnimSpeed);
+        pAnim->Play("LockingSword", false, true, 0.f, s_fDefaultAnimSpeed);
 
     Begin_LockingSync();
 }
@@ -870,6 +917,10 @@ void CBoss_Metaknight::Exit_Locking()
     }
 
     m_Lock.bActive = false;
+
+    if (CEffect_Loader::GetInstance()->Is_Current(m_SparkFxHandle))
+        m_SparkFxHandle.p->EffectContainer_Stop();
+    m_SparkFxHandle.Clear();
 
     if (auto* pBrain = static_cast<CBoss_Brain*>(m_pBrain))
         pBrain->Reset_Tree();

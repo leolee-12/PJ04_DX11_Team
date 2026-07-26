@@ -4,6 +4,7 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_OnOffPart.h"
 #include "Kirby_Ability.h"
 #include "Kirby_Deform.h"
 
@@ -87,7 +88,7 @@ void CKirby_Dodge::Exit(CKirby* pKirby)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 
-    pKirby->Put_WeaponOnBack(false);
+    pKirby->Set_OnOffPartMode(KIRBY_PART_MODE::DEFAULT);
 
     m_eDodgeState = Dodge_State::DODGE_END;
     m_eDodgeFlag = DODGE_STATE_FLAG::DODGE_NONE;
@@ -137,7 +138,7 @@ void CKirby_Dodge::Enter_DodgeState(CKirby* pKirby, Dodge_State eState)
         }
         case Dodge_State::DODGE1:
         {
-            pKirby->Put_WeaponOnBack(true);
+            pKirby->Set_OnOffPartMode(KIRBY_PART_MODE::BACK);
 
             switch (m_eDodgeAniDir)
             {

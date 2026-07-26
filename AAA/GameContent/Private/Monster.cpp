@@ -3,7 +3,6 @@
 #include "GameInstance.h"
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
-#include "LevelDesign_LoadTypes.h"
 #include "Sound_Handle.h"
 
 #include "Collider.h"
@@ -30,6 +29,7 @@ CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CMonster::CMonster(const CMonster& Prototype)
 	: CCharacter ( Prototype )
+	, m_tLevelDesignDesc(Prototype.m_tLevelDesignDesc)
 {
 }
 
@@ -51,6 +51,10 @@ HRESULT CMonster::Initialize(void* pArg)
 	if (nullptr != pArg)
 	{
 		const LD_OBJECT_DESC* pDesc = static_cast<const LD_OBJECT_DESC*>(pArg);
+
+		if (LD_CATEGORY::ENEMY == pDesc->eCategory)
+			m_tLevelDesignDesc = *pDesc;
+
 		if (!pDesc->strAIVariation.empty())
 			Apply_AIVariation(pDesc->strAIVariation);
 	}

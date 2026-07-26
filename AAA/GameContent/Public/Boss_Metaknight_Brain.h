@@ -52,7 +52,6 @@ private:
     static constexpr _float BASE_SPEED = 6.f;          // Initialize에서 준 기본 이동속도
 
     static constexpr _float UC_BACK_SPEED = 5.f;       // Step 중 뒤로 빠지는 속도
-    static constexpr _float UC_CHARGE_TIME = 1.5f;     // Charge 유지 시간
     static constexpr _float UC_RUSH_SPEED = 40.f;      // 돌진 속도
     static constexpr _float UC_RUSH_MAX_DIST = 20.f;   // 이만큼 달리면 실패 판정 -> 브레이크
     static constexpr _float UC_RUSH_TIMEOUT = 1.5f;    // 벽에 막혔을 때 안전장치

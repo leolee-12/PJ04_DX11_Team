@@ -2,6 +2,7 @@
 #include "Map_EditFile.h"
 #include "EnvObject.h"
 #include "LevelDesignObject.h"
+#include "Monster.h"
 
 NS_BEGIN(Client)
 
@@ -159,11 +160,24 @@ void CMap_EditSession::Register_PreviewObject(const _wstring& strLayerTag, const
 		return;
 	}
 
+	const LD_OBJECT_DESC* pLevelDesignDesc = nullptr;
+
 	CLevelDesignObject* pLDObject = dynamic_cast<CLevelDesignObject*>(pObject);
-	if (nullptr == pLDObject)
+	if (nullptr != pLDObject)
+	{
+		pLevelDesignDesc = &pLDObject->Get_LevelDesignDesc();
+	}
+	else
+	{
+		CMonster* pMonster = dynamic_cast<CMonster*>(pObject);
+		if (nullptr != pMonster && LD_CATEGORY::ENEMY == pMonster->Get_LevelDesignDesc().eCategory)
+			pLevelDesignDesc = &pMonster->Get_LevelDesignDesc();
+	}
+
+	if (nullptr == pLevelDesignDesc)
 		return;
 
-	const LD_OBJECT_DESC& Desc = pLDObject->Get_LevelDesignDesc();
+	const LD_OBJECT_DESC& Desc = *pLevelDesignDesc;
 
 	MAP_EDIT_LD_ITEM Item{};
 	Item.strStableKey = CMap_EditFile::Make_LevelDesignKey(Desc);

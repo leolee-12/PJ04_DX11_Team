@@ -53,7 +53,12 @@ HRESULT CEffect_RectParticle::Render()
 		if (Particle.bAlive == false)
 			continue;
 
-		const _float4x4 ParticleWorld = Make_ParticleWorldMatrix(Particle);
+		_float4x4 ParticleWorld = Make_ParticleWorldMatrix(Particle);
+		if (m_bBillboard == true && Is_ParticleOrientationEnabled() == true)
+			ParticleWorld = Make_ParticleConstrainedBillboardWorldMatrix(
+				Particle,
+				ParticleWorld);
+
 		if (FAILED(EffectRect::Bind_ParticleDrawValues(
 			m_pShaderCom, ParticleWorld, Particle.fAlpha, Particle.vColor)))
 			return E_FAIL;
@@ -98,6 +103,16 @@ HRESULT CEffect_RectParticle::Bind_ShaderValue()
 		FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)) ||
 		FAILED(EffectRect::Bind_Roll(m_pShaderCom, 0.f)))
 		return E_FAIL;
+
+	if (m_bBillboard == true && Is_ParticleOrientationEnabled() == true)
+	{
+		const _bool bShaderBillboard = false;
+		if (FAILED(m_pShaderCom->Bind_RawValue(
+			"g_bBillboard",
+			&bShaderBillboard,
+			sizeof(bShaderBillboard))))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }

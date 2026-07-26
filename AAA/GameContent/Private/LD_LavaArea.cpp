@@ -201,6 +201,24 @@ HRESULT CLD_LavaArea::Render_Model()
 		if (FAILED(hrBind))     return E_FAIL;
 		if (S_FALSE == hrBind)  continue;
 
+		if (ETOUI(WORLD_PASS::LAVA_SURFACE) == iPass && Layer.bUseUVTransform)
+		{
+			const _float3 vScaled = m_pTransformCom->Get_Scaled();
+			const _float fWorldUnitsPerTile = max(fabsf(Layer.vUVScale.x), 0.0001f);
+			const _float4 vUVTransform =
+			{
+					vScaled.x * 2.f / fWorldUnitsPerTile,
+					vScaled.z * 2.f / fWorldUnitsPerTile,
+					Layer.vUVOffset.x,
+					Layer.vUVOffset.y
+			};
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(_float4))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransformNormal", &vUVTransform, sizeof(_float4))))
+				return E_FAIL;
+		}
+
 		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 
