@@ -86,12 +86,6 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Common_Ring02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Ring02"), TEXT("../../Resources/YSE/Effect/Common_Ring03/common_ring02.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_SwordSlash2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordSlash2"), TEXT("../../Resources/YSE/Effect/Common_Ring03/SwordSlash2.png"), 1 };
 
-	// SpinSlash
-	inline constexpr TEXTURE_DESC Texture_Common_SpinSlash_1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlash_1"), TEXT("../../Resources/YSE/Effect/Common_SpinSlash/common_ring02.png"), 1 };
-	inline constexpr TEXTURE_DESC Texture_Common_SpinSlash_2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlash_2"), TEXT("../../Resources/YSE/Effect/Common_SpinSlash/SpinSlash_2.png"), 1 };
-
-	// SpinSlashTrail
-	inline constexpr TEXTURE_DESC Texture_Common_SpinSlashTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlashTrail"), TEXT("../../Resources/YSE/Effect/Common_SpinSlashTrail/common_ring02.png"), 1 };
 	// SwordTrail
 	inline constexpr TEXTURE_DESC Texture_SwordTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordTrail"), TEXT("../../Resources/YSE/Effect/SwordTrail/SwordTrail.png"), 1 };
 
