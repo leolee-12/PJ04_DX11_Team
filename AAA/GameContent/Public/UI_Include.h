@@ -34,3 +34,6 @@
 #include "UI_CurtainStatic.h"
 #include "UI_CurtainStamp.h"
 #include "UI_CurtainFadeOut.h"
+
+#include "UI_ClickQTE.h"
+#include "UI_CreditCoordinator.h"

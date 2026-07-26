@@ -184,6 +184,9 @@ public: // Picking
     void	Add_CollisionPool(_uint SrcGroup, _uint DstGroup);
     void	Reset_For_SceneChange();
     void	Clear_CollisionPool();
+    void    Query_Overlap(CCollider* pQuery, _uint Group, vector<CCollider*>* pOut);
+    void    Query_Overlap(CCollider* pQuery, const vector<_uint>& Groups, vector<CCollider*>* pOut);
+    void    Query_OverlapOwners(CCollider* pQuery, const vector<_uint>& Groups, vector<CGameObject*>* pOut);
 #pragma endregion
 
 #pragma region SOUND_MANAGER

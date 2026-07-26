@@ -21,7 +21,7 @@ HRESULT CArena::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Grassland1.marker.wav", 5.f, 0.15f);
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"Ec_MetaWind0.wav", 5.f, 0.1f);
 
     return S_OK;
 }
@@ -58,6 +58,17 @@ HRESULT CArena::Ready_Events()
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
+        });
+
+    Subscribe_Event(EventTag::Kirby_PositionSyncBegin, [this](void* pData) {
+        const auto* pDesc = static_cast<KIRBY_POSITION_SYNC_BEGIN_DESC*>(pData);
+        if (nullptr == pDesc)
+            return;
+        if (pDesc->eType != KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_LOOKAROUND)
+            return;
+
+        m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_BossMetaknight1.marker.wav", 1.f, 0.15f);
+
         });
     return S_OK;
 }

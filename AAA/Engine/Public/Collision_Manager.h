@@ -33,7 +33,11 @@ public:
 
 	void Reset_For_SceneChange() { m_hmapCollisionGroup.clear(); }		// 씬전환용 등록된 충돌체 비우기 함수
 
-	//vector<CGameObject*> Query_Collision(CCollider* pCollider, _uint Groupflag = UINT_MAX);	// 임시 충돌체크함수 (반환값 충돌한 모든 충돌체의 오너포인터 집단)
+	void Query_Overlap(CCollider* pQuery, _uint Group, vector<CCollider*>* pOut);
+	void Query_Overlap(CCollider* pQuery, const vector<_uint>& Groups, vector<CCollider*>* pOut);
+
+	// 소유 오브젝트 단위로 중복을 제거해서 받고 싶을 때
+	void Query_OverlapOwners(CCollider* pQuery, const vector<_uint>& Groups, vector<CGameObject*>* pOut);
 
 private:
 	// 매니저 내부 데이터 관리 함수 모음 (해당 함수들은 외부에서 실행되면 안됨!!)

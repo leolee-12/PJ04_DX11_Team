@@ -612,22 +612,38 @@ _bool CMonster::Handle_SoundAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePha
 	{
 	case EANIM_EVENT::Sound:
 	{
-		if (ePhase != ANIM_EVENT_PHASE::POINT)
+		const _wstring strSound = StrToWstr(e.strParam);
+		if (strSound.empty())
 			return true;
 
-		if (e.strParam.empty())
+		if (e.bIsRange)
+		{
+			if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+				Play_SectionLoopSFX(strSound.c_str(), e.vOffset.x, e.vOffset.y, e.vOffset.z);
+			else if (ePhase == ANIM_EVENT_PHASE::END)
+			{
+				if (e.iIntParam == 0)
+					Release_LoopSFX(strSound.c_str());
+				else
+					Stop_LoopSFX(strSound.c_str());
+			}
 			return true;
+		}
 
-		if (m_bSFX2D)
+		if (ePhase == ANIM_EVENT_PHASE::POINT)
 		{
-			m_pGameInstance_Proxy->Play_SFX(StrToWstr(e.strParam).c_str(), e.vOffset.x);
+			if (m_bSFX2D)
+			{
+				m_pGameInstance_Proxy->Play_SFX(strSound.c_str(), e.vOffset.x);
+			}
+			else
+			{
+				_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+				m_pGameInstance_Proxy->Play_SFX3D(strSound.c_str(), vPos, e.vOffset.x);
+			}
+			return true;
 		}
-		else
-		{
-			_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-			m_pGameInstance_Proxy->Play_SFX3D(StrToWstr(e.strParam).c_str(), vPos, e.vOffset.x);
-		}
-		return true;
+		return false;
 	}
 	default:
 		return false;		// 몬스터 고유 이벤트로 넘김

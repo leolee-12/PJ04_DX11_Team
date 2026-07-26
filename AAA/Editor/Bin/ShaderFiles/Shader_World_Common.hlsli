@@ -31,6 +31,7 @@ float g_fUVRotate = 0.f;
 
 #define FLAG_DITHER 0x01u
 #define FLAG_NEAR_DITHER 0x02u
+#define FLAG_LAVA_EDGE_DITHER 0x04u
 
 uint g_iFlags = 0u;
 uint g_iUseInstanceDissolve = 0u;
@@ -52,6 +53,8 @@ uint g_iShadowAlphaSource = 0u;
 float4 g_vLightDir = float4(0.f, -1.f, 0.f, 0.f);
 float4 g_vLightDiffuse = float4(1.f, 1.f, 1.f, 1.f);
 float4 g_vCamPosition = float4(0.f, 0.f, 0.f, 1.f);
+
+float g_fCutBlend = 0.f; // 0 = g_UnknownTexture(Src)만, 1 = g_ExtraRTexture(Dst)만
 float g_fBlendOpacity = 1.f;
 float g_fBlendFresnel = 5.f;
 
@@ -652,7 +655,7 @@ static const float BARRIER_EDGE_FADE_FULL = 0.490f; // 이 V 이상 = 불투명
 float4 PS_BLEND_UKWN_BARRIER(PS_IN In) : SV_TARGET0
 {
     Apply_DitherFromPixelInput(In);
-
+    
     float2 vBaseUV = Select_UV_PS(In, g_iUnknownUVIndex);
     float fBase = g_UnknownTexture.Sample(LinearSampler, vBaseUV).r;
 
@@ -668,11 +671,20 @@ float4 PS_BLEND_UKWN_BARRIER(PS_IN In) : SV_TARGET0
     return float4(g_vColor.rgb + g_vEmissiveColor.rgb, fAlpha);
 }
 
-  // g_vMRA.x = 크러스트 임계값, y = 경계 부드러움, z = flow 주기(초)
-  // g_MaskStrength = flow 강도, g_vEmissiveColor.w = 발광 게인
+// g_vMRA.x = 크러스트 임계값, y = 경계 부드러움, z = flow 주기(초)
+// g_MaskStrength = flow 강도, g_vEmissiveColor.w = 발광 게인
+static const float LAVA_EDGE_DITHER_START = 0.7f;
+
 PS_OUT PS_LAVA_SURFACE(PS_IN In)
 {
     Apply_DitherFromPixelInput(In);
+    
+        [branch]
+    if (0u != (g_iFlags & FLAG_LAVA_EDGE_DITHER))
+    {
+        float fEdgeDissolve = smoothstep(LAVA_EDGE_DITHER_START, 1.f, Select_UV_PS(In, g_iUVIndex).y);
+        Apply_Dither(In.vPosition, fEdgeDissolve);
+    }
 
     float2 vBaseUV = Get_BaseUV(In);
     float2 vNormalUV = Get_NormalUV(In);
@@ -718,6 +730,24 @@ PS_OUT PS_LAVA_SURFACE(PS_IN In)
                     vNormal,
                     float4(vMRA, 1.f),
                     float4(vEmissive, 1.f));
+}
+
+// 액자 컷 전환: Src = g_UnknownTexture(_a0), Dst = g_ExtraRTexture(_a1). 노멀/MRA는 모델 값 그대로.
+PS_OUT PS_CUT_CROSSFADE(PS_IN In)
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vCutUV = Get_UnknownUV(In);
+    float3 vSrc = g_UnknownTexture.Sample(LinearSampler, vCutUV).rgb;
+    float3 vDst = g_ExtraRTexture.Sample(LinearSampler, vCutUV).rgb;
+    float3 vDiffuse = lerp(vSrc, vDst, saturate(g_fCutBlend)) * g_vColor.rgb;
+
+    return Make_GBufferOutput(
+                In,
+                float4(vDiffuse, 1.f),
+                In.vNormal.xyz,
+                float4(0.f, 1.f, 1.f, 1.f),
+                float4(g_vEmissiveColor.rgb, 1.f));
 }
 
 

@@ -5,19 +5,20 @@
 #include "GameContent_const.h"
 #include "World_BlendCollector.h"
 
-#include "Model.h"
-#include "GameInstance.h"
+#include "GameContent_Events.h"
 
 NS_BEGIN(Client)
 
 CLD_Frame::CLD_Frame(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevelDesignObject(pDevice, pContext)
+	, m_bCutReset{ false }
 {
 }
 
 CLD_Frame::CLD_Frame(const CLD_Frame& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tStaticModelDesc(Prototype.m_tStaticModelDesc)
+	, m_bCutReset{ false }
 {
 }
 
@@ -70,12 +71,37 @@ HRESULT CLD_Frame::Validate_Initialized()
 	return S_OK;
 }
 
+void CLD_Frame::Update(_float fTimeDelta)
+{
+	if (m_fFirstWait < START_TIMMER)
+	{
+		m_fFirstWait += fTimeDelta;
+		if (m_fFirstWait >= START_TIMMER)
+			m_bStarted = true;
+	}
+}
+
 void CLD_Frame::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
-
 	if (!m_bActive || Is_Dead())
 		return;
+
+	if (m_bCutReset)
+	{
+		m_bCutReset = false;
+		m_fCutCursor = 0.f;
+		m_iLastCutIndex = 0;
+		m_iCreditFired = 0;
+		m_bCreditClosed = false;
+	}
+
+	if (m_bStarted)
+	{
+		const _float fCutPeriod = max(max(m_fCutHold, 0.f) + max(m_fCutFade, 0.f), 0.0001f);
+		m_fCutCursor = min(m_fCutCursor + fTimeDelta / fCutPeriod, static_cast<_float>(CUT_TEXTURE_COUNT - 1u));
+
+		Tick_CreditSignal();
+	}
 
 	Check_Visible();
 	Submit_RenderGroups();
@@ -193,6 +219,11 @@ HRESULT CLD_Frame::Ready_RenderComponents()
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
+	m_pCutTextureCom = Add_Component<CTexture>(TEXT("Com_CutTexture"), CTexture::Create(m_pDevice, m_pContext, CUT_TEXTURE_PATH, CUT_TEXTURE_COUNT));
+
+	if (nullptr == m_pCutTextureCom)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -228,6 +259,9 @@ HRESULT CLD_Frame::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind)
 		return E_FAIL;
 	if (S_FALSE == hrBind)
 		return S_OK;
+
+	if (ETOI(WORLD_PASS::CUT_CROSSFADE) == Layer.iPass && FAILED(Bind_CutTextures()))
+		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Begin(iPass)))
 		return E_FAIL;
@@ -268,6 +302,55 @@ void CLD_Frame::Submit_BlendMeshes()
 		m_pBlendCollector->Submit(this, this, m_pModelCom, pWorld, iMeshIndex);
 }
 
+void CLD_Frame::Tick_CreditSignal()
+{
+	const _int iCut = static_cast<_int>(m_fCutCursor);
+	if (iCut == m_iLastCutIndex)
+		return;
+
+	m_iLastCutIndex = iCut;
+
+	if (m_iCreditFired < CREDIT_COUNT)
+	{
+		const _int iTargetCut = CREDIT_FIRST_CUT + CREDIT_CUT_STRIDE * m_iCreditFired;
+		if (iCut >= iTargetCut)
+		{
+			++m_iCreditFired;
+			m_pGameInstance_Proxy->Publish(EventTag::Credits_Next, nullptr);
+			return;
+		}
+	}
+
+	if (!m_bCreditClosed && CREDIT_CLOSE_CUT >= 0 &&
+		m_iCreditFired >= CREDIT_COUNT && iCut >= CREDIT_CLOSE_CUT)
+	{
+		m_bCreditClosed = true;
+		m_pGameInstance_Proxy->Publish(EventTag::Credits_Next, nullptr);
+	}
+}
+
+HRESULT CLD_Frame::Bind_CutTextures()
+{
+	if (nullptr == m_pCutTextureCom)
+		return E_FAIL;
+
+	const _uint iSrc = min(static_cast<_uint>(m_fCutCursor), CUT_TEXTURE_COUNT - 1u);
+	const _uint iDst = min(iSrc + 1u, CUT_TEXTURE_COUNT - 1u);
+
+	const _float fHold = max(m_fCutHold, 0.f);
+	const _float fFade = max(m_fCutFade, 0.f);
+	const _float fElapsed = (m_fCutCursor - static_cast<_float>(iSrc)) * max(fHold + fFade, 0.0001f);
+	const _float fBlend = min(max((fElapsed - fHold) / max(fFade, 0.0001f), 0.f), 1.f);
+
+	if (FAILED(m_pCutTextureCom->Bind_ShaderResource(m_pShaderCom, "g_UnknownTexture", iSrc)))
+		return E_FAIL;
+
+	if (FAILED(m_pCutTextureCom->Bind_ShaderResource(m_pShaderCom, "g_ExtraRTexture", iDst)))
+		return E_FAIL;
+
+	return m_pShaderCom->Bind_RawValue("g_fCutBlend", &fBlend, sizeof(_float));
+}
+
 CLD_Frame* CLD_Frame::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLD_Frame* pInstance = new CLD_Frame(pDevice, pContext);
@@ -296,6 +379,7 @@ CGameObject* CLD_Frame::Clone(void* pArg)
 
 void CLD_Frame::Free()
 {
+	m_pCutTextureCom = nullptr;
 	m_pBlendCollector = nullptr;
 	m_BlendMeshIndices.clear();
 

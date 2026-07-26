@@ -76,7 +76,7 @@ HRESULT CBoss_Metaknight::Initialize(void* pArg)
         return E_FAIL;
 
     m_strBossName = L"메타나이트";
-    m_fMaxHP = 100.f;
+    m_fMaxHP = 2000.f;
     m_fCurHP = m_fMaxHP;
 
     m_pTransformCom->Set_Scale(1.3f, 1.3f, 1.3f);
@@ -234,6 +234,8 @@ void CBoss_Metaknight::Play_Death()
     Set_ParryWindow(false);
     Enable_CatchBox(false);
     End_LockingSync();
+    Stop_LoopSFX(SND_HOVERDASH);
+    Stop_LoopSFX(SND_BURSTTORNADOATTACK);
 
     CAnimator* pAnim = Get_BodyAnimator();
     if (nullptr == pAnim)
@@ -861,6 +863,8 @@ void CBoss_Metaknight::Update_Attachment()
             _float3{}, _float3{}, _float3{},
             &m_SparkAnchor,
             &pSpark, &m_SparkFxHandle);
+
+        Play_SectionLoopSFX(SND_SWORDLOCKING, 0.f, 0.2255f, 0.125f);
     }
 }
 
@@ -898,6 +902,7 @@ void CBoss_Metaknight::Enter_Locking()
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play("LockingSword", false, true, 0.f, s_fDefaultAnimSpeed);
 
+    Play_OneShotSFX(SND_SWORDLOCKSTART, 0.45f);
     Begin_LockingSync();
 }
 
@@ -921,6 +926,8 @@ void CBoss_Metaknight::Exit_Locking()
     if (CEffect_Loader::GetInstance()->Is_Current(m_SparkFxHandle))
         m_SparkFxHandle.p->EffectContainer_Stop();
     m_SparkFxHandle.Clear();
+
+    Stop_LoopSFX(SND_SWORDLOCKING);
 
     if (auto* pBrain = static_cast<CBoss_Brain*>(m_pBrain))
         pBrain->Reset_Tree();

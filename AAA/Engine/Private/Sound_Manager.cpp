@@ -60,6 +60,19 @@ void CSound_Manager::Update()
 	}
 }
 
+_wstring CSound_Manager::Get_Current_BGM_Key() const
+{
+	FMOD::Sound* pSound = nullptr;
+	if (m_pBGMChannel->getCurrentSound(&pSound) != FMOD_OK || !pSound)
+		return L"";
+
+	for (const auto& Pair : m_mapSound)   
+		if (Pair.second == pSound)
+			return Pair.first;
+
+	return L"";
+}
+
 FMOD::Channel* CSound_Manager::PlayInternal(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus, bool bLoop)
 {
 	FMOD::Sound* pSound = Find_Sound(pSoundKey);
@@ -194,6 +207,17 @@ void CSound_Manager::Fade_BGM_Out(_float fSec)
 
 void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume, CSound_Handle* pOut)
 {
+	if (pSoundKey && Get_Current_BGM_Key() == pSoundKey)
+	{
+		bool bPaused = false;
+		m_pBGMChannel->getPaused(&bPaused);
+		if (!bPaused)                    
+		{
+			if (pOut) *pOut = CSound_Handle(m_pBGMChannel);
+			return;
+		}
+	}
+
 	Fade_BGM_Out(fSec);
 
 	m_pBGMChannel = PlayInternal(pSoundKey, fVolume, ESoundBus::BGM, true);

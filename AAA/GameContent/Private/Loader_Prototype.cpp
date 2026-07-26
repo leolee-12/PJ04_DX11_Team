@@ -118,6 +118,13 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         TEXT("../../Resources/YSH/Env/LUT/Volcano01.dds"),
         1.f
       },
+        {
+        TEXT("Ending"),
+        TEXT("../../Resources/YSH/Env/IBL/Ending/Diffuse.dds"),
+        TEXT("../../Resources/YSH/Env/IBL/Ending/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/LUT/Credit01_01.dds"),
+        1.f
+      },
         // 맵 추가 = 행 추가
     };
 
