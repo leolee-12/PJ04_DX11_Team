@@ -1669,6 +1669,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot">
       <UniqueIdentifier>{f31b3b4a-903f-49e8-913b-26edfdbf7c6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote">
+      <UniqueIdentifier>{a6e69362-4eb2-451e-a5f8-b304fda5399e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -3258,6 +3261,9 @@
     <ClInclude Include="..\public\MoonShot.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Emote.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -4711,6 +4717,9 @@
     </ClCompile>
     <ClCompile Include="..\private\MoonShot.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\100. MoonShoot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Emote.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Emote</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

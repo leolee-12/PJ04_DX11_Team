@@ -164,6 +164,28 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         pCommand = new Guard_Command(KEY_STATE_TYPE::UP);
         ProcessCommand(pCommand);
     }
+
+    // Emote
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_1))
+    {
+        pCommand = new EmoteTop_Command(KEY_STATE_TYPE::DOWN);
+        ProcessCommand(pCommand);
+    }
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_2))
+    {
+        pCommand = new EmoteDown_Command(KEY_STATE_TYPE::DOWN);
+        ProcessCommand(pCommand);
+    }
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_3))
+    {
+        pCommand = new EmoteLeft_Command(KEY_STATE_TYPE::DOWN);
+        ProcessCommand(pCommand);
+    }
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_4))
+    {
+        pCommand = new EmoteRight_Command(KEY_STATE_TYPE::DOWN);
+        ProcessCommand(pCommand);
+    }
 }
 
 _bool CKirby_InputManager::Cal_MoveDir(MOVE_DIR eMoveDir, _float3& vOutDir)

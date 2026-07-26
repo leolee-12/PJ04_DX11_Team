@@ -63,6 +63,7 @@
     <ClInclude Include="..\public\Excalibur.h" />
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
+    <ClInclude Include="..\Public\Kirby_Emote.h" />
     <ClInclude Include="..\Public\Kirby_Include.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnight_QTE.h" />
@@ -600,6 +601,7 @@
     <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStarEffect.cpp" />
+    <ClCompile Include="..\Private\Kirby_Emote.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnightEncounter.cpp" />
     <ClCompile Include="..\Private\Kirby_MetaKnight_QTE.cpp" />
     <ClCompile Include="..\Private\LD_BattleBoundary.cpp" />
