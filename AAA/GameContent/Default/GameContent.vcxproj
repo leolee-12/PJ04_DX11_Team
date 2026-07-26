@@ -208,8 +208,6 @@
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\CommonHit.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
-    <ClInclude Include="..\Public\Common_Curve03.h" />
-    <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Deformable.h" />
     <ClInclude Include="..\public\DialogueDee.h" />
@@ -253,6 +251,7 @@
     <ClInclude Include="..\Public\SystemObject_Include.h" />
     <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\HammerSwing.h" />
+    <ClInclude Include="..\Public\SwordJumpSpin.h" />
     <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
@@ -372,7 +371,6 @@
     <ClInclude Include="..\Public\PoppyBrosJr_State_Throw.h" />
     <ClInclude Include="..\Public\RailTrack.h" />
     <ClInclude Include="..\Public\Kirby_Guard.h" />
-    <ClInclude Include="..\Public\Sword_JumpSlash.h" />
     <ClInclude Include="..\public\GorillaNamePlate.h" />
     <ClInclude Include="..\Public\LevelDesign_Boundary.h" />
     <ClInclude Include="..\Public\LevelDesign_Bush.h" />
@@ -747,8 +745,6 @@
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
-    <ClCompile Include="..\Private\Common_Curve03.cpp" />
-    <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\EssenceBubble.cpp" />
     <ClCompile Include="..\Private\FlowerPetals.cpp" />
@@ -779,6 +775,7 @@
     <ClCompile Include="..\Private\DistortionCommon.cpp" />
     <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\HammerSwing.cpp" />
+    <ClCompile Include="..\Private\SwordJumpSpin.cpp" />
     <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
@@ -904,7 +901,6 @@
     <ClCompile Include="..\Private\PoppyBrosJr_State_Throw.cpp" />
     <ClCompile Include="..\Private\RailTrack.cpp" />
     <ClCompile Include="..\Private\Kirby_Guard.cpp" />
-    <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp" />

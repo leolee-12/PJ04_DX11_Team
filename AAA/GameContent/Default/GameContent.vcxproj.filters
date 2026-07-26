@@ -76,9 +76,6 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1">
       <UniqueIdentifier>{bd114556-93e2-4c7f-a452-7483746e046a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
-      <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash">
       <UniqueIdentifier>{553f3de7-862e-424a-87ee-191f43044a21}</UniqueIdentifier>
     </Filter>
@@ -202,9 +199,6 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01">
       <UniqueIdentifier>{29830c83-0212-4f5e-ad0d-0455cb58e043}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\05. Common_Curve03">
-      <UniqueIdentifier>{377b3a79-9ef3-4d43-a5a4-dd199fcf4342}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect">
       <UniqueIdentifier>{eac9b9b7-bf0c-4d4c-bde8-6fc2eb74c3ed}</UniqueIdentifier>
     </Filter>
@@ -213,9 +207,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\08. Common_Ring03">
       <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\09. Common_JumpSlash">
-      <UniqueIdentifier>{a7a58fec-6650-4f57-9df6-0b8c82791b61}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\10. Common_SpinSlash">
       <UniqueIdentifier>{5ab4f5f3-211a-454f-82c1-c91e908decbf}</UniqueIdentifier>
@@ -1959,12 +1950,6 @@
     <ClInclude Include="..\Public\Common_Circle01.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Common_Curve03.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\05. Common_Curve03</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Common_JumpSlash.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\09. Common_JumpSlash</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Common_Ring03.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\08. Common_Ring03</Filter>
     </ClInclude>
@@ -3078,9 +3063,6 @@
     <ClInclude Include="..\public\Swing_Smoke.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SwingEffect</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Sword_JumpSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Sword_SpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClInclude>
@@ -3107,6 +3089,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\TestContainer.h">
       <Filter>00. GameObject\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HammerSwing.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordJumpSpin.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
@@ -3550,12 +3538,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Common_Circle01.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Common_Curve03.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\05. Common_Curve03</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Common_JumpSlash.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\09. Common_JumpSlash</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_Ring03.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\08. Common_Ring03</Filter>
@@ -4565,9 +4547,6 @@
     <ClCompile Include="..\private\Swing_Smoke.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SwingEffect</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Sword_JumpSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClCompile>
@@ -4591,6 +4570,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestContainer.cpp">
       <Filter>00. GameObject\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordJumpSpin.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>

@@ -8,6 +8,9 @@
 
 #include "Movement_Child.h"
 
+#include "Effect_Loader.h"
+#include "Effect_Container.h"
+
 namespace
 {
     constexpr _float fSpinSlashChargeMaxHorizontalSpeed = CKirby::s_fMaxHorizontalSpeed - 6.f;
@@ -147,6 +150,11 @@ void CKirby_Ability_MetaKnightSword::Exit_AttackState(CKirby* pKirby)
     Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
 
     pKirby->Set_RotationLock(false);
+
+    Effect_Stop(m_pSwordChargeEffect);
+    Effect_Stop(m_pSwordSuperChargeEffect);
+    Effect_StopImmediately(m_pMetaSwordJumpSpinTrail1);
+    Effect_StopImmediately(m_pMetaSwordJumpSpinTrail2);
 
     CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
     pMetaSword->End_Hit();
@@ -438,6 +446,22 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
         case META_SWORD_STATE::JUMP_SLASH:
         {
             pAnimator->Play("SwordSpin", false, false, 0.f, 1.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"MetaSwordJumpSpin", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 90.f, 0.f),
+                pKirby->Get_Transform()->Get_WorldMatrixPtr());
+
+            CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
+            if (pMetaSword != nullptr)
+            {
+                CEffect_Loader::GetInstance()->Spawn(L"MetaSwordJumpSpinTrail1", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                    pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pMetaSwordJumpSpinTrail1);
+                CEffect_Loader::GetInstance()->Spawn(L"MetaSwordJumpSpinTrail2", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                    pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pMetaSwordJumpSpinTrail2);
+            }
+
             break;
         }
         case META_SWORD_STATE::SPIN_SLASH_CHARGE:
@@ -455,6 +479,10 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
                 pAnimator->Set_Mask("ShuffleFront", szOverlayMasks, std::size(szOverlayMasks), true, 1.0f, 0.1f, 0.2f);
             else if (m_eCurSwordMoveState == META_SWORD_MOVE_STATE::MOVE_RIGHT)
                 pAnimator->Set_Mask("ShuffleRight", szOverlayMasks, std::size(szOverlayMasks), true, 1.0f, 0.1f, 0.2f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"MetaChargeEffect", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordChargeEffect);
 
             break;
         }
@@ -475,6 +503,11 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_MaxHorizontalSpeed(fSpinSlashChargeMaxHorizontalSpeed);
             pAnimator->Play("SuperSpinSlashChargeStart", false, false, 0.1f, 2.f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"MetaSuperChargeEffect", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordSuperChargeEffect);
+
             break;
         }
         case META_SWORD_STATE::SUPER_SPIN_SLASH_CHARGE:
@@ -692,11 +725,15 @@ void CKirby_Ability_MetaKnightSword::Exit_SwordState(CKirby* pKirby, META_SWORD_
             break;
         case META_SWORD_STATE::JUMP_SLASH:
             pKirby->Set_RotationLock(false);
+            Effect_StopImmediately(m_pMetaSwordJumpSpinTrail1);
+            Effect_StopImmediately(m_pMetaSwordJumpSpinTrail2);
             break;
         case META_SWORD_STATE::SPIN_SLASH_CHARGE:
         {
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+
+            Effect_Stop(m_pSwordChargeEffect);
             break;
         }
         case META_SWORD_STATE::SPIN_SLASH:
@@ -714,6 +751,8 @@ void CKirby_Ability_MetaKnightSword::Exit_SwordState(CKirby* pKirby, META_SWORD_
         {
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+
+            Effect_Stop(m_pSwordSuperChargeEffect);
             break;
         }
         case META_SWORD_STATE::SUPER_SPIN_SLASH_START:
