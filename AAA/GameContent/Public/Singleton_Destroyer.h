@@ -11,6 +11,7 @@ public:
 
 public:
 	static void Destroy_GameContent_Singletons();
+	static void Clear_LevelRegisteries(_uint iLevel);
 };
 
 NS_END

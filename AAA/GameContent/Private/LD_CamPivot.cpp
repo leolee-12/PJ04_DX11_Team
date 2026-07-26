@@ -59,6 +59,19 @@ HRESULT CLD_CamPivot::Validate_Initialized()
 	return S_OK;
 }
 
+void CLD_CamPivot::Priority_Update(_float fTimeDelta)
+{
+	if (!m_bShotCam)
+	{
+		CUTSCENE_CAMERA_DESC cam{};
+		cam.eCam = ECutsceneCam::Cutscene;
+		cam.szTrack = L"Ending_Cut1_camera1";
+		cam.pAnchorWorld = Get_PivotWorldMatrixPtr();
+		m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+		m_bShotCam = true;
+	}
+}
+
 void CLD_CamPivot::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
@@ -91,7 +104,7 @@ HRESULT CLD_CamPivot::On_EditTransformChanged()
 
 void CLD_CamPivot::Sync_PivotWorldMatrix()
 {
-	m_matPivotWorld = *m_pTransformCom->Get_WorldMatrixPtr();
+	XMStoreFloat4x4(&m_matPivotWorld, XMMatrixRotationY(XMConvertToRadians(180.f)) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 #ifdef _DEBUG

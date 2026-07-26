@@ -39,6 +39,8 @@ public: // Engine
 
     void    Clear_Resources(_int iLevelIndex);
 
+    void    Register_LevelClearCallback(function<void(_uint)> cb);
+
     _float RandomFloat(_float fMin, _float fMax) const;
     _int   RandomInt(_int iMin, _int iMax) const;
 

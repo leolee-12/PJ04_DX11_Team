@@ -39,6 +39,7 @@ namespace
         /* STAGE1_STEP2  */ VOLCANO_LIGHT,
         /* STAGE1_STEP3  */ VOLCANO_LIGHT,
         /* ARENA         */ ARENA_LIGHT,
+        /* ENDING        */ DEFAULT_LIGHT,
         /* TEST          */ { { 0.25f, -1.f, 0.25f, 0.f },
                               { 1.f,   1.f,  1.f,   1.f },
                               { 0.5f,  0.5f, 0.5f,  1.f },

@@ -16,3 +16,11 @@ void CSingleton_Destroyer::Destroy_GameContent_Singletons()
 	CBubble_Manager::DestroyInstance();
 	CDropStar_Manager::DestroyInstance();
 }
+
+void CSingleton_Destroyer::Clear_LevelRegisteries(_uint iLevel)
+{
+	CProjectile_Manager::GetInstance()->Clear_Level(iLevel);
+	CBubble_Manager::GetInstance()->Clear_Level(iLevel);
+	CDropStar_Manager::GetInstance()->Clear_Level(iLevel);
+	CEffect_Loader::GetInstance()->Clear_Epochs(iLevel);
+}

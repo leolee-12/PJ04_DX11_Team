@@ -27,6 +27,10 @@ struct WATER_RENDER_DESC
 	_float2 vNormalSpeed1 = { -0.012f, 0.018f };
 	_float  fNormalStrength = { 1.f };
 
+	// De-tiling (0 = off)
+	_float  fNormalWarpStrength = { 0.f };
+	_float  fNormalSwayStrength = { 0.f };
+
 	// Reflection / Refraction
 	_float  fFresnelPower = { 5.f };
 	_float  fReflectionStrength = { 0.8f };
@@ -36,6 +40,7 @@ struct WATER_RENDER_DESC
 	_float  fLightReceiveStrength = { 1.f };
 	_float  fSpecularPower = { 64.f };
 	_float  fSpecularStrength = { 1.f };
+	_float  fSpecularScatter = { 0.f };
 
 	// Foam
 	_float  fFoamWidth = { 0.4f };

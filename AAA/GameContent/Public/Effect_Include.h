@@ -51,6 +51,7 @@
 #include "Tornado_BK.h"
 #include "EssenceAura.h"
 #include "MoonShot.h"
+#include "HammerSwing.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"

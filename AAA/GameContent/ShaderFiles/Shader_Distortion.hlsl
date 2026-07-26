@@ -10,6 +10,19 @@ float g_fStrength = { 0.03f };
 float g_fAlpha = { 1.f };
 float2 g_vTiling = { 1.f, 1.f };
 float2 g_vOffset = { 0.f, 0.f };
+bool g_bUseUVEdgeFade = { false };
+int g_iUVEdgeFadeAxis = { 0 };
+float g_fUVEdgeFadeStartRange = { 0.1f };
+float g_fUVEdgeFadeEndRange = { 0.1f };
+float g_fUVEdgeFadePower = { 1.f };
+bool g_bLinearReveal = { false };
+float g_fLinearRevealRatio = { 1.f };
+int g_iLinearRevealAxis = { 0 };
+bool g_bLinearRevealReverse = { false };
+bool g_bLinearHide = { false };
+float g_fLinearHideRatio = { 1.f };
+int g_iLinearHideAxis = { 0 };
+bool g_bLinearHideReverse = { false };
 
 struct VS_IN
 {
@@ -56,8 +69,57 @@ struct PS_IN
     float3 vBinormalV : TEXCOORD3;
 };
 
+float ComputeUVEdgeFade1D(float fCoord, float fStartRange, float fEndRange)
+{
+    fCoord = saturate(fCoord);
+    fStartRange = saturate(fStartRange);
+    fEndRange = saturate(fEndRange);
+
+    float fStartFade = fStartRange > 0.0001f
+        ? smoothstep(0.f, fStartRange, fCoord) : 1.f;
+    float fEndFade = fEndRange > 0.0001f
+        ? smoothstep(0.f, fEndRange, 1.f - fCoord) : 1.f;
+
+    return fStartFade * fEndFade;
+}
+
+float ComputeUVEdgeFade(float2 vTexcoord)
+{
+    if (g_bUseUVEdgeFade == false)
+        return 1.f;
+
+    float fFadeX = ComputeUVEdgeFade1D(
+        vTexcoord.x, g_fUVEdgeFadeStartRange, g_fUVEdgeFadeEndRange);
+    float fFadeY = ComputeUVEdgeFade1D(
+        vTexcoord.y, g_fUVEdgeFadeStartRange, g_fUVEdgeFadeEndRange);
+    float fFade = g_iUVEdgeFadeAxis == 0
+        ? fFadeX : (g_iUVEdgeFadeAxis == 1 ? fFadeY : fFadeX * fFadeY);
+
+    return pow(saturate(fFade), clamp(g_fUVEdgeFadePower, 0.1f, 8.f));
+}
+
 float4 PS_WRITE_OFFSET(PS_IN In) : SV_TARGET
 {
+    if (g_bLinearReveal)
+    {
+        float revealCoord =
+            g_iLinearRevealAxis == 1 ? In.vTexcoord.y : In.vTexcoord.x;
+        if (g_bLinearRevealReverse)
+            revealCoord = 1.f - revealCoord;
+        if (revealCoord > saturate(g_fLinearRevealRatio))
+            discard;
+    }
+
+    if (g_bLinearHide)
+    {
+        float hideCoord =
+            g_iLinearHideAxis == 1 ? In.vTexcoord.y : In.vTexcoord.x;
+        if (g_bLinearHideReverse)
+            hideCoord = 1.f - hideCoord;
+        if (hideCoord > saturate(g_fLinearHideRatio))
+            discard;
+    }
+
     float2 uv = In.vTexcoord * g_vTiling + g_vOffset;
 
     float2 dir;
@@ -91,7 +153,8 @@ float4 PS_WRITE_OFFSET(PS_IN In) : SV_TARGET
     // 뷰/월드는 +Y가 위, 화면 UV는 +Y가 아래 -> Y 뒤집기
     dir.y = -dir.y;
 
-    float2 offset = dir * g_fStrength * g_fAlpha;
+    float fUVEdgeFade = ComputeUVEdgeFade(In.vTexcoord);
+    float2 offset = dir * g_fStrength * g_fAlpha * fUVEdgeFade;
 
     return float4(offset, 0.f, 1.f); // a=1 : BS_Additive가 SrcAlpha 곱하는 경우 대비
 }

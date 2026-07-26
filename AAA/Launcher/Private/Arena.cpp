@@ -75,7 +75,7 @@ HRESULT CArena::Ready_Events()
 
 HRESULT CArena::Ready_Lights()
 {
-    CLevelLight_DB::Apply(m_pGameInstance_Proxy, LEVEL::STAGE0_STEP2);
+    CLevelLight_DB::Apply(m_pGameInstance_Proxy, LEVEL::ARENA);
 
     return S_OK;
 }

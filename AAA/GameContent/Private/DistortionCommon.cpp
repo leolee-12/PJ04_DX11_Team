@@ -12,6 +12,24 @@ CDistortionCommon::CDistortionCommon(ID3D11Device* pDevice, ID3D11DeviceContext*
 	, m_bBillboard{ false }
 	, m_bRadialFromUV{ true }
 	, m_fDistortionStrength{ 0.01f }
+	, m_bFlipGreen{ false }
+	, m_bUseUVEdgeFade{ false }
+	, m_iUVEdgeFadeAxis{ 0 }
+	, m_fUVEdgeFadeStartRange{ 0.1f }
+	, m_fUVEdgeFadeEndRange{ 0.1f }
+	, m_fUVEdgeFadePower{ 1.f }
+	, m_bLinearReveal{ false }
+	, m_iLinearRevealAxis{ 0 }
+	, m_bLinearRevealReverse{ false }
+	, m_fLinearRevealStartRatio{ 0.f }
+	, m_fLinearRevealEndRatio{ 1.f }
+	, m_bLinearHide{ false }
+	, m_iLinearHideAxis{ 0 }
+	, m_bLinearHideReverse{ false }
+	, m_fLinearHideStartRatio{ 0.f }
+	, m_fLinearHideEndRatio{ 1.f }
+	, m_fLinearRevealRatio{ 1.f }
+	, m_fLinearHideRatio{ 1.f }
 {
 }
 
@@ -20,8 +38,26 @@ CDistortionCommon::CDistortionCommon(const CDistortionCommon& Prototype)
 	, m_bBillboard{ Prototype.m_bBillboard }
 	, m_bRadialFromUV{ Prototype.m_bRadialFromUV }
 	, m_fDistortionStrength{ Prototype.m_fDistortionStrength }
+	, m_bFlipGreen{ Prototype.m_bFlipGreen }
+	, m_bUseUVEdgeFade{ Prototype.m_bUseUVEdgeFade }
+	, m_iUVEdgeFadeAxis{ Prototype.m_iUVEdgeFadeAxis }
+	, m_fUVEdgeFadeStartRange{ Prototype.m_fUVEdgeFadeStartRange }
+	, m_fUVEdgeFadeEndRange{ Prototype.m_fUVEdgeFadeEndRange }
+	, m_fUVEdgeFadePower{ Prototype.m_fUVEdgeFadePower }
+	, m_bLinearReveal{ Prototype.m_bLinearReveal }
+	, m_iLinearRevealAxis{ Prototype.m_iLinearRevealAxis }
+	, m_bLinearRevealReverse{ Prototype.m_bLinearRevealReverse }
+	, m_fLinearRevealStartRatio{ Prototype.m_fLinearRevealStartRatio }
+	, m_fLinearRevealEndRatio{ Prototype.m_fLinearRevealEndRatio }
+	, m_bLinearHide{ Prototype.m_bLinearHide }
+	, m_iLinearHideAxis{ Prototype.m_iLinearHideAxis }
+	, m_bLinearHideReverse{ Prototype.m_bLinearHideReverse }
+	, m_fLinearHideStartRatio{ Prototype.m_fLinearHideStartRatio }
+	, m_fLinearHideEndRatio{ Prototype.m_fLinearHideEndRatio }
 	, m_iModelLevel{ Prototype.m_iModelLevel }
 	, m_wstrModelTag{ Prototype.m_wstrModelTag }
+	, m_fLinearRevealRatio{ Prototype.m_fLinearRevealRatio }
+	, m_fLinearHideRatio{ Prototype.m_fLinearHideRatio }
 {
 }
 
@@ -55,6 +91,48 @@ HRESULT CDistortionCommon::Initialize(void* pArg)
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CDistortionCommon::Update_Core(
+	const _float fTimeDelta,
+	const _float fRatio)
+{
+	__super::Update_Core(fTimeDelta, fRatio);
+
+	if (m_bLinearReveal == false)
+		m_fLinearRevealRatio = 1.f;
+	else
+	{
+		const _float fRevealRange =
+			m_fLinearRevealEndRatio - m_fLinearRevealStartRatio;
+		if (fabsf(fRevealRange) <= Helper::fEpsilon)
+			m_fLinearRevealRatio =
+				fRatio >= m_fLinearRevealEndRatio ? 1.f : 0.f;
+		else
+		{
+			m_fLinearRevealRatio =
+				(fRatio - m_fLinearRevealStartRatio) / fRevealRange;
+			Helper::FloatClamp(m_fLinearRevealRatio, 0.f, 1.f);
+		}
+	}
+
+	if (m_bLinearHide == false)
+		m_fLinearHideRatio = 1.f;
+	else
+	{
+		const _float fHideRange =
+			m_fLinearHideEndRatio - m_fLinearHideStartRatio;
+		if (fabsf(fHideRange) <= Helper::fEpsilon)
+			m_fLinearHideRatio =
+				fRatio >= m_fLinearHideEndRatio ? 0.f : 1.f;
+		else
+		{
+			_float fHideProgress =
+				(fRatio - m_fLinearHideStartRatio) / fHideRange;
+			Helper::FloatClamp(fHideProgress, 0.f, 1.f);
+			m_fLinearHideRatio = 1.f - fHideProgress;
+		}
+	}
 }
 
 void CDistortionCommon::Late_Update(_float fTimeDelta)
@@ -157,6 +235,45 @@ HRESULT CDistortionCommon::Bind_DistortionResources(_float* pOutAlpha)
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue(
 		"g_vOffset", &m_vCurTextureUVOffset, sizeof(m_vCurTextureUVOffset))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_bUseUVEdgeFade", &m_bUseUVEdgeFade, sizeof(m_bUseUVEdgeFade))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_iUVEdgeFadeAxis", &m_iUVEdgeFadeAxis, sizeof(m_iUVEdgeFadeAxis))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_fUVEdgeFadeStartRange", &m_fUVEdgeFadeStartRange, sizeof(m_fUVEdgeFadeStartRange))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_fUVEdgeFadeEndRange", &m_fUVEdgeFadeEndRange, sizeof(m_fUVEdgeFadeEndRange))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_fUVEdgeFadePower", &m_fUVEdgeFadePower, sizeof(m_fUVEdgeFadePower))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_bLinearReveal", &m_bLinearReveal, sizeof(m_bLinearReveal))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_fLinearRevealRatio", &m_fLinearRevealRatio, sizeof(m_fLinearRevealRatio))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_iLinearRevealAxis", &m_iLinearRevealAxis, sizeof(m_iLinearRevealAxis))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_bLinearRevealReverse", &m_bLinearRevealReverse, sizeof(m_bLinearRevealReverse))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_bLinearHide", &m_bLinearHide, sizeof(m_bLinearHide))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_fLinearHideRatio", &m_fLinearHideRatio, sizeof(m_fLinearHideRatio))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_iLinearHideAxis", &m_iLinearHideAxis, sizeof(m_iLinearHideAxis))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue(
+		"g_bLinearHideReverse", &m_bLinearHideReverse, sizeof(m_bLinearHideReverse))))
 		return E_FAIL;
 
 	return S_OK;

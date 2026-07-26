@@ -150,6 +150,11 @@ namespace
 		bChanged |= ImGui::DragFloat2("Normal Speed 1##WaterMaterial", (float*)&Desc.vNormalSpeed1, 0.0005f, 0.f, 0.f, "%.4f");
 
 		ImGui::Separator();
+		ImGui::TextUnformatted("De-Tiling");
+		bChanged |= ImGui::DragFloat("Normal Warp Strength##WaterMaterial", &Desc.fNormalWarpStrength, 0.002f, 0.f, 1.f, "%.3f");
+		bChanged |= ImGui::DragFloat("Normal Sway Strength##WaterMaterial", &Desc.fNormalSwayStrength, 0.002f, -1.f, 1.f, "%.3f");
+
+		ImGui::Separator();
 		ImGui::TextUnformatted("Surface");
 		bChanged |= ImGui::DragFloat("Normal Strength##WaterMaterial", &Desc.fNormalStrength, 0.01f, 0.f, 4.f);
 		bChanged |= ImGui::DragFloat("Fresnel Power##WaterMaterial", &Desc.fFresnelPower, 0.02f, 0.1f, 16.f);
@@ -158,6 +163,7 @@ namespace
 		bChanged |= ImGui::DragFloat("Light Receive Strength##WaterMaterial", &Desc.fLightReceiveStrength, 0.01f, 0.f, 1.f);
 		bChanged |= ImGui::DragFloat("Specular Power##WaterMaterial", &Desc.fSpecularPower, 0.5f, 1.f, 256.f);
 		bChanged |= ImGui::DragFloat("Specular Strength##WaterMaterial", &Desc.fSpecularStrength, 0.01f, 0.f, 8.f);
+		bChanged |= ImGui::DragFloat("Specular Scatter##WaterMaterial", &Desc.fSpecularScatter, 0.01f, 0.f, 8.f, "%.2f");
 
 		ImGui::Separator();
 		ImGui::TextUnformatted("Foam");

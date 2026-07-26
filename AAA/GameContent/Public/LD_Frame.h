@@ -6,6 +6,7 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
+class CTexture;
 NS_END
 
 NS_BEGIN(Client)
@@ -18,12 +19,18 @@ class CLD_Frame final
 {
 	GENERATED_BODY(CLD_Frame)
 
+	PROPERTY(_float, m_fCutHold, L"Cut Hold", L"Frame")		// 사진 1장 정지 시간(초)
+	PROPERTY(_float, m_fCutFade, L"Cut Fade", L"Frame")		// 다음 사진으로 넘어가는 시간(초)
+	PROPERTY(_bool, m_bCutReset, L"Cut Reset", L"Frame")	// 체크하면 첫 컷으로. 즉시 자동 해제
+
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"CreditKirbyHouseFrame";
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Frame";
 	static constexpr const _tchar* MODEL_PROTO_TAG = L"Proto_Component_Model_Frame";
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
 	static constexpr const _char* MODEL_PATH = "../../Resources/Map/Gimmick/NonAnim/CreditKirbyHouseFrame/CreditKirbyHouseFrame.ysh";
+	static constexpr const _tchar * CUT_TEXTURE_PATH = L"../../Resources/Map/Gimmick/NonAnim/CreditKirbyHouseFrame/_TP_TexturePattern_1.%02d.dds";
+	static constexpr _uint CUT_TEXTURE_COUNT = 13u;	//	_1.00 ~ _1.12
 
 private:
 	CLD_Frame(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -49,10 +56,12 @@ public:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CTexture* m_pCutTextureCom = { nullptr };
 	CWorld_BlendCollector* m_pBlendCollector = { nullptr };
 
 	LD_STATIC_MODEL_DESC m_tStaticModelDesc = {};
 	vector<_uint> m_BlendMeshIndices;
+	_float m_fCutCursor = { 0.f };
 
 private:
 	HRESULT Ready_RenderComponents();
@@ -60,6 +69,7 @@ private:
 	HRESULT Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND eKind);
 	void Cache_BlendMeshIndices();
 	void Submit_BlendMeshes();
+	HRESULT Bind_CutTextures();
 
 public:
 	static CLD_Frame* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
