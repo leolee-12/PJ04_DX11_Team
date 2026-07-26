@@ -460,6 +460,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaFly()
                     tInfo.fSpeed = SPD;
                     Anim()->Enqueue(tInfo);
 
+                    m_pOwner->Play_SectionLoopSFX(CBoss_Metaknight::SND_HOVERDASH, 0.13f, 0.6014f, 0.15f);
                     _vector vC = XMLoadFloat3(vCorner.get());
                     mv->Face_Instant(vC);
                     XMStoreFloat3(vGoal.get(), vC + XMVectorSet(0.f, GIGA_FLY_H, 0.f, 0.f));
@@ -468,6 +469,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaFly()
                 else if (*iPhase == 1)
                 {
                     Anim()->Play("HoverDashEnd", false, true, 0.15f, SPD);
+                    m_pOwner->Release_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
 
                     _vector vLook = XMVector3Normalize(XMVectorSetY(
                         m_pOwner->Get_Transform()->Get_State(STATE::LOOK), 0.f));
@@ -586,6 +588,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockFly()
                     info.strAniName = "HoverDash"; info.bLoop = true; info.bRestart = true;
                     info.fBlend = 0.1f; info.fSpeed = SPD;
                     Anim()->Enqueue(info);
+                    m_pOwner->Play_SectionLoopSFX(CBoss_Metaknight::SND_HOVERDASH, 0.13f, 0.6014f, 0.15f);
                     *phase = 1;
                 }
             }
@@ -598,6 +601,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockFly()
                 if (FlyNoClip(kDest, GIGA_FLY_SPEED, dt, GIGA_ARRIVE))
                 {
                     Anim()->Play("HoverDashEnd", false, true, 0.15f, SPD);
+                    m_pOwner->Release_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
                     *phase = 2;
                 }
             }
@@ -630,6 +634,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
         [this, startOn, risen](CBlackboard*, _float dt) -> BT_STATUS {
             if (!*startOn) {
                 Anim()->Play("BurstTornadoStart", false, true, 0.2f, SPD);
+                m_pOwner->Play_SectionLoopSFX(CBoss_Metaknight::SND_BURSTTORNADOATTACK, 0.1299f, 0.5198f, 0.2f);
                 *risen = 0.f;                       // 누적 리셋
                 *startOn = true;
                 return BT_STATUS::RUNNING;
@@ -678,6 +683,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
                 Anim()->Play("BurstTornadoAttack", false, true, 0.2f, SPD);
                 meta->Begin_RockDecalSlide();
                 meta->Set_TopViewCam(true);
+                m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_BURSTTORNADOATTACK);
                 *atkOn = true;
             }
             if (Anim()->Is_Finished()) { *atkOn = false; return BT_STATUS::SUCCESS; }
