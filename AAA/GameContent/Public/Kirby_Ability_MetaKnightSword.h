@@ -3,6 +3,10 @@
 #include "Kirby_Ability.h"
 #include "GameContent_Defines.h"
 
+NS_BEGIN(Engine)
+class CEffect_Container;
+NS_END
+
 NS_BEGIN(Client)
 
 class CKirby;
@@ -71,6 +75,10 @@ private:
 	META_SWORD_MOVE_STATE m_ePreSwordMoveState{};
 	_float3 m_vSwordWishDir{};
 	_bool m_bMoveLock{};
+
+	// Effect
+	CEffect_Container* m_pSwordChargeEffect{};
+	CEffect_Container* m_pSwordSuperChargeEffect{};
 
 private:
 	void Change_SwordState(CKirby* pKirby, META_SWORD_STATE eNext);

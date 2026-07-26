@@ -41,6 +41,8 @@ namespace
         { TEXT("SpinSlashTrail_Super"),   TEXT("../../Resources/EffectContainerJSON/YSE/SpinSlashTrail_Super.json") },
         { TEXT("SwordChargeEffect"),      TEXT("../../Resources/EffectContainerJSON/YSE/SwordChargeEffect.json") },
         { TEXT("SwordSuperChargeEffect"), TEXT("../../Resources/EffectContainerJSON/YSE/SwordSuperChargeEffect.json") },
+        { TEXT("MetaChargeEffect"),       TEXT("../../Resources/YSE/EffectContainer/MetaChargeEffect.JSON") },
+        { TEXT("MetaSuperChargeEffect"),  TEXT("../../Resources/YSE/EffectContainer/MetaSuperChargeEffect.JSON") },
         {TEXT("UpwardsSlash"),            TEXT("../../Resources/EffectContainerJSON/YSE/UpwardsSlash.JSON")},
         { TEXT("RockFloor"),              TEXT("../../Resources/EffectContainerJSON/YSH/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/BoostGas.json") },
