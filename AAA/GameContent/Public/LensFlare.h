@@ -14,6 +14,7 @@ class CLensFlare final : public CEffect_Container
 	PROPERTY(_float, m_fGhostViewDepth, L"Ghost View Depth", L"LensFlare");
 	PROPERTY(_float, m_fScreenShowMargin, L"Screen Show Margin", L"LensFlare");
 	PROPERTY(_float, m_fScreenHideMargin, L"Screen Hide Margin", L"LensFlare");
+	PROPERTY(_float, m_fAxisRotationDegree, L"Axis Rotation Degree", L"LensFlare");
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LensFlare";

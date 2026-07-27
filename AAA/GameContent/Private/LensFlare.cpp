@@ -14,6 +14,7 @@ CLensFlare::CLensFlare(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	, m_fScreenShowMargin{ 1.15f }
 	, m_fScreenHideMargin{ 1.25f }
 	, m_bScreenVisible{ false }
+	, m_fAxisRotationDegree{ 0.f }
 {
 }
 
@@ -25,6 +26,7 @@ CLensFlare::CLensFlare(const CLensFlare& Prototype)
 	, m_fScreenShowMargin{ Prototype.m_fScreenShowMargin }
 	, m_fScreenHideMargin{ Prototype.m_fScreenHideMargin }
 	, m_bScreenVisible{ false }
+	, m_fAxisRotationDegree{ Prototype.m_fAxisRotationDegree }
 {
 }
 
@@ -242,6 +244,9 @@ _bool CLensFlare::Validate_LensProperties()
 	if (!MathUtils::Is_FiniteFloat(m_fAxisExtent))
 		return false;
 
+	if (!MathUtils::Is_FiniteFloat(m_fAxisRotationDegree))
+		return false;
+
 	if (!MathUtils::Is_FiniteFloat(m_fGhostViewDepth) || m_fGhostViewDepth <= Helper::fEpsilon)
 		return false;
 
@@ -285,12 +290,29 @@ _bool CLensFlare::Project_SourceToNDC(_float2* pOutSourceNDC) const
 		&& MathUtils::Is_FiniteFloat(pOutSourceNDC->y);
 }
 
+
 _float2 CLensFlare::Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisPosition) const
 {
 	const _float fFinalAxis = fAxisPosition * m_fAxisExtent;
-	const _float fAxisScale = 1.f - fFinalAxis;
 
-	return { vSourceNDC.x * fAxisScale, vSourceNDC.y * fAxisScale };
+	/* 광원에서 화면 중심 쪽으로 향하는 오프셋. 회전은 이 오프셋에만 걸어야 축 위치 0인 코어가 광원에 붙어 있다. */
+	_float2 vOffset{ -vSourceNDC.x * fFinalAxis, -vSourceNDC.y * fFinalAxis };
+
+	if (fabsf(m_fAxisRotationDegree) > Helper::fEpsilon)
+	{
+		/* NDC 는 종횡비가 빠진 공간이라, 화면 비율로 늘린 뒤 회전해야 눈에 보이는 각도와 일치한다. 종횡비는 투영행렬에서 _11). */
+		const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+		const _float fAspect = (pProj != nullptr && fabsf(pProj->_11) > Helper::fEpsilon) ? pProj->_22 / pProj->_11 : 1.f;
+
+		const _float fRadian = XMConvertToRadians(m_fAxisRotationDegree);
+		const _float fCos = cosf(fRadian), fSin = sinf(fRadian);
+		const _float fX = vOffset.x * fAspect, fY = vOffset.y;
+
+		vOffset.x = (fX * fCos - fY * fSin) / fAspect;
+		vOffset.y = fX * fSin + fY * fCos;
+	}
+
+	return { vSourceNDC.x + vOffset.x, vSourceNDC.y + vOffset.y };
 }
 
 _bool CLensFlare::Unproject_AtViewDepth(const _float2& vNDC, _float fViewDepth, _float3* pOutWorldPosition) const
