@@ -1406,7 +1406,7 @@ void CGameObject_Factory::Register_Effect()
     Register(CMeteorExplosion::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMeteorExplosion),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PIECE_SMALL_MODEL_TAG,
                         CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceSmall.ysh", 
