@@ -364,11 +364,11 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor">
       <UniqueIdentifier>{a635d2af-ffd7-4249-9928-530e4b40697c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst">
-      <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteoAura">
+      <UniqueIdentifier>{134753ad-e3c3-48db-ae27-aa08e368651f}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
-      <UniqueIdentifier>{d41fb018-cdcd-4071-b86d-a77216d8f744}</UniqueIdentifier>
+      <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
@@ -2673,8 +2673,11 @@
     <ClInclude Include="..\public\MetaknightNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MeteorBurst.h">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
+    <ClInclude Include="..\Public\MetaSuperSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeteorExplosion.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeteorRock.h">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
@@ -3057,8 +3060,17 @@
     <ClInclude Include="..\Public\SwordHitEffect.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SwordJumpSpin.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\SwordSlash1.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordSuperSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordTrail_BK.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
@@ -3068,21 +3080,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\TestContainer.h">
       <Filter>00. GameObject\Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\HammerSwing.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordJumpSpin.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordSpinSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordSuperSpinSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MetaSuperSpinSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
@@ -4181,8 +4178,11 @@
     <ClCompile Include="..\private\MetaknightNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MeteorBurst.cpp">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
+    <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeteorExplosion.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeteorRock.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
@@ -4538,20 +4538,11 @@
     <ClCompile Include="..\Private\SwordHitEffect.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SwordSlash1.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\SwordTrail_BK.cpp">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestContainer.cpp">
-      <Filter>00. GameObject\Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\HammerSwing.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\SwordJumpSpin.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordSlash1.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordSpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
@@ -4559,8 +4550,11 @@
     <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    <ClCompile Include="..\Private\SwordTrail_BK.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestContainer.cpp">
+      <Filter>00. GameObject\Test</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
