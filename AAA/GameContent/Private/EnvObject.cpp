@@ -375,12 +375,7 @@ HRESULT CEnvObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MES
 HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag)
 {
 	if (wstrModelProtoTag.empty())
-	{
-		if(!m_bRenderable)
-			return S_OK;
-
-		return E_FAIL;	// 렌더할 객체가 모델이 없으면 초기화 실패
-	}
+		return E_FAIL;
 
 	m_pShaderCom = Add_Component<CShader>(Shader_World_NonAnim.iLevelID, Shader_World_NonAnim.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
@@ -536,6 +531,8 @@ void CEnvObject::Refresh_WorldBounds()
 
 void CEnvObject::Check_Visible()
 {
+	PROFILE_CPU_SCOPE(Engine::EPROFILE_CPU_SECTION::ENV_CULLING);
+
 	const _bool bEnableShadow = ENABLE_ENV_OBJECT_SHADOW && m_bCastShadow;
 
 	CCullingState::CULLING_EVALUATION_INPUT Input{};

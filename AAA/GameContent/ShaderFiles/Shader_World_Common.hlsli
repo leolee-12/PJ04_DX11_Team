@@ -8,6 +8,7 @@ Texture2D g_NormalTexture;
 Texture2D g_MRATexture;
 Texture2D g_UnknownTexture;
 Texture2D g_ExtraRTexture;
+Texture2D g_EmissiveTexture;
 Texture2D g_FlowTexture;
 uint g_iHasFlowTexture = 0u;
 float g_fWorldTime = 0.f;
@@ -540,24 +541,19 @@ float4 PS_BLEND_UKWN_OVERLAY(PS_IN In) : SV_TARGET0
     return float4(0.f, 0.f, 0.f, fShadeAlpha);
 }
 
-PS_OUT PS_DCUT_UMN(PS_IN In)
+float4 PS_BLEND_DCUT_UMN(PS_IN In) : SV_TARGET0
 {
     Apply_DitherFromPixelInput(In);
 
-    float fMask = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In)).a;
-    if (fMask < 0.1f)
+    float2 vUV = Get_BaseUV(In);
+    float fMask = g_DiffuseTexture.Sample(LinearSampler, vUV).a;
+    float fEmissive = g_EmissiveTexture.Sample(LinearSampler, vUV).r;
+    float fAlpha = saturate(fMask * fEmissive);
+
+    if (fAlpha < 0.001f)
         discard;
 
-    float3 vDiffuse = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).rgb;
-    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
-    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
-
-    return Make_GBufferOutput(
-                  In,
-                  float4(vDiffuse, fMask),
-                  vNormal,
-                  float4(vMRA, 1.f),
-                  float4(g_vEmissiveColor.rgb * fMask, 1.f));
+    return float4(g_vEmissiveColor.rgb * max(g_vEmissiveColor.w, 0.f), fAlpha);
 }
 
 float4 PS_BLEND_DMN(PS_IN In) : SV_TARGET0
@@ -809,19 +805,19 @@ float3 Decode_DecalNormal(float2 vUV, float3 vTangent, float3 vNormal, float3 vB
     return normalize(nT.x * T + nT.y * B + nT.z * N);
 }
 
-PS_DECAL_OUT Make_DecalOutput(float2 vUV, float3 vTangent, float3 vNormal, float3 vBinormal)
+PS_DECAL_OUT Make_DecalOutput(float2 vUV, float3 vTangent, float3 vNormal, float3 vBinormal, float fDecalAlpha)
 {
     PS_DECAL_OUT Out = (PS_DECAL_OUT) 0;
 
     float4 vColor = float4(0.f, 0.f, 0.f, 1.f);
     float fCoverage = 0.f;
 
-      [branch]
+        [branch]
     if (0.f < g_fDecalUseUnknown)
     {
         float3 vUnknown = g_UnknownTexture.Sample(LinearSampler, vUV).rgb;
         float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));
-        fCoverage = saturate(fBrightness * max(g_MaskStrength, 0.f)) * g_fDecalAlpha;
+        fCoverage = saturate(fBrightness * max(g_MaskStrength, 0.f)) * fDecalAlpha;
     }
     else
     {
@@ -829,19 +825,19 @@ PS_DECAL_OUT Make_DecalOutput(float2 vUV, float3 vTangent, float3 vNormal, float
         if (vColor.a <= 0.f)
             discard;
 
-        fCoverage = vColor.a * g_fDecalAlpha;
+        fCoverage = vColor.a * fDecalAlpha;
     }
 
     Out.vDiffuse = float4(vColor.rgb, fCoverage);
 
-      [branch]
+        [branch]
     if (0.f < g_fDecalHasNormal)
     {
         float3 vWorldNormal = Decode_DecalNormal(vUV, vTangent, vNormal, vBinormal);
         Out.vNormal = float4(vWorldNormal * 0.5f + 0.5f, fCoverage * g_fDecalHasNormal);
     }
 
-      [branch]
+        [branch]
     if (0.f < g_fDecalHasMRA)
     {
         float3 vMRA = g_MRATexture.Sample(LinearSampler, vUV).rgb;
@@ -849,4 +845,9 @@ PS_DECAL_OUT Make_DecalOutput(float2 vUV, float3 vTangent, float3 vNormal, float
     }
 
     return Out;
+}
+
+PS_DECAL_OUT Make_DecalOutput(float2 vUV, float3 vTangent, float3 vNormal, float3 vBinormal)
+{
+    return Make_DecalOutput(vUV, vTangent, vNormal, vBinormal, g_fDecalAlpha);
 }

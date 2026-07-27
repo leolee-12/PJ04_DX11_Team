@@ -40,12 +40,6 @@ HRESULT CMapObject::Validate_Initialized()
 	return S_OK;
 }
 
-void CMapObject::Late_Update(_float fTimeDelta)
-{
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
-}
-
 HRESULT CMapObject::Render()
 {
 	if (FAILED(Bind_ShaderResources()))

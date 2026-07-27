@@ -243,6 +243,19 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			if (StageDesc.strStageName != Entry.pStageName)
 				continue;
 
+			const _bool bHasShellSection = any_of(
+				StageDesc.SectionDescs.begin(),
+				StageDesc.SectionDescs.end(),
+				[&](const MAP_SECTION_DESC& SectionDesc) { return SectionDesc.strSectionName == Entry.pShellSectionName; });
+
+			if (!bHasShellSection)
+			{
+				Log_GameContentWarning("MapStage gimmick shell missing: "
+					+ WstrToStr(StageDesc.strStageName)
+					+ "/" + WstrToStr(Entry.pShellSectionName));
+				continue;
+			}
+
 			CMapGimmickSection::MAP_GIMMICK_SECTION_DESC Desc{};
 			Desc.pEntry = &Entry;
 			Desc.iModelProtoLevel = Levels.iStageModelLevel;

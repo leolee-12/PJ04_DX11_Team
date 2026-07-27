@@ -88,7 +88,7 @@ namespace
 
         { TEXT("FlowerPetals"),           TEXT("../../Resources/EffectContainerJSON/MAP/Proto_FlowerPetals_0.JSON") },
         { TEXT("FlowerWing"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_FlowerWing.JSON") },
-        { TEXT("LensFlare"),              TEXT("../../Resources/EffectContainerJSON/MAP/Proto_LensFlare_0.JSON") },
+        { TEXT("LensFlare"),              TEXT("../../Resources/Map/Effect/Proto_LensFlare_0.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_Big.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_0.JSON") },

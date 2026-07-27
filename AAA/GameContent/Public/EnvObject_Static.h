@@ -34,7 +34,6 @@ public: // Editor preview
 
 public:	// Instance
 	void	Set_InstanceController(CEnv_InstanceController* pCtrl);
-	_bool	Can_RenderInstance() const;
 
 private:
 	CEnv_InstanceController* m_pInstanceController = { nullptr };

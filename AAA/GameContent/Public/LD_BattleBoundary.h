@@ -72,8 +72,9 @@ private:
 	LD_BATTLE_BOUNDARY_DESC	m_tBattleBoundaryDesc = {};
 
 	vector<_uint>	m_BlendMeshIndices;
-	_float			m_fAlpha = { 0.f };
-	_float			m_fAlphaTarget = { 0.f };
+	_float			m_fPlacedPositionY = { 0.f };
+	_float			m_fActivationRatio = { 0.f };
+	_float			m_fTargetActivationRatio = { 0.f };
 
 private:
 	HRESULT Ready_RenderComponents();
