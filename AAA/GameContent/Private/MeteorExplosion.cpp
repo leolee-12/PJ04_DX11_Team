@@ -55,24 +55,30 @@ HRESULT CMeteorExplosion::Render()
 
 HRESULT CMeteorExplosion::Ready_EffectPartObjects()
 {
-	CMeshParticleCommon::MESH_PARTICLE_COMMON_DESC tMeshParticle{};
-	tMeshParticle.iModelLevel = m_iPrototypeLevel;
-	tMeshParticle.bUseDiffuseTexture = true;
-	tMeshParticle.bUseNormalTexture = true;
-	tMeshParticle.bUseMRATexture = true;
-	tMeshParticle.bUseUnknownTexture = false;
-	tMeshParticle.bUseTextureCom = false;
-	tMeshParticle.bUseMaskCom = false;
-	tMeshParticle.bCustomShader = false;
-	
-	// MeshParticleCommon - MeteorPieceSmall
-	tMeshParticle.wstrModelTag = PIECE_SMALL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"PieceSmall", &tMeshParticle)))
+	CMeshParticleCommon::MESH_PARTICLE_COMMON_DESC tDesc{};
+	tDesc.iModelLevel        = m_iPrototypeLevel;
+	tDesc.bUseDiffuseTexture = true;
+	tDesc.bUseNormalTexture  = true;
+	tDesc.bUseMRATexture     = true;
+	tDesc.bUseUnknownTexture = false;
+	tDesc.bUseTextureCom     = false;
+	tDesc.bUseMaskCom        = false;
+	tDesc.bCustomShader      = false;
+
+	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_1", &tDesc)))
 		return E_FAIL;
 
-	// MeshParticleCommon - MeteorPieceCool
-	tMeshParticle.wstrModelTag = PIECE_COOL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"PieceCool", &tMeshParticle)))
+	tDesc.wstrModelTag = PIECE_SMALL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_2", &tDesc)))
+		return E_FAIL;
+
+	tDesc.wstrModelTag = PIECE_SMALL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_3", &tDesc)))
+		return E_FAIL;
+
+	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_4", &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
