@@ -1126,6 +1126,9 @@
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking">
       <UniqueIdentifier>{b0d99798-cd56-46ca-b795-9dcd57643831}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\MoonShot">
+      <UniqueIdentifier>{bbd5d08f-f2bc-4d50-8123-4bf76bddeca5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge">
       <UniqueIdentifier>{3ceb17f9-42d0-469a-aa8b-a899f361b548}</UniqueIdentifier>
     </Filter>
@@ -2667,6 +2670,9 @@
     <ClInclude Include="..\public\Meta_IntroLocking.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Meta_MoonShot.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\MoonShot</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Meta_UpperCharge.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClInclude>
@@ -4171,6 +4177,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Meta_IntroLocking.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\IntroLocking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_MoonShot.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\MoonShot</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Meta_UpperCharge.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>

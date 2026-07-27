@@ -511,11 +511,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         return BT_STATUS::SUCCESS;
         });
 
-    auto* pFire = CBTAction::Create([this](CBlackboard*, _float) {
-        static_cast<CBoss_Metaknight*>(m_pOwner)->Fire_GigaMoonShot();
-        return BT_STATUS::SUCCESS;
-        });
-
     auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
         static_cast<CBoss_Metaknight*>(m_pOwner)->Start_PatternCooldowns(CBoss_Metaknight::s_fGigaCooldown);
         return BT_STATUS::SUCCESS;
@@ -527,7 +522,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         Clip("Landing", SPD, 0.2f),
         pFace,
         Clip("GigaMoonCharge", SPD, 0.2f),
-        pFire,
         Clip("GigaMoonShot", SPD, 0.2f),
         pEnd,
         });

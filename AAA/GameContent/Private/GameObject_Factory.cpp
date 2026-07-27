@@ -2110,6 +2110,16 @@ void CGameObject_Factory::Metaknight_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Thunder/Metaknight_00_Common_ThunderLine.ysh"));
         )
     );
+
+    Register(CMeta_MoonShot::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_MoonShot),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_MoonShot::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Moon/Metaknight_00_MoonShot.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_MoonShot::MODEL_PROTO_TAG_TOP,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Moon/Metaknight_00_MoonShotTop.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Free()

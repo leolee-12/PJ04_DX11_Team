@@ -68,9 +68,9 @@ public:
 
     // Äð´Ù¿î
     static constexpr _float s_fDodgeCooldown = 4.f;
-    static constexpr _float s_fGigaCooldown = 20.f;
-    static constexpr _float s_fRockCooldown = 40.f;
-    static constexpr _float s_fUpperCooldown = 60.f;
+    static constexpr _float s_fGigaCooldown = 2000.f;
+    static constexpr _float s_fRockCooldown = 4.f;
+    static constexpr _float s_fUpperCooldown = 600.f;
     //static constexpr _float s_fUpperCooldown = 3.f;
 
     // »ç¸Á

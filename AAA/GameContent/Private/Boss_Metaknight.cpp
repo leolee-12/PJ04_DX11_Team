@@ -379,6 +379,14 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
                 m_pBody->OffMask();
                 break;
             }
+
+            case EANIM_EVENT::Projectile:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                Fire_GigaMoonShot();
+                break;
+            }
         }
 
         });
