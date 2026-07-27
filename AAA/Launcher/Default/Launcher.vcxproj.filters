@@ -58,6 +58,9 @@
     <Filter Include="01. Levels\02. Stage\Town\Step2">
       <UniqueIdentifier>{1b8c9dca-188a-4f78-8570-33b958d68890}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\02. Stage\Town\Step3">
+      <UniqueIdentifier>{ebb21332-4b63-49e6-83b2-5c5a221fd2d4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01. Levels\03. Ending">
       <UniqueIdentifier>{fd5aebcc-ee09-4f5f-a13d-ab5fe1f1378b}</UniqueIdentifier>
     </Filter>
@@ -128,6 +131,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Town_Step2.h">
       <Filter>01. Levels\02. Stage\Town\Step2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Town_Step3.h">
+      <Filter>01. Levels\02. Stage\Town\Step3</Filter>
     </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>98. Default</Filter>
@@ -203,6 +209,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Town_Step2.cpp">
       <Filter>01. Levels\02. Stage\Town\Step2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Town_Step3.cpp">
+      <Filter>01. Levels\02. Stage\Town\Step3</Filter>
     </ClCompile>
     <ClCompile Include="Launcher.cpp">
       <Filter>98. Default</Filter>

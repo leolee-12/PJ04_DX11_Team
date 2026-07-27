@@ -649,8 +649,8 @@ void CGameObject_Factory::Register_NonAnimObject()
             Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Water/Water.ysh", false));));
 
     Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
-        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
-            CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
+        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", false));));
     Register(CLD_MeteorGenerator::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_MeteorGenerator),
         LOADER
         (
@@ -1402,6 +1402,20 @@ void CGameObject_Factory::Register_Effect()
                     "../../Resources/CHJ/Effect/CopyEssence/Ring01/Common_Ring03.ysh"));
         )
     );
+
+    Register(CMeteorExplosion::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMeteorExplosion),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PIECE_SMALL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceSmall.ysh", 
+                            XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PIECE_COOL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceCool.ysh",
+                            XMMatrixRotationY(XMConvertToRadians(180.f))));
+        ));
 }
 
 void CGameObject_Factory::Register_BossEffect()

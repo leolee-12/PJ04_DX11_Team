@@ -187,6 +187,7 @@ HRESULT CLD_GarageRadio::Ready_Events()
 		{
 			Play_Anim(ANIM_PERFORM);
 			m_eState = STATE::PLAYING;
+			m_pGameInstance_Proxy->Play_BGM(L"K15_TitleDemo1.marker.wav", 0.35f);
 		});
 
 	return S_OK;

@@ -25,8 +25,8 @@ public:
 private:
 	_float3							m_vBaseScale = {};
 
-	static constexpr _float			s_fSquishDur = 0.05f;	// 납작해지는 시간
-	static constexpr _float			s_fLifeTime = 0.50f;	// 소멸까지
+	static constexpr _float			s_fSquishDur = 0.02f;	// 납작해지는 시간
+	static constexpr _float			s_fLifeTime = 0.25f;	// 소멸까지
 	static constexpr _float			s_fFlatY = 0.12f;		// 최종 Y 배율
 	static constexpr _float			s_fSpreadXZ = 1.25f;	
 

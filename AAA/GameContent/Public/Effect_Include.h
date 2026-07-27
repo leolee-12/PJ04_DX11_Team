@@ -53,6 +53,7 @@
 #include "SwordSpinSlash.h"
 #include "SwordSuperSpinSlash.h"
 #include "MetaSuperSpinSlash.h"
+#include "MeteorExplosion.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"

@@ -431,14 +431,14 @@ void CKirby::Update_DumpCool(_float fTimeDelta)
     {
         if (m_bCurDecreaseDumpCool)
         {
-            ABILITY_DISCARD_BIND_DESC d{};
-            d.pCoolTime = &m_fAccDumpCoolTime;
-            d.fMaxCoolTime = m_fMaxDumpCoolTime;
+            ABILITY_DISCARD_BIND_DESC tDesc{};
+            tDesc.pCoolTime = &m_fAccDumpCoolTime;
+            tDesc.fMaxCoolTime = m_fMaxDumpCoolTime;
 
             if(Has_Deform())
-                d.bIsAbility = false;
+                tDesc.bIsAbility = false;
 
-            m_pGameInstance_Proxy->Publish(EventTag::AbilityDiscardUI_Bind, &d);
+            m_pGameInstance_Proxy->Publish(EventTag::AbilityDiscardUI_Bind, &tDesc);
         }
 
         m_bPreDecreaseDumpCool = m_bCurDecreaseDumpCool;
@@ -447,7 +447,6 @@ void CKirby::Update_DumpCool(_float fTimeDelta)
     if (m_bCurDecreaseDumpCool == true)
     {
         m_fAccDumpCoolTime -= fTimeDelta;
-
         m_bCurDecreaseDumpCool = false;
     }
     else
@@ -471,11 +470,22 @@ _bool CKirby::Can_Dump()
     return false;
 }
 
+void CKirby::Add_Coin(_int iCoin)
+{
+    if (m_iCoin == 0 && iCoin < 0)
+        return;
+
+    if(iCoin != 0)
+    {
+        // ÀÌº¥Æ®
+        m_iCoin += iCoin;
+    }
+}
+
 HRESULT CKirby::Ready_Components()
 {
     // Controller
-    m_pController = Add_Component<CController>(TEXT("Com_Controller"),
-        CController::Create(m_pDevice, m_pContext));
+    m_pController = Add_Component<CController>(TEXT("Com_Controller"), CController::Create(m_pDevice, m_pContext));
     if (m_pController == nullptr)
         return E_FAIL;
 

@@ -93,6 +93,8 @@ void CLD_Frame::Late_Update(_float fTimeDelta)
 		m_iLastCutIndex = 0;
 		m_iCreditFired = 0;
 		m_bCreditClosed = false;
+		m_fEndHold = 0.f;
+		m_bEndFadeFired = false;
 	}
 
 	if (m_bStarted)
@@ -101,6 +103,7 @@ void CLD_Frame::Late_Update(_float fTimeDelta)
 		m_fCutCursor = min(m_fCutCursor + fTimeDelta / fCutPeriod, static_cast<_float>(CUT_TEXTURE_COUNT - 1u));
 
 		Tick_CreditSignal();
+		Tick_EndFade(fTimeDelta);
 	}
 
 	Check_Visible();
@@ -304,7 +307,10 @@ void CLD_Frame::Submit_BlendMeshes()
 
 void CLD_Frame::Tick_CreditSignal()
 {
-	const _int iCut = static_cast<_int>(m_fCutCursor);
+	const _float fPeriod = max(max(m_fCutHold, 0.f) + max(m_fCutFade, 0.f), 0.0001f);
+	const _float fFadeRatio = max(m_fCutFade, 0.f) / fPeriod;
+
+	const _int iCut = static_cast<_int>(m_fCutCursor + fFadeRatio);
 	if (iCut == m_iLastCutIndex)
 		return;
 
@@ -326,6 +332,23 @@ void CLD_Frame::Tick_CreditSignal()
 	{
 		m_bCreditClosed = true;
 		m_pGameInstance_Proxy->Publish(EventTag::Credits_Next, nullptr);
+	}
+}
+
+void CLD_Frame::Tick_EndFade(_float fTimeDelta)
+{
+	if (m_bEndFadeFired || !m_bCreditClosed)
+		return;
+
+	if (m_fCutCursor < static_cast<_float>(CUT_TEXTURE_COUNT - 1u))
+		return;
+
+	m_fEndHold += fTimeDelta;
+
+	if (m_fEndHold >= max(m_fLastCutHold, 0.f))
+	{
+		m_bEndFadeFired = true;
+		m_pGameInstance_Proxy->Publish(TEXT("Ending.BlackFade"), nullptr);
 	}
 }
 
