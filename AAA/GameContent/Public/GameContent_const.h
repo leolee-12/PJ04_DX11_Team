@@ -134,6 +134,7 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Meta_Shine1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Shine1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/Shine1.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Meta_HitFire1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_HitFire1"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/HitFire1.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Meta_HitFire2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_HitFire2"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Lock/HitFire2.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Meta_Slash2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Meta_Slash2"), TEXT("../../Resources/YSH/Boss/Metaknight/Effect/Slash/Slash2.png"), 1 };
 
 
 	//sky

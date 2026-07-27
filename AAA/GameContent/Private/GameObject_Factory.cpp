@@ -2120,6 +2120,25 @@ void CGameObject_Factory::Metaknight_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Moon/Metaknight_00_MoonShotTop.ysh"));
         )
     );
+
+    Register(CMeta_Slash::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_Slash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Meta_Slash2.iLevelID, Texture_Meta_Slash2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Meta_Slash2.szFileTag, Texture_Meta_Slash2.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_Slash::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Slash/Metaknight_00_Common_Ring03High.ysh"
+                , XMMatrixRotationX(XMConvertToRadians(90.f))));
+        )
+    );
+
+    Register(CMeta_Rock::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMeta_Rock),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_Rock::MODEL_PROTO_TAG_ROCK,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Rock/BurstTornadoDebrisB.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Free()

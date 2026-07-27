@@ -27,3 +27,5 @@
 #include "Meta_DemoUpperAtk.h"
 #include "Meta_DemoUpperFinal.h"
 #include "Meta_MoonShot.h"
+#include "Meta_Slash.h"
+#include "Meta_Rock.h"

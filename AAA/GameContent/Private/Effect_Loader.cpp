@@ -158,6 +158,10 @@ namespace
         { TEXT("Meta_LockingSpark"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_LockingSpark.JSON") },
         { TEXT("Meta_MoonShot"),              TEXT("../../Resources/YSH/Effects/Metaknight/Meta_MoonShot.JSON") },
 
+        { TEXT("Meta_Slash1"),              TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Slash1.JSON") },
+        { TEXT("Meta_Slash2"),              TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Slash2.JSON") },
+        { TEXT("Meta_Slash3"),              TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Slash3.JSON") },
+
         { TEXT("Meta_DemoUpperAtk1"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk1.JSON") },
         { TEXT("Meta_DemoUpperAtk2"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk2.JSON") },
         { TEXT("Meta_DemoUpperAtk3"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk3.JSON") },
