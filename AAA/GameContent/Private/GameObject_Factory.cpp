@@ -625,6 +625,8 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_QTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_QTE), LOADER());
     Register(CUI_UIFadeOut::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_UIFadeOut), LOADER());
     Register(CUI_AbilityDiscard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_AbilityDiscard), LOADER());
+    Register(CUI_ClickQTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_ClickQTE), LOADER());
+    Register(CUI_CreditCoordinator::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_CreditCoordinator), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
@@ -647,8 +649,8 @@ void CGameObject_Factory::Register_NonAnimObject()
             Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Water/Water.ysh", false));));
 
     Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
-        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
-            CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
+        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", false));));
     Register(CLD_MeteorGenerator::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_MeteorGenerator),
         LOADER
         (
@@ -743,6 +745,24 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
+    Register(CSwordJumpSpin::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordJumpSpin),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/Common_Curve03.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::TAIL_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_tail.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::SCROLL_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_scroll06.dds"), 1));
+        )
+    );
+
     Register(CHammerSwing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerSwing),
         LOADER
         (
@@ -1326,62 +1346,53 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-    // 3. JumpSlash
-    Register(CSword_JumpSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_JumpSlash),
-        LOADER
-        (
-            // Common_JumpSlash
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_JumpSlash::PROTOTYPE_TAG,
-                CCommon_JumpSlash::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_JumpSlash"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_JumpSlash/Model_Common_JumpSlash.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_Common_JumpSlash.iLevelID, Texture_Common_JumpSlash.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_JumpSlash.szFileTag, Texture_Common_JumpSlash.iNumTex));
-
-            // Common_Curve03
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Curve03::PROTOTYPE_TAG,
-                CCommon_Curve03::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Curve03"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
-        )
-    );
-
-    // 4. SpinSlash
-    Register(CSword_SpinSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlash),
-        LOADER
-        (
-            // Common_SpinSlash
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlash::PROTOTYPE_TAG,
-                CCommon_SpinSlash::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlash"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlash/Model_Common_SpinSlash.ysh",
+    // Shared Sword / Meta SpinSlash
+    Register(CSwordSpinSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordSpinSlash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG,
+                CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSpinSlash::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Sword/00_SwordSpinSlash/Common_Ring03.ysh",
                     XMMatrixRotationX(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_1.iLevelID, Texture_Common_SpinSlash_1.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_1.szFileTag, Texture_Common_SpinSlash_1.iNumTex));
-
-            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_2.iLevelID, Texture_Common_SpinSlash_2.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_2.szFileTag, Texture_Common_SpinSlash_2.iNumTex));
-        )
-    );
-
-    // 5. SpinSlashTrail
-    Register(CSword_SpinSlashTrail::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlashTrail),
-        LOADER
-        (
-            // Common_SpinSlashTrail
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlashTrail::PROTOTYPE_TAG,
-                CCommon_SpinSlashTrail::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlashTrail"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlashTrail/Model_Common_SpinSlashTrail.ysh",
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSpinSlash::MODEL_PROTO_TAG_RING_HIGH,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Sword/00_SwordSpinSlash/Common_Ring03High.ysh",
                     XMMatrixRotationX(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlashTrail.iLevelID, Texture_Common_SpinSlashTrail.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlashTrail.szFileTag, Texture_Common_SpinSlashTrail.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSpinSlash::DISTORTION_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordSpinSlash/indirectwarpring2_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSpinSlash::SPIN_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordSpinSlash/common_spin02.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSpinSlash::MASK_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordSpinSlash/common_circle05.dds"), 1));
         )
     );
-    
+
+    Register(CSwordSuperSpinSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordSuperSpinSlash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSuperSpinSlash::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Sword/00_SwordSuperSpinSlash/Common_Ring03.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSuperSpinSlash::SPIN01_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordSuperSpinSlash/common_spin01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSuperSpinSlash::SPIN06_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordSuperSpinSlash/common_spin06.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordSuperSpinSlash::CIRCLE04_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordSuperSpinSlash/common_circle04.dds"), 1));
+        )
+    );
+
     Register(CEssenceAura::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CEssenceAura),
         LOADER(
             TRY_ADD_PROTO(pProxy, iLevelIndex, CEssenceCrown::PROTOTYPE_TAG, CEssenceCrown::Create(pDevice, pContext));
@@ -1966,6 +1977,34 @@ void CGameObject_Factory::Metaknight_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMoonShot::MODEL_PROTO_TAG_MOON,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSE/Effect/MetaKnightSword/MoonShot/MoonShot.ysh"));
+        )
+    );
+
+    Register(CMetaSuperSpinSlash::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMetaSuperSpinSlash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG,
+                CRectParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSuperSpinSlash::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/MetaSuperSpinSlash/Common_Ring03.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSuperSpinSlash::SPIN01_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSuperSpinSlash/common_spin01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSuperSpinSlash::SPIN06_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSuperSpinSlash/common_spin06.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSuperSpinSlash::CIRCLE04_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSuperSpinSlash/common_circle04.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSuperSpinSlash::CIRCLE05_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSuperSpinSlash/common_circle05.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSuperSpinSlash::CIRCLE01_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSuperSpinSlash/common_circle01.dds"), 1));
         )
     );
 

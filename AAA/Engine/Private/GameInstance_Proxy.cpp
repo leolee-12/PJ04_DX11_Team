@@ -13,6 +13,7 @@
 #include "PhysX_Manager.h"
 #include "Font_Manager.h"
 #include "Object_Manager.h"
+#include "Collision_Manager.h"
 
 using namespace physx;
 
@@ -690,6 +691,27 @@ void	CGameInstance_Proxy::Clear_CollisionPool()
 		return;
 
 	m_pOwner->Clear_CollisionPool();
+}
+void    CGameInstance_Proxy::Query_Overlap(CCollider* pQuery, _uint Group, vector<CCollider*>* pOut)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pCollision_Manager->Query_Overlap(pQuery, Group, pOut);
+}
+void    CGameInstance_Proxy::Query_Overlap(CCollider* pQuery, const vector<_uint>& Groups, vector<CCollider*>* pOut)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pCollision_Manager->Query_Overlap(pQuery, Groups, pOut);
+}
+void    CGameInstance_Proxy::Query_OverlapOwners(CCollider* pQuery, const vector<_uint>& Groups, vector<CGameObject*>* pOut)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pCollision_Manager->Query_OverlapOwners(pQuery, Groups, pOut);
 }
 #pragma endregion
 

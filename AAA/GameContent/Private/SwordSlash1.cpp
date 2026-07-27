@@ -3,7 +3,6 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 
-#include "Common_Curve03.h"
 #include "Common_Ring03.h"
 
 CSwordSlash1::CSwordSlash1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -90,6 +90,9 @@ namespace Client
         inline constexpr const _tchar* HUD_SetVisible = L"HUD.SetVisible";
         inline constexpr const _tchar* TitleLogo_Show = L"TitleLogo.Show";
 
+        inline constexpr const _tchar* Credits_Next = L"Credits.Next";
+        inline constexpr const _tchar* Credits_Finished = L"Credits.Finished";
+
         // 대화 이벤트
         inline constexpr const _tchar* Dialogue_Start = L"Dialogue.Start";
         inline constexpr const _tchar* Dialogue_Finished = L"Dialogue.Finished";
@@ -193,6 +196,7 @@ namespace Client
         const _tchar*      szTrack = nullptr;                // 컷씬캠일 때 재생 트랙 (예: L"DemoAppear2_camera1")
         CAnimator*         pProgress = nullptr;                 // progress 소스(고릴라 애니메이터)
         const _float4x4*   pAnchorWorld = nullptr;        // 로컬->월드 앵커(고릴라 월드행렬)
+        _float             fSpeed = 1.f;
     };
 
     struct BOSSCAM_FOCUS_DESC

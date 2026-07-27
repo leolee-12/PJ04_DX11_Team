@@ -57,7 +57,7 @@ HRESULT CCamera_Cutscene::Initialize(void* pArg)
     return S_OK;
 }
 
-_bool CCamera_Cutscene::Play_Track(const _tchar* szTrack, CAnimator* pProgress, const _float4x4* pAnchorWorld)
+_bool CCamera_Cutscene::Play_Track(const _tchar* szTrack, CAnimator* pProgress, const _float4x4* pAnchorWorld, _float fSpeed)
 {
     if (!szTrack) return false;
     wstring name = szTrack;
@@ -73,8 +73,9 @@ _bool CCamera_Cutscene::Play_Track(const _tchar* szTrack, CAnimator* pProgress, 
         }
         it = m_Tracks.emplace(name, move(t)).first;
     }
-    m_pCur = &it->second; 
-    m_pProgress = pProgress; 
+    m_pCur = &it->second;
+    m_pProgress = pProgress;
+    m_fSpeed = fSpeed;
 
     if(pAnchorWorld)
         m_pAnchor = pAnchorWorld;
@@ -93,7 +94,7 @@ void CCamera_Cutscene::Priority_Update(_float fTimeDelta)
     Tick_Shake(fTimeDelta);
 
     if (m_pCur && nullptr == m_pProgress)
-        m_fLocalTime += fTimeDelta;
+        m_fLocalTime += fTimeDelta * m_fSpeed;
 
     Apply_Pose();
     __super::Priority_Update(fTimeDelta);

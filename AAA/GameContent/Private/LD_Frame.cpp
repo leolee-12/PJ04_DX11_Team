@@ -5,14 +5,12 @@
 #include "GameContent_const.h"
 #include "World_BlendCollector.h"
 
-#include "GameInstance.h"
+#include "GameContent_Events.h"
 
 NS_BEGIN(Client)
 
 CLD_Frame::CLD_Frame(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevelDesignObject(pDevice, pContext)
-	, m_fCutHold{ 2.f }
-	, m_fCutFade{ 1.f }
 	, m_bCutReset{ false }
 {
 }
@@ -20,8 +18,6 @@ CLD_Frame::CLD_Frame(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CLD_Frame::CLD_Frame(const CLD_Frame& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tStaticModelDesc(Prototype.m_tStaticModelDesc)
-	, m_fCutHold{ Prototype.m_fCutHold }
-	, m_fCutFade{ Prototype.m_fCutFade }
 	, m_bCutReset{ false }
 {
 }
@@ -75,6 +71,16 @@ HRESULT CLD_Frame::Validate_Initialized()
 	return S_OK;
 }
 
+void CLD_Frame::Update(_float fTimeDelta)
+{
+	if (m_fFirstWait < START_TIMMER)
+	{
+		m_fFirstWait += fTimeDelta;
+		if (m_fFirstWait >= START_TIMMER)
+			m_bStarted = true;
+	}
+}
+
 void CLD_Frame::Late_Update(_float fTimeDelta)
 {
 	if (!m_bActive || Is_Dead())
@@ -84,10 +90,21 @@ void CLD_Frame::Late_Update(_float fTimeDelta)
 	{
 		m_bCutReset = false;
 		m_fCutCursor = 0.f;
+		m_iLastCutIndex = 0;
+		m_iCreditFired = 0;
+		m_bCreditClosed = false;
+		m_fEndHold = 0.f;
+		m_bEndFadeFired = false;
 	}
 
-	const _float fCutPeriod = max(max(m_fCutHold, 0.f) + max(m_fCutFade, 0.f), 0.0001f);
-	m_fCutCursor = min(m_fCutCursor + fTimeDelta / fCutPeriod, static_cast<_float>(CUT_TEXTURE_COUNT - 1u));
+	if (m_bStarted)
+	{
+		const _float fCutPeriod = max(max(m_fCutHold, 0.f) + max(m_fCutFade, 0.f), 0.0001f);
+		m_fCutCursor = min(m_fCutCursor + fTimeDelta / fCutPeriod, static_cast<_float>(CUT_TEXTURE_COUNT - 1u));
+
+		Tick_CreditSignal();
+		Tick_EndFade(fTimeDelta);
+	}
 
 	Check_Visible();
 	Submit_RenderGroups();
@@ -286,6 +303,53 @@ void CLD_Frame::Submit_BlendMeshes()
 
 	for (_uint iMeshIndex : m_BlendMeshIndices)
 		m_pBlendCollector->Submit(this, this, m_pModelCom, pWorld, iMeshIndex);
+}
+
+void CLD_Frame::Tick_CreditSignal()
+{
+	const _float fPeriod = max(max(m_fCutHold, 0.f) + max(m_fCutFade, 0.f), 0.0001f);
+	const _float fFadeRatio = max(m_fCutFade, 0.f) / fPeriod;
+
+	const _int iCut = static_cast<_int>(m_fCutCursor + fFadeRatio);
+	if (iCut == m_iLastCutIndex)
+		return;
+
+	m_iLastCutIndex = iCut;
+
+	if (m_iCreditFired < CREDIT_COUNT)
+	{
+		const _int iTargetCut = CREDIT_FIRST_CUT + CREDIT_CUT_STRIDE * m_iCreditFired;
+		if (iCut >= iTargetCut)
+		{
+			++m_iCreditFired;
+			m_pGameInstance_Proxy->Publish(EventTag::Credits_Next, nullptr);
+			return;
+		}
+	}
+
+	if (!m_bCreditClosed && CREDIT_CLOSE_CUT >= 0 &&
+		m_iCreditFired >= CREDIT_COUNT && iCut >= CREDIT_CLOSE_CUT)
+	{
+		m_bCreditClosed = true;
+		m_pGameInstance_Proxy->Publish(EventTag::Credits_Next, nullptr);
+	}
+}
+
+void CLD_Frame::Tick_EndFade(_float fTimeDelta)
+{
+	if (m_bEndFadeFired || !m_bCreditClosed)
+		return;
+
+	if (m_fCutCursor < static_cast<_float>(CUT_TEXTURE_COUNT - 1u))
+		return;
+
+	m_fEndHold += fTimeDelta;
+
+	if (m_fEndHold >= max(m_fCutHold, 0.f))
+	{
+		m_bEndFadeFired = true;
+		m_pGameInstance_Proxy->Publish(TEXT("Ending.BlackFade"), nullptr);
+	}
 }
 
 HRESULT CLD_Frame::Bind_CutTextures()
