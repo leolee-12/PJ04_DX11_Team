@@ -202,8 +202,6 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	ENV_COLLISION_DESC tCollision;
 	ENV_RENDER_DESC tRender;
 	ENV_EFFECT_DESC tEffect;
-
-	json jRawProperties;
 };
 
 inline _bool EnvObject_NeedsModel(const ENV_OBJECT_DESC& Desc)
@@ -218,7 +216,7 @@ inline _bool EnvObject_NeedsModel(const ENV_OBJECT_DESC& Desc)
 struct ENV_INSTANCE_DATA
 {
 	_float4x4 matWorld = {};
-	_float4 vDissolveParams = {}; // x: Main, y: Shadow, z: NearDither 길이, w: reserved
+	_float4 vDissolveParams = {}; // x: Main, y: Shadow, z: NearDither 길이, w: DecalAlpha
 };
 
 static_assert(sizeof(ENV_INSTANCE_DATA) == 80, "ENV_INSTANCE_DATA must match the instance input layout.");

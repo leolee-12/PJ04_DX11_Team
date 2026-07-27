@@ -345,7 +345,7 @@ void CLD_Frame::Tick_EndFade(_float fTimeDelta)
 
 	m_fEndHold += fTimeDelta;
 
-	if (m_fEndHold >= max(m_fCutHold, 0.f))
+	if (m_fEndHold >= max(m_fLastCutHold, 0.f))
 	{
 		m_bEndFadeFired = true;
 		m_pGameInstance_Proxy->Publish(TEXT("Ending.BlackFade"), nullptr);

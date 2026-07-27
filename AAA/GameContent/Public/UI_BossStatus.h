@@ -55,9 +55,14 @@ private:
     _float m_fSlideDuration = { 1.f };
     _float m_fSlideOffsetX = { 600.f };
 
+    CSound_Handle m_hAppearSFX = {};
+    _bool         m_bAppearSFXPlaying = { false };
+
 private:
     HRESULT Ready_Components();
     void    Try_BindGauge();
+    void    Start_AppearSFX();
+    void    Stop_AppearSFX();
     void    Start_SlideIn();
     void    Update_SlideIn(_float fTimeDelta);
     static _float Ease_OutCubic(_float t) 

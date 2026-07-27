@@ -83,7 +83,7 @@ struct VS_DECAL_OUT
     nointerpolation float4 vInvRow2 : TEXCOORD6;
     nointerpolation float4 vInvRow3 : TEXCOORD7;
 
-    nointerpolation float fDissolve : TEXCOORD8;
+    nointerpolation float2 vInstanceParams : TEXCOORD8; // x: Dissolve, y: DecalAlpha
 };
 
 float3x3 Build_Inverse3x3(float3 vRow0, float3 vRow1, float3 vRow2)
@@ -121,14 +121,14 @@ VS_DECAL_OUT VS_DECAL(VS_IN In)
     Out.vInvRow1 = float4(matInv3[1], 0.f);
     Out.vInvRow2 = float4(matInv3[2], 0.f);
     Out.vInvRow3 = float4(vInvTrans, 1.f);
-    Out.fDissolve = In.vDissolveParams.x;
-
+    Out.vInstanceParams = In.vDissolveParams.xw;
+    
     return Out;
 }
 
 PS_DECAL_OUT PS_DECAL(VS_DECAL_OUT In)
 {
-    Apply_Dither(In.vPosition, In.fDissolve);
+    Apply_Dither(In.vPosition, In.vInstanceParams.x);
 
     float2 vScreenUV = Get_ScreenUV(In.vProjPos);
     float fSceneDepth = Sample_SceneDepth(vScreenUV);
@@ -141,7 +141,7 @@ PS_DECAL_OUT PS_DECAL(VS_DECAL_OUT In)
     Apply_DecalMaterialMask(In.vPosition.xy);
 
     float2 vDecalUV = Get_DecalUV(vLocalPosition);
-    return Make_DecalOutput(vDecalUV, In.vMatrixRow0.xyz, In.vMatrixRow1.xyz, -In.vMatrixRow2.xyz);
+    return Make_DecalOutput(vDecalUV, In.vMatrixRow0.xyz, In.vMatrixRow1.xyz, -In.vMatrixRow2.xyz, In.vInstanceParams.y);
 }
 
 

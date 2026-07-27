@@ -45,6 +45,8 @@ namespace
         { TEXT("SwordSuperChargeEffect"), TEXT("../../Resources/EffectContainerJSON/YSE/SwordSuperChargeEffect.json") },
         { TEXT("MetaChargeEffect"),       TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaChargeEffect.JSON") },
         { TEXT("MetaSuperChargeEffect"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperChargeEffect.JSON") },
+        { TEXT("MetaSlash1"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash1.JSON") },
+        { TEXT("MetaSlash2"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash2.JSON") },
         { TEXT("MetaSuperSpinSlash"),      TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperSpinSlash.JSON") },
         { TEXT("MetaSwordJumpSpin"),          TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpin.JSON") },
         { TEXT("MetaSwordJumpSpinTrail1"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpinTrail1.JSON") },
@@ -88,7 +90,7 @@ namespace
 
         { TEXT("FlowerPetals"),           TEXT("../../Resources/EffectContainerJSON/MAP/Proto_FlowerPetals_0.JSON") },
         { TEXT("FlowerWing"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_FlowerWing.JSON") },
-        { TEXT("LensFlare"),              TEXT("../../Resources/EffectContainerJSON/MAP/Proto_LensFlare_0.JSON") },
+        { TEXT("LensFlare"),              TEXT("../../Resources/Map/Effect/Proto_LensFlare_0.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_Big.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_0.JSON") },

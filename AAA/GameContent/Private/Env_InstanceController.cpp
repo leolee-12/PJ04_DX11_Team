@@ -15,23 +15,13 @@ CEnv_InstanceController::CEnv_InstanceController(const CEnv_InstanceController& 
 {
 }
 
-ENV_INSTANCE_BATCH_HANDLE CEnv_InstanceController::Register_BatchesForDesc(const ENV_OBJECT_DESC& tDesc)
+_uint CEnv_InstanceController::Register_MainBatch(const ENV_OBJECT_DESC& tDesc)
 {
-	ENV_INSTANCE_BATCH_HANDLE tHandle{};
-
-	if (tDesc.wstrModelProtoTag.empty())
-		return tHandle;
-
-	if (tDesc.tRender.bIsDecal)
-	{
-		ENV_INSTANCE_KEY tDecalKey{ tDesc.iModelProtoLevel, tDesc.wstrModelProtoTag, RENDERID::DECAL };
-		tHandle.iDecalBatchIndex = FindOrCreate_BatchIndex(tDecalKey);
-		return tHandle;
-	}
+	if (tDesc.wstrModelProtoTag.empty() || tDesc.tRender.bIsDecal)
+		return INVALID_INDEX;
 
 	ENV_INSTANCE_KEY tMainKey{ tDesc.iModelProtoLevel, tDesc.wstrModelProtoTag, RENDERID::NONBLEND };
-	tHandle.iMainBatchIndex = FindOrCreate_BatchIndex(tMainKey);
-	return tHandle;
+	return FindOrCreate_BatchIndex(tMainKey);
 }
 
 _uint CEnv_InstanceController::Register_ShadowBatch(const ENV_OBJECT_DESC& tDesc)
@@ -41,6 +31,15 @@ _uint CEnv_InstanceController::Register_ShadowBatch(const ENV_OBJECT_DESC& tDesc
 
 	ENV_INSTANCE_KEY tShadowKey{ tDesc.iModelProtoLevel, tDesc.wstrModelProtoTag, RENDERID::SHADOW };
 	return FindOrCreate_BatchIndex(tShadowKey);
+}
+
+_uint CEnv_InstanceController::Register_DecalBatch(const ENV_OBJECT_DESC& tDesc)
+{
+	if (tDesc.wstrModelProtoTag.empty() || !tDesc.tRender.bIsDecal)
+		return INVALID_INDEX;
+
+	ENV_INSTANCE_KEY tDecalKey{ tDesc.iModelProtoLevel, tDesc.wstrModelProtoTag, RENDERID::DECAL };
+	return FindOrCreate_BatchIndex(tDecalKey);
 }
 
 _bool CEnv_InstanceController::Submit_Main(_uint iBatchIndex, CEnvObject_Static* pObj)
@@ -139,11 +138,15 @@ _uint CEnv_InstanceController::FindOrCreate_BatchIndex(const ENV_INSTANCE_KEY& t
 
 	CEnv_InstanceBatch* pBatch = CEnv_InstanceBatch::Create(m_pDevice, m_pContext, &tDesc);
 	if (nullptr == pBatch)
+	{
+		m_BatchIndexByKey.emplace(tKey, INVALID_INDEX);
 		return INVALID_INDEX;
+	}
 
 	if (FAILED(Apply_CachedMeshLayers(tKey, pBatch)))
 	{
 		Safe_Release(pBatch);
+		m_BatchIndexByKey.emplace(tKey, INVALID_INDEX);
 		return INVALID_INDEX;
 	}
 

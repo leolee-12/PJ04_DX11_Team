@@ -109,6 +109,7 @@ public:
     _float                                  Get_Alpha() const { return m_fAlpha; }
 
     void                                    Play_AppearSweep(_float fTargetRatio, _float fSpeed = 0.8f);
+    _bool                                   Is_AppearSweeping() const { return m_bAppearSweep; }
     void                                    Reset_Empty();
     void                                    Snap(_float fRatio);
 
