@@ -36,12 +36,11 @@ public:
 	void	Refresh_CombinedWorldMatrix();
 
 public:
-	json	Serialize_SectionState() const;
-	void	Deserialize_SectionState(const json& j);
-	void	Set_UseCollMesh(_bool bUseCollMesh);
-	void	Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
-	_bool	Has_CollMesh() const { return m_bHasCollMesh; }
-	_bool	Is_UseCollMesh() const { return m_bUseCollMesh; }
+	HRESULT Set_UseCollMesh(_bool bUseCollMesh);
+	void    Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
+	void    Deactivate();
+	_bool   Has_CollMesh() const { return m_bHasCollMesh; }
+	_bool   Is_UseCollMesh() const { return m_bUseCollMesh; }
 
 	// Creation descriptor baseline for MapTool policy and transform overrides.
 	const MAP_SECTION_DESC& Get_Desc() const { return m_tDesc; }
@@ -76,7 +75,7 @@ private:
 	_bool				m_bHasCollMesh = { false };
 	_bool				m_bUseCollMesh = { true };
 
-	physx::PxRigidStatic* m_pColliderActor = { nullptr };
+	physx::PxRigidStatic* m_pRigidStatic = { nullptr };
 
 #ifdef _DEBUG
 	_int m_iEditorSoloMeshIndex = -1;
@@ -89,8 +88,9 @@ private:
 	virtual const _tchar*	Get_ModelProtoTag() const override;
 	virtual _uint			Get_ModelProtoLevel() const override;
 	virtual HRESULT			Bind_WorldMatrix() override;
-	void					Refresh_ColliderPose();
-	void					Rebuild_ColliderActor();
+	HRESULT					Ready_RigidStatic();
+	void					Refresh_RigidStaticPose();
+	void					Release_RigidStatic();
 
 public:
 	static CMapSection* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

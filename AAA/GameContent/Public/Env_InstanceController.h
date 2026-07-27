@@ -19,8 +19,9 @@ private:
 
 public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
-	ENV_INSTANCE_BATCH_HANDLE Register_BatchesForDesc(const ENV_OBJECT_DESC& tDesc);
+	_uint Register_MainBatch(const ENV_OBJECT_DESC& tDesc);
 	_uint Register_ShadowBatch(const ENV_OBJECT_DESC& tDesc);
+	_uint Register_DecalBatch(const ENV_OBJECT_DESC& tDesc);
 	_bool Submit_Main(_uint iBatchIndex, CEnvObject_Static* pObj);
 	_bool Submit_Shadow(_uint iBatchIndex, CEnvObject_Static* pObj);
 	_bool Submit_Decal(_uint iBatchIndex, CEnvObject_Static* pObj);

@@ -922,9 +922,6 @@ _bool CModel::Should_CookCollisionMesh(_uint iMeshIndex, const string& strMeshNa
 	if (m_iCookExcludePass >= 0 && iMeshIndex < m_MeshLayers.size() && m_iCookExcludePass == m_MeshLayers[iMeshIndex].iPass)
 		return false;
 
-	if (MODEL::MAP != m_eType)
-		return true;
-
 	return !m_CollisionCookFilter || m_CollisionCookFilter(strMeshName);
 }
 

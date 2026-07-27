@@ -252,21 +252,13 @@ namespace
 		const _wstring& strFallbackManifestPath,
 		const _wstring& strLevelObjectsPath,
 		_wstring* pOutManifestPath,
-		MAP_EDIT_DATA* pOutMapContentDesc,
-		json* pOutMapStageOverride = nullptr,
-		_bool* pOutHasMapStageOverride = nullptr)
+		MAP_EDIT_DATA* pOutMapContentDesc)
 	{
 		if (nullptr == pOutManifestPath || nullptr == pOutMapContentDesc)
 			return E_FAIL;
 
 		*pOutManifestPath = strFallbackManifestPath;
 		*pOutMapContentDesc = {};
-
-		if (nullptr != pOutMapStageOverride)
-			*pOutMapStageOverride = json::object();
-
-		if (nullptr != pOutHasMapStageOverride)
-			*pOutHasMapStageOverride = false;
 
 		Try_LoadLevelMapContent(strLevelObjectsPath, pOutMapContentDesc);
 
@@ -282,11 +274,7 @@ namespace
 		if (pOutMapContentDesc->strManifestPath.empty())
 			pOutMapContentDesc->strManifestPath = *pOutManifestPath;
 
-		const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
-			*pOutManifestPath,
-			pOutMapContentDesc,
-			pOutMapStageOverride,
-			pOutHasMapStageOverride);
+		const HRESULT hrAsset = CMap_EditFile::Load_EditFile(*pOutManifestPath, pOutMapContentDesc);
 
 		if (S_FALSE == hrAsset)
 			return S_OK;
@@ -716,93 +704,34 @@ HRESULT CMap_Loader::Spawn_Map(
 
 	_wstring strResolvedManifestPath;
 	MAP_EDIT_DATA MapContentDesc{};
-	json jMapStageOverride = json::object();
-	_bool bHasMapStageOverride = false;
 
-	if (FAILED(Resolve_LevelMapRequest(
-		strFallbackManifestPath,
-		strLevelObjectsPath,
-		&strResolvedManifestPath,
-		&MapContentDesc,
-		&jMapStageOverride,
-		&bHasMapStageOverride)))
-	{
+	if (FAILED(Resolve_LevelMapRequest(strFallbackManifestPath, strLevelObjectsPath, &strResolvedManifestPath, &MapContentDesc)))
 		return E_FAIL;
-	}
 
 	const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc = MapContentDesc.bHasMapContent ? &MapContentDesc.OverrideDesc : nullptr;
 
-	CMapStage* pLocalStage = nullptr;
-	CMapStage** ppStageForSpawn = ppOutStage;
-
-	if (Options.bLoadStage
-		&& nullptr == ppStageForSpawn
-		&& bHasMapStageOverride)
-	{
-		ppStageForSpawn = &pLocalStage;
-	}
-
-	const HRESULT hrSpawn = Spawn_Map(
+	return Spawn_Map(
 		pDevice,
 		pContext,
 		strResolvedManifestPath,
 		iRuntimeLevel,
 		pOutReport,
-		ppStageForSpawn,
+		ppOutStage,
 		Options,
 		pLevelDesignOverrideDesc,
 		pLevelDesignOverrideDesc);
-
-	if (FAILED(hrSpawn))
-		return hrSpawn;
-
-	if (Options.bLoadStage && bHasMapStageOverride)
-	{
-		CMapStage* pStageToApply =
-			nullptr != ppOutStage ? *ppOutStage : pLocalStage;
-
-		if (FAILED(CMap_EditFile::Apply_Stage(
-			pStageToApply,
-			jMapStageOverride)))
-		{
-			return E_FAIL;
-		}
-	}
-
-	return S_OK;
 }
 
-HRESULT CMap_Loader::Load_MapStage_Runtime(
-	const MAP_RUNTIME_LOAD_CONTEXT& Context,
-	const _wstring& strMapManifestPath,
-	CMapStage** ppOutStage,
-	json* pOutMapStageOverride,
-	_bool* pOutHasMapStageOverride)
+HRESULT CMap_Loader::Load_MapStage_Runtime(const MAP_RUNTIME_LOAD_CONTEXT& Context, const _wstring& strMapManifestPath, CMapStage** ppOutStage)
 {
 	if (nullptr != ppOutStage)
 		*ppOutStage = nullptr;
-
-	if (nullptr != pOutMapStageOverride)
-		*pOutMapStageOverride = json::object();
-
-	if (nullptr != pOutHasMapStageOverride)
-		*pOutHasMapStageOverride = false;
 
 	if (!Is_RuntimeLoadContextValid(Context) || strMapManifestPath.empty())
 		return E_FAIL;
 
 	MAP_EDIT_DATA MapContentDesc{};
-	json jLocalMapStageOverride = json::object();
-	_bool bLocalHasMapStageOverride = false;
-
-	json* pStageOverride = nullptr != pOutMapStageOverride ? pOutMapStageOverride : &jLocalMapStageOverride;
-	_bool* pHasStageOverride = nullptr != pOutHasMapStageOverride ? pOutHasMapStageOverride : &bLocalHasMapStageOverride;
-
-	const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
-		strMapManifestPath,
-		&MapContentDesc,
-		pStageOverride,
-		pHasStageOverride);
+	const HRESULT hrAsset = CMap_EditFile::Load_EditFile(strMapManifestPath, &MapContentDesc);
 
 	if (FAILED(hrAsset) && S_FALSE != hrAsset)
 		return hrAsset;
@@ -837,9 +766,6 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 		hr = pMapLoader->Ready_Prototypes(Levels, Package);
 		if (SUCCEEDED(hr))
 		{
-			CMapStage* pLocalStage = nullptr;
-			CMapStage** ppStageForSpawn = nullptr != ppOutStage ? ppOutStage : &pLocalStage;
-
 			MAP_SPAWN_REQUEST Request{};
 			Request.Levels = Levels;
 			Build_DefaultRuntimeTargets(Context.iPlaceLevel, &Request.Targets);
@@ -849,15 +775,9 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 			Request.Options.bSpawnAddedLevelDesign = false;
 			Request.pCreatedCallback = Context.pCreatedCallback;
 			Request.pCallbackContext = Context.pCallbackContext;
-			Request.ppOutStage = ppStageForSpawn;
+			Request.ppOutStage = ppOutStage;
 
 			hr = pMapLoader->Spawn(Package, Request, nullptr);
-
-			if (SUCCEEDED(hr) && *pHasStageOverride)
-			{
-				CMapStage* pStageToApply = nullptr != ppOutStage ? *ppOutStage : pLocalStage;
-				hr = CMap_EditFile::Apply_Stage(pStageToApply, *pStageOverride);
-			}
 		}
 	}
 
@@ -1166,14 +1086,14 @@ HRESULT CMap_Loader::Get_EditFilePath(const _wstring& strManifestPath, _wstring*
 	return CMap_EditFile::Get_EditFilePath(strManifestPath, pOutEditFilePath);
 }
 
-HRESULT CMap_Loader::Load_EditFile(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData, json* pOutStageEdit, _bool* pOutHasStageEdit)
+HRESULT CMap_Loader::Load_EditFile(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData)
 {
-	return CMap_EditFile::Load_EditFile(strManifestPath, pInOutData, pOutStageEdit, pOutHasStageEdit);
+	return CMap_EditFile::Load_EditFile(strManifestPath, pInOutData);
 }
 
-HRESULT CMap_Loader::Save_EditFile(const MAP_EDIT_DATA& Data, const CMapStage* pStage)
+HRESULT CMap_Loader::Save_EditFile(const MAP_EDIT_DATA& Data)
 {
-	return CMap_EditFile::Save_EditFile(Data, pStage);
+	return CMap_EditFile::Save_EditFile(Data);
 }
 
 HRESULT CMap_Loader::Get_PresetEditFilePath(_uint iMapIndex, const _wstring& strManifestPath, _wstring* pOutEditFilePath)
@@ -1181,15 +1101,14 @@ HRESULT CMap_Loader::Get_PresetEditFilePath(_uint iMapIndex, const _wstring& str
 	return CMap_EditFile::Get_PresetEditFilePath(iMapIndex, strManifestPath, pOutEditFilePath);
 }
 
-HRESULT CMap_Loader::Load_PresetEditFile(_uint iMapIndex, const _wstring& strManifestPath,
-	MAP_EDIT_DATA* pInOutData, json* pOutStageEdit, _bool* pOutHasStageEdit)
+HRESULT CMap_Loader::Load_PresetEditFile(_uint iMapIndex, const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData)
 {
-	return CMap_EditFile::Load_PresetEditFile(iMapIndex, strManifestPath, pInOutData, pOutStageEdit, pOutHasStageEdit);
+	return CMap_EditFile::Load_PresetEditFile(iMapIndex, strManifestPath, pInOutData);
 }
 
-HRESULT CMap_Loader::Save_PresetEditFile(_uint iMapIndex, const MAP_EDIT_DATA& Data, const CMapStage* pStage)
+HRESULT CMap_Loader::Save_PresetEditFile(_uint iMapIndex, const MAP_EDIT_DATA& Data)
 {
-	return CMap_EditFile::Save_PresetEditFile(iMapIndex, Data, pStage);
+	return CMap_EditFile::Save_PresetEditFile(iMapIndex, Data);
 }
 
 HRESULT CMap_Loader::Ready_TexHub(CGameInstance_Proxy* pProxy)

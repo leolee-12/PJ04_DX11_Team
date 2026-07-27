@@ -33,11 +33,12 @@ void CEnv_InstanceBatch::Submit(CEnvObject_Static* pObj, _uint64 iCurrentFrame)
 	Safe_AddRef(pObj);
 
 	tData.InstanceData.matWorld = *pObj->Get_Transform()->Get_WorldMatrixPtr();
-	tData.InstanceData.vDissolveParams = {
+	tData.InstanceData.vDissolveParams =
+	{
 		pObj->Get_FinalMainDissolve(),
 		pObj->Get_FinalShadowDissolve(),
 		pObj->Get_NearDitherLength(),
-		0.f
+		pObj->Get_DecalAlpha()
 	};
 
 	m_Submitted.push_back(tData);
@@ -345,13 +346,6 @@ HRESULT CEnv_InstanceBatch::Render_Decal_Instanced()
 	if (nullptr == pReferenceObj)
 		return Render_Decal_NotInstanced();
 
-	const _float fDecalAlpha = pReferenceObj->Get_DecalAlpha();
-	for (const auto& item : m_Submitted)
-	{
-		if (nullptr == item.pObj || fabsf(item.pObj->Get_DecalAlpha() - fDecalAlpha) > 0.0001f)
-			return Render_Decal_NotInstanced();
-	}
-
 	if (FAILED(Update_InstanceBuffer()))
 		return E_FAIL;
 
@@ -370,8 +364,6 @@ HRESULT CEnv_InstanceBatch::Render_Decal_Instanced()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsCenter", &vDecalBoundsCenter, sizeof(_float3))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsExtents", &vDecalBoundsExtents, sizeof(_float3))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &fDecalAlpha, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
 		return E_FAIL;

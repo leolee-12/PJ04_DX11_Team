@@ -16,6 +16,7 @@ struct LD_MODEL_REQUIREMENT
 	_bool bCookCollisionMesh = { false };
 	_float4x4 PreTransformMatrix = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f };
 	_bool bUseTextureHubLoader = { true };
+	function<_bool(const _string&)> fcCollisionCookFilter = { nullptr };
 };
 
 struct LD_SPAWN_SPEC

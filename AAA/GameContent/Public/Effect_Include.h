@@ -55,6 +55,7 @@
 #include "MetaSlash1.h"
 #include "MetaSlash2.h"
 #include "MetaSuperSpinSlash.h"
+#include "MeteorExplosion.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
