@@ -2670,6 +2670,9 @@
     <ClInclude Include="..\public\Meta_UpperCharge.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MetaDecisiveSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\MetaknightNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
     </ClInclude>
@@ -4180,6 +4183,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Meta_UpperCharge.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaDecisiveSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MetaknightNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>

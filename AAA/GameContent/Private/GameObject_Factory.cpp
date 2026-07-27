@@ -2020,6 +2020,26 @@ void CGameObject_Factory::Metaknight_Effect()
         )
     );
 
+    Register(CMetaDecisiveSlash::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMetaDecisiveSlash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/Common_Ring03.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::SPIN_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/common_spin01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::CIRCLE05_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/common_circle05.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::CIRCLE06_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/common_circle06.dds"), 1));
+        )
+    );
+
     Register(CMetaSuperSpinSlash::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMetaSuperSpinSlash),
         LOADER(
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,

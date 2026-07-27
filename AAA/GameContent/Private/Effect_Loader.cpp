@@ -47,6 +47,7 @@ namespace
         { TEXT("MetaSuperChargeEffect"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperChargeEffect.JSON") },
         { TEXT("MetaSlash1"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash1.JSON") },
         { TEXT("MetaSlash2"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash2.JSON") },
+        { TEXT("MetaDecisiveSlash"),     TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaDecisiveSlash.JSON") },
         { TEXT("MetaSuperSpinSlash"),      TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperSpinSlash.JSON") },
         { TEXT("MetaSwordJumpSpin"),          TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpin.JSON") },
         { TEXT("MetaSwordJumpSpinTrail1"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpinTrail1.JSON") },
