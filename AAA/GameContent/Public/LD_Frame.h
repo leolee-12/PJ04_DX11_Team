@@ -74,6 +74,7 @@ private:
 
 	_float m_fCutHold = { 4.f };
 	_float m_fCutFade = { 1.2f };
+	_float m_fLastCutHold = { 8.f };
 
 	_int  m_iLastCutIndex = { 0 };
 	_int  m_iCreditFired = { 0 };
