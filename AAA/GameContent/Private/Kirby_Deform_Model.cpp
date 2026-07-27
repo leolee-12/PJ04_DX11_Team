@@ -189,7 +189,7 @@ _bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& 
 
     FX_HANDLE hEffect{};
     const HRESULT hr = pEffectLoader->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(),
-        e.vOffset, vLocalLookFloat, _float3{}, pKirbyTransform->Get_WorldMatrixPtr(), nullptr, &hEffect);
+        e.vOffset, vLocalLookFloat, _float3{}, pKirby->Get_RenderWorldMatrixPtr(), nullptr, &hEffect);
 
     if (FAILED(hr) || !pEffectLoader->Is_Current(hEffect))
         return true;

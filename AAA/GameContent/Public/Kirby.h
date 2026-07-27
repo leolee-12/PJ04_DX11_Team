@@ -175,6 +175,13 @@ public:
 	void Set_DeformEndTrigger(_bool bDeformEnd) { m_bDeformEndTrigger = bDeformEnd; }
 	_bool Get_DeformEndTrigger() { return m_bDeformEndTrigger; }
 
+	// Coin
+	void Add_Coin(_int iCoin);
+	_int Get_Coin() { return m_iCoin; }
+
+	// Render Matrix
+	const _float4x4* Get_RenderWorldMatrixPtr() { return &m_RenderWorldMatrix; }
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();
@@ -265,6 +272,9 @@ private:
 
 	// Level Spawner
 	const void* m_pLastSpawner = { nullptr };
+
+	// Coin
+	_uint m_iCoin{};
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

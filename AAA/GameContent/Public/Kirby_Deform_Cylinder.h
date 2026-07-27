@@ -87,6 +87,9 @@ private:
 
 	CSound_Handle m_RollSound{};
 
+	_bool m_bCurMoveInput{};
+	_bool m_bPreMoveInput{};
+
 public:
 	static CKirby_Deform_Cylinder* Create();
 

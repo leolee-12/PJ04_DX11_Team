@@ -112,7 +112,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         {
             CEffect_Loader::GetInstance()->Spawn(L"InhaleContainer", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.93f, 0.4f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pInhaleEffect);
+                pKirby->Get_RenderWorldMatrixPtr(), &m_pInhaleEffect);
             static_cast<CInhaleContainer*>(m_pInhaleEffect)->On_SuperInhale();
 
             pBodyAnimator->Play("SuperInhaleStart", false, false, 0.1f, 2.5f);

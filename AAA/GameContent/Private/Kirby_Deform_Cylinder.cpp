@@ -96,6 +96,8 @@ void CKirby_Deform_Cylinder::Exit_Deform(CKirby* pKirby)
 void CKirby_Deform_Cylinder::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_bReqEndAttackState = false;
+    m_bCurMoveInput = false;
+    m_bPreMoveInput = false;
 
     m_eCylinderState = DEFORM_CYLINDER_STATE::CYLINDER_STATE_END;
     Change_DeformCylinderState(pKirby, DEFORM_CYLINDER_STATE::ROT_MOVEDIR);
@@ -108,6 +110,8 @@ void CKirby_Deform_Cylinder::Update_AttackState(CKirby* pKirby, _float fTimeDelt
 
 void CKirby_Deform_Cylinder::Exit_AttackState(CKirby* pKirby)
 {
+    m_bCurMoveInput = false;
+    m_bPreMoveInput = false;
 }
 
 _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -115,7 +119,21 @@ _bool CKirby_Deform_Cylinder::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
     //m_vRotDir
     switch (eCommandType)
-    {
+    {        
+        case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+        case KIRBY_COMMAND_TYPE::MOVE_LEFT:
+        case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (m_eCylinderState == DEFORM_CYLINDER_STATE::CLASHED_WAIT)
+                m_bCurMoveInput = true;
+
+            return true;
+        }
+
         // Dump
         case KIRBY_COMMAND_TYPE::DUMP:
         {
@@ -342,6 +360,17 @@ void CKirby_Deform_Cylinder::Update_DeformCylinderState(CKirby* pKirby, _float f
         }
         case DEFORM_CYLINDER_STATE::CLASHED_WAIT:
         {
+            if (m_bCurMoveInput != m_bPreMoveInput)
+            {
+                if (m_bCurMoveInput == true)
+                    pCylinderAnimator->Play("ClashedMove", true, false, 0.1f, 2.f);
+                else
+                    pCylinderAnimator->Play("ClashedWait", true, false, 0.1f, 1.5f);
+
+                m_bPreMoveInput = m_bCurMoveInput;
+            }
+
+            m_bCurMoveInput = false;
             break;
         }
     }
