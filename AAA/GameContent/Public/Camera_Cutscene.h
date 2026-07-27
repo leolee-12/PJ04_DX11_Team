@@ -41,7 +41,10 @@ public:
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
     // 트랙 인계 (Cutscene_CameraChange 핸들러가 호출)
-    _bool Play_Track(const _tchar* szTrack, CAnimator* pProgress, const _float4x4* pAnchorWorld);
+    _bool Play_Track(const _tchar* szTrack, CAnimator* pProgress, const _float4x4* pAnchorWorld, _float fSpeed = 1.f);
+
+    void   Set_TrackSpeed(_float fSpeed) { m_fSpeed = fSpeed; }
+    _float Get_TrackSpeed() const { return m_fSpeed; }
 
 private:
     unordered_map<wstring, CAM_TRACK> m_Tracks;     // 이름 -> 트랙 캐시
@@ -51,6 +54,7 @@ private:
     wstring          m_strDir = L"../../Resources/YSH/CameraData/CamAnim/";
 
     _float m_fLocalTime = { 0.f };
+    _float m_fSpeed = { 1.f };
 
 private:
     virtual HRESULT Ready_Events() override;   

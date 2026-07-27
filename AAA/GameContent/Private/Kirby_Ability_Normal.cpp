@@ -60,7 +60,7 @@ void CKirby_Ability_Normal::Enter_AttackState(CKirby* pKirby, _int iFlag)
 
             CEffect_Loader::GetInstance()->Spawn(L"InhaleContainer", pKirby->Get_LevelIndex(),
                 m_vInhaleEffectStartPos, _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pInhaleEffect);
+                pKirby->Get_RenderWorldMatrixPtr(), &m_pInhaleEffect);
 
             static_cast<CInhaleContainer*>(m_pInhaleEffect)->Off_SuperInhale();
 

@@ -82,7 +82,7 @@ void CKirby_Ladder::Enter(CKirby* pKirby, _int iFlag)
 
     CEffect_Loader::GetInstance()->Spawn(L"OnLadderEffect", pKirby->Get_LevelIndex(),
         _float3{ 0.f, -0.2f, 0.f }, _float3{ 0.f, 0.f, 0.f }, _float3{ 0.f, 0.f, 0.f },
-        pKirby->Get_Transform()->Get_WorldMatrixPtr());
+        pKirby->Get_RenderWorldMatrixPtr());
 
     m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_Ladder.wav", 0.5f);
 }

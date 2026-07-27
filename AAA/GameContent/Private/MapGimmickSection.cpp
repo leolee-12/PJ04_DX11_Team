@@ -282,6 +282,14 @@ HRESULT CMapGimmickSection::Ready_Fragments()
 		return E_FAIL;
 	}
 
+	const _uint iUnmapped = static_cast<_uint>(count(m_MeshFragmentIndices.begin(),
+		m_MeshFragmentIndices.end(), INVALID_FRAGMENT_INDEX));
+	if (0 != iUnmapped)
+	{
+		Log_GameContentWarning("MapGimmickSection unmapped meshes: " + WstrToStr(m_pEntry->pSectionName)
+			+ " count=" + to_string(iUnmapped) + "/" + to_string(iNumMeshes));
+	}
+
 	return S_OK;
 }
 
@@ -518,6 +526,20 @@ CGameObject* CMapGimmickSection::Clone(void* pArg)
 
 void CMapGimmickSection::Free()
 {
+	if (nullptr != m_pTrigger)
+	{
+		m_pTrigger->Set_Enabled(false);
+		m_pTrigger->Clear_Callbacks();
+
+		if (nullptr != m_pGameInstance_Proxy)
+		{
+			m_pGameInstance_Proxy->Immediate_Unregister(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+		}
+
+		m_pTrigger->Mark_Unregistered();
+		m_pTrigger = nullptr;
+	}
+
 	__super::Free();
 }
 

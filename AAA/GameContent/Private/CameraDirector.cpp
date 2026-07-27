@@ -86,7 +86,7 @@ void CCameraDirector::On_CameraChange(void* p)
 
     _bool bReady = false;
     if (bCut)
-        bReady = m_pCutCam->Play_Track(d->szTrack, d->pProgress, d->pAnchorWorld);
+        bReady = m_pCutCam->Play_Track(d->szTrack, d->pProgress, d->pAnchorWorld, d->fSpeed);
 
     if (bArea)
     {
@@ -108,6 +108,7 @@ void CCameraDirector::On_CameraChange(void* p)
             m_pAreaCam->Begin_Handoff(vEye, vAt, pFromCam->Get_Fovy());
         }
 
+        m_pAreaCam->Reset_Shake();
         m_pAreaCam->Set_Active(true);
         m_pCutCam->Set_Active(false);
         m_pBossCam->Set_Active(false);
@@ -126,6 +127,7 @@ void CCameraDirector::On_CameraChange(void* p)
         m_pAreaCam->Set_Active(false);
         m_pDlgCam->Set_Active(false);
         m_pBossCam->Snap();
+        m_pBossCam->Reset_Shake();
         m_pBossCam->Set_Active(true);
         m_pCoasterCam->Snap();
         m_pCoasterCam->Set_Active(false);
@@ -139,6 +141,7 @@ void CCameraDirector::On_CameraChange(void* p)
         m_pBossCam->Set_Active(false);
         m_pDlgCam->Set_Active(false);
         m_pCoasterCam->Snap();
+        m_pCoasterCam->Reset_Shake();
         m_pCoasterCam->Set_Active(true);
         return;
     }
@@ -151,6 +154,7 @@ void CCameraDirector::On_DialogueCamBegin(void* p)
         return;
 
     m_pDlgCam->Begin(*d->pAnchorWorld, XMLoadFloat3(&d->vPosA), XMLoadFloat3(&d->vPosB));
+    m_pDlgCam->Reset_Shake();
     m_pDlgCam->Set_Active(true);
     m_pAreaCam->Set_Active(false);
     m_pCutCam->Set_Active(false);

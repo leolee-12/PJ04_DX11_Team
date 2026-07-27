@@ -36,9 +36,10 @@ public:
     _float Get_Current() const { return m_fCur; }
     _float Get_Max()     const { return m_fMax; }
 
-    void Appear(_float fCurrent, _float fMax);
-    void Reset_Empty();
-    void Snap_Value(_float fCurrent, _float fMax);
+    void  Appear(_float fCurrent, _float fMax);
+    _bool Is_Appearing() const;
+    void  Reset_Empty();
+    void  Snap_Value(_float fCurrent, _float fMax);
 
 private:
     void   Push();

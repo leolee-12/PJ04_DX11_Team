@@ -35,12 +35,22 @@ namespace
         { TEXT("OnLadderEffect"),         TEXT("../../Resources/EffectContainerJSON/YSE/OnLadderEffect.JSON") },
         { TEXT("SwordSlash1"),            TEXT("../../Resources/EffectContainerJSON/YSE/SwordSlash1_Alpha_Color.json") },
         { TEXT("SwordSlash3"),            TEXT("../../Resources/EffectContainerJSON/YSE/SwordSlash3.json") },
-        { TEXT("JumpSlash_1"),            TEXT("../../Resources/EffectContainerJSON/YSE/JumpSlash_1.json") },
-        { TEXT("SpinSlash"),              TEXT("../../Resources/EffectContainerJSON/YSE/SpinSlash.json") },
-        { TEXT("SpinSlashTrail"),         TEXT("../../Resources/EffectContainerJSON/YSE/SpinSlashTrail.json") },
-        { TEXT("SpinSlashTrail_Super"),   TEXT("../../Resources/EffectContainerJSON/YSE/SpinSlashTrail_Super.json") },
+        { TEXT("SwordJumpSpin"),            TEXT("../../Resources/YSE/EffectContainer/Sword/SwordJumpSpin.JSON") },
+        { TEXT("SwordJumpSpinTrail1"),        TEXT("../../Resources/YSE/EffectContainer/Sword/SwordJumpSpinTrail1.JSON") },
+        { TEXT("SwordJumpSpinTrail2"),        TEXT("../../Resources/YSE/EffectContainer/Sword/SwordJumpSpinTrail2.JSON") },
+        { TEXT("SwordSpinSlash"),         TEXT("../../Resources/YSE/EffectContainer/Sword/SwordSpinSlash.JSON") },
+        { TEXT("SwordSuperSpinSlash"),    TEXT("../../Resources/YSE/EffectContainer/Sword/SwordSuperSpinSlash.JSON") },
+        { TEXT("SwordSpinSlashTrail"),    TEXT("../../Resources/YSE/EffectContainer/Sword/SwordSpinSlashTrail.JSON") },
         { TEXT("SwordChargeEffect"),      TEXT("../../Resources/EffectContainerJSON/YSE/SwordChargeEffect.json") },
         { TEXT("SwordSuperChargeEffect"), TEXT("../../Resources/EffectContainerJSON/YSE/SwordSuperChargeEffect.json") },
+        { TEXT("MetaChargeEffect"),       TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaChargeEffect.JSON") },
+        { TEXT("MetaSuperChargeEffect"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperChargeEffect.JSON") },
+        { TEXT("MetaSlash1"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash1.JSON") },
+        { TEXT("MetaSlash2"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash2.JSON") },
+        { TEXT("MetaSuperSpinSlash"),      TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperSpinSlash.JSON") },
+        { TEXT("MetaSwordJumpSpin"),          TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpin.JSON") },
+        { TEXT("MetaSwordJumpSpinTrail1"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpinTrail1.JSON") },
+        { TEXT("MetaSwordJumpSpinTrail2"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpinTrail2.JSON") },
         {TEXT("UpwardsSlash"),            TEXT("../../Resources/EffectContainerJSON/YSE/UpwardsSlash.JSON")},
         { TEXT("RockFloor"),              TEXT("../../Resources/EffectContainerJSON/YSH/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/BoostGas.json") },
@@ -84,7 +94,7 @@ namespace
 
         { TEXT("FlowerPetals"),           TEXT("../../Resources/EffectContainerJSON/MAP/Proto_FlowerPetals_0.JSON") },
         { TEXT("FlowerWing"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_FlowerWing.JSON") },
-        { TEXT("LensFlare"),              TEXT("../../Resources/EffectContainerJSON/MAP/Proto_LensFlare_0.JSON") },
+        { TEXT("LensFlare"),              TEXT("../../Resources/Map/Effect/Proto_LensFlare_0.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_Big.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_0.JSON") },
@@ -106,8 +116,9 @@ namespace
         { TEXT("EssenceAura"),            TEXT("../../Resources/EffectContainerJSON/CHJ/EssenceAura.JSON") },
         { TEXT("PickUpEffect"),           TEXT("../../Resources/EffectContainerJSON/CHJ/PickUpEffect.JSON") },
         { TEXT("DropStarEffect"),         TEXT("../../Resources/EffectContainerJSON/CHJ/DropStarEffect.JSON") },
+        { TEXT("MeteorExplosion"),        TEXT("../../Resources/CHJ/Effect/EffectContainers/MeteorExplosion.JSON")},
 
-        // Armadillo
+#pragma region Armadillo Effects
         { TEXT("RutA"),                   TEXT("../../Resources/EffectContainerJSON/YSH/RutA.JSON") },
         { TEXT("RutB"),                   TEXT("../../Resources/EffectContainerJSON/YSH/RutB.JSON") },
         { TEXT("Dust"),                   TEXT("../../Resources/EffectContainerJSON/YSH/Dust.JSON") },
@@ -117,7 +128,9 @@ namespace
         { TEXT("TwinSpinWind"),           TEXT("../../Resources/EffectContainerJSON/YSH/TwinSpinWind.JSON") },
         { TEXT("PartnerWind"),            TEXT("../../Resources/EffectContainerJSON/YSH/PartnerWind.JSON") },
         { TEXT("WallImpact"),             TEXT("../../Resources/EffectContainerJSON/YSH/WallImpact.JSON") },
+#pragma endregion
 
+#pragma region Leopard Effects
         //Leopard
         { TEXT("LeoSlash_L"),             TEXT("../../Resources/EffectContainerJSON/YSH/LeoSlash_L.JSON") },
         { TEXT("LeoSlash_R"),             TEXT("../../Resources/EffectContainerJSON/YSH/LeoSlash_R.JSON") },
@@ -135,9 +148,10 @@ namespace
         { TEXT("Nail_Smoke"),             TEXT("../../Resources/EffectContainerJSON/YSH/Nail_Smoke.JSON") },
         { TEXT("LeoJump_Smoke"),          TEXT("../../Resources/EffectContainerJSON/YSH/LeoJump_Smoke.JSON") },
 
-        { TEXT("MoonShot"),                   TEXT("../../Resources/YSE/EffectContainer/MoonShot.JSON") },
+        { TEXT("MoonShot"),                   TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MoonShot.JSON") },
+#pragma endregion
 
-        //Meta
+#pragma region  MetaKnight Effects
         { TEXT("Meta_IntroLocking"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_IntroLocking.JSON") },
         { TEXT("Meta_AppearFlash"),           TEXT("../../Resources/YSH/Effects/Metaknight/Meta_AppearFlash.JSON") },
         { TEXT("Meta_Attack1Flash"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Attack1Flash.JSON") },
@@ -163,7 +177,7 @@ namespace
         { TEXT("Meta_DemoUpperAtk11"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk11.JSON") },
         { TEXT("Meta_DemoUpperAtk12"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk12.JSON") },
         { TEXT("Meta_DemoUpperAtk13"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk13.JSON") },
-
+#pragma endregion
     };
 }
 

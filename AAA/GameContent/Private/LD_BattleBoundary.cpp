@@ -11,8 +11,9 @@ NS_BEGIN(Client)
 
 namespace
 {
-	constexpr _float BATTLE_BOUNDARY_FADE_IN_DURATION = 0.8f;
-	constexpr _float BATTLE_BOUNDARY_FADE_OUT_DURATION = 1.2f;
+	constexpr _float BATTLE_BOUNDARY_ACTIVATE_DURATION = 0.8f;
+	constexpr _float BATTLE_BOUNDARY_DEACTIVATE_DURATION = 1.2f;
+	constexpr _float BATTLE_BOUNDARY_RISE_HEIGHT = 6.1f;
 
 	struct BATTLE_BOUNDARY_VARIANT
 	{
@@ -80,6 +81,8 @@ HRESULT CLD_BattleBoundary::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_fPlacedPositionY = XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION));
+
 	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
 
@@ -126,8 +129,8 @@ HRESULT CLD_BattleBoundary::Ready_Events()
 		return E_FAIL;
 
 	// 미니보스/보스 공통. Boss_HP_Appeared는 인트로 종료 시점에 발행된다(BossBase.cpp:94).
-	Subscribe_Event(EventTag::Boss_HP_Appeared, [this](void*) { m_fAlphaTarget = 1.f; });
-	Subscribe_Event(EventTag::Boss_Died, [this](void*) { m_fAlphaTarget = 0.f; });
+	Subscribe_Event(EventTag::Boss_HP_Appeared, [this](void*) { m_fTargetActivationRatio = 1.f; });
+	Subscribe_Event(EventTag::Boss_Died, [this](void*) { m_fTargetActivationRatio = 0.f; });
 
 	return S_OK;
 }
@@ -136,25 +139,32 @@ void CLD_BattleBoundary::Update(_float fTimeDelta)
 {
 	if (m_pGameInstance_Proxy->Is_EditMode())
 	{
-		m_fAlpha = 1.f;	// 에디터에서는 항상 보여야 배치 가능
+		m_fActivationRatio = 1.f;
 		return;
 	}
 
-	const _bool bFadeIn = m_fAlphaTarget > m_fAlpha;
-	const _float fDuration = bFadeIn ? BATTLE_BOUNDARY_FADE_IN_DURATION : BATTLE_BOUNDARY_FADE_OUT_DURATION;
+	if (m_fActivationRatio == m_fTargetActivationRatio)
+		return;
+
+	const _bool bActivating = m_fTargetActivationRatio > m_fActivationRatio;
+	const _float fDuration = bActivating ? BATTLE_BOUNDARY_ACTIVATE_DURATION : BATTLE_BOUNDARY_DEACTIVATE_DURATION;
 	const _float fStep = fDuration > 0.f ? fTimeDelta / fDuration : 1.f;
 
-	m_fAlpha = bFadeIn ? min(m_fAlphaTarget, m_fAlpha + fStep) : max(m_fAlphaTarget, m_fAlpha - fStep);
+	m_fActivationRatio = bActivating
+		? min(m_fTargetActivationRatio, m_fActivationRatio + fStep)
+		: max(m_fTargetActivationRatio, m_fActivationRatio - fStep);
 
-	if (m_fAlpha != m_fAlphaTarget)	// 등장/퇴장 중 = 위치가 옮겨지는 구간
-		Sync_PhysicsActor();
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetY(vPosition, m_fPlacedPositionY + BATTLE_BOUNDARY_RISE_HEIGHT *
+		m_fActivationRatio));
+	Sync_PhysicsActor();
 }
 
 void CLD_BattleBoundary::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (!m_bActive || Is_Dead() || m_fAlpha <= 0.001f)
+	if (!m_bActive || Is_Dead() || m_fActivationRatio <= 0.001f)
 		return;
 
 	Check_Visible();
@@ -209,8 +219,7 @@ void CLD_BattleBoundary::Deserialize_Internal(const json& j)
 {
 	__super::Deserialize_Internal(j);
 
-	// AddedMapObjects 는 스폰이 끝난 뒤 트랜스폼이 들어온다(Map_Spawner.cpp:488).
-	// Create_StaticActor 가 스케일을 PxMeshScale 로 구워버리므로 여기서 다시 만든다.
+	m_fPlacedPositionY = XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION));
 	Rebuild_PhysicsActor();
 }
 
@@ -219,6 +228,7 @@ HRESULT CLD_BattleBoundary::On_EditTransformChanged()
 	if (FAILED(__super::On_EditTransformChanged()))
 		return E_FAIL;
 
+	m_fPlacedPositionY = XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION));
 	Rebuild_PhysicsActor();
 	return S_OK;
 }
@@ -239,8 +249,17 @@ void CLD_BattleBoundary::Register_LevelDesignSpecs()
 		Spec.pMakeDefaultDesc = &Make_DefaultDesc;		// 없으면 MapTool 팔레트에 안 뜬다
 		Spec.ModelRequirements =
 		{
-			{ Variant.pModelProtoTag, Variant.pModelPath, MODEL::NONANIM, true }
+			  { Variant.pModelProtoTag, Variant.pModelPath, MODEL::NONANIM, true }
 		};
+
+		if (Spec.wstrModelProtoTag == MODEL_PROTO_TAG_CYLINDRICAL)
+		{
+			LD_MODEL_REQUIREMENT& ModelRequirement = Spec.ModelRequirements.front();
+			ModelRequirement.fcCollisionCookFilter = [](const _string& strMeshName) -> _bool
+				{
+					return strMeshName == "BackM1__BarricadeC";
+				};
+		}
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 	}
@@ -343,7 +362,7 @@ HRESULT CLD_BattleBoundary::Render_Mesh(_uint iMeshIndex, MESH_LAYER_RENDER_KIND
 	// Bind_WorldCommonParams가 Layer.vRenderColor로 g_vColor를 이미 바인딩했다(MeshLayer_Binder.cpp:311).
 	// 알파만 곱해 덮어쓴다. CModel::Set_MeshLayer로 모델을 건드리면 _meshlayer.json이 오염된다.
 	_float4 vRenderColor = Layer.vRenderColor;
-	vRenderColor.w *= m_fAlpha;
+	vRenderColor.w *= m_fActivationRatio;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vRenderColor, sizeof(_float4))))
 		return E_FAIL;
 

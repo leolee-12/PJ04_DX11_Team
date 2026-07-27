@@ -80,6 +80,7 @@ void CPanel_Profiler::Render()
 
 		ImGui::Separator();
 		ImGui::Text("Engine Env Visible:");
+		ImGui::Text("  culling %.3f ms", CpuMs(Engine::EPROFILE_CPU_SECTION::ENV_CULLING));
 		ImGui::Text("  main %u / shadow %u",
 			Counter(Engine::EPROFILE_COUNTER::ENV_VISIBLE_MAIN),
 			Counter(Engine::EPROFILE_COUNTER::ENV_VISIBLE_SHADOW));

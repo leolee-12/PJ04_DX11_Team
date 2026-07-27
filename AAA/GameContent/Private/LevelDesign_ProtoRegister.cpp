@@ -98,6 +98,7 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(const LD_RUNTIME_LEVELS& Le
 			ModelDesc.pModelFilePath = Requirement.strFilePath.c_str();
 			ModelDesc.bCookCollisionMesh = Requirement.bCookCollisionMesh;
 			ModelDesc.PreTransformMatrix = Requirement.PreTransformMatrix;
+			ModelDesc.fcCollisionCookFilter = Requirement.fcCollisionCookFilter;
 
 			pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, ModelDesc);
 		}

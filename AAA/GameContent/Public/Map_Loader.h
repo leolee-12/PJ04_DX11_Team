@@ -68,9 +68,7 @@ public:
 	static HRESULT Load_MapStage_Runtime(
 		const MAP_RUNTIME_LOAD_CONTEXT& Context,
 		const _wstring& strMapManifestPath,
-		CMapStage** ppOutStage = nullptr,
-		json* pOutMapStageOverride = nullptr,
-		_bool* pOutHasMapStageOverride = nullptr);
+		CMapStage** ppOutStage = nullptr);
 
 	static HRESULT Load_Env_Runtime(
 		const MAP_RUNTIME_LOAD_CONTEXT& Context,
@@ -102,12 +100,12 @@ public:
 	static _bool			Is_MapEnvLayer(const _wstring& strLayerTag);
 
 	static HRESULT			Get_EditFilePath(const _wstring& strManifestPath, _wstring* pOutEditFilePath);
-	static HRESULT			Load_EditFile(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData, json* pOutStageEdit = nullptr, _bool* pOutHasStageEdit = nullptr);
-	static HRESULT			Save_EditFile(const MAP_EDIT_DATA& Data, const CMapStage* pStage);
+	static HRESULT			Load_EditFile(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData);
+	static HRESULT			Save_EditFile(const MAP_EDIT_DATA& Data);
 
 	static HRESULT			Get_PresetEditFilePath(_uint iMapIndex, const _wstring& strManifestPath, _wstring* pOutEditFilePath);
-	static HRESULT			Load_PresetEditFile(_uint iMapIndex, const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData, json* pOutStageEdit = nullptr, _bool* pOutHasStageEdit = nullptr);
-	static HRESULT			Save_PresetEditFile(_uint iMapIndex, const MAP_EDIT_DATA& Data, const CMapStage* pStage);
+	static HRESULT			Load_PresetEditFile(_uint iMapIndex, const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData);
+	static HRESULT			Save_PresetEditFile(_uint iMapIndex, const MAP_EDIT_DATA& Data);
 
 	static HRESULT			Ready_TexHub(CGameInstance_Proxy* pProxy);
 

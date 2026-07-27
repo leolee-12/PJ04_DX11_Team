@@ -3,6 +3,10 @@
 #include "Kirby_Ability.h"
 #include "GameContent_Defines.h"
 
+NS_BEGIN(Engine)
+class CEffect_Container;
+NS_END
+
 NS_BEGIN(Client)
 
 class CKirby;
@@ -72,6 +76,19 @@ private:
 	_float3 m_vSwordWishDir{};
 	_bool m_bMoveLock{};
 
+	// Effect
+	_bool m_bSwordSpinSlashStarted{};
+	_bool m_bMetaSuperSpinSlashStarted{};
+	CEffect_Container* m_pSwordSpinSlash{};
+	CEffect_Container* m_pMetaSuperSpinSlash{};
+	CEffect_Container* m_pSwordSpinSlashTrail{};
+
+	CEffect_Container* m_pSwordChargeEffect{};
+	CEffect_Container* m_pSwordSuperChargeEffect{};
+
+	CEffect_Container* m_pMetaSwordJumpSpinTrail1{};
+	CEffect_Container* m_pMetaSwordJumpSpinTrail2{};
+
 private:
 	void Change_SwordState(CKirby* pKirby, META_SWORD_STATE eNext);
 	void Enter_SwordState(CKirby* pKirby, META_SWORD_STATE eState);
@@ -83,6 +100,7 @@ private:
 
 	void Update_MoveLockByRatio(_float fRatio, _float fRatioStart, _float fRatioEnd);
 	void Update_MaxHorizontalSpeedByRatio(CMovement_Child* pMovement, _float fRatio, _float fRatioStart, _float fRatioEnd, _float fSpeed);
+	void FadeOut_SpinSlashEffect(CEffect_Container*& pEffectContainer, _float fFadeOutDuration);
 
 public:
 	static CKirby_Ability_MetaKnightSword* Create();

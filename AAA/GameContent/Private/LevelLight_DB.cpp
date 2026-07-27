@@ -26,6 +26,14 @@ namespace
         TEXT("Arena"),
     };
 
+    const LEVEL_LIGHT ENDING_LIGHT = {
+        { 0.557f, -0.766f, 0.321f, 0.f },   // vDir
+        { 3.1f,   3.075f,   2.78f,  1.f },   // vDiffuse
+        { 0.f,    0.f,     0.f,    1.f },   // vAmbient
+        { 1.f,    1.f,     1.f,    1.f },   // vSpecular
+        TEXT("Ending"),
+    };
+
     const LEVEL_LIGHT g_LevelLights[ETOUI(LEVEL::END)] = {
         /* STATIC        */ DEFAULT_LIGHT,
         /* FIRST_LOADING */ DEFAULT_LIGHT,
@@ -34,12 +42,13 @@ namespace
         /* STAGE0_STEP2  */ DEFAULT_LIGHT,
         /* TOWN_STEP1    */ DEFAULT_LIGHT,
         /* TOWN_STEP2    */ DEFAULT_LIGHT,
+        /* TOWN_STEP3    */ DEFAULT_LIGHT,
         /* BOSS_STAGE1   */ DEFAULT_LIGHT,
         /* STAGE1_STEP1  */ VOLCANO_LIGHT,
         /* STAGE1_STEP2  */ VOLCANO_LIGHT,
         /* STAGE1_STEP3  */ VOLCANO_LIGHT,
         /* ARENA         */ ARENA_LIGHT,
-        /* ENDING        */ DEFAULT_LIGHT,
+        /* ENDING        */ ENDING_LIGHT,
         /* TEST          */ { { 0.25f, -1.f, 0.25f, 0.f },
                               { 1.f,   1.f,  1.f,   1.f },
                               { 0.5f,  0.5f, 0.5f,  1.f },

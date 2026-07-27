@@ -254,7 +254,7 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
 
             CEffect_Loader::GetInstance()->Spawn(L"CarMilkyWay", pKirby->Get_LevelIndex(),
                 _float3(0.f, 1.3f, 2.4f), _float3(0.f, 0.f, 0.f), _float3(0.f, 180.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pBoostWind);
+                pKirby->Get_RenderWorldMatrixPtr(), &m_pBoostWind);
 
             m_fMinimumBoostTime = 0.2f;
             break;
@@ -484,7 +484,7 @@ void CKirby_Deform_Car::BoostEffectStart(CKirby* pKirby, CEffect_Container*& pCo
 {
     CEffect_Loader::GetInstance()->Spawn(EffectTag, pKirby->Get_LevelIndex(),
         _float3(0.f, 0.35f, -3.3f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-        pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer);
+        pKirby->Get_RenderWorldMatrixPtr(), &pContainer);
 }
 
 _bool CKirby_Deform_Car::Check_FrontCollision(CKirby* pKirby)

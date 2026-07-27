@@ -76,7 +76,8 @@ HRESULT CBoss_Metaknight::Initialize(void* pArg)
         return E_FAIL;
 
     m_strBossName = L"메타나이트";
-    m_fMaxHP = 2000.f;
+    //m_fMaxHP = 2000.f;
+    m_fMaxHP = 100.f;
     m_fCurHP = m_fMaxHP;
 
     m_pTransformCom->Set_Scale(1.3f, 1.3f, 1.3f);
@@ -264,6 +265,7 @@ void CBoss_Metaknight::On_Enter_Corpse()
     __super::On_Enter_Corpse();
 
     m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
+    m_pGameInstance_Proxy->Publish(TEXT("EndingFade_Start"), nullptr);
 }
 
 void CBoss_Metaknight::Play_PhaseTransition(_int iNewPhase)
