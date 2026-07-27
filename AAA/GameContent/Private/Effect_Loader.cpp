@@ -74,6 +74,9 @@ namespace
         { TEXT("BombExplosion"),          TEXT("../../Resources/EffectContainerJSON/YSH/BombExplosion.JSON") },
         { TEXT("CommonHit"),              TEXT("../../Resources/EffectContainerJSON/CHJ/CommonHit.JSON") },
         { TEXT("SwordHitEffect"),         TEXT("../../Resources/CHJ/Effect/EffectContainers/SwordHitEffect/SwordHitEffect.JSON") },
+        { TEXT("WarpOutEffect"),          TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutEffect/WarpOutEffect.JSON") },
+        { TEXT("WarpOutStart"),           TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutStart/WarpOutStart.JSON") },
+        { TEXT("WarpOutEnd"),             TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutEnd/WarpOutEnd.JSON") },
         { TEXT("SpitObject"),             TEXT("../../Resources/EffectContainerJSON/CHJ/SpitObject.JSON") },
         { TEXT("SpitAir"),                TEXT("../../Resources/EffectContainerJSON/YSH/Spit_Air.JSON") },
 

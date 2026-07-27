@@ -10,6 +10,8 @@
 
 // Effect
 #include "SwordHitEffect.h"
+#include "WarpOutStart.h"
+#include "WarpOutEnd.h"
 #include "Effect_Include.h"
 
 //sky
@@ -898,6 +900,29 @@ void CGameObject_Factory::Register_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Circle01.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordHitEffect::MODEL_PROTO_TAG_RING,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Lock/Metaknight_00_Common_Ring03High.ysh"));
+        )
+    );
+
+    Register(CWarpOutStart::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWarpOutStart),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG,
+                CRectParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Kabu_CommonLine.iLevelID, Texture_Kabu_CommonLine.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Kabu_CommonLine.szFileTag, Texture_Kabu_CommonLine.iNumTex));
+        )
+    );
+
+    Register(CWarpOutEnd::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWarpOutEnd),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG,
+                CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Kabu_FlashCircle.iLevelID, Texture_Kabu_FlashCircle.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Kabu_FlashCircle.szFileTag, Texture_Kabu_FlashCircle.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWarpOutEnd::SMOKE_MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
         )
     );
 

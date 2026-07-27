@@ -159,6 +159,8 @@ namespace ProtoDesc
 
 	// Monster Effect
 	inline constexpr TEXTURE_DESC Texture_BK_CommonSlash = { ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_BK_CommonSlash"),  TEXT("../../Resources/CHJ/Effect/Monster/BladeKnight/common_slash.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Kabu_CommonLine = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Kabu_CommonLine"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/Common_Line.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Kabu_FlashCircle ={ ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_Kabu_FlashCircle"), TEXT("../../Resources/CHJ/Effect/Textures/circlegradation_a.png"), 1 }; 
 }
 
 using namespace ProtoDesc;

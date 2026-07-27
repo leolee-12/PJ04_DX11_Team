@@ -346,6 +346,12 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut">
       <UniqueIdentifier>{2de7be80-f2e2-4b8e-b8a9-b3f8685376d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut\End">
+      <UniqueIdentifier>{03e94a40-6191-442b-8d0a-08b13408c002}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut\Start">
+      <UniqueIdentifier>{8eb1b2c9-635d-48d3-9cd7-f352e26bb283}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy">
       <UniqueIdentifier>{ef83fc79-86ca-4d01-a53e-3135ff41ea5c}</UniqueIdentifier>
     </Filter>
@@ -3258,8 +3264,11 @@
     <ClInclude Include="..\Public\WarpInEffect.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpIn</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\WarpOutEffect.h">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
+    <ClInclude Include="..\Public\WarpOutEnd.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut\End</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WarpOutStart.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut\Start</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Water_Defines.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
@@ -4721,8 +4730,11 @@
     <ClCompile Include="..\Private\WarpInEffect.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpIn</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\WarpOutEffect.cpp">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut</Filter>
+    <ClCompile Include="..\Private\WarpOutEnd.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut\End</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WarpOutStart.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut\Start</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Water_RenderBinder.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>

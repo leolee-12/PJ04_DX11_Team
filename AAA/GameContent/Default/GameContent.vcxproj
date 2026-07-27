@@ -550,7 +550,8 @@
     <ClInclude Include="..\Public\WaddleDee_Hat.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
     <ClInclude Include="..\Public\WarpInEffect.h" />
-    <ClInclude Include="..\Public\WarpOutEffect.h" />
+    <ClInclude Include="..\Public\WarpOutEnd.h" />
+    <ClInclude Include="..\Public\WarpOutStart.h" />
     <ClInclude Include="..\Public\Water_Defines.h" />
     <ClInclude Include="..\Public\Water_RenderBinder.h" />
     <ClInclude Include="..\Public\World_BlendCollector.h" />
@@ -1045,7 +1046,8 @@
     <ClCompile Include="..\Private\WaddleDee_Hat.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
     <ClCompile Include="..\Private\WarpInEffect.cpp" />
-    <ClCompile Include="..\Private\WarpOutEffect.cpp" />
+    <ClCompile Include="..\Private\WarpOutEnd.cpp" />
+    <ClCompile Include="..\Private\WarpOutStart.cpp" />
     <ClCompile Include="..\Private\Water_RenderBinder.cpp" />
     <ClCompile Include="..\Private\World_BlendCollector.cpp" />
     <ClCompile Include="..\public\Dialogue_Director.cpp" />
