@@ -382,12 +382,6 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor">
       <UniqueIdentifier>{a635d2af-ffd7-4249-9928-530e4b40697c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst">
-      <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
-      <UniqueIdentifier>{d41fb018-cdcd-4071-b86d-a77216d8f744}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
     </Filter>
@@ -1672,6 +1666,12 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteoAura">
+      <UniqueIdentifier>{134753ad-e3c3-48db-ae27-aa08e368651f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
+      <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2697,8 +2697,8 @@
     <ClInclude Include="..\public\MetaknightNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MeteorBurst.h">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
+    <ClInclude Include="..\Public\MeteorExplosion.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeteorRock.h">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>
@@ -4205,8 +4205,8 @@
     <ClCompile Include="..\private\MetaknightNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MeteorBurst.cpp">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorBurst</Filter>
+    <ClCompile Include="..\Private\MeteorExplosion.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeteorRock.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\04. MeteorRock</Filter>

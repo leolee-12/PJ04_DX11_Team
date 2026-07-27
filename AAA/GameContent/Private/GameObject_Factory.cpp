@@ -1391,6 +1391,20 @@ void CGameObject_Factory::Register_Effect()
                     "../../Resources/CHJ/Effect/CopyEssence/Ring01/Common_Ring03.ysh"));
         )
     );
+
+    Register(CMeteorExplosion::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMeteorExplosion),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PIECE_SMALL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceSmall.ysh", 
+                            XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PIECE_COOL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceCool.ysh",
+                            XMMatrixRotationY(XMConvertToRadians(180.f))));
+        ));
 }
 
 void CGameObject_Factory::Register_BossEffect()
