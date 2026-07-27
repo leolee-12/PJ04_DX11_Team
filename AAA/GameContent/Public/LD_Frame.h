@@ -79,6 +79,9 @@ private:
 	_int  m_iCreditFired = { 0 };
 	_bool m_bCreditClosed = { false };
 
+	_float m_fEndHold = { 0.f };
+	_bool  m_bEndFadeFired = { false };
+
 private:
 	HRESULT Ready_RenderComponents();
 	HRESULT Bind_ShaderResources();
@@ -86,6 +89,7 @@ private:
 	void Cache_BlendMeshIndices();
 	void Submit_BlendMeshes();
 	void Tick_CreditSignal();
+	void Tick_EndFade(_float fTimeDelta);
 	HRESULT Bind_CutTextures();
 
 public:
