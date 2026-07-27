@@ -436,13 +436,13 @@ HRESULT CMonster::Ready_State()
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT)
+	if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT ||
+		tInfo.eHitType == HIT_TYPE::HAMMER_PRESS)
 	{
 		if (m_pMovement->Is_Grounded())
 			Change_State(MONSTER_STATE_TYPE::FLATTEN);
 		else
 			Despawn();
-
 		return;
 	}
 
@@ -469,6 +469,16 @@ void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 
 void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
+	if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT ||
+		tInfo.eHitType == HIT_TYPE::HAMMER_PRESS)
+	{
+		if (m_pMovement->Is_Grounded())
+			Change_State(MONSTER_STATE_TYPE::FLATTEN);
+		else
+			Despawn();
+		return;
+	}
+
 	if (tInfo.eHitType != HIT_TYPE::BODY_CONTACT)
 		Open_BodyCheckBlock();
 
@@ -862,6 +872,27 @@ void CMonster::Update_SpatPivot_FromBone()
 			pBone->_41, pBone->_42, pBone->_43);
 }
 
+void CMonster::Resolve_DamageReactSFX(const ATTACK_INFO& tInfo)
+{
+	// 몬스터들 피격 사운드 처리
+	HIT_TYPE eHitType = tInfo.eHitType;
+	
+	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+
+	if (eHitType == HIT_TYPE::SWORD_DEFAULT ||
+		eHitType == HIT_TYPE::SWORD_SPIN ||
+		eHitType == HIT_TYPE::UPWARD_SLASH)
+		Play_OneShotSFX3D(SND_DAMAGEREACT_SWORD, vPos, 0.5f);
+	else if (eHitType == HIT_TYPE::HAMMER_NORMAL || eHitType == HIT_TYPE::HAMMER_PRESS)
+		Play_OneShotSFX3D(SND_DAMAGEREACT_HAMMER, vPos, 0.5f);
+	else if (eHitType == HIT_TYPE::HAMMER_ONIGOROSI)
+		Play_OneShotSFX3D(SND_DAMAGEREACT_HAMMER_ONIGOROSI, vPos, 0.5f);
+	else if (eHitType == HIT_TYPE::BREAKERABLE_HIT)
+		Play_OneShotSFX3D(SND_DAMAGEREACT_SPIKE, vPos, 0.5f);
+	else
+		Play_OneShotSFX3D(SND_DAMAGEREACT_NORMAL, vPos, 0.5f);
+}
+
 void CMonster::Play_OneShotSFX(const _tchar* pKey, _float fVolume, ESoundBus eBus)
 {
 	m_pGameInstance_Proxy->Play_SFX(pKey, fVolume, eBus);
@@ -919,6 +950,13 @@ void CMonster::Stop_AllSounds()
 	for (auto& Pair : m_Sounds)
 		Pair.second.Stop();
 	m_Sounds.clear();
+}
+
+void CMonster::Damaged(const ATTACK_INFO& tInfo)
+{
+	__super::Damaged(tInfo);
+
+	Resolve_DamageReactSFX(tInfo);
 }
 
 void CMonster::On_Swallowed()

@@ -108,9 +108,6 @@ void CCharacter::Damaged(const ATTACK_INFO& tInfo)
     if (Block_Hit(tInfo)) 
         return;
 
-    m_pGameInstance_Proxy->Play_SFX(
-        TEXT("CharaBasic_DamageReact_Normal.wav"), 0.5f);
-
     m_fHitFlashTime = m_fHitFlashDuration;
 
     m_fHitStopTime = m_fHitStopDuration;
