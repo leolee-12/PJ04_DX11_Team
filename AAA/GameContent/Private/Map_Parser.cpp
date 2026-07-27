@@ -396,7 +396,6 @@ void CMap_Parser::Parse_DecorEntry(const wstring& wstrSourceFile, const wstring&
 
 	ENV_OBJECT_DESC Desc = Make_BaseDesc(wstrSourceFile, wstrSection, wstrEntryKey);
 	Desc.eKind = ENV_OBJECT_KIND::STATIC;
-	Desc.jRawProperties = jEntry;
 
 	if (!JsonUtils::Try_ReadString(jEntry, "Basic.ObjectName", &Desc.wstrObjectName))
 		return;
@@ -425,7 +424,6 @@ void CMap_Parser::Parse_ToyObjEntry(
 	CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(Desc);
 
 	Desc.eKind = ENV_OBJECT_KIND::INTERACT;
-	Desc.jRawProperties = jEntry;
 
 	if (!JsonUtils::Try_ReadString(jEntry, "Basic.ObjectName", &Desc.wstrObjectName))
 		return;
@@ -477,7 +475,6 @@ void CMap_Parser::Parse_EffectEntry(const _wstring& wstrSourceFile, const _wstri
 	CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(Desc);
 
 	Desc.eKind = ENV_OBJECT_KIND::EFFECT;
-	Desc.jRawProperties = jEntry;
 
 	JsonUtils::Try_ReadString(jEntry, "Basic.ObjectName", &Desc.wstrObjectName);
 	JsonUtils::Try_ReadString(jEntry, "Basic.BasicInfo.ObjectName", &Desc.wstrObjectName);

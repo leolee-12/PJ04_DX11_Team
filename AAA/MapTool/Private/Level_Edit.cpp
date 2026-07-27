@@ -878,8 +878,7 @@ HRESULT CLevel_Edit::Save_PlaceEdit()
 
 	return CMap_Loader::Save_PresetEditFile(
 		static_cast<_uint>(MapContentDesc.iPresetIndex),
-		MapContentDesc,
-		m_pMapStage);
+		MapContentDesc);
 }
 
 HRESULT CLevel_Edit::Save_MapOverride()

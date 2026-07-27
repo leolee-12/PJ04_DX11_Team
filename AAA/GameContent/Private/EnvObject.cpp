@@ -531,6 +531,8 @@ void CEnvObject::Refresh_WorldBounds()
 
 void CEnvObject::Check_Visible()
 {
+	PROFILE_CPU_SCOPE(Engine::EPROFILE_CPU_SECTION::ENV_CULLING);
+
 	const _bool bEnableShadow = ENABLE_ENV_OBJECT_SHADOW && m_bCastShadow;
 
 	CCullingState::CULLING_EVALUATION_INPUT Input{};

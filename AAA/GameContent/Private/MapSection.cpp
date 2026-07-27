@@ -35,10 +35,11 @@ HRESULT CMapSection::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bHasCollMesh = nullptr != m_pModelCom->Get_CollisionMesh();
-	m_bUseCollMesh = m_bUseCollMesh && m_bHasCollMesh;
 
 	m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
-	Rebuild_ColliderActor();
+
+	if (FAILED(Ready_RigidStatic()))
+		return E_FAIL;
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
@@ -58,9 +59,9 @@ HRESULT CMapSection::Validate_Initialized()
 		Log_GameContentWarning("MapSection descriptor invalid: " + WstrToStr(m_strSectionName));
 		return E_FAIL;
 	}
-	if (m_bUseCollMesh && (!m_bHasCollMesh || nullptr == m_pColliderActor))
+	if (m_bUseCollMesh && (!m_bHasCollMesh || nullptr == m_pRigidStatic))
 	{
-		Log_GameContentWarning("MapSection collider invalid: " + WstrToStr(m_strSectionName));
+		Log_GameContentError("MapSection rigid static invalid: " + WstrToStr(m_strSectionName));
 		return E_FAIL;
 	}
 	return S_OK;
@@ -114,7 +115,7 @@ void CMapSection::Refresh_CombinedWorldMatrix()
 		CombinedWorld *= XMLoadFloat4x4(m_pParentMatrix);
 
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, CombinedWorld);
-	Refresh_ColliderPose();
+	Refresh_RigidStaticPose();
 }
 
 #pragma region Editable
@@ -150,8 +151,10 @@ _bool CMapSection::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 
 HRESULT CMapSection::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 {
+	if (FAILED(Set_UseCollMesh(Policy.bUseCollMesh)))
+		return E_FAIL;
+
 	m_bRenderable = Policy.bRenderable;
-	Set_UseCollMesh(m_bHasCollMesh ? Policy.bUseCollMesh : false);
 	return S_OK;
 }
 
@@ -202,25 +205,35 @@ _bool CMapSection::Should_RenderMesh(_uint iMesh) const
 }
 #endif
 
-json CMapSection::Serialize_SectionState() const
-{
-	json j = IReflectable::Serialize();
-	j["SectionName"] = WstrToStr(m_strSectionName);
-	return j;
-}
-
-void CMapSection::Deserialize_SectionState(const json& j)
-{
-	IReflectable::Deserialize_Internal(j);
-}
-
-void CMapSection::Set_UseCollMesh(_bool bUseCollMesh)
+HRESULT CMapSection::Set_UseCollMesh(_bool bUseCollMesh)
 {
 	if (m_bUseCollMesh == bUseCollMesh)
-		return;
+		return S_OK;
 
-	m_bUseCollMesh = bUseCollMesh;
-	Rebuild_ColliderActor();
+	if (!bUseCollMesh)
+	{
+		m_bUseCollMesh = false;
+		Release_RigidStatic();
+		return S_OK;
+	}
+
+	m_bUseCollMesh = true;
+
+	if (FAILED(Ready_RigidStatic()))
+	{
+		m_bUseCollMesh = false;
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+void CMapSection::Deactivate()
+{
+	Set_Active(false);
+	m_bRenderable = false;
+	m_bUseCollMesh = false;
+	Release_RigidStatic();
 }
 
 const _tchar* CMapSection::Get_ModelProtoTag() const
@@ -238,28 +251,52 @@ HRESULT CMapSection::Bind_WorldMatrix()
 	return m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix);
 }
 
-void CMapSection::Refresh_ColliderPose()
+HRESULT CMapSection::Ready_RigidStatic()
 {
-	if (nullptr == m_pColliderActor)
-		return;
+	if (!m_bUseCollMesh || nullptr != m_pRigidStatic)
+		return S_OK;
 
-	m_pGameInstance_Proxy->Refresh_StaticActorPose(m_pColliderActor, XMLoadFloat4x4(&m_CombinedWorldMatrix));
-}
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pModelCom)
+		return E_FAIL;
 
-void CMapSection::Rebuild_ColliderActor()
-{
-	if (nullptr != m_pColliderActor)
+	auto* pCollisionMesh = m_pModelCom->Get_CollisionMesh();
+	if (nullptr == pCollisionMesh)
 	{
-		m_pGameInstance_Proxy->Remove_StaticActor(m_pColliderActor);
-		m_pColliderActor = nullptr;
+		Log_GameContentError("MapSection collision mesh missing: " + WstrToStr(m_strSectionName)
+			+ ", model=" + WstrToStr(m_strModelProtoTag));
+		return E_FAIL;
 	}
 
-	if (!m_bUseCollMesh)
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(
+		pCollisionMesh,
+		XMLoadFloat4x4(&m_CombinedWorldMatrix));
+
+	if (nullptr == m_pRigidStatic)
+	{
+		Log_GameContentError("MapSection rigid static creation failed: " + WstrToStr(m_strSectionName));
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+void CMapSection::Refresh_RigidStaticPose()
+{
+	if (nullptr == m_pRigidStatic)
 		return;
 
-	m_pColliderActor = m_pGameInstance_Proxy->Create_StaticActor(
-		m_pModelCom->Get_CollisionMesh(),
-		XMLoadFloat4x4(&m_CombinedWorldMatrix));
+	m_pGameInstance_Proxy->Refresh_StaticActorPose(m_pRigidStatic, XMLoadFloat4x4(&m_CombinedWorldMatrix));
+}
+
+void CMapSection::Release_RigidStatic()
+{
+	if (nullptr == m_pRigidStatic)
+		return;
+
+	if (nullptr != m_pGameInstance_Proxy)
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
+
+	m_pRigidStatic = nullptr;
 }
 
 CMapSection* CMapSection::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -290,12 +327,7 @@ CGameObject* CMapSection::Clone(void* pArg)
 
 void CMapSection::Free()
 {
-	if (m_pColliderActor)
-	{ 
-		m_pGameInstance_Proxy->Remove_StaticActor(m_pColliderActor);
-		m_pColliderActor = nullptr;
-	}
-
+	Release_RigidStatic();
 	__super::Free();
 }
 

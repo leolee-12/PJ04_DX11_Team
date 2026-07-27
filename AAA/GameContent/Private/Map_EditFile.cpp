@@ -1,13 +1,8 @@
 #include "Map_EditFile.h"
 #include "Map_PresetCatalog.h"
-#include "MapStage.h"
-#include "MapSection.h"
 
 #include "DataExporter.h"
 #include "DataLoader.h"
-
-#include <algorithm>
-#include <filesystem>
 
 NS_BEGIN(Client)
 
@@ -1341,20 +1336,10 @@ HRESULT CMap_EditFile::Get_PresetEditFilePath(_uint iPresetIndex, const _wstring
 	return Get_EditFilePath(strResolvedManifestPath, pOutEditFilePath);
 }
 
-HRESULT CMap_EditFile::Load_EditFile(
-	const _wstring& strManifestPath,
-	MAP_EDIT_DATA* pInOutMapContentDesc,
-	json* pOutMapStageOverride,
-	_bool* pOutHasMapStageOverride)
+HRESULT CMap_EditFile::Load_EditFile(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutMapContentDesc)
 {
 	if (nullptr == pInOutMapContentDesc)
 		return E_FAIL;
-
-	if (nullptr != pOutMapStageOverride)
-		*pOutMapStageOverride = json::object();
-
-	if (nullptr != pOutHasMapStageOverride)
-		*pOutHasMapStageOverride = false;
 
 	if (strManifestPath.empty())
 		return E_FAIL;
@@ -1393,19 +1378,6 @@ HRESULT CMap_EditFile::Load_EditFile(
 			pInOutMapContentDesc->bLoadEnv = SavedMapContentDesc.bLoadEnv;
 			pInOutMapContentDesc->OverrideDesc = SavedMapContentDesc.OverrideDesc;
 		}
-
-		const auto IterMapStage = jRoot.find("MapStage");
-		if (IterMapStage != jRoot.end() && IterMapStage->is_object())
-		{
-			if (Merge_LegacyStageRenderableOverrides(*IterMapStage, &pInOutMapContentDesc->OverrideDesc))
-				pInOutMapContentDesc->bHasMapContent = true;
-
-			if (nullptr != pOutMapStageOverride && nullptr != pOutHasMapStageOverride)
-			{
-				*pOutMapStageOverride = *IterMapStage;
-				*pOutHasMapStageOverride = true;
-			}
-		}
 	}
 	catch (const json::exception&)
 	{
@@ -1415,12 +1387,7 @@ HRESULT CMap_EditFile::Load_EditFile(
 	return S_OK;
 }
 
-HRESULT CMap_EditFile::Load_PresetEditFile(
-	_uint iPresetIndex,
-	const _wstring& strManifestPath,
-	MAP_EDIT_DATA* pInOutMapContentDesc,
-	json* pOutMapStageOverride,
-	_bool* pOutHasMapStageOverride)
+HRESULT CMap_EditFile::Load_PresetEditFile(_uint iPresetIndex, const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutMapContentDesc)
 {
 	if (nullptr == pInOutMapContentDesc)
 		return E_FAIL;
@@ -1437,19 +1404,13 @@ HRESULT CMap_EditFile::Load_PresetEditFile(
 	if (pInOutMapContentDesc->strManifestPath.empty())
 		pInOutMapContentDesc->strManifestPath = strResolvedManifestPath;
 
-	const HRESULT hr = Load_EditFile(
-		strResolvedManifestPath,
-		pInOutMapContentDesc,
-		pOutMapStageOverride,
-		pOutHasMapStageOverride);
+	const HRESULT hr = Load_EditFile(strResolvedManifestPath, pInOutMapContentDesc);
 
 	pInOutMapContentDesc->iPresetIndex = static_cast<_int>(iPresetIndex);
 	return hr;
 }
 
-HRESULT CMap_EditFile::Save_EditFile(
-	const MAP_EDIT_DATA& MapContentDesc,
-	const CMapStage* pStage)
+HRESULT CMap_EditFile::Save_EditFile(const MAP_EDIT_DATA& MapContentDesc)
 {
 	if (!MapContentDesc.bHasMapContent || MapContentDesc.strManifestPath.empty())
 		return E_FAIL;
@@ -1461,16 +1422,10 @@ HRESULT CMap_EditFile::Save_EditFile(
 	json jRoot = json::object();
 	jRoot["MapContent"] = Save_Data(MapContentDesc);
 
-	if (nullptr != pStage)
-		jRoot["MapStage"] = Save_Stage(pStage);
-
 	return CDataExporter::Write_JsonFile(strEditFilePath.c_str(), jRoot);
 }
 
-HRESULT CMap_EditFile::Save_PresetEditFile(
-	_uint iPresetIndex,
-	const MAP_EDIT_DATA& MapContentDesc,
-	const CMapStage* pStage)
+HRESULT CMap_EditFile::Save_PresetEditFile(_uint iPresetIndex, const MAP_EDIT_DATA& MapContentDesc)
 {
 	MAP_EDIT_DATA SaveDesc = MapContentDesc;
 	SaveDesc.bHasMapContent = true;
@@ -1487,7 +1442,7 @@ HRESULT CMap_EditFile::Save_PresetEditFile(
 		}
 	}
 
-	return Save_EditFile(SaveDesc, pStage);
+	return Save_EditFile(SaveDesc);
 }
 
 json CMap_EditFile::Save_Data(const MAP_EDIT_DATA& Desc)
@@ -1724,42 +1679,6 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 		}
 	}
 
-	return S_OK;
-}
-
-json CMap_EditFile::Save_Stage(const CMapStage* pStage)
-{
-	if (nullptr == pStage)
-		return json::object();
-
-	json jOverride = json::object();
-	jOverride["StageName"] = WstrToStr(pStage->Get_StageName());
-	jOverride["Sections"] = json::array();
-
-	const auto& Sections = pStage->Get_Sections();
-	for (const CMapSection* pSection : Sections)
-	{
-		if (nullptr == pSection)
-			continue;
-
-		jOverride["Sections"].push_back(pSection->Serialize_SectionState());
-	}
-
-	return jOverride;
-}
-
-HRESULT CMap_EditFile::Apply_Stage(CMapStage* pStage, const json& jOverride)
-{
-	if (nullptr == pStage)
-		return E_FAIL;
-
-	if (jOverride.is_null())
-		return S_OK;
-
-	if (!jOverride.is_object())
-		return E_FAIL;
-
-	pStage->Deserialize(jOverride);
 	return S_OK;
 }
 

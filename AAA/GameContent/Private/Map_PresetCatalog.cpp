@@ -32,7 +32,6 @@ namespace
 		{ "Town2", L"Town2", },
 
 		{ "Arena", L"Arena", },
-		{ "Town3", L"Town3", },
 	};
 
 	const MAP_PRESET_CATALOG_ENTRY* Get_PresetEntry(_uint iPresetIndex)

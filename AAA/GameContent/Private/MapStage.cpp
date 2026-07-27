@@ -55,32 +55,6 @@ HRESULT CMapStage::Validate_Initialized()
 			return E_FAIL;
 	}
 
-	_bool bHasAllGimmickShellSections = true;
-
-	For_Each_MapGimmickEntry(m_strStageName,
-		[&](const MAP_GIMMICK_SECTION_ENTRY& Entry)
-		{
-			_bool bHasShellSection = false;
-
-			for (CMapSection* pSection : m_Sections)
-			{
-				if (pSection->Get_SectionName() != Entry.pShellSectionName)
-					continue;
-
-				bHasShellSection = true;
-				break;
-			}
-
-			if (!bHasShellSection)
-			{
-				Log_GameContentWarning("MapStage gimmick shell missing: " + WstrToStr(m_strStageName) + "/" + WstrToStr(Entry.pShellSectionName));
-				bHasAllGimmickShellSections = false;
-			}
-		});
-
-	if (!bHasAllGimmickShellSections)
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -127,62 +101,6 @@ void CMapStage::Clear_EditorSoloMeshAllSections()
 	}
 }
 #endif
-
-json CMapStage::Serialize() const
-{
-	json j = __super::Serialize();
-	j["StageName"] = WstrToStr(m_strStageName);
-	j["Sections"] = json::array();
-
-	for (const CMapSection* pSection : m_Sections)
-	{
-		j["Sections"].push_back(pSection->Serialize_SectionState());
-	}
-
-	return j;
-}
-
-void CMapStage::Deserialize_Internal(const json& j)
-{
-	const auto IterStageName = j.find("StageName");
-	if (IterStageName != j.end())
-	{
-		if (!IterStageName->is_string())
-			return;
-
-		if (StrToWstr(IterStageName->get<string>()) != m_strStageName)
-			return;
-	}
-
-	__super::Deserialize_Internal(j);
-
-	if (j.contains("Sections") && j["Sections"].is_array())
-	{
-		unordered_map<wstring, CMapSection*> SectionByName;
-		for (CMapSection* pSection : m_Sections)
-		{
-			SectionByName.emplace(pSection->Get_SectionName(), pSection);
-		}
-
-		for (const auto& jSection : j["Sections"])
-		{
-			if (!jSection.is_object())
-				continue;
-			if (!jSection.contains("SectionName") || !jSection["SectionName"].is_string())
-				continue;
-
-			const wstring strSectionName = StrToWstr(jSection["SectionName"].get<string>());
-			auto iter = SectionByName.find(strSectionName);
-			if (iter == SectionByName.end())
-				continue;
-
-			iter->second->Deserialize_SectionState(jSection);
-		}
-	}
-
-	m_bSnapshotValid = false;
-	Refresh_SectionTransforms();
-}
 
 HRESULT CMapStage::Ready_Events()
 {
@@ -282,8 +200,7 @@ void CMapStage::On_GimmickSectionBreak(const _tchar* pShellSectionName)
 		if (pSection->Get_SectionName() != pShellSectionName)
 			continue;
 
-		pSection->Set_Renderable(false);
-		pSection->Set_UseCollMesh(false);
+		pSection->Deactivate();
 		return;
 	}
 }
