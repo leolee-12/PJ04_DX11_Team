@@ -41,6 +41,8 @@ struct LAUNCHER_LEVEL_PROFILES final
 
 	static constexpr const _tchar* LEVEL_ENDING =
 		L"../../Resources/YSH/Level_Manifest/Level_Ending.json";
+	static constexpr const _tchar* LEVEL_ENDINGLOADING =
+		L"../../Resources/YSH/Level_Manifest/Level_EndingLoading.json";
 
 	static constexpr const _tchar* LEVEL_TEST =
 		L"../../Resources/YSH/Level_Manifest/Level_Test.json";

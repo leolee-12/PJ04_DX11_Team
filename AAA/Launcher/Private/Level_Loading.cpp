@@ -36,10 +36,10 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_eNextLevelID = eNextLevelID;
+
     if (FAILED(Load_LoadingLevel()))
         return E_FAIL;
-
-    m_eNextLevelID = eNextLevelID;
 
     m_pLoader = CLoader::Create(m_pDevice, m_pContext, eNextLevelID);
     if (nullptr == m_pLoader)
@@ -118,8 +118,12 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Load_LoadingLevel()
 {
+    const _tchar* szProfile = (LEVEL::ENDING == m_eNextLevelID)
+        ? LAUNCHER_LEVEL_PROFILES::LEVEL_ENDINGLOADING
+        : LAUNCHER_LEVEL_PROFILES::LEVEL_LOADING;
+    
     LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_LOADING, &Manifest)))
+    if (FAILED(Load_LevelManifest(szProfile, &Manifest)))
         return E_FAIL;
 
     LEVEL eLevel = LEVEL::LOADING;
