@@ -3,8 +3,6 @@
 #include "WalkSmoke.h"
 #include "SwordSlash1.h"
 #include "InhaleContainer.h"
-#include "Sword_SpinSlash.h"
-#include "Sword_SpinSlashTrail.h"
 #include "RockBurst.h"
 #include "DeathSmoke.h"
 #include "RockBounce.h"
@@ -52,6 +50,9 @@
 #include "MoonShot.h"
 #include "HammerSwing.h"
 #include "SwordJumpSpin.h"
+#include "SwordSpinSlash.h"
+#include "SwordSuperSpinSlash.h"
+#include "MetaSuperSpinSlash.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -62,8 +63,6 @@
 #include "Vacuum.h"
 #include "TornadoSpinReverse.h"
 #include "Common_Ring03.h"
-#include "Common_SpinSlash.h"
-#include "Common_SpinSlashTrail.h"
 #include "RockEffect.h"
 #include "RockFloorEffect.h"
 #include "SmokeParticle.h"

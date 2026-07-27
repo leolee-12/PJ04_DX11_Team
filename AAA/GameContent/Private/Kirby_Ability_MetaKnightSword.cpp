@@ -23,6 +23,8 @@ namespace
 
     constexpr _uint iSwordOverlaySlot = 1;
     constexpr const _char* szOverlayMasks[] = { "L_FootJ", "R_FootJ" };
+
+    constexpr _float fSpinSlashFadeOutDuration = 0.2f;
 }
 
 CKirby_Ability_MetaKnightSword::CKirby_Ability_MetaKnightSword()
@@ -104,6 +106,8 @@ void CKirby_Ability_MetaKnightSword::Enter_AttackState(CKirby* pKirby, _int iFla
 {
     m_bReqEndAttackState = false;
     m_iSuperSpinSlashCount = iSuperSpinSlashInitialCount;
+    m_bSwordSpinSlashStarted = false;
+    m_bMetaSuperSpinSlashStarted = false;
 
     m_eSwordState = META_SWORD_STATE::SWORD_STATE_END;
     Change_SwordState(pKirby, m_eStartSwordState);
@@ -151,10 +155,15 @@ void CKirby_Ability_MetaKnightSword::Exit_AttackState(CKirby* pKirby)
 
     pKirby->Set_RotationLock(false);
 
+    FadeOut_SpinSlashEffect(m_pSwordSpinSlash, fSpinSlashFadeOutDuration);
+    FadeOut_SpinSlashEffect(m_pMetaSuperSpinSlash, fSpinSlashFadeOutDuration);
+    m_bSwordSpinSlashStarted = false;
+    m_bMetaSuperSpinSlashStarted = false;
     Effect_Stop(m_pSwordChargeEffect);
     Effect_Stop(m_pSwordSuperChargeEffect);
     Effect_StopImmediately(m_pMetaSwordJumpSpinTrail1);
     Effect_StopImmediately(m_pMetaSwordJumpSpinTrail2);
+    Effect_StopImmediately(m_pSwordSpinSlashTrail);
 
     CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
     pMetaSword->End_Hit();
@@ -490,6 +499,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
         {
             // Shuffle Clear
             Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
+            m_bSwordSpinSlashStarted = false;
             pAnimator->Play("SpinSlash", false, false, 0.1f, 2.f);
             break;
         }
@@ -521,6 +531,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
         {
             // Shuffle Clear
             Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
+            m_bMetaSuperSpinSlashStarted = false;
             pAnimator->Play("SuperSpinSlashStart", false, false, 0.1f, 2.f);
             break;
         }
@@ -650,8 +661,33 @@ void CKirby_Ability_MetaKnightSword::Update_SwordState(CKirby* pKirby, _float fT
 
         // Spin
         case META_SWORD_STATE::SPIN_SLASH:
+        {
             AniEndChangeState(META_SWORD_STATE::SPIN_SLASH_END);
+
+            if (m_bSwordSpinSlashStarted == false && fRatio >= 0.01f)
+            {
+                m_bSwordSpinSlashStarted = true;
+                CEffect_Loader::GetInstance()->Spawn(L"SwordSpinSlash", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 1.f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordSpinSlash);
+
+                CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
+                if (pMetaSword != nullptr)
+                {
+                    CEffect_Loader::GetInstance()->Spawn(L"SwordSpinSlashTrail", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                        pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pSwordSpinSlashTrail);
+                }
+            }
+
+            if (fRatio >= 0.78f)
+            {
+                FadeOut_SpinSlashEffect(m_pSwordSpinSlash, fSpinSlashFadeOutDuration);
+                Effect_StopImmediately(m_pSwordSpinSlashTrail);
+            }
+
             break;
+        }
 
         case META_SWORD_STATE::SPIN_SLASH_END:
             Update_MoveLockByRatio(fRatio, 0.f, 0.75f);
@@ -674,8 +710,28 @@ void CKirby_Ability_MetaKnightSword::Update_SwordState(CKirby* pKirby, _float fT
 
         // Spin Super
         case META_SWORD_STATE::SUPER_SPIN_SLASH_START:
+        {
             AniEndChangeState(META_SWORD_STATE::SUPER_SPIN_SLASH_LOOP);
+
+            if (m_bMetaSuperSpinSlashStarted == false && fRatio >= 0.15f)
+            {
+                m_bMetaSuperSpinSlashStarted = true;
+                CEffect_Loader::GetInstance()->Spawn(L"MetaSuperSpinSlash", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 1.05f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pMetaSuperSpinSlash);
+
+                CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(
+                    pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
+                if (pMetaSword != nullptr)
+                {
+                    CEffect_Loader::GetInstance()->Spawn(L"SwordSpinSlashTrail", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                        pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pSwordSpinSlashTrail);
+                }
+            }
+
             break;
+        }
 
         case META_SWORD_STATE::SUPER_SPIN_SLASH_LOOP:
             if (bIsAniFinish)
@@ -758,6 +814,8 @@ void CKirby_Ability_MetaKnightSword::Exit_SwordState(CKirby* pKirby, META_SWORD_
         case META_SWORD_STATE::SUPER_SPIN_SLASH_START:
             break;
         case META_SWORD_STATE::SUPER_SPIN_SLASH_LOOP:
+            FadeOut_SpinSlashEffect(m_pMetaSuperSpinSlash, fSpinSlashFadeOutDuration);
+            Effect_StopImmediately(m_pSwordSpinSlashTrail);
             break;
         case META_SWORD_STATE::SUPER_SPIN_SLASH_END:
             m_bMoveLock = false;
@@ -838,6 +896,15 @@ void CKirby_Ability_MetaKnightSword::Update_MaxHorizontalSpeedByRatio(CMovement_
     }
 
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+}
+
+void CKirby_Ability_MetaKnightSword::FadeOut_SpinSlashEffect(CEffect_Container*& pEffectContainer, _float fFadeOutDuration)
+{
+    if (pEffectContainer != nullptr)
+    {
+        pEffectContainer->Start_FadeOut(fFadeOutDuration);
+        pEffectContainer = nullptr;
+    }
 }
 
 CKirby_Ability_MetaKnightSword* CKirby_Ability_MetaKnightSword::Create()

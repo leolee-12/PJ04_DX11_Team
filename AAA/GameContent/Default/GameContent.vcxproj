@@ -252,6 +252,9 @@
     <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\HammerSwing.h" />
     <ClInclude Include="..\Public\SwordJumpSpin.h" />
+    <ClInclude Include="..\Public\SwordSpinSlash.h" />
+    <ClInclude Include="..\Public\SwordSuperSpinSlash.h" />
+    <ClInclude Include="..\Public\MetaSuperSpinSlash.h" />
     <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
@@ -276,8 +279,6 @@
     <ClInclude Include="..\Public\SphereMesh.h" />
     <ClInclude Include="..\Public\SphereParticle.h" />
     <ClInclude Include="..\Public\Common_SphereNoise.h" />
-    <ClInclude Include="..\Public\Common_SpinSlash.h" />
-    <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\DespawnEffect.h" />
     <ClInclude Include="..\public\DeathSmoke.h" />
     <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h" />
@@ -329,11 +330,9 @@
     <ClInclude Include="..\Public\SwordCharge.h" />
     <ClInclude Include="..\Public\SwordChargeEffect.h" />
     <ClInclude Include="..\public\Swing_Smoke.h" />
-    <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Projectile_Bomb.h" />
-    <ClInclude Include="..\Public\Sword_SpinSlash.h" />
     <ClInclude Include="..\public\PhysicsProjectile.h" />
     <ClInclude Include="..\public\Projectile.h" />
     <ClInclude Include="..\public\Projectile_Boulder.h" />
@@ -776,6 +775,9 @@
     <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\HammerSwing.cpp" />
     <ClCompile Include="..\Private\SwordJumpSpin.cpp" />
+    <ClCompile Include="..\Private\SwordSpinSlash.cpp" />
+    <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp" />
+    <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp" />
     <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
@@ -799,8 +801,6 @@
     <ClCompile Include="..\Private\SphereMesh.cpp" />
     <ClCompile Include="..\Private\SphereParticle.cpp" />
     <ClCompile Include="..\Private\Common_SphereNoise.cpp" />
-    <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
-    <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\DespawnEffect.cpp" />
     <ClCompile Include="..\private\DeathSmoke.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_Generic.cpp" />
@@ -849,11 +849,9 @@
     <ClCompile Include="..\Private\SwordCharge.cpp" />
     <ClCompile Include="..\Private\SwordChargeEffect.cpp" />
     <ClCompile Include="..\private\Swing_Smoke.cpp" />
-    <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Projectile_Bomb.cpp" />
-    <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
     <ClCompile Include="..\private\PhysicsProjectile.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />
     <ClCompile Include="..\private\Projectile_Boulder.cpp" />
