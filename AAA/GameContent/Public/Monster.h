@@ -25,6 +25,15 @@ class CMonster abstract : public CCharacter, public IInhalable
 {
 	GENERATED_BODY_ABSTRACT(CMonster)
 
+public:
+#pragma region 공용 사운드 키
+	static constexpr const _tchar* SND_DAMAGEREACT_NORMAL				= L"CharaBasic_DamageReact_Normal.wav";
+	static constexpr const _tchar* SND_DAMAGEREACT_SWORD				= L"CharaBasic_DamageReact_HitSlash.wav";
+	static constexpr const _tchar* SND_DAMAGEREACT_SPIKE				= L"CharaBasic_DamageReact_HitSpike.wav";
+	static constexpr const _tchar* SND_DAMAGEREACT_HAMMER				= L"HeroHammerToy_DamageReact_HitHammer.wav";
+	static constexpr const _tchar* SND_DAMAGEREACT_HAMMER_ONIGOROSI		= L"HeroHammerToy_DamageReact_HitHammerOnigorosi.wav";
+#pragma endregion
+
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CMonster(const CMonster& Prototype);
@@ -78,6 +87,8 @@ public: // Inhalable
 	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override { return m_eCopyAbility; }
 	virtual CGameObject*		Get_GameObject() override final { return this; }
 	virtual _float3				Get_SpatPivotOffset() const override { return m_vSpatPivot; }
+
+	virtual void				Damaged(const ATTACK_INFO& tInfo) override;
 
 	virtual void				On_Swallowed();
 	virtual void				On_SpatBegin() override;
@@ -225,6 +236,8 @@ protected:
 	void						Compute_SpatPivot();
 	void                        Open_BodyCheckBlock();
 	void						Update_SpatPivot_FromBone();
+
+	void						Resolve_DamageReactSFX(const ATTACK_INFO& tInfo);
 
 protected:
 	template<class TPart>

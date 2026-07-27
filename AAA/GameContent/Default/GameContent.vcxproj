@@ -82,7 +82,7 @@
     <ClInclude Include="..\public\Meta_IntroLocking.h" />
     <ClInclude Include="..\public\Meta_UpperCharge.h" />
     <ClInclude Include="..\public\MoonShot.h" />
-    <ClInclude Include="..\Public\MeteorBurst.h" />
+    <ClInclude Include="..\Public\MeteorExplosion.h" />
     <ClInclude Include="..\Public\MeteorRock.h" />
     <ClInclude Include="..\Public\MeteorRock_Large.h" />
     <ClInclude Include="..\Public\MeteorRock_Small.h" />
@@ -618,7 +618,7 @@
     <ClCompile Include="..\private\Meta_IntroLocking.cpp" />
     <ClCompile Include="..\private\Meta_UpperCharge.cpp" />
     <ClCompile Include="..\private\MoonShot.cpp" />
-    <ClCompile Include="..\Private\MeteorBurst.cpp" />
+    <ClCompile Include="..\Private\MeteorExplosion.cpp" />
     <ClCompile Include="..\Private\MeteorRock.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Large.cpp" />
     <ClCompile Include="..\Private\MeteorRock_Small.cpp" />
