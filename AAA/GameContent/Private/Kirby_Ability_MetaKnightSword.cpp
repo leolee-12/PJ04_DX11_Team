@@ -423,6 +423,10 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
             // Sword Have Clear
             Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
             pAnimator->Play("Meta_Attack1", false, false, 0.f, 1.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"MetaSlash1", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.5f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 8.f),
+                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case META_SWORD_STATE::SLASH_1_END:
@@ -435,6 +439,10 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
             // Sword Have Clear
             Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
             pAnimator->Play("Meta_Attack2", false, false, 0.f, 1.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"MetaSlash2", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.5f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, -8.f),
+                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case META_SWORD_STATE::SLASH_3:

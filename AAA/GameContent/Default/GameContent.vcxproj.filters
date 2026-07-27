@@ -3081,6 +3081,12 @@
     <ClInclude Include="..\Public\SwordSuperSpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MetaSlash1.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MetaSlash2.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\MetaSuperSpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
@@ -4558,6 +4564,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaSlash1.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaSlash2.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
