@@ -2,7 +2,7 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 
-#include "MeshParticleCommon.h"
+#include "MeshEmitterCommon.h"
 
 CMeteorExplosion::CMeteorExplosion(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
@@ -55,7 +55,7 @@ HRESULT CMeteorExplosion::Render()
 
 HRESULT CMeteorExplosion::Ready_EffectPartObjects()
 {
-	CMeshParticleCommon::MESH_PARTICLE_COMMON_DESC tDesc{};
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel        = m_iPrototypeLevel;
 	tDesc.bUseDiffuseTexture = true;
 	tDesc.bUseNormalTexture  = true;
@@ -66,19 +66,19 @@ HRESULT CMeteorExplosion::Ready_EffectPartObjects()
 	tDesc.bCustomShader      = false;
 
 	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_1", &tDesc)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_1", &tDesc)))
 		return E_FAIL;
 
 	tDesc.wstrModelTag = PIECE_SMALL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_2", &tDesc)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_2", &tDesc)))
 		return E_FAIL;
 
 	tDesc.wstrModelTag = PIECE_SMALL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_3", &tDesc)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_3", &tDesc)))
 		return E_FAIL;
 
 	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"Chunk_4", &tDesc)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_4", &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
