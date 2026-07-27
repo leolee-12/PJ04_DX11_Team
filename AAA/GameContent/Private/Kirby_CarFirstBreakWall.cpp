@@ -70,7 +70,7 @@ void CKirby_CarFirstBreakWall::Request_Attachment_End(CKirby* pKirby, const KIRB
     {
         case KIRBY_ATTACHMENT_END_REASON::DEFORM_CAR_GET_FIRST_RELEASE:
         {
-            Transition_Fall_OR_Wait_OR_Run(pKirby);
+            Transition_Wait_OR_Run(pKirby);
             break;
         }
         default:

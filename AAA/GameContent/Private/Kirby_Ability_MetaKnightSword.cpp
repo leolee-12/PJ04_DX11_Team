@@ -458,7 +458,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
 
             CEffect_Loader::GetInstance()->Spawn(L"MetaSwordJumpSpin", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 90.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                pKirby->Get_RenderWorldMatrixPtr());
 
             CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
             if (pMetaSword != nullptr)
@@ -491,7 +491,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
 
             CEffect_Loader::GetInstance()->Spawn(L"MetaChargeEffect", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordChargeEffect);
+                pKirby->Get_RenderWorldMatrixPtr(), &m_pSwordChargeEffect);
 
             break;
         }
@@ -516,7 +516,7 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
 
             CEffect_Loader::GetInstance()->Spawn(L"MetaSuperChargeEffect", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordSuperChargeEffect);
+                pKirby->Get_RenderWorldMatrixPtr(), &m_pSwordSuperChargeEffect);
 
             break;
         }
@@ -669,7 +669,7 @@ void CKirby_Ability_MetaKnightSword::Update_SwordState(CKirby* pKirby, _float fT
                 m_bSwordSpinSlashStarted = true;
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSpinSlash", pKirby->Get_LevelIndex(),
                     _float3(0.f, 1.f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordSpinSlash);
+                    pKirby->Get_RenderWorldMatrixPtr(), &m_pSwordSpinSlash);
 
                 CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));
                 if (pMetaSword != nullptr)
@@ -718,7 +718,7 @@ void CKirby_Ability_MetaKnightSword::Update_SwordState(CKirby* pKirby, _float fT
                 m_bMetaSuperSpinSlashStarted = true;
                 CEffect_Loader::GetInstance()->Spawn(L"MetaSuperSpinSlash", pKirby->Get_LevelIndex(),
                     _float3(0.f, 1.05f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pMetaSuperSpinSlash);
+                    pKirby->Get_RenderWorldMatrixPtr(), &m_pMetaSuperSpinSlash);
 
                 CKirby_MetaSword* pMetaSword = static_cast<CKirby_MetaSword*>(
                     pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::METAKNIGHT_SWORD));

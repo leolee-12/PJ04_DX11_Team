@@ -525,7 +525,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
 
             CEffect_Loader::GetInstance()->Spawn(L"SwordChargeEffect", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordChargeEffect);
+                pKirby->Get_RenderWorldMatrixPtr(), &m_pSwordChargeEffect);
 
             break;
         }
@@ -550,7 +550,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
 
             CEffect_Loader::GetInstance()->Spawn(L"SwordSuperChargeEffect", pKirby->Get_LevelIndex(),
                 _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordSuperChargeEffect);
+                pKirby->Get_RenderWorldMatrixPtr(), &m_pSwordSuperChargeEffect);
 
             break;
         }
@@ -622,7 +622,7 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
                     _float3(-0.2f, 0.75f, 1.1f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 12.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                    pKirby->Get_RenderWorldMatrixPtr());
             }
 
             break;
@@ -655,25 +655,25 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
                     _float3(0.1f, 0.55f, 1.3f), _float3(0.f, 0.f, 1.f), _float3(0.f, -10.f, 170.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                    pKirby->Get_RenderWorldMatrixPtr());
             }
             if (CanPlayEffect(SWORD_EFFECT::SLASH2_2, pAnimator, 0.32f))
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
                     _float3(-0.2f, 0.9f, 1.1f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 15.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                    pKirby->Get_RenderWorldMatrixPtr());
             }
             if (CanPlayEffect(SWORD_EFFECT::SLASH2_3, pAnimator, 0.5f))
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
                     _float3(0.1f, 0.55f, 1.3f), _float3(0.f, 0.f, 1.f), _float3(0.f, -15.f, 170.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                    pKirby->Get_RenderWorldMatrixPtr());
             }
             if (CanPlayEffect(SWORD_EFFECT::SLASH2_4, pAnimator, 0.75f))
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
                     _float3(-0.2f, 0.9f, 1.1f), _float3(0.f, 0.f, 1.f), _float3(0.f, 20.f, 2.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                    pKirby->Get_RenderWorldMatrixPtr());
             }
 
             break;
@@ -694,7 +694,7 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSlash3", pKirby->Get_LevelIndex(),
                     _float3(0.5f, 0.8f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 240.f, 0.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                    pKirby->Get_RenderWorldMatrixPtr());
             }
 
             break;
@@ -724,7 +724,7 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordJumpSpin", pKirby->Get_LevelIndex(),
                     _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 90.f, 0.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+                    pKirby->Get_RenderWorldMatrixPtr());
 
                 CKirby_Sword* pSword = static_cast<CKirby_Sword*>(
                     pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
@@ -765,7 +765,7 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSpinSlash", pKirby->Get_LevelIndex(),
                     _float3(0.f, 1.f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSpinSlash);
+                    pKirby->Get_RenderWorldMatrixPtr(), &m_pSpinSlash);
 
                 CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
                 if (pSword != nullptr)
@@ -813,7 +813,7 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSuperSpinSlash", pKirby->Get_LevelIndex(),
                     _float3(0.f, 1.05f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
-                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSpinSlash);
+                    pKirby->Get_RenderWorldMatrixPtr(), &m_pSpinSlash);
 
                 CKirby_Sword* pSword = static_cast<CKirby_Sword*>(
                     pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
