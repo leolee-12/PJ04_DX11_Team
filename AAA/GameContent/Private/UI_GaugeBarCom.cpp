@@ -26,6 +26,11 @@ void CUI_GaugeBarCom::Appear(_float fCurrent, _float fMax)
     if (m_pGauge) m_pGauge->Play_AppearSweep(m_fCur / m_fMax);
 }
 
+_bool CUI_GaugeBarCom::Is_Appearing() const
+{
+    return m_pGauge ? m_pGauge->Is_AppearSweeping() : false;
+}
+
 void CUI_GaugeBarCom::Reset_Empty() 
 { 
     m_fCur = 0.f; 
