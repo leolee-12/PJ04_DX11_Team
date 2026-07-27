@@ -115,10 +115,16 @@ HRESULT CLensFlare::Ready_EffectPartObjects()
 	tRectDesc.bUseMaskCom = false;
 	tRectDesc.bCustomShader = false;
 
+	// circleglow2 는 알파가 전 픽셀 0 → 마스크 슬롯에서 Red 채널을 알파원으로 사용
+	tRectDesc.bUseMaskCom = true;
+	tRectDesc.iMaskLevel = m_iPrototypeLevel;
+	tRectDesc.wstrMaskTag = TEXT("Prototype_Component_Texture_LensFlare_CircleGlow2");
 	tRectDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_CircleGlow2");
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, TEXT("Line"), &tRectDesc)))
 		return E_FAIL;
 
+	tRectDesc.bUseMaskCom = false;
+	tRectDesc.wstrMaskTag = L"";
 	tRectDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_Common_Circle06");
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, TEXT("Circle1"), &tRectDesc)))
 		return E_FAIL;
@@ -136,8 +142,9 @@ HRESULT CLensFlare::Ready_EffectPartObjects()
 	tMeshDesc.bCustomShader = false;
 
 	tMeshDesc.wstrModelTag = TEXT("Prototype_Component_Model_LensFlare_Common_Circle01");
-	tMeshDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_CircleGradation");
-	tMeshDesc.wstrMaskTag = TEXT("Prototype_Component_Texture_LensFlare_ThunderRoot2");
+	// circlegradation 은 알파가 전 픽셀 0 → 마스크 슬롯으로 옮겨 Red 채널을 알파원으로 사용
+	tMeshDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_ThunderRoot2");
+	tMeshDesc.wstrMaskTag = TEXT("Prototype_Component_Texture_LensFlare_CircleGradation");
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Hexagon1"), &tMeshDesc)))
 		return E_FAIL;
 
