@@ -55,6 +55,14 @@ void CUI_BossStatus::Update(_float fTimeDelta)
 
     Update_SlideIn(fTimeDelta);
 
+    if (m_bAppearSFXPlaying
+        && APPEAR_PHASE::DONE == m_eAppearPhase
+        && m_pGaugeBar && m_pGaugeBar->Is_Bound()
+        && !m_pGaugeBar->Is_Appearing())
+    {
+        Stop_AppearSFX();
+    }
+
 #ifdef _DEBUG
     if (m_pGaugeBar)
     {
@@ -114,10 +122,11 @@ HRESULT CUI_BossStatus::Ready_Events()
             if (m_pGaugeBar && m_pGaugeBar->Is_Bound())
                 m_pGaugeBar->Reset_Empty();
 
+            Stop_AppearSFX();
             Start_SlideIn();   
         });
 
-    Subscribe_Event(EventTag::Boss_Died, [this](void*) { Set_Active(false); });
+    Subscribe_Event(EventTag::Boss_Died, [this](void*) { Stop_AppearSFX(); Set_Active(false); });
 
     return S_OK;
 }
@@ -142,6 +151,7 @@ void CUI_BossStatus::Try_BindGauge()
     if (m_bPendingAppear)
     {
         m_pGaugeBar->Appear(m_fPendingCurr, m_fPendingMax);
+        Start_AppearSFX();
         m_bPendingAppear = false;
         m_bPendingHP = false;
     }
@@ -150,6 +160,18 @@ void CUI_BossStatus::Try_BindGauge()
         m_pGaugeBar->Set_Value(m_fPendingCurr, m_fPendingMax);
         m_bPendingHP = false;
     }
+}
+
+void CUI_BossStatus::Start_AppearSFX()
+{
+    m_hAppearSFX = m_pGameInstance_Proxy->Play_SFX(L"UiBasic_BossHpUp.wav", 0.35f, ESoundBus::UI);
+    m_bAppearSFXPlaying = true;
+}
+
+void CUI_BossStatus::Stop_AppearSFX()
+{
+    m_hAppearSFX.Stop();
+    m_bAppearSFXPlaying = false;
 }
 
 void CUI_BossStatus::Start_SlideIn()
@@ -186,7 +208,10 @@ void CUI_BossStatus::Update_SlideIn(_float fTimeDelta)
         m_eAppearPhase = APPEAR_PHASE::DONE;
 
         if (m_pGaugeBar && m_pGaugeBar->Is_Bound())
+        {
             m_pGaugeBar->Appear(m_fPendingCurr, m_fPendingMax);
+            Start_AppearSFX();
+        }
         else
             m_bPendingAppear = true;  
     }
@@ -226,5 +251,6 @@ CGameObject* CUI_BossStatus::Clone(void* pArg)
 
 void CUI_BossStatus::Free()
 {
+    Stop_AppearSFX();
     __super::Free();
 }

@@ -42,6 +42,7 @@ namespace
         /* STAGE0_STEP2  */ DEFAULT_LIGHT,
         /* TOWN_STEP1    */ DEFAULT_LIGHT,
         /* TOWN_STEP2    */ DEFAULT_LIGHT,
+        /* TOWN_STEP3    */ DEFAULT_LIGHT,
         /* BOSS_STAGE1   */ DEFAULT_LIGHT,
         /* STAGE1_STEP1  */ VOLCANO_LIGHT,
         /* STAGE1_STEP2  */ VOLCANO_LIGHT,
