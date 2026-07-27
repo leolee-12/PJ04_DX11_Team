@@ -21,7 +21,7 @@ HRESULT CArena::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Play_BGM_Fade(L"Ec_MetaWind0.wav", 5.f, 0.1f);
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"Ec_MetaWind0.wav", 2.f, 0.2f);
 
     return S_OK;
 }

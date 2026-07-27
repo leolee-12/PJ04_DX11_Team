@@ -56,8 +56,8 @@ HRESULT CSwordHitEffect::Ready_EffectPartObjects()
 	tDesc.iModelLevel = m_iPrototypeLevel;
 	tDesc.bUseTextureCom = true;
 	tDesc.wstrModelTag = MODEL_PROTO_TAG_CIRCLE;
-	tDesc.iTextureLevel = Texture_Common_Flash02.iLevelID;
-	tDesc.wstrTextureTag = Texture_Common_Flash02.szProtoTag;
+	tDesc.iTextureLevel = Texture_SwordHit_Flash02.iLevelID;
+	tDesc.wstrTextureTag = Texture_SwordHit_Flash02.szProtoTag;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"HitFire1", &tDesc)))
 		return E_FAIL;
 
@@ -73,8 +73,7 @@ HRESULT CSwordHitEffect::Ready_EffectPartObjects()
 	return S_OK;
 }
 
-CSwordHitEffect* CSwordHitEffect::Create(ID3D11Device* pDevice,
-	ID3D11DeviceContext* pContext)
+CSwordHitEffect* CSwordHitEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CSwordHitEffect* pInstance = new CSwordHitEffect(pDevice, pContext);
 

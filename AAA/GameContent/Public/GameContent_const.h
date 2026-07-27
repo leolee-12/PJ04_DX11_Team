@@ -105,7 +105,8 @@ namespace ProtoDesc
 	// Hit 
 	inline constexpr TEXTURE_DESC Texture_CommonHit01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonHit01"), TEXT("../../Resources/CHJ/Effect/Damage/common_hit01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_CommonRing01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonRing01"), TEXT("../../Resources/CHJ/Effect/Common/common_ring01.dds"), 1 };
-	
+	inline constexpr TEXTURE_DESC Texture_SwordHit_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordHit_Flash02"), TEXT("../../Resources/CHJ/Effect/Damage/sword_flash02.png"), 1 };
+
 	// Sparkle
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle01"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle01.dds"), 1 };
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle02"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle02.dds"), 1 };

@@ -908,8 +908,8 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, Texture_Meta_Ring1.iLevelID, Texture_Meta_Ring1.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Meta_Ring1.szFileTag, Texture_Meta_Ring1.iNumTex));
-            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_SwordHit_Flash02.iLevelID, Texture_SwordHit_Flash02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_SwordHit_Flash02.szFileTag, Texture_SwordHit_Flash02.iNumTex));
             TRY_ADD_PROTO(pProxy, Texture_Meta_HitFire1.iLevelID, Texture_Meta_HitFire1.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Meta_HitFire1.szFileTag, Texture_Meta_HitFire1.iNumTex));
             TRY_ADD_PROTO(pProxy, Texture_Meta_HitFire2.iLevelID, Texture_Meta_HitFire2.szProtoTag,
