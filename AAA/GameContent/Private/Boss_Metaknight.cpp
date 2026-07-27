@@ -264,6 +264,7 @@ void CBoss_Metaknight::On_Enter_Corpse()
     __super::On_Enter_Corpse();
 
     m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
+    m_pGameInstance_Proxy->Publish(TEXT("EndingFade_Start"), nullptr);
 }
 
 void CBoss_Metaknight::Play_PhaseTransition(_int iNewPhase)

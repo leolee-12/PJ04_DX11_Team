@@ -16,6 +16,7 @@
 
 #include "Town_Step1.h"
 #include "Town_Step2.h"
+#include "Town_Step3.h"
 
 #include "Boss_Stage1.h"
 
@@ -76,6 +77,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
             break;
         case LEVEL::TOWN_STEP2:
             pNextLevel = CTown_Step2::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::TOWN_STEP3:
+            pNextLevel = CTown_Step3::Create(m_pDevice, m_pContext);
             break;
         case LEVEL::BOSS_STAGE1:
             pNextLevel = CBoss_Stage1::Create(m_pDevice, m_pContext);
