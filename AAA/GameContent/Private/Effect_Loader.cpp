@@ -73,6 +73,7 @@ namespace
 
         { TEXT("BombExplosion"),          TEXT("../../Resources/EffectContainerJSON/YSH/BombExplosion.JSON") },
         { TEXT("CommonHit"),              TEXT("../../Resources/EffectContainerJSON/CHJ/CommonHit.JSON") },
+        { TEXT("SwordHitEffect"),         TEXT("../../Resources/CHJ/Effect/EffectContainers/SwordHitEffect/SwordHitEffect.JSON") },
         { TEXT("SpitObject"),             TEXT("../../Resources/EffectContainerJSON/CHJ/SpitObject.JSON") },
         { TEXT("SpitAir"),                TEXT("../../Resources/EffectContainerJSON/YSH/Spit_Air.JSON") },
 

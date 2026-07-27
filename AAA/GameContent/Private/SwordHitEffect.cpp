@@ -1,6 +1,8 @@
 #include "SwordHitEffect.h"
+#include "GameContent_const.h"
 
-#include "MeshEmitterCommon.h"
+#include "MeshCommon.h"
+#include "MeshParticleCommon.h"
 
 CSwordHitEffect::CSwordHitEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
@@ -50,6 +52,23 @@ HRESULT CSwordHitEffect::Render()
 
 HRESULT CSwordHitEffect::Ready_EffectPartObjects()
 {
+	CMeshCommon::MESH_COMMON_DESC tDesc{};
+	tDesc.iModelLevel = m_iPrototypeLevel;
+	tDesc.bUseTextureCom = true;
+	tDesc.wstrModelTag = MODEL_PROTO_TAG_CIRCLE;
+	tDesc.iTextureLevel = Texture_Common_Flash02.iLevelID;
+	tDesc.wstrTextureTag = Texture_Common_Flash02.szProtoTag;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"HitFire1", &tDesc)))
+		return E_FAIL;
+
+	tDesc.iTextureLevel = Texture_Meta_Line2.iLevelID;
+	tDesc.wstrTextureTag = Texture_Meta_Line2.szProtoTag;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"HitLine1", &tDesc)))
+		return E_FAIL;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"HitLine2", &tDesc)))
+		return E_FAIL;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"LinePtcl", &tDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
