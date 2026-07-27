@@ -4,18 +4,25 @@
 CUI_FadeOut::CUI_FadeOut(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUI_CurtainSequenceBase(pDevice, pContext)
     , m_strDoneEvent{ L"FadeOut_Done" }
+    , m_strStartSFX{ L"UiResident_TownGeteIn.wav" }
+    , m_fBGMFadeOut{ 0.f }
 {
 }
 CUI_FadeOut::CUI_FadeOut(const CUI_FadeOut& Prototype)
     : CUI_CurtainSequenceBase(Prototype)
     , m_strDoneEvent{ Prototype.m_strDoneEvent }
+    , m_strStartSFX{ Prototype. m_strStartSFX }
+    , m_fBGMFadeOut{ Prototype.m_fBGMFadeOut }
 {
 }
 
 void CUI_FadeOut::On_SequenceStart()
 {
-    m_pGameInstance_Proxy->Play_SFX(L"UiResident_TownGeteIn.wav", 0.35f, ESoundBus::UI);
-    //m_pGameInstance_Proxy->Fade_BGM_Out(1.f);
+    if (!m_strStartSFX.empty())
+        m_pGameInstance_Proxy->Play_SFX(m_strStartSFX.c_str(), 0.35f, ESoundBus::UI);
+
+    if (m_fBGMFadeOut > 0.f)
+        m_pGameInstance_Proxy->Fade_BGM_Out(m_fBGMFadeOut);
 }
 
 void CUI_FadeOut::On_SequenceDone()
