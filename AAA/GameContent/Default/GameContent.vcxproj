@@ -59,6 +59,7 @@
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
     <ClInclude Include="..\Public\Effect_Include.h" />
+    <ClInclude Include="..\Public\EnvInteract_BreakProp.h" />
     <ClInclude Include="..\public\EnvTrigger_Debug.h" />
     <ClInclude Include="..\public\EnvTrigger_LevelChange.h" />
     <ClInclude Include="..\Public\Env_Include.h" />
@@ -596,6 +597,7 @@
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\private\Camera_Coaster.cpp" />
+    <ClCompile Include="..\Private\EnvInteract_BreakProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
     <ClCompile Include="..\private\EnvTrigger_Debug.cpp" />

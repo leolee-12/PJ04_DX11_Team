@@ -2055,6 +2055,9 @@
     <ClInclude Include="..\Public\Env_SpotLight.h">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EnvInteract_BreakProp.h">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\EnvInteract_KickProp.h">
       <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClInclude>
@@ -3655,6 +3658,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Env_SpotLight.cpp">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvInteract_BreakProp.cpp">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp">
       <Filter>00. GameObject\02. EnvObject\Interact</Filter>
