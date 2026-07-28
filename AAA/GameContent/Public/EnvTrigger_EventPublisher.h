@@ -3,20 +3,18 @@
 
 NS_BEGIN(Client)
 
-class CEnvTrigger_EventPublisher final : public CEnvObject_Trigger
+class CEnvTrigger_EventPublisher : public CEnvObject_Trigger
 {
-	GENERATED_BODY(CEnvTrigger_EventPublisher)
+	GENERATED_BODY_ABSTRACT(CEnvTrigger_EventPublisher)
 
 	PROPERTY(_wstring, m_strEventTag, L"Event Tag", L"Event Publisher")
-	PROPERTY(_wstring, m_strPayload, L"Payload", L"Event Publisher")
 	PROPERTY(_wstring, m_strExitEventTag, L"Exit Event Tag", L"Event Publisher")
-	PROPERTY(_wstring, m_strExitPayload, L"Exit Payload", L"Event Publisher")
 	PROPERTY(_bool, m_bPublishOnce, L"Publish Once", L"Event Publisher")
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_EnvTrigger_EventPublisher";
 
-private:
+protected:
 	CEnvTrigger_EventPublisher(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CEnvTrigger_EventPublisher(const CEnvTrigger_EventPublisher& Prototype);
 	virtual ~CEnvTrigger_EventPublisher() = default;
@@ -24,18 +22,17 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+
+protected:
+	virtual void* Get_EnterPayload() { return nullptr; }
+	virtual void* Get_ExitPayload() { return nullptr; }
 
 private:
-	_bool m_bPublished = { false };
-	_bool m_bExitPublished = { false };
-
-private:
-	void Publish_Event(const _wstring& strEventTag, const _wstring& strPayload, _bool& bPublished);
-
 	virtual void OnTriggerEnter(CCollider* pOther) override;
 	virtual void OnTriggerStay(CCollider* pOther) override;
 	virtual void OnTriggerExit(CCollider* pOther) override;
+
+	virtual void Set_Active(_bool b) override;
 
 public:
 	static CEnvTrigger_EventPublisher* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

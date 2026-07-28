@@ -55,7 +55,7 @@ private:
 	CUI_Text*				m_pAmount = { nullptr };
 	CUIAnimatorCom*			 m_pUIAnimatorCom = { nullptr };
 	
-	_uint					m_iStarCount = { 0 };
+	inline static _uint		m_iStarCount = { 0 };
 	_float					m_fVisibleDuration = { 3.0f };		// 마지막 획득 후 유지 시간
 	_float					m_fVisibleElapsed = { 0.f };
 	_float					m_fFadeInDuration = { 0.12f };

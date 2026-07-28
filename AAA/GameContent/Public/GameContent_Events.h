@@ -365,4 +365,11 @@ namespace Client
     };
 #pragma endregion
 
+#pragma region 페이드 인아웃
+    struct FADEOUT_PAYLOAD
+    {
+        _float fSFXDuration = { 0.f };
+    };
+#pragma endregion
+
 }

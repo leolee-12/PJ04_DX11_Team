@@ -60,7 +60,7 @@ void CUI_CurtainSequenceBase::Refresh_Subscription()
     if (!m_strTriggerEvent.empty() && !m_bSubscribed)
     {
         m_hTrigger = m_pGameInstance_Proxy->Subscribe(
-            m_strTriggerEvent, [this](void*) { Play(); });   // 비활성이어도 콜백은 옴 → Play()가 Active
+            m_strTriggerEvent, [this](void* pData) { On_Event(pData); Play(); });   // 비활성이어도 콜백은 옴 → Play()가 Active
         m_bSubscribed = true;
     }
 }
