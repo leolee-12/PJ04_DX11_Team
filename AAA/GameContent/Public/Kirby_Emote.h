@@ -31,6 +31,13 @@ public:
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+private:
+	_int m_eEmoteStateFlag{};
+	_float m_fInteractedRatio{};
+	_bool m_bInteracted{};
+
+	CCollider* m_pQueryBox{};
+
 public:
 	static CKirby_Emote* Create();
 private:
