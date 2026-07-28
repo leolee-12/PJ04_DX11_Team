@@ -74,6 +74,7 @@ protected:
 protected:
 	HRESULT Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC& tDesc);
 	HRESULT Bind_ShaderResources();
+	virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) { return true; }
 
 protected:
 	virtual void Free();

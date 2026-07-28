@@ -82,6 +82,22 @@ HRESULT CKirby_MetaHat::Render()
     return S_OK;
 }
 
+_bool CKirby_MetaHat::Should_RenderShadowMesh(_uint iMeshIndex)
+{
+    switch (iMeshIndex)
+    {
+        case META_HAT_MESH::HOVERING_MASK:
+        case META_HAT_MESH::HOVERING_STRAP:
+            return m_bIsHovering;
+
+        case META_HAT_MESH::MASK:
+        case META_HAT_MESH::STRAP:
+            return !m_bIsHovering;
+    }
+
+    return false;
+}
+
 void CKirby_MetaHat::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
 {
     switch (ePartMode)

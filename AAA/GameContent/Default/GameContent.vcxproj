@@ -256,6 +256,8 @@
     <ClInclude Include="..\Public\SystemObject_Include.h" />
     <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\HammerSwing.h" />
+    <ClInclude Include="..\Public\WheelHammer.h" />
+    <ClInclude Include="..\Public\OnigorosiHammerFirst.h" />
     <ClInclude Include="..\Public\SwordJumpSpin.h" />
     <ClInclude Include="..\Public\SwordSpinSlash.h" />
     <ClInclude Include="..\Public\SwordSuperSpinSlash.h" />
@@ -439,6 +441,7 @@
     <ClInclude Include="..\public\GigantEdge_Sword.h" />
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Bomb.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Crash.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
@@ -484,6 +487,7 @@
     <ClInclude Include="..\Public\Kirby_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ToyHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
+    <ClInclude Include="..\Public\Kirby_CrashHat.h" />
     <ClInclude Include="..\Public\Kirby_IceHat.h" />
     <ClInclude Include="..\Public\Kirby_SleepHat.h" />
     <ClInclude Include="..\public\UI_Eraser.h" />
@@ -787,6 +791,8 @@
     <ClCompile Include="..\Private\DistortionCommon.cpp" />
     <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\HammerSwing.cpp" />
+    <ClCompile Include="..\Private\WheelHammer.cpp" />
+    <ClCompile Include="..\Private\OnigorosiHammerFirst.cpp" />
     <ClCompile Include="..\Private\SwordJumpSpin.cpp" />
     <ClCompile Include="..\Private\SwordSpinSlash.cpp" />
     <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp" />
@@ -918,6 +924,7 @@
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Crash.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
@@ -1002,6 +1009,7 @@
     <ClCompile Include="..\Private\Kirby_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ToyHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_CrashHat.cpp" />
     <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
     <ClCompile Include="..\Private\Kirby_SleepHat.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />

@@ -17,7 +17,7 @@ namespace Client
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
 
 	enum class KIRBY_SHADER_PASS { KIRBY, ANIM_TEXTURED_PBR, ANIM_CONSTANT_PBR, ANIM_SHADOW, BOMBHAT, META_SWORD, META_MASK };
-	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD, BOMB, ICE, SLEEP, TOY_HAMMER, METAKNIGHT_SWORD };
+	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD, BOMB, ICE, SLEEP, TOY_HAMMER, METAKNIGHT_SWORD, CRASH };
 	enum class DEFORM_TYPE { NONE, CAR, CYLINDER, COASTER };
 	
 	static constexpr _float s_fQTE_GorillaLimit = { 5.f };
@@ -58,7 +58,9 @@ namespace Client
 		_float3 vRadians = { 0.f, 0.f, 0.f };
 	};
 
+	constexpr _uint DYNAMIC_ACTOR_ID = 0;
 	constexpr _uint WORLD_STATIC_ID = 1;
+	constexpr _uint WORLD_LD_ID = 2;
 }
 
 using namespace Client;
