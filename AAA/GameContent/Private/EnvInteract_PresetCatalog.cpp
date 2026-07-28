@@ -51,6 +51,8 @@ namespace
 		case ENV_INTERACT_TYPE::BREAKABLE:
 			Preset.eShape = ENV_INTERACT_SHAPE::BOX;
 			Preset.bDamageable = true;
+			Preset.wstrBreakSoundKey = L"GimmickBlock_BoxPlasticBreak.wav";
+			Preset.wstrBreakEffectKey = L"VanishEffect";
 			break;
 
 		case ENV_INTERACT_TYPE::BLOOM_PROP:
