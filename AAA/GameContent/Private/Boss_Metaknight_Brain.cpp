@@ -27,9 +27,9 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     //    });
     
     // 에디터 애니매이션 편집용
-    //return CBTReactiveSelector::Create({
-    //    Clip("Wait", SPD, 0.f),
-    //    });
+    return CBTReactiveSelector::Create({
+        Clip("Wait", SPD, 0.f),
+        });
 
     CBTNode* pCombat = CBTSequence::Create({
         Make_GigaBranch(),
@@ -51,6 +51,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     return CBTReactiveSelector::Create({
         Make_LockOutcomeBranch(),
         Make_DodgeBranch(),
+        Make_RockBranch(),
         Make_UpperBranch(),
         pCombat,
         });
@@ -511,11 +512,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         return BT_STATUS::SUCCESS;
         });
 
-    auto* pFire = CBTAction::Create([this](CBlackboard*, _float) {
-        static_cast<CBoss_Metaknight*>(m_pOwner)->Fire_GigaMoonShot();
-        return BT_STATUS::SUCCESS;
-        });
-
     auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
         static_cast<CBoss_Metaknight*>(m_pOwner)->Start_PatternCooldowns(CBoss_Metaknight::s_fGigaCooldown);
         return BT_STATUS::SUCCESS;
@@ -527,7 +523,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         Clip("Landing", SPD, 0.2f),
         pFace,
         Clip("GigaMoonCharge", SPD, 0.2f),
-        pFire,
         Clip("GigaMoonShot", SPD, 0.2f),
         pEnd,
         });
@@ -601,7 +596,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockFly()
                 if (FlyNoClip(kDest, GIGA_FLY_SPEED, dt, GIGA_ARRIVE))
                 {
                     Anim()->Play("HoverDashEnd", false, true, 0.15f, SPD);
-                    m_pOwner->Release_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
+                    m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
                     *phase = 2;
                 }
             }
@@ -752,15 +747,24 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
         [trackOn] { *trackOn = false; });
 
     auto fallOn = make_shared<bool>(false);
+    auto fallHold = make_shared<_float>(0.f);
     auto* pDiveFall = CBTAction::Create(
-        [this, fallOn](CBlackboard*, _float dt) -> BT_STATUS {
+        [this, fallOn, fallHold](CBlackboard*, _float dt) -> BT_STATUS {
             auto* tf = m_pOwner->Get_Transform();
             auto* mv = m_pOwner->Get_Movement();
+
             if (!*fallOn) {
-                Anim()->Play("DiveBombFall", false, true, 0.1f, SPD);
+                Anim()->Play("DiveBombFall", true, true, 0.1f, SPD);
                 *fallOn = true;
+                *fallHold = 0.f;
                 return BT_STATUS::RUNNING;
             }
+
+            if (*fallHold < DIVEBOMB_FALL_HOLD) {
+                *fallHold += dt;
+                return BT_STATUS::RUNNING;
+            }
+
             _vector p = tf->Get_State(STATE::POSITION);
             _float floorY = CBoss_Metaknight::s_vGigaPoints[0].y;
             _float y = XMVectorGetY(p) - DIVEBOMB_FALL_SPEED * dt;
@@ -769,13 +773,14 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockDrop()
                 tf->Set_State(STATE::POSITION, XMVectorSetY(p, floorY));
                 mv->Sync_To_Controller();
                 *fallOn = false;
+                *fallHold = 0.f;
                 return BT_STATUS::SUCCESS;
             }
             tf->Set_State(STATE::POSITION, XMVectorSetY(p, y));
             mv->Sync_To_Controller();
             return BT_STATUS::RUNNING;
         },
-        [fallOn] { *fallOn = false; });
+        [fallOn, fallHold] { *fallOn = false; *fallHold = 0.f; });
 
     auto* pEnd = CBTAction::Create([this](CBlackboard*, _float) {
         m_pOwner->Get_Movement()->Set_GravityEnabled(true);

@@ -36,6 +36,7 @@ public:
     _bool   Is_Done()    const { return m_bDone; }
     _bool   Is_Playing() const { return m_bStarted && !m_bDone; }
     void    Reset_Containor();
+    virtual void On_Event(void* pData) {};
 
     virtual void On_Deserialized() override;
 
