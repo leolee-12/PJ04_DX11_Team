@@ -439,9 +439,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Clear">
       <UniqueIdentifier>{1bbc49fa-6136-4673-a659-2bc54e9438ee}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge">
-      <UniqueIdentifier>{859ac8de-dcc8-4015-a7ef-68eee0e3db5f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue">
       <UniqueIdentifier>{2c2d36e9-7ad0-4552-90ae-4bf34ee1586c}</UniqueIdentifier>
     </Filter>
@@ -1660,6 +1657,9 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge">
+      <UniqueIdentifier>{859ac8de-dcc8-4015-a7ef-68eee0e3db5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2164,6 +2164,9 @@
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HammerSwing.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WheelHammer.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HitMark.h">
@@ -3720,6 +3723,9 @@
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WheelHammer.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HitMark.cpp">
