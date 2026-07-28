@@ -46,6 +46,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_WaddleDee = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_WaddleDee"), TEXT("../Bin/ShaderFiles/Shader_WaddleDee.hlsl") };
 	inline constexpr SHADER_DESC Shader_Bomb = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Bomb"), TEXT("../Bin/ShaderFiles/Shader_Bomb.hlsl") };
 	inline constexpr SHADER_DESC Shader_EffectRock = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_EffectRock"), TEXT("../Bin/ShaderFiles/Shader_EffectRock.hlsl") };
+	inline constexpr SHADER_DESC Shader_Meteor = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Meteor"), TEXT("../Bin/ShaderFiles/Shader_Meteor.hlsl") };
 	inline constexpr SHADER_DESC Shader_Ring = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Ring"), TEXT("../Bin/ShaderFiles/Shader_Ring.hlsl") };
 	inline constexpr SHADER_DESC Shader_Distortion = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Distortion"), TEXT("../Bin/ShaderFiles/Shader_Distortion.hlsl") };
 	inline constexpr SHADER_DESC Shader_AbillityModel = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AbillityModel"), TEXT("../Bin/ShaderFiles/Shader_AbillityModel.hlsl") };

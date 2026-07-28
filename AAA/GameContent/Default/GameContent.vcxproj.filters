@@ -4817,4 +4817,9 @@
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Meteor.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>
