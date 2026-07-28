@@ -259,6 +259,9 @@
     <ClInclude Include="..\Public\SwordJumpSpin.h" />
     <ClInclude Include="..\Public\SwordSpinSlash.h" />
     <ClInclude Include="..\Public\SwordSuperSpinSlash.h" />
+    <ClInclude Include="..\Public\MetaSlash1.h" />
+    <ClInclude Include="..\Public\MetaSlash2.h" />
+    <ClInclude Include="..\Public\MetaDecisiveSlash.h" />
     <ClInclude Include="..\Public\MetaSuperSpinSlash.h" />
     <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
@@ -787,6 +790,9 @@
     <ClCompile Include="..\Private\SwordJumpSpin.cpp" />
     <ClCompile Include="..\Private\SwordSpinSlash.cpp" />
     <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp" />
+    <ClCompile Include="..\Private\MetaSlash1.cpp" />
+    <ClCompile Include="..\Private\MetaSlash2.cpp" />
+    <ClCompile Include="..\Private\MetaDecisiveSlash.cpp" />
     <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp" />
     <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />

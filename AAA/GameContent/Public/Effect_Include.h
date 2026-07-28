@@ -52,6 +52,9 @@
 #include "SwordJumpSpin.h"
 #include "SwordSpinSlash.h"
 #include "SwordSuperSpinSlash.h"
+#include "MetaSlash1.h"
+#include "MetaSlash2.h"
+#include "MetaDecisiveSlash.h"
 #include "MetaSuperSpinSlash.h"
 #include "MeteorExplosion.h"
 

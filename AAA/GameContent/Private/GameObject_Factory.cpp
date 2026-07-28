@@ -1983,6 +1983,66 @@ void CGameObject_Factory::Metaknight_Effect()
         )
     );
 
+    Register(CMetaSlash1::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMetaSlash1),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash1::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/MetaSlash1/Common_Ring03.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash1::SPIN_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSlash1/common_spin01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash1::CIRCLE05_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSlash1/common_circle05.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash1::CIRCLE06_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSlash1/common_circle06.dds"), 1));
+        )
+    );
+
+    Register(CMetaSlash2::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMetaSlash2),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash2::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/MetaSlash2/Common_Ring03.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash2::SPIN_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSlash2/common_spin01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash2::CIRCLE05_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSlash2/common_circle05.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaSlash2::CIRCLE06_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaSlash2/common_circle06.dds"), 1));
+        )
+    );
+
+    Register(CMetaDecisiveSlash::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMetaDecisiveSlash),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::MODEL_PROTO_TAG_RING,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/Common_Ring03.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::SPIN_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/common_spin01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::CIRCLE05_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/common_circle05.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMetaDecisiveSlash::CIRCLE06_TEXTURE_PROTO_TAG,
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/YSE/Effect/MetaKnightSword/MetaDecisiveSlash/common_circle06.dds"), 1));
+        )
+    );
+
     Register(CMetaSuperSpinSlash::PROTOTYPE_TAG, TEXT("00.Metaknight_Effect"), CREATOR(CMetaSuperSpinSlash),
         LOADER(
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
