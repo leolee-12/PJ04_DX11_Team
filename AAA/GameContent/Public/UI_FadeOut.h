@@ -26,6 +26,8 @@ protected:
     virtual void On_SequenceStart() override;
     virtual void On_SequenceDone() override;   // 페이드아웃 완료 신호
 
+    virtual void On_Event(void* pData) override;
+    
 public:
     static CUI_FadeOut* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;

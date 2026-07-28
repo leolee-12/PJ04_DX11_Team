@@ -163,6 +163,7 @@ namespace
         { TEXT("Meta_Slash3"),                TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Slash3.JSON") },
 
         { TEXT("Meta_Rock"),                  TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Rock.JSON") },
+        { TEXT("Meta_FallCharge"),            TEXT("../../Resources/YSH/Effects/Metaknight/Meta_FallCharge.JSON") },
 
         { TEXT("Meta_DemoUpperAtk1"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk1.JSON") },
         { TEXT("Meta_DemoUpperAtk2"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk2.JSON") },
