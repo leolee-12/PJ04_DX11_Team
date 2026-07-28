@@ -63,6 +63,7 @@ namespace
         { TEXT("HammerSwing"),            TEXT("../../Resources/YSE/EffectContainer/HammerSwing.JSON") },
         { TEXT("HammerSwingFinal"),       TEXT("../../Resources/YSE/EffectContainer/HammerSwingFinal.JSON") },
         { TEXT("WheelHammer"),            TEXT("../../Resources/YSE/EffectContainer/WheelHammer.JSON") },
+        { TEXT("OnigorosiHammerFirst"),   TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerFirst.JSON") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/EffectContainerJSON/YSE/GetAbilityEffect.JSON") },
         { TEXT("GetDeformEffect"),        TEXT("../../Resources/EffectContainerJSON/YSE/GetDeformEffect .JSON") },

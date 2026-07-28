@@ -269,6 +269,13 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG, CKirby_BombHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BombHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Bomb/Hat/BombHat.ysh"));
+
+            // Crash Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_CrashHat::PROTOTYPE_TAG,
+                CKirby_CrashHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CrashHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Crash/CrashHat/CrashHat.ysh"));
+
             // Bomb
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirbyBomb::PROTOTYPE_TAG, CKirbyBomb::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirbyBomb::MODEL_PROTO_TAG,
@@ -748,74 +755,56 @@ void CGameObject_Factory::Register_Effect()
     Register(CSwordJumpSpin::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordJumpSpin),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
-                CMeshCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/Common_Curve03.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::MODEL_PROTO_TAG, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/Common_Curve03.ysh", XMMatrixRotationY(XMConvertToRadians(90.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::TAIL_TEXTURE_PROTO_TAG,
-                CTexture::Create(pDevice, pContext,
-                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_tail.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_tail.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordJumpSpin::SCROLL_TEXTURE_PROTO_TAG,
-                CTexture::Create(pDevice, pContext,
-                    TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_scroll06.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Sword/00_SwordJumpSpin/common_scroll06.dds"), 1));
         )
     );
 
     Register(CHammerSwing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerSwing),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
-                CMeshCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG,
-                CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerSwing::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSE/Effect/Hammer/00_HammerSwing/SwingTorus3.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Hammer/00_HammerSwing/SwingTorus3.ysh"));
             TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID,
                 Texture_HammerSwing_Distortion.szProtoTag,
-                CTexture::Create(pDevice, pContext,
-                    Texture_HammerSwing_Distortion.szFileTag,
-                    Texture_HammerSwing_Distortion.iNumTex));
-            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID,
-                Texture_HammerSwing_Shape.szProtoTag,
-                CTexture::Create(pDevice, pContext,
-                    Texture_HammerSwing_Shape.szFileTag,
-                    Texture_HammerSwing_Shape.iNumTex));
-            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID,
-                Texture_HammerSwing_Edge.szProtoTag,
-                CTexture::Create(pDevice, pContext,
-                    Texture_HammerSwing_Edge.szFileTag,
-                    Texture_HammerSwing_Edge.iNumTex));
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Distortion.szFileTag, Texture_HammerSwing_Distortion.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID, Texture_HammerSwing_Shape.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Shape.szFileTag, Texture_HammerSwing_Shape.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID, Texture_HammerSwing_Edge.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
         )
     );
 
     Register(CWheelHammer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWheelHammer),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
-                CMeshCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG,
-                CDistortionCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CWheelHammer::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWheelHammer::MODEL_PROTO_TAG, CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSE/Effect/Hammer/00_HammerSwing/SwingTorus3.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID,
-                Texture_HammerSwing_Distortion.szProtoTag,
-                CTexture::Create(pDevice, pContext,
-                    Texture_HammerSwing_Distortion.szFileTag,
-                    Texture_HammerSwing_Distortion.iNumTex));
-            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID,
-                Texture_HammerSwing_Shape.szProtoTag,
-                CTexture::Create(pDevice, pContext,
-                    Texture_HammerSwing_Shape.szFileTag,
-                    Texture_HammerSwing_Shape.iNumTex));
-            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID,
-                Texture_HammerSwing_Edge.szProtoTag,
-                CTexture::Create(pDevice, pContext,
-                    Texture_HammerSwing_Edge.szFileTag,
-                    Texture_HammerSwing_Edge.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID, Texture_HammerSwing_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Distortion.szFileTag, Texture_HammerSwing_Distortion.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID, Texture_HammerSwing_Shape.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Shape.szFileTag, Texture_HammerSwing_Shape.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID, Texture_HammerSwing_Edge.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
+        )
+    );
+    Register(COnigorosiHammerFirst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(COnigorosiHammerFirst),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, COnigorosiHammerFirst::MODEL_PROTO_TAG, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/Common/OnigorosiFirst.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_OnigorosiHammerFirst.iLevelID, Texture_OnigorosiHammerFirst.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_OnigorosiHammerFirst.szFileTag, Texture_OnigorosiHammerFirst.iNumTex));
         )
     );
     Register(CCoasterWind::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCoasterWind),
@@ -918,12 +907,11 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CStarParticle::PROTOTYPE_TAG, CStarParticle::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
-                            CModel::Create(pDevice, pContext, MODEL::NONANIM,  "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,  "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CHitMark::PROTOTYPE_TAG, CHitMark::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, Texture_CommonHit01.iLevelID, Texture_CommonHit01.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_CommonHit01.szFileTag,
-                    Texture_CommonHit01.iNumTex));
+                CTexture::Create(pDevice, pContext, Texture_CommonHit01.szFileTag, Texture_CommonHit01.iNumTex));
         ));
 
     // 5 
@@ -954,8 +942,7 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSparkle::PROTOTYPE_TAG, CSparkle::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle02.iLevelID, Texture_CommonSparkle02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_CommonSparkle02.szFileTag,
-                    Texture_CommonSparkle02.iNumTex));
+                CTexture::Create(pDevice, pContext, Texture_CommonSparkle02.szFileTag, Texture_CommonSparkle02.iNumTex));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeMesh"),

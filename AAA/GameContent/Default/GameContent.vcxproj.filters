@@ -508,6 +508,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\06. Kirby_Ability_MetaSword">
       <UniqueIdentifier>{5b8d35f5-998b-48f9-9c6c-6ff56d93d4c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\07. Kirby_Ability_Crash">
+      <UniqueIdentifier>{6418db13-814c-44ed-8d47-b7a3a67fa30e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform">
       <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
     </Filter>
@@ -573,6 +576,9 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\08. MetaHat">
       <UniqueIdentifier>{8f59b103-c3fe-4a3c-bcb6-b6b800dd6ac4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\09. CrashHat">
+      <UniqueIdentifier>{0f7d271a-fec2-4e63-af3c-3442cde31d9b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
@@ -2169,6 +2175,9 @@
     <ClInclude Include="..\Public\WheelHammer.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\OnigorosiHammerFirst.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\HitMark.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
     </ClInclude>
@@ -2220,6 +2229,9 @@
     <ClInclude Include="..\Public\Kirby_Ability_Bomb.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\02. Kirby_Ability_Bomb</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Crash.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\07. Kirby_Ability_Crash</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClInclude>
@@ -2252,6 +2264,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_BombHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_CrashHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\09. CrashHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
@@ -3728,6 +3743,9 @@
     <ClCompile Include="..\Private\WheelHammer.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\OnigorosiHammerFirst.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\HitMark.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
     </ClCompile>
@@ -3773,6 +3791,9 @@
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\02. Kirby_Ability_Bomb</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Crash.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\07. Kirby_Ability_Crash</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
     </ClCompile>
@@ -3805,6 +3826,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_BombHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_CrashHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\09. CrashHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
