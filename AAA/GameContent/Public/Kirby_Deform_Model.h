@@ -53,6 +53,7 @@ protected:
 public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
+	virtual HRESULT Render_Shadow() override;
 
 public:
 	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
@@ -70,7 +71,7 @@ protected:
 	_bool Handle_AnimEventParent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
 	HRESULT Bind_CommonShaderResources(CShader* pShader);
-
+	virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) { return true; }
 protected:
 	CShader* m_pKirbyShaderCom{};
 

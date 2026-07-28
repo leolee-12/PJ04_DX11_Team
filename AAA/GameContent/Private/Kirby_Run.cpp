@@ -46,6 +46,8 @@ void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
     // Wait
     if (pKirby->Has_MoveDir() == false)
         pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
+
+    pKirby->Get_ActiveAttackMode()->Update_RunState(pKirby, fTimeDelta);
 }
 
 void CKirby_Run::Exit(CKirby* pKirby)

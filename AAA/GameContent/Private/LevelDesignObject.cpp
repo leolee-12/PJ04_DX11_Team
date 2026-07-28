@@ -46,7 +46,7 @@ HRESULT CLevelDesignObject::Initialize(void* pArg)
 	if (nullptr == m_pCullingState)
 		return E_FAIL;
 
-	m_iMaterialID = 0;
+	m_iMaterialID = WORLD_LD_ID;
 
 	return S_OK;
 }

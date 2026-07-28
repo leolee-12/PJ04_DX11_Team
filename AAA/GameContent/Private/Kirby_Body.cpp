@@ -71,9 +71,11 @@ HRESULT CKirby_Body::Render_Shadow()
     m_pKirbyShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ));
 
     const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
-
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        if (!Should_RenderShadowMesh(i))
+            continue;
+
         m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", i);
 
         if (FAILED(m_pKirbyShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::ANIM_SHADOW))))
@@ -82,6 +84,11 @@ HRESULT CKirby_Body::Render_Shadow()
         m_pModelCom->Render(i);
     }
     return S_OK;
+}
+
+_bool CKirby_Body::Should_RenderShadowMesh(_uint iMeshIndex)
+{
+    return iMeshIndex < m_VisibleMeshes.size() && m_VisibleMeshes[iMeshIndex];
 }
 
 HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)

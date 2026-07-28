@@ -292,10 +292,24 @@ void CAnimator::Enqueue(const ANI_PLAY_INFO& info)
 
 void CAnimator::SetBoneRotation(const _char* szBone, _float fAngleDeg, _fvector vAxis)
 {
-    m_strRotBone = szBone;
-    m_fRotAngle = fAngleDeg;
-    XMStoreFloat4(&m_vRotAxis, vAxis);
-    m_bHasRotReq = true;
+    if (szBone == nullptr)
+        return;
+
+    for (auto& Request : m_BoneRotationRequests)
+    {
+        if (Request.strBone != szBone)
+            continue;
+
+        Request.fAngle = fAngleDeg;
+        XMStoreFloat4(&Request.vAxis, vAxis);
+        return;
+    }
+
+    BONE_ROTATION_REQUEST Request{};
+    Request.strBone = szBone;
+    Request.fAngle = fAngleDeg;
+    XMStoreFloat4(&Request.vAxis, vAxis);
+    m_BoneRotationRequests.push_back(Request);
 }
 
 _bool CAnimator::Has_Bone(const _char* szBone) const
@@ -355,11 +369,8 @@ void CAnimator::Update(_float fTimeDelta)
                 Layer.bFinished = m_pModel->Apply_Mask(Layer, fTimeDelta);          // Base 위에 블렌드
         }
 
-        if (m_bHasRotReq)
-        {
-            m_pModel->RotateBone(m_strRotBone.c_str(), m_fRotAngle, XMLoadFloat4(&m_vRotAxis));
-            m_bHasRotReq = false;
-        }
+        for (const auto& Request : m_BoneRotationRequests)
+            m_pModel->RotateBone(Request.strBone.c_str(), Request.fAngle, XMLoadFloat4(&Request.vAxis));
 
         m_pModel->Update_Combined();                                                // 모든 레이어 쌓인 뒤에 계층 결합 1회
     }
