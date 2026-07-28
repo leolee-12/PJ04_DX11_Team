@@ -46,6 +46,7 @@ private:
     static constexpr _float ROCK_TRACK_SPEED = 12.f;    
     static constexpr _float DIVEBOMB_RANGE = 4.f;
     static constexpr _float DIVEBOMB_FALL_SPEED = 20.f;
+    static constexpr _float DIVEBOMB_FALL_HOLD = 1.f;
     static constexpr _float ROCK_TRACK_Y = 13.f;
     static constexpr _float TRACK_DESCEND_SPEED = 12.f;
 

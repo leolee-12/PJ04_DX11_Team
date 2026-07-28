@@ -449,7 +449,11 @@ void CKirby_Ability_MetaKnightSword::Enter_SwordState(CKirby* pKirby, META_SWORD
         {
             // Sword Have Clear
             Clear_Overlay(pKirby, iSwordOverlaySlot, 0.f);
-            pAnimator->Play("Meta_Attack3", false, false, 0.f, 2.f);
+            pAnimator->Play("Meta_Attack3", false, false, 0.f, 2.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"MetaDecisiveSlash", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.7f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case META_SWORD_STATE::JUMP_SLASH_START:

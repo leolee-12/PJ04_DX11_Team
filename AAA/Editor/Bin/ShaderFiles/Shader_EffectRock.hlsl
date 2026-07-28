@@ -172,6 +172,8 @@ struct PS_GBUFFER_OUT
     float4 vDepth : SV_TARGET2;
     float4 vMRA : SV_TARGET3;
     float4 vEmissive : SV_TARGET4;
+    float4 vGeoNormal : SV_TARGET5;
+    uint vMaterialID : SV_TARGET6;
 };
 
 void Apply_CircleUVAnim(float2 vTexcoord, bool bUse, float fRatio, float fStartDegree, bool bClockwise)
@@ -404,12 +406,14 @@ PS_GBUFFER_OUT PS_GBUFFER(PS_IN In)
 
     float4 vColor = ComposeEffectColor_Linear(In.vTexcoord);
 
-    if (vColor.a <= g_fAlphaClip)
+    float fCoverage = g_fAlpha;
+
+    if (fCoverage <= g_fAlphaClip)
         discard;
 
     uint2 vPixel = uint2(In.vPosition.xy);
     float fThreshold = g_fBayer4x4[(vPixel.y & 3) * 4 + (vPixel.x & 3)];
-    if (vColor.a < fThreshold)
+    if (fCoverage < fThreshold)
         discard;
 
     // Normal: 노멀맵 있으면 RG 2채널 샘플 + Z 재구성, 없으면 정점 노멀
@@ -439,8 +443,10 @@ PS_GBUFFER_OUT PS_GBUFFER(PS_IN In)
     Out.vNormal = float4(vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, 1.f);
-    Out.vEmissive = float4(g_vEmissiveColor.rgb * vColor.a, 1.f);
-
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * fCoverage, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = 0;
+    
     return Out;
 }
 
