@@ -46,6 +46,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_WaddleDee = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_WaddleDee"), TEXT("../Bin/ShaderFiles/Shader_WaddleDee.hlsl") };
 	inline constexpr SHADER_DESC Shader_Bomb = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Bomb"), TEXT("../Bin/ShaderFiles/Shader_Bomb.hlsl") };
 	inline constexpr SHADER_DESC Shader_EffectRock = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_EffectRock"), TEXT("../Bin/ShaderFiles/Shader_EffectRock.hlsl") };
+	inline constexpr SHADER_DESC Shader_Meteor = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Meteor"), TEXT("../Bin/ShaderFiles/Shader_Meteor.hlsl") };
 	inline constexpr SHADER_DESC Shader_Ring = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Ring"), TEXT("../Bin/ShaderFiles/Shader_Ring.hlsl") };
 	inline constexpr SHADER_DESC Shader_Distortion = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Distortion"), TEXT("../Bin/ShaderFiles/Shader_Distortion.hlsl") };
 	inline constexpr SHADER_DESC Shader_AbillityModel = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AbillityModel"), TEXT("../Bin/ShaderFiles/Shader_AbillityModel.hlsl") };
@@ -105,7 +106,8 @@ namespace ProtoDesc
 	// Hit 
 	inline constexpr TEXTURE_DESC Texture_CommonHit01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonHit01"), TEXT("../../Resources/CHJ/Effect/Damage/common_hit01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_CommonRing01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonRing01"), TEXT("../../Resources/CHJ/Effect/Common/common_ring01.dds"), 1 };
-	
+	inline constexpr TEXTURE_DESC Texture_SwordHit_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordHit_Flash02"), TEXT("../../Resources/CHJ/Effect/Damage/sword_flash02.png"), 1 };
+
 	// Sparkle
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle01"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle01.dds"), 1 };
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle02"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle02.dds"), 1 };

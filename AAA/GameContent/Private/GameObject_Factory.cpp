@@ -909,8 +909,8 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, Texture_Meta_Ring1.iLevelID, Texture_Meta_Ring1.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Meta_Ring1.szFileTag, Texture_Meta_Ring1.iNumTex));
-            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_SwordHit_Flash02.iLevelID, Texture_SwordHit_Flash02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_SwordHit_Flash02.szFileTag, Texture_SwordHit_Flash02.iNumTex));
             TRY_ADD_PROTO(pProxy, Texture_Meta_HitFire1.iLevelID, Texture_Meta_HitFire1.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Meta_HitFire1.szFileTag, Texture_Meta_HitFire1.iNumTex));
             TRY_ADD_PROTO(pProxy, Texture_Meta_HitFire2.iLevelID, Texture_Meta_HitFire2.szProtoTag,
@@ -1472,15 +1472,22 @@ void CGameObject_Factory::Register_Effect()
     Register(CMeteorExplosion::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMeteorExplosion),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PIECE_SMALL_MODEL_TAG,
-                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceSmall.ysh", 
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceSmall.ysh",
                             XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PIECE_COOL_MODEL_TAG,
                         CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceCool.ysh",
                             XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::SPHERE_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Common_Spere.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::SMOKE_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
         ));
 }
 

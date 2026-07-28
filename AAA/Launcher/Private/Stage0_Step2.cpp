@@ -49,6 +49,7 @@ HRESULT CStage0_Step2::Ready_Events()
         CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
         if (pLoadingLevel)
         {
+            m_pGameInstance_Proxy->Fade_BGM_Out(1.f);
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
