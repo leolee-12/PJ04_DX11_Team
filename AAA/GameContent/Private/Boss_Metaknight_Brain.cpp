@@ -51,6 +51,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     return CBTReactiveSelector::Create({
         Make_LockOutcomeBranch(),
         Make_DodgeBranch(),
+        Make_RockBranch(),
         Make_UpperBranch(),
         pCombat,
         });

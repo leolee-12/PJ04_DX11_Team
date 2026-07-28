@@ -285,7 +285,7 @@ private:
     _float4x4 m_SparkAnchor{};
 
     // µð¹ö±×
-    static constexpr _bool s_bSkipIntro = false;
+    static constexpr _bool s_bSkipIntro = true;
 
 private:
     HRESULT Ready_MetaEvents();
