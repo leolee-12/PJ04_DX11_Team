@@ -2069,6 +2069,15 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			bChanged = true;
 		}
 
+		bool bEmissiveMono = (0u != (Layer.iFlags & WorldShaderFlags::EmissiveMono));
+		if (ImGui::Checkbox("Emissive Mono (R -> RGB)##MeshLayer", &bEmissiveMono))
+		{
+			Layer.iFlags = bEmissiveMono
+				? (Layer.iFlags | WorldShaderFlags::EmissiveMono)
+				: (Layer.iFlags & ~WorldShaderFlags::EmissiveMono);
+			bChanged = true;
+		}
+
 		if (Ui.bEnvObjectMeshUi)
 			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
 		else
@@ -2268,6 +2277,9 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 			ImGui::TableNextColumn();
 			DrawCompactExtraCell("ExR", "##WorldExR", Layer.iExtraBind[0], Layer.iExtraTexType[0]);
+
+			ImGui::TableNextColumn();
+			DrawCompactLayerSlotCell("Emi", "##WorldTexEmissive", MTEX_TYPE::EMISSIVE);
 
 			ImGui::EndTable();
 		}
