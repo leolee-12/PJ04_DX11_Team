@@ -17,6 +17,7 @@ public:
 	static constexpr const _tchar* PIECE_COOL_MODEL_TAG			= L"Prototype_Component_Model_MeteorPieceCool";
 	static constexpr const _tchar* SPHERE_MODEL_TAG				= L"Prototype_Component_Model_MeteorSphere";
 	static constexpr const _tchar* SMOKE_MODEL_TAG				= L"Prototype_Component_Model_MeteorSmoke";
+	static constexpr const _tchar* PUFF_MODEL_TAG				= L"Prototype_Component_Model_MeteorPuff";
 
 private:
 	CMeteorExplosion(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

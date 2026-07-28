@@ -56,43 +56,40 @@ HRESULT CMeteorExplosion::Render()
 
 HRESULT CMeteorExplosion::Ready_EffectPartObjects()
 {
-	// Stage 1 : blast volume - one big sphere, emissive drives the bloom.
-	CMeshCommon::MESH_COMMON_DESC tBlast{};
-	tBlast.iModelLevel        = m_iPrototypeLevel;
-	tBlast.wstrModelTag       = SPHERE_MODEL_TAG;
-	tBlast.bUseDiffuseTexture = true;
-	tBlast.bUseNormalTexture  = false;
-	tBlast.bUseMRATexture     = false;
-	tBlast.bUseUnknownTexture = false;
-	tBlast.bUseTextureCom     = false;
-	tBlast.bUseMaskCom        = false;
-	tBlast.bCustomShader      = true;
-	tBlast.iShaderLevel       = Shader_Meteor.iLevelID;
-	tBlast.wstrShaderTag      = Shader_Meteor.szProtoTag;
+	CMeshCommon::MESH_COMMON_DESC tMesh{};
+	tMesh.iModelLevel        = m_iPrototypeLevel;
+	tMesh.bUseDiffuseTexture = true;
+	tMesh.bUseNormalTexture  = false;
+	tMesh.bUseMRATexture     = false;
+	tMesh.bUseUnknownTexture = false;
+	tMesh.bUseTextureCom     = false;
+	tMesh.bUseMaskCom        = false;
+	tMesh.bCustomShader      = true;
+	tMesh.iShaderLevel       = Shader_Meteor.iLevelID;
+	tMesh.wstrShaderTag      = Shader_Meteor.szProtoTag;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Blast", &tBlast)))
+	tMesh.wstrModelTag = SPHERE_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Blast", &tMesh)))
 		return E_FAIL;
 
-	// Stage 2 : many small spheres, dither-dissolve as their alpha falls.
+	tMesh.bUseDiffuseTexture = false;
+
+	tMesh.wstrModelTag = PUFF_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Puff", &tMesh)))
+		return E_FAIL;
+
+	// Stage 3 : rock fragments. Piece models carry diffuse / normal / MRA.
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel        = m_iPrototypeLevel;
 	tDesc.bUseDiffuseTexture = true;
-	tDesc.bUseNormalTexture  = false;
-	tDesc.bUseMRATexture     = false;
+	tDesc.bUseNormalTexture  = true;
+	tDesc.bUseMRATexture     = true;
 	tDesc.bUseUnknownTexture = false;
 	tDesc.bUseTextureCom     = false;
 	tDesc.bUseMaskCom        = false;
 	tDesc.bCustomShader      = true;
 	tDesc.iShaderLevel       = Shader_Meteor.iLevelID;
 	tDesc.wstrShaderTag      = Shader_Meteor.szProtoTag;
-
-	tDesc.wstrModelTag = SPHERE_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Puff", &tDesc)))
-		return E_FAIL;
-
-	// Stage 3 : rock fragments. Piece models carry diffuse / normal / MRA.
-	tDesc.bUseNormalTexture = true;
-	tDesc.bUseMRATexture    = true;
 
 	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_1", &tDesc)))

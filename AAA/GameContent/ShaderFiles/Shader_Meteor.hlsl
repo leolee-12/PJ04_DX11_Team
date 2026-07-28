@@ -1,13 +1,18 @@
 // ============================================================================
-//  Shader_Meteor.hlsl  -  temporary shader for the MeteorExplosion effect.
-//  Baseline: byte-copy of Shader_EffectRock.hlsl
-//    - PS_GBUFFER (pass 0 / 4) : Bayer 4x4 screen-space dither dissolve
-//                                driven by alpha, plus emissive -> bloom.
-//    - passes are 0..7 only  =>  parts using this MUST keep Depth Ignore = 0
-//                                (Effect_Part.cpp Resolve_ShaderPass()).
-//  Once the meteor look is validated here, port the changes back into the
-//  shared effect shaders.
+//  Shader_Meteor.hlsl  -  dedicated shader for the MeteorExplosion effect.
+//  Currently an exact copy of Shader_EffectRock.hlsl.
+//
+//  The dissolve experiment (UV / local-position / normal driven fronts) was
+//  rolled back on 2026-07-28. Parts now fade out with their Alpha curve only.
+//
+//    - PS_GBUFFER (pass 0 / 4) still carries EffectRock's inherited Bayer 4x4
+//      screen-space dither, so an alpha fade on pass 0 reads as a stipple.
+//      For a smooth fade use pass 1 (AlphaBlend) or pass 2 (Additive) together
+//      with Render Group 6 (BLEND_HDR): those run PS_MAIN and do not dither.
+//    - this technique declares passes 0..7 only, so any part using this shader
+//      MUST keep Depth Ignore = 0 (see Effect_Part.cpp Resolve_ShaderPass()).
 // ============================================================================
+
  #include "Engine_Shader_Defines.hlsli"
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;

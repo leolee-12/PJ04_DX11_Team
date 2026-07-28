@@ -1488,6 +1488,9 @@ void CGameObject_Factory::Register_Effect()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::SMOKE_MODEL_TAG,
                         CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PUFF_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Common_SmokeSphereFadeLarge.ysh"));
         ));
 }
 
