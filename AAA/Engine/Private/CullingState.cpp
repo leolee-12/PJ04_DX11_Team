@@ -8,10 +8,18 @@ namespace
 {
 	constexpr _float CULL_DISTANCE = 175.f;
 	constexpr _float DISTANCE_FADE_WIDTH = 10.f;
+	constexpr _uint CULLING_STABLE_EVALUATION_INTERVAL = 3u;
+
+	_uint Acquire_EvaluationPhase()
+	{
+		static atomic<_uint> s_iNextPhase = {};
+		return s_iNextPhase.fetch_add(1u, memory_order_relaxed) % CULLING_STABLE_EVALUATION_INTERVAL;
+	}
 }
 
 CCullingState::CCullingState(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
+	, m_iEvaluationPhase(Acquire_EvaluationPhase())
 {
 }
 
@@ -21,6 +29,7 @@ CCullingState::CCullingState(const CCullingState& Prototype)
 	, m_bHasBounds(Prototype.m_bHasBounds)
 	, m_bTransformDirty(true)
 	, m_bRotationInvariant(Prototype.m_bRotationInvariant)
+	, m_iEvaluationPhase(Acquire_EvaluationPhase())
 {
 }
 
@@ -83,6 +92,7 @@ void CCullingState::Set_RotationInvariant(_bool bEnable)
 void CCullingState::Mark_TransformDirty()
 {
 	m_bTransformDirty = true;
+	m_bForceEvaluation = true;
 }
 
 void CCullingState::Refresh_WorldBounds(const _float4x4& WorldMatrix)
@@ -118,6 +128,11 @@ void CCullingState::Refresh_WorldBounds(const _float4x4& WorldMatrix)
 
 void CCullingState::Evaluate(const CULLING_EVALUATION_INPUT& Desc)
 {
+	const _uint64 iFrameIndex = static_cast<_uint64>(m_pGameInstance_Proxy->Get_FrameIndex());
+	if (!m_bForceEvaluation
+		&& 0u != ((iFrameIndex + m_iEvaluationPhase) % CULLING_STABLE_EVALUATION_INTERVAL))
+		return;
+
 	Reset_AllResults();
 
 	const _bool bEvaluateMainDistance = Desc.bEvaluateMain && Desc.Main.bUseDistance;
@@ -141,6 +156,8 @@ void CCullingState::Evaluate(const CULLING_EVALUATION_INPUT& Desc)
 
 	if (Desc.bEvaluateShadow)
 		Evaluate_Channel(CHANNEL::SHADOW, Desc.Shadow, bEvaluateShadowDistance && bHasDistanceResult ? &DistanceResult : nullptr);
+
+	m_bForceEvaluation = false;
 }
 
 void CCullingState::Reset_AllResults()

@@ -183,8 +183,15 @@ void CPanel_Toolbar::Draw_CameraButtons(CLevel_Edit* pLevel)
 	static _float s_fJumpStep = 25.f;
 	static _float3 s_vTeleportPos = { 0.f, 5.f, -10.f };
 
-	if (ImGui::Button("Back to Edit"))
-		pLevel->Back_To_Edit();
+	const _bool bEditMode = m_pGI_Proxy->Is_EditMode();
+
+	if (ImGui::Button(bEditMode ? "Play" : "Back to Edit"))
+	{
+		m_pGI_Proxy->Set_EditMode(!bEditMode);
+
+		if (!bEditMode)
+			pLevel->Back_To_Edit();
+	}
 
 	ImGui::SameLine();
 
