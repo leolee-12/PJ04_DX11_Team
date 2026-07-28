@@ -24,7 +24,7 @@ public:
 
     static constexpr _float         s_fSpinDuration = 0.8f;
     static constexpr _float         s_fStartLead = 0.35f;
-    static constexpr _float         s_fSpinMaxDegPerSec = 1440.f;
+    static constexpr _float         s_fSpinMaxDegPerSec = 2880.f;
     static constexpr _float         s_fWarpInvisibleTime = 1.0f;
 
 protected:

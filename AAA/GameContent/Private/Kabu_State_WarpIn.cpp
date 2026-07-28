@@ -1,6 +1,8 @@
 #include "Kabu_State_WarpIn.h"
 #include "Kabu.h"
 #include "Monster_RailMovement.h"
+#include "MonsterPart.h"
+#include "Effect_Loader.h"
 
 HRESULT CKabu_State_WarpIn::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -27,6 +29,34 @@ void CKabu_State_WarpIn::Enter(MONSTER_STATE_TYPE ePrevState)
 
     if (m_pAnimator && !m_PlayInfo.strAniName.empty())
         m_pAnimator->Play(&m_PlayInfo);
+
+	CKabu* pKabu = static_cast<CKabu*>(m_pOwner);
+	CTransform* pTransform = pKabu->Get_Transform();
+
+	if (!pKabu->Is_RenderCulled())
+	{
+		_float3 vPos{};
+		XMStoreFloat3(&vPos, pTransform->Get_State(STATE::POSITION));
+		vPos.y += 0.5f;
+
+		const auto& Parts = pKabu->Get_PartObjects();
+		auto it = Parts.find(TEXT("Body"));
+		if (it != Parts.end())
+		{
+			CMonsterPart* pBody = static_cast<CMonsterPart*>(it->second);
+			const _float4x4* pBone =
+				nullptr != pBody ? pBody->Get_BoneMatrixPtr("CenterL") : nullptr;
+			if (nullptr != pBone)
+			{
+				_matrix matBoneWorld =
+					XMLoadFloat4x4(pBone) * XMLoadFloat4x4(pTransform->Get_WorldMatrixPtr());
+				XMStoreFloat3(&vPos, matBoneWorld.r[3]);
+			}
+		}
+
+		CEffect_Loader::GetInstance()->Spawn(
+			TEXT("WarpInEffect"), pKabu->Get_LevelIndex(), vPos);
+	}
 }
 
 void CKabu_State_WarpIn::Update(_float fTimeDelta)
