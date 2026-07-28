@@ -153,7 +153,7 @@ void CLD_MeteorGenerator::Fire_Rock()
     XMStoreFloat3(&vTarget, vGen);
 
     CMeteorRock* pRock = static_cast<CMeteorRock*>(pProj);
-    pRock->Configure(m_tMeteorDesc.fFallSpeed, fLife, !m_tMeteorDesc.bNoBreakEffect, m_tMeteorDesc.fImpactRadius * 1.25f);
+    pRock->Configure(m_tMeteorDesc.fFallSpeed, fLife, !m_tMeteorDesc.bNoBreakEffect, m_tMeteorDesc.fImpactRadius * 2.f);
     pRock->Set_TargetPos(vTarget);
 
     _float3 vDir;

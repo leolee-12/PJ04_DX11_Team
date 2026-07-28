@@ -65,8 +65,8 @@ HRESULT CMeteorExplosion::Ready_EffectPartObjects()
 	tMesh.bUseTextureCom     = false;
 	tMesh.bUseMaskCom        = false;
 	tMesh.bCustomShader      = true;
-	tMesh.iShaderLevel       = Shader_Meteor.iLevelID;
-	tMesh.wstrShaderTag      = Shader_Meteor.szProtoTag;
+	tMesh.iShaderLevel       = Shader_EffectRock.iLevelID;
+	tMesh.wstrShaderTag      = Shader_EffectRock.szProtoTag;
 
 	tMesh.wstrModelTag = SPHERE_MODEL_TAG;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Blast", &tMesh)))
@@ -88,8 +88,8 @@ HRESULT CMeteorExplosion::Ready_EffectPartObjects()
 	tDesc.bUseTextureCom     = false;
 	tDesc.bUseMaskCom        = false;
 	tDesc.bCustomShader      = true;
-	tDesc.iShaderLevel       = Shader_Meteor.iLevelID;
-	tDesc.wstrShaderTag      = Shader_Meteor.szProtoTag;
+	tDesc.iShaderLevel       = Shader_EffectRock.iLevelID;
+	tDesc.wstrShaderTag      = Shader_EffectRock.szProtoTag;
 
 	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_1", &tDesc)))
