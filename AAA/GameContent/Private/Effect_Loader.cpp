@@ -87,6 +87,7 @@ namespace
         { TEXT("WarpOutEffect"),          TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutEffect/WarpOutEffect.JSON") },
         { TEXT("WarpOutStart"),           TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutStart/WarpOutStart.JSON") },
         { TEXT("WarpOutEnd"),             TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutEnd/WarpOutEnd.JSON") },
+        { TEXT("WarpInEffect"),           TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpInEffect/WarpInEffect.JSON") },
         { TEXT("SpitObject"),             TEXT("../../Resources/EffectContainerJSON/CHJ/SpitObject.JSON") },
         { TEXT("SpitAir"),                TEXT("../../Resources/EffectContainerJSON/YSH/Spit_Air.JSON") },
 
