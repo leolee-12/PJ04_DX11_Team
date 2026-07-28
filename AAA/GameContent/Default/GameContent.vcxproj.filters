@@ -49,6 +49,9 @@
     <Filter Include="00. GameObject\02. EnvObject\EnvTrigger\Trigger">
       <UniqueIdentifier>{84257336-de92-4c0b-834e-ecde29e11e01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\EnvTrigger\Trigger\EventPublisher">
+      <UniqueIdentifier>{baed38f1-ec26-4d43-9692-ad9b5fc529ca}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\02. EnvObject\EnvTrigger\Volume">
       <UniqueIdentifier>{c487a407-1c31-42f3-afaa-a5b383647e55}</UniqueIdentifier>
     </Filter>
@@ -1129,6 +1132,12 @@
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\MoonShot">
       <UniqueIdentifier>{bbd5d08f-f2bc-4d50-8123-4bf76bddeca5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\Rock">
+      <UniqueIdentifier>{d2636a0f-a37f-4ee2-b19b-a11f28d57043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\Slash">
+      <UniqueIdentifier>{5e763974-4ce6-4d4f-a28e-3c79360e5dd7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge">
       <UniqueIdentifier>{3ceb17f9-42d0-469a-aa8b-a899f361b548}</UniqueIdentifier>
     </Filter>
@@ -1663,12 +1672,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\Slash">
-      <UniqueIdentifier>{5e763974-4ce6-4d4f-a28e-3c79360e5dd7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\MetaKnight\Effect\Rock">
-      <UniqueIdentifier>{d2636a0f-a37f-4ee2-b19b-a11f28d57043}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2067,11 +2070,17 @@
     <ClInclude Include="..\Public\EnvObject_Trigger.h">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\EnvTrigger_Debug.h">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger\EventPublisher</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h">
-      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger\EventPublisher</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvTrigger_Generic.h">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnvTrigger_LevelChange.h">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger\EventPublisher</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
@@ -2679,6 +2688,12 @@
     <ClInclude Include="..\public\Meta_MoonShot.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\MoonShot</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Meta_Rock.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Rock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Meta_Slash.h">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Slash</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Meta_UpperCharge.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClInclude>
@@ -3267,12 +3282,6 @@
     <ClInclude Include="..\Public\World_BlendCollector.h">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Meta_Slash.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Slash</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Meta_Rock.h">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Rock</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3638,11 +3647,17 @@
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\EnvTrigger_Debug.cpp">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger\EventPublisher</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp">
-      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger\EventPublisher</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvTrigger_Generic.cpp">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnvTrigger_LevelChange.cpp">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger\EventPublisher</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
@@ -4193,6 +4208,12 @@
     <ClCompile Include="..\private\Meta_MoonShot.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\MoonShot</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Meta_Rock.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Rock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Meta_Slash.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Slash</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Meta_UpperCharge.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClCompile>
@@ -4735,12 +4756,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Meta_Slash.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Slash</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Meta_Rock.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\Rock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

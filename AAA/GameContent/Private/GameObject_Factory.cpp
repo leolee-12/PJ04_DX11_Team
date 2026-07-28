@@ -634,6 +634,9 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CEnvTrigger_Generic::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_Generic), LOADER());
     Register(CEnvTrigger_RenderGlobals::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_RenderGlobals), LOADER());
     Register(CEnvTrigger_EventPublisher::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_EventPublisher), LOADER());
+    Register(CEnvTrigger_Debug::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_Debug), LOADER());
+    Register(CEnvTrigger_LevelChange::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_LevelChange), LOADER());
+
     Register(CEnvVolume_Effect::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Effect), LOADER());
     Register(CEnvVolume_Culling::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Culling), LOADER());
     Register(CEnvVolume_Light::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Light), LOADER());

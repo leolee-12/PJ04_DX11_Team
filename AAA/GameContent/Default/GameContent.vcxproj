@@ -59,6 +59,8 @@
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
     <ClInclude Include="..\Public\Effect_Include.h" />
+    <ClInclude Include="..\public\EnvTrigger_Debug.h" />
+    <ClInclude Include="..\public\EnvTrigger_LevelChange.h" />
     <ClInclude Include="..\Public\Env_Include.h" />
     <ClInclude Include="..\public\Excalibur.h" />
     <ClInclude Include="..\public\Excalibur_Body.h" />
@@ -589,6 +591,8 @@
     <ClCompile Include="..\private\Camera_Coaster.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
+    <ClCompile Include="..\private\EnvTrigger_Debug.cpp" />
+    <ClCompile Include="..\private\EnvTrigger_LevelChange.cpp" />
     <ClCompile Include="..\private\Excalibur.cpp" />
     <ClCompile Include="..\private\Excalibur_Body.cpp" />
     <ClCompile Include="..\private\Excalibur_GetIt.cpp" />
