@@ -38,6 +38,7 @@ public:
 
 private:
 	HRESULT Ready_Components();
+	virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) override;
 
 private:
 	_bool m_bBodyAOn{};

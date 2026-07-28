@@ -68,6 +68,23 @@ HRESULT CKirby_ToyHat::Render()
     return S_OK;
 }
 
+_bool CKirby_ToyHat::Should_RenderShadowMesh(_uint iMeshIndex)
+{
+    switch (iMeshIndex)
+    {
+    case TOY_HAT_MESH::HOVERING_STRAP:
+        return m_eOffMesh != TOY_HAT_MESH::HOVERING_STRAP;
+
+    case TOY_HAT_MESH::STRAP:
+        return m_eOffMesh != TOY_HAT_MESH::STRAP;
+
+    case TOY_HAT_MESH::HEAD:
+        return true;
+    }
+
+    return false;
+}
+
 void CKirby_ToyHat::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
 {
     switch (ePartMode)

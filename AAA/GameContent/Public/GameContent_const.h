@@ -81,6 +81,7 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_HammerSwing_Distortion = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HammerSwing_Distortion"), TEXT("../../Resources/YSE/Effect/Hammer/00_HammerSwing/indirectwind_normal_unorm.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_HammerSwing_Shape = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HammerSwing_Shape"), TEXT("../../Resources/YSE/Effect/Hammer/00_HammerSwing/common_shockwave02_2.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_HammerSwing_Edge = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HammerSwing_Edge"), TEXT("../../Resources/YSE/Effect/Hammer/00_HammerSwing/common_shockwave07_2.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_OnigorosiHammerFirst = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_OnigorosiHammerFirst"), TEXT("../../Resources/YSE/Hammer/ToyHammer/HammerC_BaseColor.782003610.dds"), 1 };
 
 	// SwordSlash1
 	inline constexpr TEXTURE_DESC Texture_Common_Ring02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Ring02"), TEXT("../../Resources/YSE/Effect/Common_Ring03/common_ring02.png"), 1 };

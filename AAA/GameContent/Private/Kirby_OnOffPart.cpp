@@ -79,6 +79,9 @@ HRESULT CKirby_OnOffPart::Render_Shadow()
     const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        if (!Should_RenderShadowMesh(i))
+            continue;
+
         if (m_pAnimatorCom)
         {
             if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))

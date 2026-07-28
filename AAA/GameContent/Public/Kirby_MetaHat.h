@@ -39,6 +39,7 @@ public:
 
 private:
 	HRESULT Ready_Components();
+	virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) override;
 
 	_bool m_bIsHovering{};
 
