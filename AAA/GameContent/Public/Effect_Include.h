@@ -51,6 +51,7 @@
 #include "HammerSwing.h"
 #include "WheelHammer.h"
 #include "OnigorosiHammerFirst.h"
+#include "OnigorosiHammerEnd.h"
 #include "SwordJumpSpin.h"
 #include "SwordSpinSlash.h"
 #include "SwordSuperSpinSlash.h"

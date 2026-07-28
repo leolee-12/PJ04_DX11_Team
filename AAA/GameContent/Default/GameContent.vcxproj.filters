@@ -2895,6 +2895,9 @@
     <ClInclude Include="..\Public\OnigorosiHammerFirst.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\OnigorosiHammerEnd.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\OnLadderEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\23. OnLadderEffect</Filter>
     </ClInclude>
@@ -4419,6 +4422,9 @@
       <Filter>00. GameObject\06. Monster\08. NormalEnemy_Wild\Parts\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\OnigorosiHammerFirst.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OnigorosiHammerEnd.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\OnLadderEffect.cpp">

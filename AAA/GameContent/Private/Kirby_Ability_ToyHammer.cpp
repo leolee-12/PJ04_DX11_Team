@@ -431,6 +431,10 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack1.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerFirst", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_2:
@@ -438,6 +442,10 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack2.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerSecond", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
@@ -445,6 +453,10 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack3.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerEnd", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_4:
