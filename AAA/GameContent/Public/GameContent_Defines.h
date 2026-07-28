@@ -58,7 +58,9 @@ namespace Client
 		_float3 vRadians = { 0.f, 0.f, 0.f };
 	};
 
+	constexpr _uint DYNAMIC_ACTOR_ID = 0;
 	constexpr _uint WORLD_STATIC_ID = 1;
+	constexpr _uint WORLD_LD_ID = 2;
 }
 
 using namespace Client;

@@ -71,6 +71,8 @@ void CKirby_Deform_Car::Enter_Deform(CKirby* pKirby)
     BreakerableHitBoxDesc.fRadius = 2.5f;
     BreakerableHitBoxDesc.fHeight = 0.f;
     pKirby->Set_ColliderDesc(CKirby::BREAKERABLE_HITBOX, BreakerableHitBoxDesc);
+
+    m_fRollDegree = 0.f;
 }
 
 void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
@@ -221,6 +223,11 @@ _bool CKirby_Deform_Car::Enter_Attack_KeyUp(CKirby* pKirby)
     return true;
 }
 
+void CKirby_Deform_Car::Update_RunState(CKirby* pKirby, _float fTimeDelta)
+{
+    Roll_Wheel(pKirby, fTimeDelta);
+}
+
 void CKirby_Deform_Car::Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext)
 {
     if (m_eDeformCar_State == eNext)
@@ -297,6 +304,7 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
     {
         case DEFORM_CAR_STATE::BOOST:
         {
+            Roll_Wheel(pKirby, fTimeDelta);
             Update_BoostJumpState(pKirby, fTimeDelta);
 
             // 회전
@@ -333,6 +341,8 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
         }
         case DEFORM_CAR_STATE::BOOST_END:
         {
+            Roll_Wheel(pKirby, fTimeDelta);
+
             // 회전
             _vector vRotDir = XMLoadFloat3(&m_vRotDir);
             if (XMVectorGetX(XMVector3LengthSq(vRotDir)) > Helper::fEpsilon)
@@ -505,6 +515,28 @@ _bool CKirby_Deform_Car::Check_FrontCollision(CKirby* pKirby)
         vCenter, fRadius, vDir,
         3.f,
         &vDumpNormal, &fDumpDistance, true, false);
+}
+
+void CKirby_Deform_Car::Roll_Wheel(CKirby* pKirby, _float fTimeDelta)
+{
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    _float3 vVelocity = pMovement->Get_Velocity();
+    _vector vSpeedXZ = XMLoadFloat3(&vVelocity);
+    vSpeedXZ = XMVectorSetY(vSpeedXZ, 0.f);
+
+    _float fSpeedXZ = XMVectorGetX(XMVector3Length(vSpeedXZ));
+    if (fSpeedXZ < Helper::fEpsilon)
+        return;
+
+    constexpr _float fRotScale = 70.f;
+    m_fRollDegree += fSpeedXZ * fRotScale * fTimeDelta;
+    m_fRollDegree = fmodf(m_fRollDegree, 360.f);
+
+    CAnimator* pAnimator = pKirby->Get_CurrentDeformModel()->Get_Animator();
+    pAnimator->SetBoneRotation("L_BTireJ", m_fRollDegree, XMVectorSet(-1.f, 0.f, 0.f, 0.f));
+    pAnimator->SetBoneRotation("L_FTireJ", m_fRollDegree, XMVectorSet(-1.f, 0.f, 0.f, 0.f));
+    pAnimator->SetBoneRotation("R_BTireJ", m_fRollDegree, XMVectorSet(-1.f, 0.f, 0.f, 0.f));
+    pAnimator->SetBoneRotation("R_FTireJ", m_fRollDegree, XMVectorSet(-1.f, 0.f, 0.f, 0.f));
 }
 
 CKirby_Deform_Car* CKirby_Deform_Car::Create()

@@ -131,6 +131,13 @@ private:
     _wstring Resolve_DataFilePath(const _wstring& strPath) const;
 
 private:
+    struct BONE_ROTATION_REQUEST
+    {
+        _string strBone = {};
+        _float  fAngle = { 0.f };
+        _float4 vAxis = { 1.f, 0.f, 0.f, 0.f };
+    };
+
     CModel* m_pModel = { nullptr };
     EventCallback   m_Callback = { nullptr };
 
@@ -153,10 +160,7 @@ private:
     LAYER               m_Layers[MAX_LAYERS] = {};
 
     // 회전에 필요한 변수
-    _string             m_strRotBone;       // 회전을 적용할 본 이름 "RotL"
-    _float              m_fRotAngle = { 0.f };
-    _float4             m_vRotAxis = { 1.f, 0.f, 0.f, 0.f };
-    _bool               m_bHasRotReq = { false };
+    vector<BONE_ROTATION_REQUEST> m_BoneRotationRequests = {};
 
 public:
     static CAnimator* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
