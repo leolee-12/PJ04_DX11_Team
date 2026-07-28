@@ -84,10 +84,6 @@ CEnvTrigger_RenderGlobals::CEnvTrigger_RenderGlobals(const CEnvTrigger_RenderGlo
 	m_strProtoTag = PROTOTYPE_TAG;
 }
 
-HRESULT CEnvTrigger_RenderGlobals::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
-}
 
 HRESULT CEnvTrigger_RenderGlobals::Initialize(void* pArg)
 {
@@ -104,10 +100,6 @@ HRESULT CEnvTrigger_RenderGlobals::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CEnvTrigger_RenderGlobals::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
-{
-	__super::Copy_PrototypeName(pOutData);
-}
 
 void CEnvTrigger_RenderGlobals::OnTriggerEnter(CCollider* pOther)
 {

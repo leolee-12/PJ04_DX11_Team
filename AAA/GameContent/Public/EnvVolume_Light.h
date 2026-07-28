@@ -20,9 +20,7 @@ private:
 	virtual ~CEnvVolume_Light() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 #ifdef _DEBUG
 protected:
