@@ -87,6 +87,21 @@ HRESULT CKirby_ToyHammer::Render()
     return S_OK;
 }
 
+_bool CKirby_ToyHammer::Should_RenderShadowMesh(_uint iMeshIndex)
+{
+    switch (iMeshIndex)
+    {
+        case TOY_HAMMER_MESH::HANDLE:
+            return true;
+
+        case TOY_HAMMER_MESH::HEAD:
+        case TOY_HAMMER_MESH::TOP:
+            return !m_bBurn;
+    }
+
+    return false;
+}
+
 void CKirby_ToyHammer::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)
 {
     switch (ePartMode)

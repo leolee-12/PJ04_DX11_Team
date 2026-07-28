@@ -36,6 +36,7 @@ public:
 
 private:
     HRESULT Ready_Components();
+    virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) override;
 
     TOY_HAT_MESH m_eOffMesh{};
 

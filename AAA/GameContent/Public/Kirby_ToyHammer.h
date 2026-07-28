@@ -66,6 +66,7 @@ private:
     HRESULT Ready_Components();
     HRESULT Ready_HitBox();
     void	SetUp_HitBox_Callback();
+    virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) override;
 
 private:
     CCollider* m_pHitBox{};
