@@ -495,6 +495,16 @@ HRESULT CWaddleDee::Validate_Initialized()
 		|| !m_pBody->Has_Animation(s_strAngryClip))
 		return E_FAIL;
 
+	if (!m_bUseMovement)
+	{
+		for (const _tchar* pArenaBattleAnimClip : s_ArenaBattleAnimClips)
+		{
+			const _string strArenaBattleAnimClip = WstrToStr(pArenaBattleAnimClip);
+			if (!m_pBody->Has_Animation(strArenaBattleAnimClip.c_str()))
+				return E_FAIL;
+		}
+	}
+
 	for (const INTERACT_ANIM_DESC& InteractAnimDesc : s_InteractAnimDescs)
 	{
 		if (!m_pBody->Has_Animation(InteractAnimDesc.szClip))
@@ -678,6 +688,27 @@ void CWaddleDee::Update_Idle(_float fTimeDelta)
 		return;
 	}
 
+	if (!m_bUseMovement && !m_pGameInstance_Proxy->Is_EditMode())
+	{
+		if (m_fStateTimer > 0.f)
+		{
+			m_fStateTimer = max(0.f, m_fStateTimer - fTimeDelta);
+
+			if (m_fStateTimer <= 0.f)
+				Play_Idle();
+
+			return;
+		}
+
+		if (m_pBody->Get_Animator()->Is_Finished())
+		{
+			m_pBody->Get_Animator()->Play(s_strIdleClip, true, true, s_fBlendDuration, s_fAnimationSpeed);
+			m_fStateTimer = m_pGameInstance_Proxy->RandomFloat(0.5f, 2.f);
+		}
+
+		return;
+	}
+
 	if (!m_bUseMovement || !m_bWander || !m_strFixedAnim.empty())
 		return;
 
@@ -689,6 +720,17 @@ void CWaddleDee::Update_Idle(_float fTimeDelta)
 
 void CWaddleDee::Play_Idle()
 {
+	if (!m_bUseMovement && !m_pGameInstance_Proxy->Is_EditMode())
+	{
+		const _uint iClipIndex = static_cast<_uint>(m_pGameInstance_Proxy->RandomInt(0, static_cast<_int>(s_iArenaBattleAnimClipCount) - 1));
+		const _string strClip = WstrToStr(s_ArenaBattleAnimClips[iClipIndex]);
+
+		m_pBody->Get_Animator()->Play(strClip, false, true, s_fBlendDuration, s_fAnimationSpeed);
+		m_fStateTimer = 0.f;
+		m_strAppliedFixedAnim = m_strFixedAnim;
+		return;
+	}
+
 	const _string strClip = m_strFixedAnim.empty() ? s_strIdleClip : WstrToStr(m_strFixedAnim);
 
 	m_pBody->Get_Animator()->Play(strClip, true, true, s_fBlendDuration, s_fAnimationSpeed);
