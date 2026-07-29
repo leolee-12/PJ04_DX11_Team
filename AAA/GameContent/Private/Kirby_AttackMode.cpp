@@ -67,6 +67,15 @@ void CKirby_AttackMode::Effect_StopImmediately(CEffect_Container*& pContainer)
     }
 }
 
+void CKirby_AttackMode::Effect_FadeOut(CEffect_Container*& pContainer, _float fFadeOutTime)
+{
+    if (pContainer != nullptr)
+    {
+        pContainer->Start_FadeOut(fFadeOutTime);
+        pContainer = nullptr;
+    }
+}
+
 void CKirby_AttackMode::Free()
 {
     Safe_Release(m_pGameInstance_Proxy);

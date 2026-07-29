@@ -10,6 +10,7 @@ namespace
 {
 	constexpr const _tchar*		WOOD_BOX_BREAK_SOUNDKEY			= L"GimmickBlock_BoxWoodBreak.wav";
 	constexpr const _tchar *	PLASTIC_BOX_BREAK_SOUNDKEY		= L"GimmickBlock_BoxPlasticBreak.wav";
+	constexpr const _tchar*		BOX_IRON_BREAK_SOUNDKEY			= L"GimmickBlock_BoxIronBreak.wav";
 	constexpr const _tchar*		NORMAL_ROCK_BREAK_SOUNDKEY		= L"GimmickBreakable_NormalRockBreak.wav";
 	constexpr const _tchar*		LARGE_ROCK_BREAK_SOUNDKEY		= L"GimmickBreakable_LargeRockBreak.wav";
 
@@ -45,7 +46,7 @@ namespace
 			{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh",
 			MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, L"CommonHit", PLASTIC_BOX_BREAK_SOUNDKEY, 0.25f, BREAK_MASK_LV1 },
 			{ L"BoxIron", CLevelDesign_Breakable::BOXIRON_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxIron/BoxIron2.ysh",
-			MODEL::ANIM, 0u, "Model__BoxIronC", false, L"CommonHit", nullptr, 0.f, BREAK_MASK_LV2 },
+			MODEL::ANIM, 0u, "Model__BoxIronC", false, L"CommonHit", BOX_IRON_BREAK_SOUNDKEY, 0.25f, BREAK_MASK_LV2 },
 			{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh",
 			MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f, BREAK_MASK_LV2 },
 			{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh",

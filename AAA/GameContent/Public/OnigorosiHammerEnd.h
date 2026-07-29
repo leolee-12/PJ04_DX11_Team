@@ -4,21 +4,21 @@
 
 NS_BEGIN(Client)
 
-class COnigorosiHammerFirst final : public CEffect_Container
+class COnigorosiHammerEnd final : public CEffect_Container
 {
-	GENERATED_BODY(COnigorosiHammerFirst)
+	GENERATED_BODY(COnigorosiHammerEnd)
 
 public:
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_OnigorosiHammerFirst";
-	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_OnigorosiHammerFirst";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_OnigorosiHammerEnd";
+	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_OnigorosiHammerEnd";
 	static constexpr const _tchar* WARP_PART_TAG = L"TailModelWarp";
 	static constexpr const _tchar* COLOR_PART_TAG = L"TailModel";
 	static constexpr const _tchar* YELLOW_PART_TAG = L"TailModelYellow";
 
 private:
-	COnigorosiHammerFirst(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	COnigorosiHammerFirst(const COnigorosiHammerFirst& Prototype);
-	virtual ~COnigorosiHammerFirst() = default;
+	COnigorosiHammerEnd(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	COnigorosiHammerEnd(const COnigorosiHammerEnd& Prototype);
+	virtual ~COnigorosiHammerEnd() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;
@@ -38,7 +38,7 @@ private:
 	HRESULT Ready_EffectPartObjects();
 
 public:
-	static COnigorosiHammerFirst* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static COnigorosiHammerEnd* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:

@@ -39,7 +39,7 @@ void CKirby_Emote::Enter(CKirby* pKirby, _int iFlag)
     {
         case EMOTE_STATE_FLAG::EMOTE_TOP:
             pAnimator->Play("EmoteWaveHand", false, true, 0.1f, 1.5f);
-            m_fInteractedRatio = 0.1f;
+            m_fInteractedRatio = 0.2f;
             break;
         case EMOTE_STATE_FLAG::EMOTE_DOWN:
             pAnimator->Play("WaitSit", false, true, 0.1f, 1.5f);
@@ -105,8 +105,12 @@ void CKirby_Emote::Update(CKirby* pKirby, const _float fTimeDelta)
             if (pWaddleDee == nullptr)
                 continue;
 
-            // m_eEmoteStateFlag 이걸로 분기
-            //pWaddleDee->
+            const CWaddleDee::WADDLEDEE_EMOTE eEmote
+                = m_eEmoteStateFlag == EMOTE_STATE_FLAG::EMOTE_TOP
+                ? CWaddleDee::WADDLEDEE_EMOTE::WAVE
+                : CWaddleDee::WADDLEDEE_EMOTE::YAY;
+
+            pWaddleDee->React_Emote(eEmote);
         }
 
         m_bInteracted = true;

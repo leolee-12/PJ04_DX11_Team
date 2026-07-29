@@ -804,14 +804,63 @@ void CGameObject_Factory::Register_Effect()
                 CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
         )
     );
+    Register(CHammerFire::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerFire),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerFire::MODEL_PROTO_TAG_FIRE01, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/Common/Common_Fire01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerFire::MODEL_PROTO_TAG_FIRE03, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/Common/Common_Fire03.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFire_Scroll.iLevelID, Texture_HammerFire_Scroll.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFire_Scroll.szFileTag, Texture_HammerFire_Scroll.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFire_Mask.iLevelID, Texture_HammerFire_Mask.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFire_Mask.szFileTag, Texture_HammerFire_Mask.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFire_Distortion.iLevelID, Texture_HammerFire_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFire_Distortion.szFileTag, Texture_HammerFire_Distortion.iNumTex));
+        )
+    );
+    Register(CHammerFireSwing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerFireSwing),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFireSwing.iLevelID, Texture_HammerFireSwing.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFireSwing.szFileTag, Texture_HammerFireSwing.iNumTex));
+        )
+    );
     Register(COnigorosiHammerFirst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(COnigorosiHammerFirst),
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, COnigorosiHammerFirst::MODEL_PROTO_TAG, CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSE/Effect/Hammer/Common/OnigorosiFirst.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_OnigorosiHammerFirst.iLevelID, Texture_OnigorosiHammerFirst.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_OnigorosiHammerFirst.szFileTag, Texture_OnigorosiHammerFirst.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID, Texture_HammerSwing_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Distortion.szFileTag, Texture_HammerSwing_Distortion.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_OnigorosiHammerFirst_Fire.iLevelID, Texture_OnigorosiHammerFirst_Fire.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_OnigorosiHammerFirst_Fire.szFileTag, Texture_OnigorosiHammerFirst_Fire.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID, Texture_HammerSwing_Shape.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Shape.szFileTag, Texture_HammerSwing_Shape.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID, Texture_HammerSwing_Edge.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
+        )
+    );
+    Register(COnigorosiHammerEnd::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(COnigorosiHammerEnd),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, COnigorosiHammerEnd::MODEL_PROTO_TAG, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/Common/OnigorosiEnd.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID, Texture_HammerSwing_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Distortion.szFileTag, Texture_HammerSwing_Distortion.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_OnigorosiHammerFirst_Fire.iLevelID, Texture_OnigorosiHammerFirst_Fire.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_OnigorosiHammerFirst_Fire.szFileTag, Texture_OnigorosiHammerFirst_Fire.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID, Texture_HammerSwing_Shape.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Shape.szFileTag, Texture_HammerSwing_Shape.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID, Texture_HammerSwing_Edge.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
         )
     );
     Register(CCoasterWind::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCoasterWind),
@@ -1206,6 +1255,20 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CSplit_Trash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Trash),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanGreen"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanGreen.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanOrange"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanOrange.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanPurple"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanPurple.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanRed"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanRed.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanYellow"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanYellow.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TrashA"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_TrashA.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_StoneDust.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+        )
+    );
+
     // 10
     Register(CSplit_Stone::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Stone),
         LOADER
@@ -1228,6 +1291,51 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafL"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicL.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicM.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafS"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicS.ysh"));
+        )
+    );
+
+    Register(CCrashEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCrashEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_GROUND_SMOKE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Cylinder3.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_SPHERE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Spere.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_RING_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Ring01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_CIRCLE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Circle01.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_SLASH_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/slash01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WAVE_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_wave01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_RING04_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_ring04.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE01_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_STAR00_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_star00.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE02_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle02.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_SHINE_CIRCLE_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_shinecircle01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE06_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle06.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_RING03_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_ring03.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE07_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle07.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE_GLOW_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/circleglow2.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WARP_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirectwarpcirkle_normal.dds"), 1));
         )
     );
 

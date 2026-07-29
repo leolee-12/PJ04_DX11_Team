@@ -74,7 +74,6 @@ private:
 
 public:
 	static CKirby_Ability_Sleep* Create();
-
 private:
 	virtual void Free() override;
 };
