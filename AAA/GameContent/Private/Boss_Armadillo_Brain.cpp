@@ -233,7 +233,7 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
         pFallLoop, Clip("HitWallLanding", SPD),
         CBTAction::Create([this](CBlackboard*, _float) { 
             m_pOwner->Play_SectionLoopSFX(CBoss_Armadillo::SND_STUNLOOP, 0.03f, 0.45f, 0.25f);
-            m_pOwner->Spawn_LoopFx(L"FaintEffect", "ControlL");
+            m_pOwner->Spawn_LoopFx(L"FaintEffect", "ControlL", _float3(0.f, 3.5f, -2.f));
             return BT_STATUS::SUCCESS;
             },
             [this]() { 

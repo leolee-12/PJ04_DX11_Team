@@ -42,10 +42,10 @@ private:
 private:
 	_float							m_fTiltAccTime = { 0.f };
 
-	static constexpr const _float   TILT_ANGLE_DEG = { 35.f };
+	static constexpr const _float   TILT_ANGLE_DEG = { 40.f };
 	static constexpr const _float   TILT_PRECESS_DEG_SEC = { 60.f };
-	static constexpr const _float   TILT_WOBBLE_CYCLES = { 2.f };
-	static constexpr const _float   TILT_WOBBLE_DEPTH = { 0.25f };
+	static constexpr const _float   TILT_WOBBLE_CYCLES = { 6.f };
+	static constexpr const _float   TILT_WOBBLE_DEPTH = { 0.45f };
 
 public:
 	static CFaintEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
