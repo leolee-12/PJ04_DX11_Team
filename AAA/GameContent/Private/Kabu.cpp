@@ -59,6 +59,36 @@ void CKabu::Update(_float fTimeDelta)
     Update_MoveSmokeFx();
 }
 
+void CKabu::Damaged(const ATTACK_INFO& tInfo)
+{
+    if (HIT_TYPE::BREAKERABLE_HIT == tInfo.eHitType ||
+        HIT_TYPE::HAMMER_PRESS == tInfo.eHitType)
+    {
+        if (!Is_Active() || Is_Invincible())
+            return;
+
+        if (MONSTER_STATE_TYPE::FLATTEN == Get_StateType())
+            return;
+
+        if (Block_Hit(tInfo))
+            return;
+
+        Stop_MoveSmokeFx(true);
+        Resolve_DamageReactSFX(tInfo);
+
+        auto* pRail = static_cast<CMonster_RailMovement*>(m_pMovement);
+
+        if (pRail && pRail->Has_Rail() && pRail->Is_OffPath())
+            Despawn();
+        else
+            Change_State(MONSTER_STATE_TYPE::FLATTEN);
+
+        return;
+    }
+
+    __super::Damaged(tInfo);
+}
+
 _bool CKabu::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
     Out.fRadius = { 0.75f };
@@ -276,23 +306,6 @@ void CKabu::Stop_MoveSmokeFx(_bool bImmediate)
     }
 
     hSlot.Clear();
-}
-
-void CKabu::On_Damaged(const ATTACK_INFO& tInfo)
-{
-    if (tInfo.eHitType == HIT_TYPE::BREAKERABLE_HIT)
-    {
-        Stop_MoveSmokeFx(true);
-
-        if (!(static_cast<CMonster_RailMovement*>(m_pMovement)->Is_OffPath()))
-            Change_State(MONSTER_STATE_TYPE::FLATTEN);
-        else
-            Despawn();
-
-        return;
-    }
-
-    __super::On_Damaged(tInfo);
 }
 
 HRESULT  CKabu::Ready_PartObjects()
