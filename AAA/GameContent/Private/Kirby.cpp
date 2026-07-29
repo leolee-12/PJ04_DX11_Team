@@ -1227,7 +1227,7 @@ void CKirby::Update_RenderWorldMatrix(_float fTimeDelta)
     _vector vBaseUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
 
     // 누군가에게 부착되어 있을때 적용 x
-    if (m_bIsAttach)
+    if (m_bIsAttach || !m_bUseRenderGroundAlign)
     {
         XMStoreFloat4x4(&m_RenderWorldMatrix, matBaseWorld);
         XMStoreFloat3(&m_vRenderGroundNormal, vBaseUp);
