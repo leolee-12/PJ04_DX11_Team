@@ -22,6 +22,7 @@
 #include "BombFuseEffect.h"
 #include "FlowerPetals.h"
 #include "Split_Starblock.h"
+#include "Split_Trash.h"
 #include "Split_Stone.h"
 #include "Split_Bush.h"
 #include "Split_Coaster.h"

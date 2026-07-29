@@ -51,6 +51,7 @@
     <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\public\Camera_Coaster.h" />
+    <ClInclude Include="..\Public\CrashEffect.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
     <ClInclude Include="..\Public\Dekabu_Brain.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="..\Public\RabbitEnemy_Body.h" />
     <ClInclude Include="..\Public\RabbitEnemy_Brain.h" />
     <ClInclude Include="..\Public\RabbitEnemy_State_Jump.h" />
+    <ClInclude Include="..\Public\Split_Trash.h" />
     <ClInclude Include="..\Public\SwordHitEffect.h" />
     <ClInclude Include="..\public\Spotlight_Rig.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
@@ -597,6 +599,7 @@
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\private\Camera_Coaster.cpp" />
+    <ClCompile Include="..\Private\CrashEffect.cpp" />
     <ClCompile Include="..\Private\EnvInteract_BreakProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
@@ -690,6 +693,7 @@
     <ClCompile Include="..\Private\RabbitEnemy_Body.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_Brain.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_State_Jump.cpp" />
+    <ClCompile Include="..\Private\Split_Trash.cpp" />
     <ClCompile Include="..\Private\SwordHitEffect.cpp" />
     <ClCompile Include="..\private\Spotlight_Rig.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />

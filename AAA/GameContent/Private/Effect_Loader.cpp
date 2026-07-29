@@ -96,6 +96,7 @@ namespace
         { TEXT("LensFlare"),              TEXT("../../Resources/Map/Effect/Proto_LensFlare_0.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_Big.JSON") },
+        { TEXT("Split_Trash"),            TEXT("../../Resources/Map/Effect/Proto_Split_Trash_0.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_0.JSON") },
         { TEXT("Split_Stone_Big"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_Big.JSON") },
         { TEXT("Split_Stone_Ultra"),      TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_Ultra.JSON") },

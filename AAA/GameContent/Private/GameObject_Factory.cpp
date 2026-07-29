@@ -1140,6 +1140,20 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CSplit_Trash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Trash),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanGreen"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanGreen.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanOrange"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanOrange.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanPurple"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanPurple.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanRed"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanRed.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EmptyCanYellow"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_EmptyCanYellow.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TrashA"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Can/1_TrashA.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, Model_StoneDust.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+        )
+    );
+
     // 10
     Register(CSplit_Stone::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Stone),
         LOADER
