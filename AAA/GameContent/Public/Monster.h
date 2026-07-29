@@ -66,6 +66,8 @@ public:
 
 	virtual void				On_Deserialized() override;
 
+	virtual void				Set_Active(_bool bActive) override;
+
 public: 
 	// 외부에서 타겟 주입
 	void						Set_Target(CGameObject* pTarget);

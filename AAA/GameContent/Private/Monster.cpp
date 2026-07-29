@@ -147,6 +147,14 @@ void CMonster::On_Deserialized()
 	XMStoreFloat3(&m_vBasePos, m_pTransformCom->Get_State(STATE::POSITION));
 }
 
+void CMonster::Set_Active(_bool bActive)
+{
+	if (!bActive)
+		Stop_AllSounds();
+
+	__super::Set_Active(bActive);
+}
+
 void CMonster::Set_Target(CGameObject* pTarget)
 {
 	m_BlackBoard.pTarget = pTarget;
