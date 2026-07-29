@@ -106,7 +106,8 @@ namespace ProtoDesc
 	// Hit 
 	inline constexpr TEXTURE_DESC Texture_CommonHit01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonHit01"), TEXT("../../Resources/CHJ/Effect/Damage/common_hit01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_CommonRing01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonRing01"), TEXT("../../Resources/CHJ/Effect/Common/common_ring01.dds"), 1 };
-	
+	inline constexpr TEXTURE_DESC Texture_SwordHit_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordHit_Flash02"), TEXT("../../Resources/CHJ/Effect/Damage/sword_flash02.png"), 1 };
+
 	// Sparkle
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle01"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle01.dds"), 1 };
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle02"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle02.dds"), 1 };
@@ -151,6 +152,8 @@ namespace ProtoDesc
 
 	// Monster Effect
 	inline constexpr TEXTURE_DESC Texture_BK_CommonSlash = { ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_BK_CommonSlash"),  TEXT("../../Resources/CHJ/Effect/Monster/BladeKnight/common_slash.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Kabu_CommonLine = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Kabu_CommonLine"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/Common_Line.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Kabu_FlashCircle ={ ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_Kabu_FlashCircle"), TEXT("../../Resources/CHJ/Effect/Textures/circlegradation_a.png"), 1 }; 
 }
 
 using namespace ProtoDesc;

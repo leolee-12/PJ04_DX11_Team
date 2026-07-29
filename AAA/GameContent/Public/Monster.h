@@ -76,6 +76,7 @@ public:
 	CMonster_Movement*			Get_Movement() { return m_pMovement; }
 	const _float3&				Get_BasePos() const { return m_vBasePos; }
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
+	_bool						Is_RenderCulled() const { return m_CullState.bRenderCull; }
 
 	const LD_OBJECT_DESC&		Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
 	_int						Get_AIType() const { return m_iAIType; }

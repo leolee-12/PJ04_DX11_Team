@@ -2,7 +2,8 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 
-#include "MeshParticleCommon.h"
+#include "MeshCommon.h"
+#include "MeshEmitterCommon.h"
 
 CMeteorExplosion::CMeteorExplosion(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
@@ -55,24 +56,65 @@ HRESULT CMeteorExplosion::Render()
 
 HRESULT CMeteorExplosion::Ready_EffectPartObjects()
 {
-	CMeshParticleCommon::MESH_PARTICLE_COMMON_DESC tMeshParticle{};
-	tMeshParticle.iModelLevel = m_iPrototypeLevel;
-	tMeshParticle.bUseDiffuseTexture = true;
-	tMeshParticle.bUseNormalTexture = true;
-	tMeshParticle.bUseMRATexture = true;
-	tMeshParticle.bUseUnknownTexture = false;
-	tMeshParticle.bUseTextureCom = false;
-	tMeshParticle.bUseMaskCom = false;
-	tMeshParticle.bCustomShader = false;
-	
-	// MeshParticleCommon - MeteorPieceSmall
-	tMeshParticle.wstrModelTag = PIECE_SMALL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"PieceSmall", &tMeshParticle)))
+	CMeshCommon::MESH_COMMON_DESC tMesh{};
+	tMesh.iModelLevel        = m_iPrototypeLevel;
+	tMesh.bUseDiffuseTexture = true;
+	tMesh.bUseNormalTexture  = false;
+	tMesh.bUseMRATexture     = false;
+	tMesh.bUseUnknownTexture = false;
+	tMesh.bUseTextureCom     = false;
+	tMesh.bUseMaskCom        = false;
+	tMesh.bCustomShader      = true;
+	tMesh.iShaderLevel       = Shader_EffectRock.iLevelID;
+	tMesh.wstrShaderTag      = Shader_EffectRock.szProtoTag;
+
+	tMesh.wstrModelTag = SPHERE_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Blast", &tMesh)))
 		return E_FAIL;
 
-	// MeshParticleCommon - MeteorPieceCool
-	tMeshParticle.wstrModelTag = PIECE_COOL_MODEL_TAG;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshParticleCommon::PROTOTYPE_TAG, L"PieceCool", &tMeshParticle)))
+	tMesh.bUseDiffuseTexture = false;
+
+	tMesh.wstrModelTag = PUFF_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Puff", &tMesh)))
+		return E_FAIL;
+
+	// Stage 3 : rock fragments. Piece models carry diffuse / normal / MRA.
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
+	tDesc.iModelLevel        = m_iPrototypeLevel;
+	tDesc.bUseDiffuseTexture = true;
+	tDesc.bUseNormalTexture  = true;
+	tDesc.bUseMRATexture     = true;
+	tDesc.bUseUnknownTexture = false;
+	tDesc.bUseTextureCom     = false;
+	tDesc.bUseMaskCom        = false;
+	tDesc.bCustomShader      = true;
+	tDesc.iShaderLevel       = Shader_EffectRock.iLevelID;
+	tDesc.wstrShaderTag      = Shader_EffectRock.szProtoTag;
+
+	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_1", &tDesc)))
+		return E_FAIL;
+
+	tDesc.wstrModelTag = PIECE_SMALL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_2", &tDesc)))
+		return E_FAIL;
+
+	tDesc.wstrModelTag = PIECE_SMALL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_3", &tDesc)))
+		return E_FAIL;
+
+	tDesc.wstrModelTag = PIECE_COOL_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Chunk_4", &tDesc)))
+		return E_FAIL;
+
+	// Trailing smoke. This model only exposes UNKNOWN slots.
+	tDesc.bUseDiffuseTexture = false;
+	tDesc.bUseNormalTexture  = false;
+	tDesc.bUseMRATexture     = false;
+	tDesc.bUseUnknownTexture = true;
+
+	tDesc.wstrModelTag = SMOKE_MODEL_TAG;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Smoke", &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
