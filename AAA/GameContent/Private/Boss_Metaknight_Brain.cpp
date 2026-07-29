@@ -27,9 +27,9 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     //    });
     
     // 에디터 애니매이션 편집용
-    return CBTReactiveSelector::Create({
-        Clip("Wait", SPD, 0.f),
-        });
+    //return CBTReactiveSelector::Create({
+    //    Clip("Wait", SPD, 0.f),
+    //    });
 
     CBTNode* pCombat = CBTSequence::Create({
         Make_GigaBranch(),
@@ -325,7 +325,15 @@ CBTNode* CBoss_Metaknight_Brain::Make_SwordCombo(_int iHits)
 {
     CBTNode* pOpen = CBTSequence::Create({
         //FaceWindup("Attack1Start", 540.f, SPD),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Play_SectionLoopSFX(CBoss_Metaknight::SND_ATTACK1CHARGE1, 0.047f, 0.403f, 0.4f);
+            return BT_STATUS::SUCCESS;
+        },[this]() {m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_ATTACK1CHARGE1);}),
         Clip("Attack1Charge", 2.f, 0.2f),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_ATTACK1CHARGE1);
+            return BT_STATUS::SUCCESS;
+        }),
         Make_SwordHit(true),
         Make_AttackLunge("Attack1"),
         });
@@ -470,7 +478,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaFly()
                 else if (*iPhase == 1)
                 {
                     Anim()->Play("HoverDashEnd", false, true, 0.15f, SPD);
-                    m_pOwner->Release_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
+                    m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
 
                     _vector vLook = XMVector3Normalize(XMVectorSetY(
                         m_pOwner->Get_Transform()->Get_State(STATE::LOOK), 0.f));
@@ -522,7 +530,15 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         Make_GigaFly(),
         Clip("Landing", SPD, 0.2f),
         pFace,
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Play_LoopSFX(CBoss_Metaknight::SND_GIGAMOONSHOT_CHARGE, 0.2f);
+            return BT_STATUS::SUCCESS;
+        },[this] { m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_GIGAMOONSHOT_CHARGE); }),
         Clip("GigaMoonCharge", SPD, 0.2f),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_GIGAMOONSHOT_CHARGE);
+            return BT_STATUS::SUCCESS;
+        }),
         Clip("GigaMoonShot", SPD, 0.2f),
         pEnd,
         });
