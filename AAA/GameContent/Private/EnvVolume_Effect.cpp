@@ -20,11 +20,6 @@ CEnvVolume_Effect::CEnvVolume_Effect(const CEnvVolume_Effect& Prototype)
 	m_strProtoTag = PROTOTYPE_TAG;
 }
 
-HRESULT CEnvVolume_Effect::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
-}
-
 HRESULT CEnvVolume_Effect::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
@@ -36,11 +31,6 @@ HRESULT CEnvVolume_Effect::Initialize(void* pArg)
 	m_pSpawnedEffect = nullptr;
 
 	return S_OK;
-}
-
-void CEnvVolume_Effect::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
-{
-	__super::Copy_PrototypeName(pOutData);
 }
 
 void CEnvVolume_Effect::OnTriggerEnter(CCollider* pOther)

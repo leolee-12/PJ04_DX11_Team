@@ -86,6 +86,10 @@ namespace
 
         { TEXT("BombExplosion"),          TEXT("../../Resources/EffectContainerJSON/YSH/BombExplosion.JSON") },
         { TEXT("CommonHit"),              TEXT("../../Resources/EffectContainerJSON/CHJ/CommonHit.JSON") },
+        { TEXT("SwordHitEffect"),         TEXT("../../Resources/CHJ/Effect/EffectContainers/SwordHitEffect.JSON") },
+        { TEXT("WarpOutStart"),           TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutStart.JSON") },
+        { TEXT("WarpOutEnd"),             TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpOutEnd.JSON") },
+        { TEXT("WarpInEffect"),           TEXT("../../Resources/CHJ/Effect/EffectContainers/WarpInEffect.JSON") },
         { TEXT("SpitObject"),             TEXT("../../Resources/EffectContainerJSON/CHJ/SpitObject.JSON") },
         { TEXT("SpitAir"),                TEXT("../../Resources/EffectContainerJSON/YSH/Spit_Air.JSON") },
 
@@ -116,6 +120,7 @@ namespace
         { TEXT("EssenceAura"),            TEXT("../../Resources/EffectContainerJSON/CHJ/EssenceAura.JSON") },
         { TEXT("PickUpEffect"),           TEXT("../../Resources/EffectContainerJSON/CHJ/PickUpEffect.JSON") },
         { TEXT("DropStarEffect"),         TEXT("../../Resources/EffectContainerJSON/CHJ/DropStarEffect.JSON") },
+        { TEXT("MeteorExplosion"),        TEXT("../../Resources/CHJ/Effect/EffectContainers/MeteorExplosion.JSON")},
 
 #pragma region Armadillo Effects
         { TEXT("RutA"),                   TEXT("../../Resources/EffectContainerJSON/YSH/RutA.JSON") },

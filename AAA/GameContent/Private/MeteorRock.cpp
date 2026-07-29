@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Collider.h"
+#include "Effect_Loader.h"
 
 CMeteorRock::CMeteorRock(
     ID3D11Device* pDevice,
@@ -14,8 +15,8 @@ CMeteorRock::CMeteorRock(
     m_fSpeed = 10.f;
     m_fLifeTime = 12.f;
     m_fDamage = 6.f;
-    m_fHitRadius = 2.f;
-    m_fHitHeight = 0.5f;
+    m_fHitRadius = 3.f;
+    m_fHitHeight = 0.1f;
 }
 
 CMeteorRock::CMeteorRock(const CMeteorRock& Prototype)
@@ -124,9 +125,21 @@ void CMeteorRock::Update(_float fTimeDelta)
     }
     else
     {
+        m_fVibrationElapsed += fTimeDelta;
+
+        const _float fX = sinf(m_fVibrationElapsed * VIBRATION_FREQ_X) * VIBRATION_AMPLITUDE;
+        const _float fZ = sinf(m_fVibrationElapsed * VIBRATION_FREQ_Z + 1.3f) * VIBRATION_AMPLITUDE;
+
+        m_pTransformCom->Set_State(STATE::POSITION,
+            XMLoadFloat3(&m_vTargetPos) + XMVectorSet(fX, 0.f, fZ, 0.f));
+
         m_fLingerTimer -= fTimeDelta;
         if (m_fLingerTimer <= 0.f)
+        {
+            m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&m_vTargetPos));
+            Spawn_ExplosionFx();
             Kill();
+        }
     }
 }
 
@@ -154,7 +167,7 @@ HRESULT CMeteorRock::Ready_HitBox()
             atk.pAttacker = this;
             pVictim->Damaged(atk);
         }
-        On_Impact();
+        //On_Impact();
         });
 
     m_pHitBox->Set_Enabled(false);
@@ -170,12 +183,61 @@ void CMeteorRock::Enter_Landed()
     if (m_pHitBox)
         m_pHitBox->Set_Enabled(false);
 
-    m_fLingerTimer = LINGER_SEC;
     On_Land();
+}
+
+void CMeteorRock::Spawn_ExplosionFx()
+{
+    if (!m_bBreakOnLand)
+        return;
+
+    const _float3 vRockScale = m_pTransformCom->Get_Scaled();
+    const _float fWorldRadius = m_fHitRadius * max(vRockScale.x, vRockScale.z);
+
+    _vector vBackward = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    const _vector vDir = XMLoadFloat3(&m_vDir);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-6f)
+        vBackward = -XMVector3Normalize(vDir);
+
+    _float3 vPos{};
+    XMStoreFloat3(&vPos,
+        XMLoadFloat3(&m_vTargetPos) + vBackward * (fWorldRadius * 0.5f));
+
+    CEffect_Container* pEffect = nullptr;
+    if (SUCCEEDED(CEffect_Loader::GetInstance()->Spawn(
+        TEXT("MeteorExplosion"), Get_LevelIndex(), vPos,
+        _float3{}, _float3{}, nullptr, &pEffect)) && nullptr != pEffect)
+    {
+        pEffect->Get_Transform()->Set_Scale(vRockScale.x, vRockScale.y, vRockScale.z);
+    }
 }
 
 void CMeteorRock::On_Land()
 {
+    m_fLingerTimer = LINGER_SEC;
+    m_fVibrationElapsed = 0.f;
+
+    const _float4* pCamPosition = m_pGameInstance_Proxy->Get_CamPosition();
+    if (nullptr == pCamPosition)
+        return;
+
+    const _vector vCamPosition = XMLoadFloat4(pCamPosition);
+    if (XMVector3IsNaN(vCamPosition) || XMVector3IsInfinite(vCamPosition))
+        return;
+
+    const _float fDistance = XMVectorGetX(XMVector3Length(
+        XMLoadFloat3(&m_vTargetPos) - vCamPosition));
+
+    _float fT = (fDistance - SHAKE_FULL_RADIUS) / (SHAKE_ZERO_RADIUS - SHAKE_FULL_RADIUS);
+    Helper::FloatClamp(fT, 0.f, 1.f);
+
+    const _float fFactor = 1.f - (fT * fT * (3.f - 2.f * fT));
+    if (fFactor <= Helper::fEpsilon)
+        return;
+
+    CAMERA_SHAKE_DESC desc{};
+    desc.fTrauma = SHAKE_BASE_TRAUMA * fFactor;
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &desc);
 }
 
 HRESULT CMeteorRock::Bind_ShaderResources()
@@ -245,6 +307,12 @@ HRESULT CMeteorRock::Render_Shadow()
             return E_FAIL;
     }
     return S_OK;
+}
+
+void CMeteorRock::Launch(const _float3& vPos, const _float3& vDir)
+{
+    __super::Launch(vPos, vDir);
+    m_vDir = vDir;
 }
 
 void CMeteorRock::Free()

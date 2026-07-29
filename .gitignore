@@ -469,8 +469,8 @@ skills-lock.json
 !/AAA/MapTool/[Bb]in/ShaderFiles/Shader_Grid.hlsl
 # Personal workspace files (local only, do not track)
 /명세서/
-/AGENTS.md
-/CLAUDE.md
+*.md
+!README.md
 /Temp/
 /[Dd]ocs/
 AAA/AnimUITool/Default/AnimUITool_imgui.ini
