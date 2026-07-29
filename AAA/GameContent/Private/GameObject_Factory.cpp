@@ -1509,6 +1509,19 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorExplosion::PUFF_MODEL_TAG,
                         CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Common_SmokeSphereFadeLarge.ysh"));
         ));
+
+    Register(CFaintEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CFaintEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CFaintEffect::STAR_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Boss/Common_StarSmooth3.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CFaintEffect::SMOKE_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Boss/SmokeLowPoly.ysh"));
+        ));
 }
 
 void CGameObject_Factory::Register_BossEffect()

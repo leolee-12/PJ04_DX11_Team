@@ -13,6 +13,8 @@ class CFaintEffect final : public CEffect_Container
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_FaintEffect";
+	static constexpr const _tchar* STAR_MODEL_TAG  = L"Prototype_Component_Model_FaintStar";
+	static constexpr const _tchar* SMOKE_MODEL_TAG = L"Prototype_Component_Model_FaintSmoke";
 
 private:
 	CFaintEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

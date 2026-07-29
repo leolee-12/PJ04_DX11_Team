@@ -120,6 +120,7 @@ namespace
         { TEXT("PickUpEffect"),           TEXT("../../Resources/EffectContainerJSON/CHJ/PickUpEffect.JSON") },
         { TEXT("DropStarEffect"),         TEXT("../../Resources/EffectContainerJSON/CHJ/DropStarEffect.JSON") },
         { TEXT("MeteorExplosion"),        TEXT("../../Resources/CHJ/Effect/EffectContainers/MeteorExplosion.JSON")},
+        { TEXT("FaintEffect"),            TEXT("../../Resources/CHJ/Effect/EffectContainers/FaintEffect.JSON")},
 
 #pragma region Armadillo Effects
         { TEXT("RutA"),                   TEXT("../../Resources/EffectContainerJSON/YSH/RutA.JSON") },

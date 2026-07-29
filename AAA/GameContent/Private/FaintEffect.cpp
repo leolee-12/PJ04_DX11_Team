@@ -56,13 +56,52 @@ HRESULT CFaintEffect::Render()
 
 HRESULT CFaintEffect::Ready_EffectPartObjects()
 {
+	// Both Boss models expose UNKNOWN slots only (Sample.png dummy).
 	CMeshCommon::MESH_COMMON_DESC tMesh{};
+	tMesh.iModelLevel        = m_iPrototypeLevel;
+	tMesh.bUseDiffuseTexture = false;
+	tMesh.bUseNormalTexture  = false;
+	tMesh.bUseMRATexture     = false;
+	tMesh.bUseUnknownTexture = true;
+	tMesh.bUseTextureCom     = false;
+	tMesh.bUseMaskCom        = false;
+	tMesh.bCustomShader      = false;
+	tMesh.iShaderLevel       = 0;
+	tMesh.wstrShaderTag      = L"";
+	tMesh.wstrModelTag       = STAR_MODEL_TAG;
 
-	// StarSmooth Model Part 00 ~ 02 
+	// StarSmooth Model Part 00 ~ 02
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Star_00", &tMesh)))
+		return E_FAIL;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Star_01", &tMesh)))
+		return E_FAIL;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Star_02", &tMesh)))
+		return E_FAIL;
 
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
+	tDesc.iModelLevel        = m_iPrototypeLevel;
+	tDesc.bUseDiffuseTexture = false;
+	tDesc.bUseNormalTexture  = false;
+	tDesc.bUseMRATexture     = false;
+	tDesc.bUseUnknownTexture = true;
+	tDesc.bUseTextureCom     = false;
+	tDesc.bUseMaskCom        = false;
+	tDesc.bCustomShader      = false;
+	tDesc.iShaderLevel       = 0;
+	tDesc.wstrShaderTag      = L"";
+	tDesc.wstrModelTag       = SMOKE_MODEL_TAG;
 
 	// SmokeLowPoly Model Part 00 ~ 02
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Smoke_00", &tDesc)))
+		return E_FAIL;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Smoke_01", &tDesc)))
+		return E_FAIL;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Smoke_02", &tDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
