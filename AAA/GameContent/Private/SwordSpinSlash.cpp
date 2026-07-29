@@ -9,7 +9,7 @@ CSwordSpinSlash::CSwordSpinSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 }
 
 CSwordSpinSlash::CSwordSpinSlash(const CSwordSpinSlash& Prototype)
-	: CEffect_Container{ Prototype }
+	: CEffect_Container(Prototype)
 {
 }
 
