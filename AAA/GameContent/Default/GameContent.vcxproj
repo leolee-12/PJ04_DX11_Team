@@ -258,6 +258,7 @@
     <ClInclude Include="..\Public\HammerSwing.h" />
     <ClInclude Include="..\Public\WheelHammer.h" />
     <ClInclude Include="..\Public\HammerFire.h" />
+    <ClInclude Include="..\Public\HammerFireSwing.h" />
     <ClInclude Include="..\Public\OnigorosiHammerFirst.h" />
     <ClInclude Include="..\Public\OnigorosiHammerEnd.h" />
     <ClInclude Include="..\Public\SwordJumpSpin.h" />
@@ -795,6 +796,7 @@
     <ClCompile Include="..\Private\HammerSwing.cpp" />
     <ClCompile Include="..\Private\WheelHammer.cpp" />
     <ClCompile Include="..\Private\HammerFire.cpp" />
+    <ClCompile Include="..\Private\HammerFireSwing.cpp" />
     <ClCompile Include="..\Private\OnigorosiHammerFirst.cpp" />
     <ClCompile Include="..\Private\OnigorosiHammerEnd.cpp" />
     <ClCompile Include="..\Private\SwordJumpSpin.cpp" />

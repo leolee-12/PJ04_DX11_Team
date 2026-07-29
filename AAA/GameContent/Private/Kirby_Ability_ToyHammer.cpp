@@ -22,6 +22,20 @@ namespace
      constexpr _float fChargeLevel4Time = 8.8f;
 
      constexpr _uint iChargeOverlaySlot = 2;
+
+     enum TOY_HAMMER_HIT_PARAM
+     {
+         HAMMER_ATTACK_H, HAMMER_ATTACK_FINAL_H,
+         CHARGE_ATTACK_1_H, CHARGE_ATTACK_2_H, CHARGE_ATTACK_3_H, CHARGE_ATTACK_4_H,
+         WHEELHAMMER_H, WHEELHAMMER_FALL_H
+     };
+
+     enum TOY_HAMMER_FX_PARAM
+     {
+         ATTACK_FX, ATTACK_FINAL_FX,
+         CHARGE_ATTACK_1_FX, CHARGE_ATTACK_2_FX, CHARGE_ATTACK_3_FX, CHARGE_ATTACK_3_FIRE_FX, CHARGE_ATTACK_4_FX, 
+         WHEELHAMMER_FX
+     };
 }
 
 CKirby_Ability_ToyHammer::CKirby_Ability_ToyHammer()
@@ -240,111 +254,196 @@ void CKirby_Ability_ToyHammer::On_Damaged_KirbyState(CKirby* pKirby, const ATTAC
 
 _bool CKirby_Ability_ToyHammer::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
+    // Slide
     if (__super::Handle_BodyAnimEvent(pKirby, e, ePhase))
         return true;
 
-    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Hitbox)
-        return false;
-
     CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
 
-    if (pToyHammer == nullptr)
-        return false;
-
-    enum TOY_HAMMER_HIT_PARAM
+    if (static_cast<EANIM_EVENT>(e.iEventType) == EANIM_EVENT::Hitbox)
     {
-        HAMMER_ATTACK_H,
-        HAMMER_ATTACK_FINAL_H,
-        CHARGE_ATTACK_1_H,
-        CHARGE_ATTACK_2_H,
-        CHARGE_ATTACK_3_H,
-        CHARGE_ATTACK_4_H,
-        WHEELHAMMER_H,
-        WHEELHAMMER_FALL_H
-    };
+        _int iHitParam = e.iIntParam;
+        if (iHitParam == CHARGE_ATTACK_1_H && m_eToyHammerState == TOY_HAMMER_STATE::CHARGE_ATTACK_4)
+            iHitParam = CHARGE_ATTACK_4_H;
 
-    _int iHitParam = e.iIntParam;
-
-    if (iHitParam == CHARGE_ATTACK_1_H && m_eToyHammerState == TOY_HAMMER_STATE::CHARGE_ATTACK_4)
-        iHitParam = CHARGE_ATTACK_4_H;
-
-    if (ePhase == ANIM_EVENT_PHASE::BEGIN)
-    {
-        ATTACK_INFO tAttackInfo{};
-
-        switch (static_cast<TOY_HAMMER_HIT_PARAM>(iHitParam))
+        if (ePhase == ANIM_EVENT_PHASE::BEGIN)
         {
-            case HAMMER_ATTACK_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK);
-                tAttackInfo.fDamage = 100.f;
-                tAttackInfo.fKnockback = 5.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
-                break;
-            case HAMMER_ATTACK_FINAL_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK_FINAL);
-                tAttackInfo.fDamage = 100.f;
-                tAttackInfo.fKnockback = 10.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_PRESS;
-                break;
-            case CHARGE_ATTACK_1_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_1);
-                tAttackInfo.fDamage = 100.f;
-                tAttackInfo.fKnockback = 5.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
-                break;
-            case CHARGE_ATTACK_2_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_2);
-                tAttackInfo.fDamage = 150.f;
-                tAttackInfo.fKnockback = 10.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
-                break;
-            case CHARGE_ATTACK_3_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_3);
-                tAttackInfo.fDamage = 200.f;
-                tAttackInfo.fKnockback = 15.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
-                break;
-            case CHARGE_ATTACK_4_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_4);
-                tAttackInfo.fDamage = 100.f;
-                tAttackInfo.fKnockback = 5.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
-                break;
-            case WHEELHAMMER_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER);
-                tAttackInfo.fDamage = 100.f;
-                tAttackInfo.fKnockback = 5.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
-                break;
-            case WHEELHAMMER_FALL_H:
-                pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER_FALL);
-                tAttackInfo.fDamage = 100.f;
-                tAttackInfo.fKnockback = 5.f;
-                tAttackInfo.eHitType = HIT_TYPE::HAMMER_PRESS;
-                break;
-            default:
-                return false;
+            ATTACK_INFO tAttackInfo{};
+
+            switch (static_cast<TOY_HAMMER_HIT_PARAM>(iHitParam))
+            {
+                case HAMMER_ATTACK_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK);
+                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fKnockback = 5.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
+                    break;
+                case HAMMER_ATTACK_FINAL_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK_FINAL);
+                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fKnockback = 10.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_PRESS;
+                    break;
+                case CHARGE_ATTACK_1_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_1);
+                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fKnockback = 5.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
+                    break;
+                case CHARGE_ATTACK_2_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_2);
+                    tAttackInfo.fDamage = 150.f;
+                    tAttackInfo.fKnockback = 10.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
+                    break;
+                case CHARGE_ATTACK_3_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_3);
+                    tAttackInfo.fDamage = 200.f;
+                    tAttackInfo.fKnockback = 15.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
+                    break;
+                case CHARGE_ATTACK_4_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_4);
+                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fKnockback = 5.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
+                    break;
+                case WHEELHAMMER_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER);
+                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fKnockback = 5.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
+                    break;
+                case WHEELHAMMER_FALL_H:
+                    pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER_FALL);
+                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fKnockback = 5.f;
+                    tAttackInfo.eHitType = HIT_TYPE::HAMMER_PRESS;
+                    break;
+                default:
+                    return false;
+            }
+
+            pToyHammer->Begin_Hit(tAttackInfo);
+            return true;
         }
 
-        pToyHammer->Begin_Hit(tAttackInfo);
+        if (ePhase == ANIM_EVENT_PHASE::END)
+        {
+            switch (static_cast<TOY_HAMMER_HIT_PARAM>(iHitParam))
+            {
+                case HAMMER_ATTACK_H:
+                case HAMMER_ATTACK_FINAL_H:
+                case CHARGE_ATTACK_1_H:
+                case CHARGE_ATTACK_2_H:
+                case CHARGE_ATTACK_3_H:
+                case CHARGE_ATTACK_4_H:
+                case WHEELHAMMER_H:
+                case WHEELHAMMER_FALL_H:
+                    pToyHammer->End_Hit();
+                    return true;
+            }
+        }
+
         return true;
     }
 
-    if (ePhase == ANIM_EVENT_PHASE::END)
+    if (static_cast<EANIM_EVENT>(e.iEventType) == EANIM_EVENT::AbilityFx)
     {
-        switch (static_cast<TOY_HAMMER_HIT_PARAM>(iHitParam))
+        _int iFxParam = e.iIntParam;
+
+        if (iFxParam == CHARGE_ATTACK_1_FX && m_eToyHammerState == TOY_HAMMER_STATE::CHARGE_ATTACK_4)
+            iFxParam = CHARGE_ATTACK_4_FX;
+
+        if (ePhase == ANIM_EVENT_PHASE::POINT)
         {
-            case HAMMER_ATTACK_H:
-            case HAMMER_ATTACK_FINAL_H:
-            case CHARGE_ATTACK_1_H:
-            case CHARGE_ATTACK_2_H:
-            case CHARGE_ATTACK_3_H:
-            case CHARGE_ATTACK_4_H:
-            case WHEELHAMMER_H:
-            case WHEELHAMMER_FALL_H:
-                pToyHammer->End_Hit();
-                return true;
+            switch (static_cast<TOY_HAMMER_FX_PARAM>(iFxParam))
+            {
+                case ATTACK_FX:
+                {
+                    if (m_eToyHammerState != TOY_HAMMER_STATE::ATTACK)
+                        return true;
+
+                    CTransform* pTransform = pKirby->Get_Transform();
+                    const _vector vForward = XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
+                    _float3 vPosition{};
+                    _float3 vLook{};
+                    XMStoreFloat3(&vPosition, pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f) - vForward * 0.3f);
+                    XMStoreFloat3(&vLook, vForward);
+                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwing", pKirby->Get_LevelIndex(), vPosition, vLook);
+                    return true;
+                }
+
+                case ATTACK_FINAL_FX:
+                {
+                    if (m_eToyHammerState != TOY_HAMMER_STATE::ATTACK_FINAL)
+                        return true;
+
+                    CTransform* pTransform = pKirby->Get_Transform();
+                    const _vector vForward = XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
+                    _float3 vPosition{};
+                    _float3 vLook{};
+                    XMStoreFloat3(&vPosition, pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f) + vForward);
+                    XMStoreFloat3(&vLook, vForward);
+                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwingFinal", pKirby->Get_LevelIndex(), vPosition, vLook);
+                    return true;
+                }
+
+                case CHARGE_ATTACK_1_FX:
+                    if (m_eToyHammerState == TOY_HAMMER_STATE::CHARGE_ATTACK_1)
+                        CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerFirst", pKirby->Get_LevelIndex(),
+                            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                            pKirby->Get_RenderWorldMatrixPtr());
+                    return true;
+
+                case CHARGE_ATTACK_2_FX:
+                    if (m_eToyHammerState == TOY_HAMMER_STATE::CHARGE_ATTACK_2)
+                        CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerSecond", pKirby->Get_LevelIndex(),
+                            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                            pKirby->Get_RenderWorldMatrixPtr());
+                    return true;
+
+                case CHARGE_ATTACK_3_FX:
+                    if (m_eToyHammerState == TOY_HAMMER_STATE::CHARGE_ATTACK_3)
+                        CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerEnd", pKirby->Get_LevelIndex(),
+                            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                            pKirby->Get_RenderWorldMatrixPtr());
+                    return true;
+
+                case CHARGE_ATTACK_3_FIRE_FX:
+                case CHARGE_ATTACK_4_FX:
+                    return true;
+
+                case WHEELHAMMER_FX:
+                    if (m_eToyHammerState == TOY_HAMMER_STATE::WHEELHAMMER)
+                        CEffect_Loader::GetInstance()->Spawn(L"WheelHammer", pKirby->Get_LevelIndex(),
+                            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                            pKirby->Get_RenderWorldMatrixPtr());
+                    return true;
+            }
         }
+        else if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+        {
+            switch (static_cast<TOY_HAMMER_FX_PARAM>(iFxParam))
+            {
+                case CHARGE_ATTACK_3_FIRE_FX:
+                    if (m_eToyHammerState == TOY_HAMMER_STATE::CHARGE_ATTACK_3 && m_pHammerFireSwing == nullptr)
+                        CEffect_Loader::GetInstance()->Spawn(L"HammerFireSwing", pKirby->Get_LevelIndex(),
+                            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                            pToyHammer->Get_HammerHeadWorldMatrixPtr(), &m_pHammerFireSwing);
+                    return true;
+            }
+        }
+        else if (ePhase == ANIM_EVENT_PHASE::END)
+        {
+            switch (static_cast<TOY_HAMMER_FX_PARAM>(iFxParam))
+            {
+                case CHARGE_ATTACK_3_FIRE_FX:
+                    Effect_Stop(m_pHammerFireSwing);
+                    return true;
+            }
+        }
+
     }
 
     return false;
@@ -431,34 +530,26 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         case TOY_HAMMER_STATE::CHARGE_ATTACK_1:
         {
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack1.wav", 0.25f);
-            pAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.5f);
-            pToyHammerAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.5f);
+            pAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.f);
+            pToyHammerAnimator->Play("OnigorosiHammerFirst", false, true, 0.1f, 2.f);
 
-            CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerFirst", pKirby->Get_LevelIndex(),
-                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_2:
         {
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack2.wav", 0.25f);
-            pAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.5f);
-            pToyHammerAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.5f);
+            pAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.f);
+            pToyHammerAnimator->Play("OnigorosiHammerSecond", false, true, 0.1f, 2.f);
 
-            CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerSecond", pKirby->Get_LevelIndex(),
-                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_RenderWorldMatrixPtr());
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_3:
         {
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_OnigorosiAttack3.wav", 0.25f);
-            pAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.5f);
-            pToyHammerAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 2.5f);
+            pAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 1.5f);
+            pToyHammerAnimator->Play("OnigorosiHammerEnd", false, true, 0.1f, 1.5f);
 
-            CEffect_Loader::GetInstance()->Spawn(L"OnigorosiHammerEnd", pKirby->Get_LevelIndex(),
-                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_RenderWorldMatrixPtr());
+
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_4:
@@ -473,10 +564,6 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             pAnimator->Play("WheelHammer", false, true, 0.f, 2.5f);
             pToyHammerAnimator->Play("WheelHammer", false, true, 0.f, 2.5f);
 
-            CTransform* pTransform = pKirby->Get_Transform();
-            CEffect_Loader::GetInstance()->Spawn(L"WheelHammer", pKirby->Get_LevelIndex(),
-                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-                pKirby->Get_RenderWorldMatrixPtr());
 
             pKirby->Get_Movement()->Set_VelocityY(0.f);
             pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 8.f, 0.f, 0.f));
@@ -658,7 +745,6 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                 m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge3.wav", 0.25f);
 
                 CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
-
                 CEffect_Loader::GetInstance()->Spawn(L"HammerFire", pKirby->Get_LevelIndex(),
                     _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
                     pToyHammer->Get_HammerHeadWorldMatrixPtr(), &m_pHammerFire);
@@ -671,7 +757,6 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                 Effect_FadeOut(m_pHammerFire, 0.1f);
 
                 CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
-
                 pToyHammer->BurnHammer(true);
             }
 
@@ -692,7 +777,10 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             if (AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END))
                 break;
 
-            const _float fRatio = pAnimator->Get_Progress();
+            pKirby->Reset_MoveDir();
+
+            _float fRatio = pAnimator->Get_Progress();
+
             if (fRatio >= 0.27f && fRatio <= 0.39f)
             {
                 CMovement_Child* pMovement = pKirby->Get_Movement();

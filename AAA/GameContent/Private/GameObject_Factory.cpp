@@ -817,6 +817,14 @@ void CGameObject_Factory::Register_Effect()
                 CTexture::Create(pDevice, pContext, Texture_HammerFire_Distortion.szFileTag, Texture_HammerFire_Distortion.iNumTex));
         )
     );
+    Register(CHammerFireSwing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerFireSwing),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFireSwing.iLevelID, Texture_HammerFireSwing.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFireSwing.szFileTag, Texture_HammerFireSwing.iNumTex));
+        )
+    );
     Register(COnigorosiHammerFirst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(COnigorosiHammerFirst),
         LOADER
         (

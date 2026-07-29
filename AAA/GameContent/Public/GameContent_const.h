@@ -84,6 +84,7 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_HammerFire_Scroll = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HammerFire_Scroll"), TEXT("../../Resources/YSE/Effect/Hammer/Common/common_scroll14.dds"), 1 };
 	inline constexpr TEXTURE_DESC Texture_HammerFire_Mask = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HammerFire_Mask"), TEXT("../../Resources/YSE/Effect/Hammer/Common/common_circle06.dds"), 1 };
 	inline constexpr TEXTURE_DESC Texture_HammerFire_Distortion = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HammerFire_Distortion"), TEXT("../../Resources/YSE/Effect/Hammer/Common/indirect3_normal.dds"), 1 };
+	inline constexpr TEXTURE_DESC Texture_HammerFireSwing = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HammerFireSwing"), TEXT("../../Resources/YSE/Effect/Hammer/Common/common_fire09.dds"), 1 };
 	inline constexpr TEXTURE_DESC Texture_OnigorosiHammerFirst_Fire = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_OnigorosiHammerFirst_Fire"), TEXT("../../Resources/YSE/Effect/Hammer/Common/OnigorosiHammerFirst_Fire.png"), 1 };
 
 	// SwordSlash1

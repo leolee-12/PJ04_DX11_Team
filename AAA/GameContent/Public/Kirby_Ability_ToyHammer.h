@@ -68,6 +68,7 @@ private:
     CHARGE_ANI_STATE m_eChargeAniState{};
 
     CEffect_Container* m_pHammerFire{};
+    CEffect_Container* m_pHammerFireSwing{};
 
 private:
     void Change_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eNext);
