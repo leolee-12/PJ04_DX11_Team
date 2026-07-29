@@ -4,18 +4,16 @@
 
 NS_BEGIN(Client)
 
-class CWarpInEffect final : public CEffect_Container
+class CWarpOutStart final : public CEffect_Container
 {
-	GENERATED_BODY(CWarpInEffect)
+	GENERATED_BODY(CWarpOutStart)
 
 public:
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_WarpInEffect";
-	static constexpr const _tchar* SMOKE_MODEL_PROTO_TAG = L"Prototype_Component_Model_SmokeMesh";
-
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_WarpOutStart";
 private:
-	CWarpInEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CWarpInEffect(const CWarpInEffect& Prototype);
-	virtual ~CWarpInEffect() = default;
+	CWarpOutStart(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CWarpOutStart(const CWarpOutStart& Prototype);
+	virtual ~CWarpOutStart() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,7 +33,7 @@ private:
 	HRESULT Ready_EffectPartObjects();
 
 public:
-	static CWarpInEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CWarpOutStart* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:
@@ -43,4 +41,3 @@ private:
 };
 
 NS_END
-

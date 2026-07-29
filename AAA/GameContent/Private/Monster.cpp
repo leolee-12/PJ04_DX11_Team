@@ -451,19 +451,6 @@ void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 
 	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
 
-	// 몬스터 피격 이펙트
-	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
-
-	_float3 vFaceCam{};
-	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
-
-	_float3	vPos{};
-	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-
-	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(),
-		vPos, vFaceCam, _float3(0.f, 0.f, 0.f),
-		nullptr);
-
 	Change_State(MONSTER_STATE_TYPE::KNOCK_BACK, true);
 }
 
@@ -957,6 +944,37 @@ void CMonster::Damaged(const ATTACK_INFO& tInfo)
 	__super::Damaged(tInfo);
 
 	Resolve_DamageReactSFX(tInfo);
+
+	// 몬스터 피격 이펙트
+	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
+
+	_float3	vPos{};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	HIT_TYPE eType = tInfo.eHitType;
+	const _tchar* EFFECT_KEY = { nullptr };
+	const auto& Parts = Get_PartObjects();
+	auto it = Parts.find(TEXT("Body"));
+	if (it != Parts.end())
+	{
+		CMonsterPart* pBody = static_cast<CMonsterPart*>(it->second);
+		const _float4x4* pBone = pBody->Get_BoneMatrixPtr("CenterL");
+		if (nullptr != pBone)
+		{
+			_matrix matBoneWorld = XMLoadFloat4x4(pBone) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+			XMStoreFloat3(&vPos, matBoneWorld.r[3]);
+		}
+	}
+	if (eType == HIT_TYPE::SWORD_DEFAULT || eType == HIT_TYPE::SWORD_SPIN)
+		EFFECT_KEY = L"SwordHitEffect";
+	else
+		EFFECT_KEY = L"CommonHit";
+
+	CEffect_Loader::GetInstance()->Spawn(EFFECT_KEY, Get_LevelIndex(), vPos, vFaceCam);
+
 }
 
 void CMonster::On_Swallowed()
