@@ -4,6 +4,21 @@
 
 #include "GameInstance.h"
 
+namespace
+{
+    constexpr const _tchar* s_WaddleDeeVoiceSoundKeys[] =
+    {
+        L"CharaWaddleDee_Voice1.wav",
+        L"CharaWaddleDee_Voice2.wav"
+    };
+
+    constexpr _int s_iWaddleDeeVoiceSoundCount = static_cast<_int>(std::size(s_WaddleDeeVoiceSoundKeys));
+    constexpr _float s_fWaddleDeeVoiceIntervalMin = 3.f;
+    constexpr _float s_fWaddleDeeVoiceIntervalMax = 5.f;
+
+    static_assert(s_fWaddleDeeVoiceIntervalMin > 0.f && s_fWaddleDeeVoiceIntervalMax >= s_fWaddleDeeVoiceIntervalMin);
+}
+
 CBoss_Cage::CBoss_Cage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CContainerObject{ pDevice, pContext }
 {
@@ -71,12 +86,23 @@ void CBoss_Cage::Update(_float fTimeDelta)
             {
                 fNewY = m_fFloatHeight;
                 m_eState = CAGE_STATE::FLOAT_IDLE;
+                m_fWaddleDeeVoiceTimer = 0.f;
             }
             m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetY(vPos, fNewY));
             break;
         }
 
         case CAGE_STATE::FLOAT_IDLE:
+        {
+            m_fWaddleDeeVoiceTimer -= fTimeDelta;
+
+            if (m_fWaddleDeeVoiceTimer <= 0.f)
+            {
+                const _uint iVoiceIndex = static_cast<_uint>(m_pGameInstance_Proxy->RandomInt(0, s_iWaddleDeeVoiceSoundCount - 1));
+                m_pGameInstance_Proxy->Play_SFX3D(s_WaddleDeeVoiceSoundKeys[iVoiceIndex], m_pTransformCom->Get_State(STATE::POSITION), 0.25f);
+                m_fWaddleDeeVoiceTimer = m_pGameInstance_Proxy->RandomFloat(s_fWaddleDeeVoiceIntervalMin, s_fWaddleDeeVoiceIntervalMax);
+            }
+        }
             break;
 
         case CAGE_STATE::BREAKING:

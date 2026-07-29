@@ -237,7 +237,7 @@ namespace
 				DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 
-		if (ETOI(WORLD_PASS::BLEND_DCUT_UMN) == Layer.iPass &&
+		if (Uses_WorldEmissiveSlot(Layer.iPass) &&
 			FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_EmissiveTexture",
 				MTEX_TYPE::EMISSIVE, Layer.idx[ETOUI(MTEX_TYPE::EMISSIVE)], DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;

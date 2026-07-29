@@ -1965,6 +1965,9 @@
     <ClInclude Include="..\Public\CommonHit.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CrashEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\CutsceneActor.h">
       <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClInclude>
@@ -2051,6 +2054,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Env_SpotLight.h">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvInteract_BreakProp.h">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvInteract_KickProp.h">
       <Filter>00. GameObject\02. EnvObject\Interact</Filter>
@@ -3060,6 +3066,9 @@
     <ClInclude Include="..\Public\Split_Stone.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Trash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Spotlight_Rig.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
     </ClInclude>
@@ -3596,6 +3605,9 @@
     <ClCompile Include="..\Private\CommonHit.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\CrashEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\CutsceneActor.cpp">
       <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClCompile>
@@ -3664,6 +3676,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Env_SpotLight.cpp">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvInteract_BreakProp.cpp">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp">
       <Filter>00. GameObject\02. EnvObject\Interact</Filter>
@@ -4584,6 +4599,9 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Stone.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Split_Trash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Spotlight_Rig.cpp">

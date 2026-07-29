@@ -16,7 +16,6 @@ class CWaddleDee final : public CCharacter
 	GENERATED_BODY(CWaddleDee)
 
 	PROPERTY(_wstring, m_strFixedAnim, L"FixedAnim", L"NPC")
-	PROPERTY(_float, m_fInteractRadius, L"InteractRadius", L"NPC")
 	PROPERTY(_bool, m_bWander, L"Wander", L"NPC")
 	PROPERTY(_float, m_fWanderRadius, L"WanderRadius", L"NPC")
 	PROPERTY(_float, m_fWalkSpeed, L"WalkSpeed", L"NPC")
@@ -33,6 +32,13 @@ public:
 		ANGRY
 	};
 
+	enum class WADDLEDEE_EMOTE : _uint
+	{
+		WAVE,
+		YAY,
+		_COUNT
+	};
+
 private:
 	CWaddleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CWaddleDee(const CWaddleDee& Prototype);
@@ -46,28 +52,7 @@ public:
 	virtual void Set_Active(_bool bActive) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
-private:
-	virtual void On_Deserialized() override;
-
-	HRESULT Ready_PartObjects();
-	HRESULT Ready_Movement();
-	HRESULT Ready_AnimEvents();
-	HRESULT Ready_HurtBox();
-	HRESULT Validate_Initialized();
-	void Sync_MovementStats();
-	_bool Is_Sitting() const;
-
-	void Change_State(WADDLEDEE_STATE eState);
-	_bool Find_Player();
-	void Check_Interact();
-
-	void Update_Idle(_float fTimeDelta);
-	void Update_Walk(_float fTimeDelta);
-	void Play_Idle();
-	void Pick_WalkTarget();
-	void Update_Greet(_float fTimeDelta);
-	void Update_Hit(_float fTimeDelta);
-	void Update_Angry(_float fTimeDelta);
+	void React_Emote(WADDLEDEE_EMOTE eEmote);
 
 private:
 	CWaddleDee_Body* m_pBody = { nullptr };
@@ -91,6 +76,28 @@ private:
 	_float3 m_vLookTarget = {};
 
 	CGameObject* m_pPlayer = { nullptr };
+
+private:
+	virtual void On_Deserialized() override;
+
+	HRESULT Ready_PartObjects();
+	HRESULT Ready_Movement();
+	HRESULT Ready_AnimEvents();
+	HRESULT Ready_HurtBox();
+	HRESULT Validate_Initialized();
+	void Sync_MovementStats();
+	_bool Is_Sitting() const;
+
+	void Change_State(WADDLEDEE_STATE eState);
+	_bool Find_Player();
+
+	void Update_Idle(_float fTimeDelta);
+	void Update_Walk(_float fTimeDelta);
+	void Play_Idle();
+	void Pick_WalkTarget();
+	void Update_Greet(_float fTimeDelta);
+	void Update_Hit(_float fTimeDelta);
+	void Update_Angry(_float fTimeDelta);
 
 public:
 	static _wstring Resolve_FixedAnim(const _wstring& strVariation, _uint iSeed = 0u);
