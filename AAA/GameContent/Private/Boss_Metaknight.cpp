@@ -77,7 +77,7 @@ HRESULT CBoss_Metaknight::Initialize(void* pArg)
 
     m_strBossName = L"메타나이트";
     //m_fMaxHP = 2000.f;
-    m_fMaxHP = 100.f;
+    m_fMaxHP = 200.f;
     m_fCurHP = m_fMaxHP;
 
     m_pTransformCom->Set_Scale(1.3f, 1.3f, 1.3f);
@@ -337,6 +337,29 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
                 {
                     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
                     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                }
+                break;
+            }
+
+            case EANIM_EVENT::CamShake:
+            {
+                if (e.bIsRange)
+                {
+                    _float lvl = 0.f;
+                    if (phase == ANIM_EVENT_PHASE::BEGIN)
+                        lvl = (e.iIntParam > 0 ? e.iIntParam : 50) / 100.f;
+
+                    if (phase == ANIM_EVENT_PHASE::BEGIN || phase == ANIM_EVENT_PHASE::END)
+                        m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &lvl);
+                }
+                else
+                {
+                    if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                    CAMERA_SHAKE_DESC shake{};
+                    shake.fTrauma = (e.iIntParam > 0 ? e.iIntParam : 20) / 100.f;
+                    shake.fDuration = 0.f;
+                    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
                 }
                 break;
             }
@@ -628,6 +651,8 @@ void CBoss_Metaknight::Begin_RockDecalSlide()
 
 void CBoss_Metaknight::Drop_Rocks()
 {
+    CProjectile_Rock::Reset_ImpactLatch();
+
     for (int i = 0; i < ROCK_FIELD::TILE_COUNT; ++i)
     {
         if (m_Rock.bSafe[i]) continue;
@@ -679,6 +704,10 @@ void CBoss_Metaknight::Enable_CatchBox(_bool bOn)
 void CBoss_Metaknight::Begin_Demo(EDemo eDemo)
 {
     const DEMO_DESC& tDesc = Get_DemoDesc(eDemo);
+
+    Set_AttackBusy(true);                  
+    m_bDodgeRequested = false;             
+    m_pMovement->Set_GravityEnabled(false);
 
     Snap_ToDemoOrigin();
 

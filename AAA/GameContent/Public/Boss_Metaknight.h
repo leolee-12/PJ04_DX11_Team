@@ -68,9 +68,9 @@ public:
 
     // Äð´Ù¿î
     static constexpr _float s_fDodgeCooldown = 4.f;
-    static constexpr _float s_fGigaCooldown = 2000.f;
-    static constexpr _float s_fRockCooldown = 4.f;
-    static constexpr _float s_fUpperCooldown = 600.f;
+    static constexpr _float s_fGigaCooldown = 20.f;
+    static constexpr _float s_fRockCooldown = 40.f;
+    static constexpr _float s_fUpperCooldown = 60.f;
     //static constexpr _float s_fUpperCooldown = 3.f;
 
     // »ç¸Á
@@ -149,6 +149,7 @@ public:
 
     void    Set_DodgeInvincible(_bool bOn) { m_bDodgeInvuln = bOn; }
     void    Set_AttackBusy(_bool bOn) { m_bAttackBusy = bOn; }
+    _bool   Is_AttackBusy() const { return m_bAttackBusy; }
     _bool Consume_DodgeRequest()
     {
         if (!m_bDodgeRequested) return false;
