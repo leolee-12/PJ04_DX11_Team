@@ -1,9 +1,22 @@
 #include "Kirby_Ability_Crash.h"
 
+#include "Movement_Child.h"
+
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_State.h"
 
-#include "Movement_Child.h"
+#include "Projectile_Manager.h"
+#include "KirbyBomb.h"
+
+#include "Effect_Loader.h"
+
+namespace
+{
+    constexpr _float fMaxFlameChargeTime = 1.9f;
+    constexpr _float fMaxFlameTime = 3.9f;
+    constexpr _float fMaxDamageTime = 3.5f;
+}
 
 CKirby_Ability_Crash::CKirby_Ability_Crash()
 {
@@ -27,19 +40,77 @@ COPY_ABILITY_TYPE CKirby_Ability_Crash::Get_AbilityType()
 void CKirby_Ability_Crash::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_bReqEndAttackState = false;
+
+    m_bKeyUpAttackEnd = false;
+
+    m_fAccFlameChargeTime = 0.f;
+    m_fAccFlameTime = 0.f;
+
+    m_eCrashState = CRASH_STATE::CRASH_STATE_END;
+    Change_CrashState(pKirby, CRASH_STATE::FLAME_CHARGE_START);
 }
 
 void CKirby_Ability_Crash::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 {
+    Update_CrashState(pKirby, fTimeDelta);
 }
 
 void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
 {
+    if (m_eCrashState != CRASH_STATE::CRASH_STATE_END)
+        Exit_CrashState(pKirby, m_eCrashState);
+
+    m_eCrashState = CRASH_STATE::CRASH_STATE_END;
+    m_bReqEndAttackState = true;
+
+    m_fAccFlameChargeTime = 0.f;
+    m_fAccFlameTime = 0.f;
+    m_fAccDamageTime = 0.f;
 }
 
 _bool CKirby_Ability_Crash::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+
+    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
+
+    switch (eCommandType)
+    {
+    case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            if (pCommand->IsUp())
+            {
+                m_bKeyUpAttackEnd = true;
+            }
+            return true;
+        }
+    }
+
     return false;
+}
+
+_bool CKirby_Ability_Crash::Enter_Attack_KeyDown(CKirby* pKirby)
+{
+    pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+    return true;
+}
+
+_bool CKirby_Ability_Crash::Enter_Attack_KeyPress(CKirby* pKirby)
+{
+    return true;
+}
+
+_bool CKirby_Ability_Crash::Enter_Attack_KeyUp(CKirby* pKirby)
+{
+    return true;
+}
+
+void CKirby_Ability_Crash::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    if (m_eCrashState == CRASH_STATE::DAMAGE)
+        return;
+
+    __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
 void CKirby_Ability_Crash::Change_CrashState(CKirby* pKirby, CRASH_STATE eNext)
@@ -61,19 +132,46 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
     switch (eState)
     {
         case CRASH_STATE::FLAME_CHARGE_START:
-            pAnimator->Play("FlameChargeStart", false, true, 0.1f, 1.5f);
+            m_eCrashDamageMode = CRASH_DAMAGE_MODE::DEFAULT;
+            pAnimator->Play("FlameChargeStart", false, false, 0.1f, 1.5f);
             break;
         case CRASH_STATE::FLAME_CHARGE:
-            pAnimator->Play("FlameCharge", false, true, 0.1f, 1.5f);
+            m_fAccFlameChargeTime = 0.f;
+            pAnimator->Play("FlameCharge", true, false, 0.1f, 1.5f);
             break;
         case CRASH_STATE::FLAME_START:
-            pAnimator->Play("FlameStart", false, true, 0.1f, 1.5f);
+            m_eCrashDamageMode = CRASH_DAMAGE_MODE::JUMP;
+            pAnimator->Play("FlameStart", false, false, 0.1f, 2.5f);
             break;
         case CRASH_STATE::FLAME:
-            pAnimator->Play("Flame", false, true, 0.1f, 1.5f);
+            m_fAccFlameTime = 0.f;
+            pAnimator->Play("Flame", true, false, 0.1f, 1.5f);
             break;
+        case CRASH_STATE::DAMAGE:
+        {            
+            m_pGameInstance_Proxy->Set_TimeScale(0.f);
+
+            m_fAccDamageTime = 0.f;
+            if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
+            {
+                pAnimator->Play("FlameStart", false, false, 0.1f, 2.5f);
+                CAnimator::ANI_PLAY_INFO tInfo{};
+                tInfo.strAniName = "Flame";
+                tInfo.bLoop = true;
+                tInfo.bRestart = false;
+                tInfo.fBlend = 0.1f;
+                tInfo.fSpeed = 1.5f;
+                pAnimator->Enqueue(tInfo);
+            }
+            else if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::JUMP)
+            {
+                pKirby->Get_Movement()->Force_Jump();
+            }
+
+            break;
+        }
         case CRASH_STATE::FLAME_END:
-            pAnimator->Play("FlameEnd", false, true, 0.1f, 1.5f);
+            pAnimator->Play("FlameEnd", false, false, 0.1f, 1.5f);
             break;
         case CRASH_STATE::CRASH_STATE_END:
             m_bReqEndAttackState = true;
@@ -88,25 +186,83 @@ void CKirby_Ability_Crash::Update_CrashState(CKirby* pKirby, _float fTimeDelta)
     switch (m_eCrashState)
     {
         case CRASH_STATE::FLAME_CHARGE_START:
+        {
             if (pAnimator->Is_Finished())
-                Change_CrashState(pKirby, CRASH_STATE::FLAME_CHARGE);
+            {
+                if (m_bKeyUpAttackEnd)
+                    Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
+                else
+                    Change_CrashState(pKirby, CRASH_STATE::FLAME_CHARGE);
+            }
             break;
+        }
         case CRASH_STATE::FLAME_CHARGE:
-            if (pAnimator->Is_Finished())
+        {
+            if (m_bKeyUpAttackEnd)
+            {
+                Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
+                return;
+            }
+
+            if (m_fAccFlameChargeTime >= fMaxFlameChargeTime)
+            {
                 Change_CrashState(pKirby, CRASH_STATE::FLAME_START);
+                return;
+            }
+
+            m_fAccFlameChargeTime += fTimeDelta;
+
             break;
+        }
         case CRASH_STATE::FLAME_START:
+        {
+            if (m_bKeyUpAttackEnd)
+            {
+                Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
+                return;
+            }
+
             if (pAnimator->Is_Finished())
                 Change_CrashState(pKirby, CRASH_STATE::FLAME);
+
             break;
+        }
         case CRASH_STATE::FLAME:
-            if (pAnimator->Is_Finished())
-                Change_CrashState(pKirby, CRASH_STATE::FLAME_END);
+        {
+            if (m_bKeyUpAttackEnd)
+            {
+                Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
+                return;
+            }
+
+            if (m_fAccFlameTime >= fMaxFlameTime)
+            {
+                Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
+                return;
+            }
+
+            m_fAccFlameTime += fTimeDelta;
+
             break;
+        }
+        case CRASH_STATE::DAMAGE:
+        {
+            if (m_fAccDamageTime >= fMaxDamageTime)
+            {
+                Change_CrashState(pKirby, CRASH_STATE::FLAME_END);
+                return;
+            }
+
+            m_fAccDamageTime += fTimeDelta;
+
+            break;
+        }
         case CRASH_STATE::FLAME_END:
+        {
             if (pAnimator->Is_Finished())
                 Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
             break;
+        }
     }
 }
 
@@ -114,16 +270,19 @@ void CKirby_Ability_Crash::Exit_CrashState(CKirby* pKirby, CRASH_STATE eState)
 {
     switch (eState)
     {
-    case CRASH_STATE::FLAME_CHARGE_START:
-        break;
-    case CRASH_STATE::FLAME_CHARGE:
-        break;
-    case CRASH_STATE::FLAME_START:
-        break;
-    case CRASH_STATE::FLAME:
-        break;
-    case CRASH_STATE::FLAME_END:
-        break;
+        case CRASH_STATE::FLAME_CHARGE_START:
+            break;
+        case CRASH_STATE::FLAME_CHARGE:
+            break;
+        case CRASH_STATE::FLAME_START:
+            break;
+        case CRASH_STATE::FLAME:
+            break;
+        case CRASH_STATE::DAMAGE:
+            m_pGameInstance_Proxy->Set_TimeScale(1.f);
+            break;
+        case CRASH_STATE::FLAME_END:
+            break;
     }
 }
 

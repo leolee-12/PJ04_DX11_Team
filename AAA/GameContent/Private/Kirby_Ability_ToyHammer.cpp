@@ -757,6 +757,10 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                 Effect_FadeOut(m_pHammerFire, 0.1f);
 
                 CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
+                CEffect_Loader::GetInstance()->Spawn(L"HammerBurnSmoke", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                    pToyHammer->Get_HammerHeadWorldMatrixPtr(), &m_pHammerFire);
+
                 pToyHammer->BurnHammer(true);
             }
 

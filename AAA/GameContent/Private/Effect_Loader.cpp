@@ -65,6 +65,7 @@ namespace
         { TEXT("WheelHammer"),            TEXT("../../Resources/YSE/EffectContainer/WheelHammer.JSON") },
         { TEXT("HammerFire"),             TEXT("../../Resources/YSE/EffectContainer/HammerFire.JSON") },
         { TEXT("HammerFireSwing"),        TEXT("../../Resources/YSE/EffectContainer/HammerFireSwing.JSON") },
+        { TEXT("HammerBurnSmoke"),        TEXT("../../Resources/YSE/EffectContainer/HammerBurnSmoke.JSON") },
         { TEXT("OnigorosiHammerFirst"),   TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerFirst.JSON") },
         { TEXT("OnigorosiHammerSecond"),  TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerSecond.JSON") },
         { TEXT("OnigorosiHammerEnd"),     TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerEnd.JSON") },

@@ -37,7 +37,7 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
-	virtual _bool Ignore_TimeScale() { return true; }
+	virtual _bool Ignore_TimeScale(CKirby* pKirby) { return true; }
 
 private:
 	_bool m_bPartsOn{};
