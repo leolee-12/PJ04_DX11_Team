@@ -59,24 +59,14 @@ HRESULT CGigatzo::Initialize(void* pArg)
 
 	m_TraitFlags = MT_NONE;
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
-	m_fCullDist = 95.f;
+	m_fCullDist = 120.f;
 
 	return S_OK;
 }
 
 _float CGigatzo::Get_InteractRadius() const
 {
-	switch (m_ePitch)
-	{
-	case PITCH::VERTICAL:
-		return 14.f;
-	case PITCH::HORIZONTAL:
-		return 80.f;
-	case PITCH::TILT:
-		return 15.f;
-	default:
-		return 40.f;
-	}
+    return 100.f;
 }
 
 CAnimator* CGigatzo::Get_BodyAnimator() const
@@ -109,16 +99,29 @@ _bool CGigatzo::Is_InCameraFront() const
 
 _float CGigatzo::Get_FireDistance() const
 {
-	switch (m_ePitch)
-	{
-	case PITCH::VERTICAL:
-	case PITCH::TILT:
-		return 10.f;                  
-	case PITCH::HORIZONTAL:
-		return 50.f;                  
-	default:
-		return 25.f;
-	}
+    return 100.f;
+}
+
+_bool CGigatzo::Get_MuzzleRay(_vector* pOutPos,
+    _vector* pOutDir) const
+{
+    if (nullptr == m_pBody)
+        return false;
+
+    const _float4x4* pMuzzle = m_pBody->Get_BoneMatrixPtr("HaedJ");
+    if (nullptr == pMuzzle)
+        return false;
+
+    _matrix matMuzzle = XMLoadFloat4x4(pMuzzle) *
+        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+    if (nullptr != pOutPos)
+        *pOutPos = matMuzzle.r[3];
+
+    if (nullptr != pOutDir)
+        *pOutDir = XMVector3Normalize(matMuzzle.r[1]);
+
+    return true;
 }
 
 CMonsterBrain* CGigatzo::Create_Brain()
@@ -254,16 +257,9 @@ void CGigatzo::Update(_float fTimeDelta)
 
 void CGigatzo::Fire_Bullet()
 {
-	if (nullptr == m_pBody) return;
-	const _float4x4* pMuzzle = m_pBody->Get_BoneMatrixPtr("HaedJ");
-	if (nullptr == pMuzzle) return;
-
-	_matrix matMuzzle =
-		XMLoadFloat4x4(pMuzzle) *
-		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-
-	_vector vMuzzle = matMuzzle.r[3];
-	_vector vDir = XMVector3Normalize(matMuzzle.r[1]);
+	_vector vMuzzle{}, vDir{};
+	if (!Get_MuzzleRay(&vMuzzle, &vDir))
+		return;
 
 	_float3 vP, vD;
 	XMStoreFloat3(&vP, vMuzzle);

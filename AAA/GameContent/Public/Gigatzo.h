@@ -57,7 +57,12 @@ public:
 	CGigatzo_Body*				Get_Body() { return m_pBody; }
 	_float						Get_InitWaitDelay() const { return m_fInitWaitDelay; }
 	_float						Get_BulletSpeed() const { return m_fBulletSpeed; }
+	// long range shooter: fires along the rail instead of crossing it.
+	// data marks it with a much longer bullet life (50s vs 4.5s).
+	_bool Is_LongRange() const { return m_fBulletLife > 10.f; }
 	_float						Get_FireDistance() const;
+	// muzzle world ray used both by Fire_Bullet and the brain
+	_bool Get_MuzzleRay(_vector* pOutPos, _vector* pOutDir) const;
 
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
@@ -74,7 +79,7 @@ private:
 	CGigatzo_Body*				m_pBody = { nullptr };
 	PITCH						m_ePitch = { PITCH::VERTICAL };
 	_float						m_fBulletSpeed = { 18.f };
-	_float						m_fBulletDamage = { 1.f };
+	_float						m_fBulletDamage = { 10.f };
 	_float						m_fBulletLife = { 4.5f };
 	_float						m_fInitWaitDelay = { 0.f };
 private:
