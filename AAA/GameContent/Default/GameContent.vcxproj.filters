@@ -379,6 +379,9 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
       <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Groggy">
+      <UniqueIdentifier>{52951569-d865-4ff0-92b9-e5d169a4ccc1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
     </Filter>
@@ -2193,6 +2196,9 @@
     <ClInclude Include="..\public\GorillaNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\GroggyEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Groggy</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\HammerSwing.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
     </ClInclude>
@@ -3778,6 +3784,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GorillaNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GroggyEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Groggy</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerSwing.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer</Filter>
