@@ -490,37 +490,53 @@ void CPanel_Inspector::Render()
 		{
 			ImGui::TextDisabled("LensFlare preview is not available.");
 		}
-		else if (ImGui::CollapsingHeader("LensFlare Preview", ImGuiTreeNodeFlags_DefaultOpen))
+		else
 		{
-			ImGui::PushID(pLensFlare);
+			const _bool bPreviousForceOpaque = pLDLensFlare->Get_EditorPreviewForceOpaque();
+			_bool bForceOpaque = bPreviousForceOpaque;
 
-			Draw_Properties(pLensFlare);
+			if (ImGui::IsKeyPressed(ImGuiKey_F3, false))
+				bForceOpaque = !bForceOpaque;
 
-			const auto& EffectParts = pLensFlare->Get_EffectPartObject();
-			vector<pair<_wstring, Engine::CEffect_Part*>> SortedParts(EffectParts.begin(), EffectParts.end());
+			ImGui::Checkbox("Force Preview Alpha 1 (F3)", &bForceOpaque);
+			ImGui::SameLine();
+			ImGui::TextDisabled("(MapTool preview only)");
 
-			sort(SortedParts.begin(), SortedParts.end(),
-				[](const auto& Left, const auto& Right)
-				{
-					return Left.first < Right.first;
-				});
+			if (bForceOpaque != bPreviousForceOpaque)
+				pLDLensFlare->Set_EditorPreviewForceOpaque(bForceOpaque);
 
-			for (auto& [strTag, pPart] : SortedParts)
+			if (ImGui::CollapsingHeader("LensFlare Preview", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				if (nullptr == pPart)
-					continue;
+				ImGui::PushID(pLensFlare);
 
-				const string strLabel = "Part - " + WstrToStr(strTag);
+				Draw_Properties(pLensFlare);
 
-				if (ImGui::CollapsingHeader(strLabel.c_str()))
+				const auto& EffectParts = pLensFlare->Get_EffectPartObject();
+				vector<pair<_wstring, Engine::CEffect_Part*>> SortedParts(EffectParts.begin(), EffectParts.end());
+
+				sort(SortedParts.begin(), SortedParts.end(),
+					[](const auto& Left, const auto& Right)
+					{
+						return Left.first < Right.first;
+					});
+
+				for (auto& [strTag, pPart] : SortedParts)
 				{
-					ImGui::PushID(pPart);
-					Draw_Properties(pPart);
-					ImGui::PopID();
-				}
-			}
+					if (nullptr == pPart)
+						continue;
 
-			ImGui::PopID();
+					const string strLabel = "Part - " + WstrToStr(strTag);
+
+					if (ImGui::CollapsingHeader(strLabel.c_str()))
+					{
+						ImGui::PushID(pPart);
+						Draw_Properties(pPart);
+						ImGui::PopID();
+					}
+				}
+
+				ImGui::PopID();
+			}
 		}
 	}
 
