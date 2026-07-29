@@ -31,6 +31,11 @@ _bool CUI_GaugeBarCom::Is_Appearing() const
     return m_pGauge ? m_pGauge->Is_AppearSweeping() : false;
 }
 
+_bool CUI_GaugeBarCom::Is_Filling() const
+{
+    return m_pGauge ? m_pGauge->Is_Filling() : false;
+}
+
 void CUI_GaugeBarCom::Reset_Empty() 
 { 
     m_fCur = 0.f; 

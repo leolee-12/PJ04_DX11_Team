@@ -59,7 +59,13 @@ void CUI_KirbyStatus::Update(_float fTimeDelta)
         if (it != m_UIPartObjects.end())
             m_pGaugeBar->Bind_Gauge(static_cast<CUI_GaugeFill*>(it->second));
     }
-    // m_pGaugeBar->Update() 호출 불필요
+
+    const _bool bFilling = (m_pGaugeBar && m_pGaugeBar->Is_Bound() && m_pGaugeBar->Is_Filling());
+
+    if (bFilling && !m_bHealSFXPlaying)
+        Start_HealSFX();
+    else if (!bFilling && m_bHealSFXPlaying)
+        Stop_HealSFX();
 
 #ifdef _DEBUG
     if (m_pGaugeBar)
@@ -112,7 +118,15 @@ HRESULT CUI_KirbyStatus::Ready_Events()
 
     Subscribe_Event(EventTag::HUD_SetVisible, [this](void* pData)
         {
-            if (pData) Set_Active(*static_cast<_bool*>(pData));
+            if (pData)
+            {
+                const _bool bVisible = *static_cast<_bool*>(pData);
+
+                if (false == bVisible)
+                    Stop_HealSFX();
+
+                Set_Active(bVisible);
+            }
         });
 
     return S_OK;
@@ -132,6 +146,20 @@ HRESULT CUI_KirbyStatus::Ready_Components()
         return E_FAIL;
 
     return S_OK;
+}
+
+void CUI_KirbyStatus::Start_HealSFX()
+{
+    Stop_HealSFX();
+
+    m_hHealSFX = m_pGameInstance_Proxy->Play_SFX(SND_LIFECURE, 0.35f, ESoundBus::UI);
+    m_bHealSFXPlaying = true;
+}
+
+void CUI_KirbyStatus::Stop_HealSFX()
+{
+    m_hHealSFX.Stop();
+    m_bHealSFXPlaying = false;
 }
 
 CUI_KirbyStatus* CUI_KirbyStatus::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -162,5 +190,6 @@ CGameObject* CUI_KirbyStatus::Clone(void* pArg)
 
 void CUI_KirbyStatus::Free()
 {
+    Stop_HealSFX();
     __super::Free();
 }
