@@ -65,7 +65,7 @@
     <ClInclude Include="..\public\Excalibur.h" />
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
-    <ClInclude Include="..\Public\GroggyEffect.h" />
+    <ClInclude Include="..\Public\FaintEffect.h" />
     <ClInclude Include="..\Public\Kirby_Emote.h" />
     <ClInclude Include="..\Public\Kirby_Include.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
@@ -610,7 +610,7 @@
     <ClCompile Include="..\Private\Gigatzo_Body.cpp" />
     <ClCompile Include="..\Private\Gigatzo_Brain.cpp" />
     <ClCompile Include="..\Private\Gigatzo_State_Attack.cpp" />
-    <ClCompile Include="..\Private\GroggyEffect.cpp" />
+    <ClCompile Include="..\Private\FaintEffect.cpp" />
     <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />
