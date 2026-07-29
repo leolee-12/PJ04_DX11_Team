@@ -471,7 +471,8 @@ HRESULT CKirbyBomb::Ready_HitBox()
 			CGameObject* pGameObject = pOther->Get_Owner();
 			_uint iRenderGroup = pOther->Get_RegisteredGroup();
 
-			if (iRenderGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
+			if (iRenderGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT) ||
+				iRenderGroup == ETOUI(COLLISION_LAYER::ENV_HURT))
 			{
 				if (m_bCarried)
 					return;	
@@ -490,10 +491,6 @@ HRESULT CKirbyBomb::Ready_HitBox()
 				}
 			}
 			else if (iRenderGroup == ETOUI(COLLISION_LAYER::PLAYER_BOMB))
-			{
-				On_Impact();
-			}
-			else if (iRenderGroup == ETOUI(COLLISION_LAYER::ENV_HURT))
 			{
 				On_Impact();
 			}

@@ -1120,20 +1120,35 @@ HRESULT CKirby::SetUp_Collider_Callback()
     m_KirbyColliders[BREAKERABLE_HITBOX]->Set_OnEnter(
         [this](CCollider* pOther)
         {
-            if (pOther->Get_RegisteredGroup() != ETOUI(COLLISION_LAYER::MONSTER_HURT))
-                return;
+            if (pOther->Get_RegisteredGroup() == ETOUI(COLLISION_LAYER::MONSTER_HURT))
+            { 
+                CMonster* pMonster = dynamic_cast<CMonster*>(pOther->Get_Owner());
+                if (pMonster == nullptr)
+                    return;
 
-            CMonster* pMonster = dynamic_cast<CMonster*>(pOther->Get_Owner());
-            if (pMonster == nullptr)
+                ATTACK_INFO tAttackInfo{};
+                tAttackInfo.eHitType = HIT_TYPE::BREAKERABLE_HIT;
+                tAttackInfo.pAttacker = this;
+                XMStoreFloat3(&tAttackInfo.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+                tAttackInfo.fDamage = 0.f;
+                tAttackInfo.fKnockback = 0.f;
+                pMonster->Damaged(tAttackInfo);
                 return;
-
-            ATTACK_INFO tAttackInfo{};
-            tAttackInfo.eHitType = HIT_TYPE::BREAKERABLE_HIT;
-            tAttackInfo.pAttacker = this;
-            XMStoreFloat3(&tAttackInfo.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
-            tAttackInfo.fDamage = 0.f;
-            tAttackInfo.fKnockback = 0.f;
-            pMonster->Damaged(tAttackInfo);
+            }
+            else if (pOther->Get_RegisteredGroup() == ETOUI(COLLISION_LAYER::ENV_HURT))
+            {
+                if (auto* pDamageable = dynamic_cast<IDamageable*>(pOther->Get_Owner()))
+                {
+                    ATTACK_INFO tAttackDesc{};
+                    tAttackDesc.eHitType = HIT_TYPE::BREAKERABLE_HIT;
+                    tAttackDesc.pAttacker = this;
+                    XMStoreFloat3(&tAttackDesc.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+                    tAttackDesc.fDamage = 0.f;
+                    tAttackDesc.fKnockback = 0.f;
+                    pDamageable->Damaged(tAttackDesc);
+                    return;
+                }
+            }
         }
     );
 #pragma endregion
