@@ -106,9 +106,6 @@ HRESULT CEnvInteract_BreakProp::Ready_InteractComponents()
     if (nullptr == m_pGameInstance_Proxy)
         return E_FAIL;
 
-    if (m_pGameInstance_Proxy->Is_EditMode())
-        return S_OK;
-
     if (FAILED(Ready_RigidStatic()))
         return E_FAIL;
 

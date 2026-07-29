@@ -42,8 +42,6 @@ HRESULT CEnvObject_Interact::Initialize(void* pArg)
 	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag)))
 		return E_FAIL;
 
-	Snap_ToGround();
-
 	if (FAILED(Rebuild_PhysicsActor()))
 		return E_FAIL;
 
@@ -74,81 +72,6 @@ void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 HRESULT CEnvObject_Interact::Ready_InteractComponents()
 {
 	return S_OK;
-}
-
-void CEnvObject_Interact::Snap_ToGround()
-{
-    if (m_pGameInstance_Proxy->Is_EditMode())
-        return;
-
-    if (ENV_INTERACT_TYPE::PHYSICS_PROP != m_tDesc.eInteractType
-        && ENV_INTERACT_TYPE::BREAKABLE != m_tDesc.eInteractType)
-    {
-        return;
-    }
-
-    const BoundingBox& LocalBounds = Get_LocalBounds();
-    if (!GeometryUtils::Is_ValidAABB(LocalBounds))
-        return;
-
-    const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-
-    _vector vScale{};
-    _vector vRotation{};
-    _vector vPosition{};
-    if (!XMMatrixDecompose(&vScale, &vRotation, &vPosition, WorldMatrix))
-        return;
-
-    _float3 vAbsScale{};
-    XMStoreFloat3(&vAbsScale, XMVectorAbs(vScale));
-
-    const _float3 vHalfExtents = {
-            LocalBounds.Extents.x * vAbsScale.x,
-            LocalBounds.Extents.y * vAbsScale.y,
-            LocalBounds.Extents.z * vAbsScale.z };
-
-    if (!GeometryUtils::Has_UsableSize(vHalfExtents))
-        return;
-
-    _float3 vSweepCenter{};
-    XMStoreFloat3(&vSweepCenter,
-        XMVector3TransformCoord(XMLoadFloat3(&LocalBounds.Center), WorldMatrix));
-
-    const _float fLiftDistance =
-        max(max(vHalfExtents.x, vHalfExtents.y), vHalfExtents.z) * 2.f
-        + GROUND_SNAP_LIFT_PADDING;
-
-    vSweepCenter.y += fLiftDistance;
-
-    _float4 qRotation{};
-    XMStoreFloat4(&qRotation, XMQuaternionNormalize(vRotation));
-
-    const _float3 vDown = { 0.f, -1.f, 0.f };
-    _float3 vHitNormal{};
-    _float fHitDistance{};
-
-    if (!m_pGameInstance_Proxy->Sweep_Box(
-        vSweepCenter,
-        vHalfExtents,
-        qRotation,
-        vDown,
-        fLiftDistance + GROUND_SNAP_MAX_DROP,
-        &vHitNormal,
-        &fHitDistance,
-        true,
-        false))
-    {
-        return;
-    }
-
-    if (fHitDistance < 0.f || vHitNormal.y < GROUND_SNAP_MIN_NORMAL_Y)
-        return;
-
-    const _float fOffsetY = fLiftDistance - fHitDistance + GROUND_SNAP_CLEARANCE;
-    vPosition = XMVectorSetY(vPosition, XMVectorGetY(vPosition) + fOffsetY);
-
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vPosition, 1.f));
-    Refresh_WorldBounds();
 }
 
 CEnvObject_Interact* CEnvObject_Interact::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

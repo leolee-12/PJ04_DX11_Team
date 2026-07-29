@@ -131,9 +131,6 @@ HRESULT CEnvInteract_KickProp::Ready_InteractComponents()
 	if (nullptr == m_pGameInstance_Proxy)
 		return E_FAIL;
 
-	if (m_pGameInstance_Proxy->Is_EditMode())
-		return S_OK;
-
 	if (FAILED(Ready_DynamicActor()))
 		return E_FAIL;
 
@@ -384,6 +381,7 @@ void CEnvInteract_KickProp::Handle_InteractColliderEnter(CCollider* pOther)
 		break;
 	}
 }
+
 void CEnvInteract_KickProp::Kick_FromPlayer(CGameObject* pPlayer)
 {
 	if (m_bKicked || m_bKickPending)

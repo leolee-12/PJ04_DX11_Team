@@ -23,9 +23,6 @@ public:
 protected:
     virtual HRESULT Ready_InteractComponents();
 
-private:
-    void Snap_ToGround();
-
 public:
     static CEnvObject_Interact* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;

@@ -19,7 +19,7 @@ namespace
 			{ L"InteractiveGsPabble02L", ENV_INTERACT_TYPE::PHYSICS_PROP, 20u, 1 },
 			{ L"InteractiveGsEmptyCan01L", ENV_INTERACT_TYPE::PHYSICS_PROP, 10u, 1 },
 			{ L"TrashCan", ENV_INTERACT_TYPE::BREAKABLE, 30u, 1 },
-			{ L"PuffFlower", ENV_INTERACT_TYPE::BLOOM_PROP, 20u, 1 }
+			{ L"TrashCanC", ENV_INTERACT_TYPE::BREAKABLE, 30u, 1 },
 	};
 
 	_bool Has_InteractivePrefix(const _wstring& wstrObjectName)
