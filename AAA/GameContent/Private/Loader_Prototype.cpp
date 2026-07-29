@@ -385,12 +385,29 @@ HRESULT CLIENT_DLL Load_Level_FromManifest(const LEVEL_LOAD_CONTEXT& ctx, const 
 
 HRESULT CLIENT_DLL Apply_RenderGlobals_FromFile(CGameInstance_Proxy* pProxy, const _tchar* strPath)
 {
-    if (nullptr == pProxy || nullptr == strPath)
+    if (nullptr == pProxy)
+        return E_FAIL;
+
+    RENDERGLOBALS_VALUES Values = {};
+    if (FAILED(Load_RenderGlobals_Preset(strPath, &Values)))
+        return E_FAIL;
+
+    for (const auto& [strKey, vValue] : Values)
+        pProxy->Set_ShaderGlobal(strKey, vValue);
+
+    return S_OK;
+}
+
+HRESULT CLIENT_DLL Load_RenderGlobals_Preset(const _tchar* strPath, RENDERGLOBALS_VALUES* pOut)
+{
+    if (nullptr == strPath || nullptr == pOut)
         return E_FAIL;
 
     string strContent = {};
     if (FAILED(CDataLoader::Read_Json(strPath, &strContent)))
         return E_FAIL;
+
+    pOut->clear();
 
     try
     {
@@ -401,7 +418,7 @@ HRESULT CLIENT_DLL Apply_RenderGlobals_FromFile(CGameInstance_Proxy* pProxy, con
             if (!a.is_array() || a.size() < 4)
                 continue;
 
-            pProxy->Set_ShaderGlobal(it.key(),
+            pOut->emplace_back(it.key(),
                 _float4(a[0].get<float>(), a[1].get<float>(),
                     a[2].get<float>(), a[3].get<float>()));
         }
@@ -409,6 +426,55 @@ HRESULT CLIENT_DLL Apply_RenderGlobals_FromFile(CGameInstance_Proxy* pProxy, con
     catch (json::exception&)
     {
         return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+HRESULT CLIENT_DLL Load_RenderGlobals_PresetFolder(const _tchar* strFolder, RENDERGLOBALS_TABLE* pOut, CGameInstance_Proxy* pProxy)
+{
+    if (nullptr == strFolder || nullptr == pOut)
+        return E_FAIL;
+
+    namespace fs = std::filesystem;
+
+    std::error_code ec = {};
+    const fs::path Folder = strFolder;
+    if (false == fs::exists(Folder, ec))
+        return E_FAIL;
+
+    pOut->clear();
+
+    for (const auto& Entry : fs::directory_iterator(Folder, ec))
+    {
+        if (false == Entry.is_regular_file())
+            continue;
+
+        if (Entry.path().extension() != L".json")
+            continue;
+
+        RENDERGLOBALS_VALUES Values = {};
+        if (FAILED(Load_RenderGlobals_Preset(Entry.path().c_str(), &Values)))
+            continue;
+
+#ifdef _DEBUG
+        if (nullptr != pProxy)
+        {
+            for (const auto& [strKey, vValue] : Values)
+            {
+                if (nullptr == pProxy->Get_ShaderGlobal(strKey))
+                {
+                    OutputDebugStringA(("[RenderGlobals] Unknown key '" + strKey
+                        + "' in " + Entry.path().filename().string() + "\n").c_str());
+                }
+            }
+        }
+#else
+        UNREFERENCED_PARAMETER(pProxy);
+#endif
+
+        pOut->emplace(Entry.path().stem().wstring(),
+            make_shared<const RENDERGLOBALS_VALUES>(move(Values)));
     }
 
     return S_OK;

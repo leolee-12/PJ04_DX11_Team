@@ -16,11 +16,6 @@ private:
 	CEnvTrigger_Generic(const CEnvTrigger_Generic& Prototype);
 	virtual ~CEnvTrigger_Generic() = default;
 
-public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
-
 protected:
 	virtual void OnTriggerEnter(CCollider* pOther) override;
 	virtual void OnTriggerStay(CCollider* pOther) override;

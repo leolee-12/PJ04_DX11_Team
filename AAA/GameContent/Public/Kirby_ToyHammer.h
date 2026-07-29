@@ -62,11 +62,15 @@ public:
     void Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType);
     _bool Is_HammerHeadCollision(_float fNormalY = 0.f);
 
+    const _float4x4* Get_HammerHeadWorldMatrixPtr() { return &m_HammerHeadWorldMatrix; }
+
 private:
     HRESULT Ready_Components();
     HRESULT Ready_HitBox();
     void	SetUp_HitBox_Callback();
     virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) override;
+
+    void Cal_HammerHeadEffectSocket();
 
 private:
     CCollider* m_pHitBox{};
@@ -75,6 +79,8 @@ private:
     unordered_set<CGameObject*> m_DamagedTargets;
 
     _bool m_bBurn{};
+
+    _float4x4 m_HammerHeadWorldMatrix{};
 
 public:
     static CKirby_ToyHammer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

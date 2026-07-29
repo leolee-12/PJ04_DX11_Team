@@ -68,6 +68,8 @@ public:
     void  Spotlight_TrackKirby();
     void  Spotlight_LockTarget(_fvector vWorldPos);
 
+    void  Fire_CamShake();
+
 protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;

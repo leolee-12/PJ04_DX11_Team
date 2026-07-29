@@ -1,8 +1,17 @@
 #include "EnvObject_Interact.h"
 
 #include "GameInstance_Proxy.h"
+#include "Geometry_Utils.h"
 
 NS_BEGIN(Client)
+
+namespace
+{
+	constexpr _float GROUND_SNAP_LIFT_PADDING = 0.1f;
+	constexpr _float GROUND_SNAP_MAX_DROP = 1.f;
+	constexpr _float GROUND_SNAP_CLEARANCE = 0.02f;
+	constexpr _float GROUND_SNAP_MIN_NORMAL_Y = 0.5f;
+}
 
 CEnvObject_Interact::CEnvObject_Interact(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEnvObject(pDevice, pContext)

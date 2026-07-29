@@ -586,7 +586,7 @@ void CPanel_Inspector::Render()
 	End_Panel();
 }
 
-_bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
+_bool CPanel_Inspector::Draw_Properties(_In_ IReflectable* pHolder)
 {
 	_bool bChanged = false;
 	string strCurrentCategory = {};
@@ -723,18 +723,64 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 		}
 		case PROP_TYPE::WSTRING:
 		{
-        ImGui::Text(strPropName.c_str());
+			ImGui::Text(strPropName.c_str());
 
-        wstring* pWstr = (wstring*)pData;
-        string str = WstrToStr(*pWstr);
-        char buf[256] = {};
-        strcpy_s(buf, str.c_str());
-        if (ImGui::InputText(("##" + strPropName).c_str(), buf, sizeof(buf)))
-        {
-                *pWstr = StrToWstr(buf);
-                bChanged = true;
-        }
-        break;
+			wstring* pWstr = (wstring*)pData;
+
+			if (prop.strCategory == L"Render Globals" && prop.strName == L"Preset")
+			{
+				auto* pRenderGlobals = dynamic_cast<Client::CEnvTrigger_RenderGlobals*>(pHolder);
+				const Client::RENDERGLOBALS_TABLE* pTable =
+					nullptr != pRenderGlobals ? pRenderGlobals->Get_PresetTable() : nullptr;
+
+				if (nullptr != pTable)
+				{
+					vector<const wstring*> SortedKeys;
+					SortedKeys.reserve(pTable->size());
+					for (const auto& Pair : *pTable)
+						SortedKeys.push_back(&Pair.first);
+
+					sort(SortedKeys.begin(), SortedKeys.end(),
+						[](const wstring* pLeft, const wstring* pRight) { return *pLeft < *pRight; });
+
+					const string strPreview = pWstr->empty() ? "(none)" : WstrToStr(*pWstr);
+
+					if (ImGui::BeginCombo(("##" + strPropName).c_str(), strPreview.c_str()))
+					{
+						for (const wstring* pKey : SortedKeys)
+						{
+							const bool bSelected = (*pKey == *pWstr);
+							if (ImGui::Selectable(WstrToStr(*pKey).c_str(), bSelected))
+							{
+								*pWstr = *pKey;
+								bChanged = true;
+							}
+							if (bSelected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button(("Reload##" + strPropName).c_str()))
+					{
+						pRenderGlobals->Reload_PresetTable();
+						bChanged = true;
+					}
+
+					break;
+				}
+			}
+
+			string str = WstrToStr(*pWstr);
+			char buf[256] = {};
+			strcpy_s(buf, str.c_str());
+			if (ImGui::InputText(("##" + strPropName).c_str(), buf, sizeof(buf)))
+			{
+				*pWstr = StrToWstr(buf);
+				bChanged = true;
+			}
+			break;
 		}
 		}
 	}
@@ -2069,6 +2115,15 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			bChanged = true;
 		}
 
+		bool bEmissiveMono = (0u != (Layer.iFlags & WorldShaderFlags::EmissiveMono));
+		if (ImGui::Checkbox("Emissive Mono (R -> RGB)##MeshLayer", &bEmissiveMono))
+		{
+			Layer.iFlags = bEmissiveMono
+				? (Layer.iFlags | WorldShaderFlags::EmissiveMono)
+				: (Layer.iFlags & ~WorldShaderFlags::EmissiveMono);
+			bChanged = true;
+		}
+
 		if (Ui.bEnvObjectMeshUi)
 			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
 		else
@@ -2268,6 +2323,9 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 			ImGui::TableNextColumn();
 			DrawCompactExtraCell("ExR", "##WorldExR", Layer.iExtraBind[0], Layer.iExtraTexType[0]);
+
+			ImGui::TableNextColumn();
+			DrawCompactLayerSlotCell("Emi", "##WorldTexEmissive", MTEX_TYPE::EMISSIVE);
 
 			ImGui::EndTable();
 		}

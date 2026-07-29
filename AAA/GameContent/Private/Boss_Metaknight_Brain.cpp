@@ -51,7 +51,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     return CBTReactiveSelector::Create({
         Make_LockOutcomeBranch(),
         Make_DodgeBranch(),
-        Make_RockBranch(),
+        //Make_RockBranch(),
         Make_UpperBranch(),
         pCombat,
         });
@@ -1232,7 +1232,10 @@ CBTNode* CBoss_Metaknight_Brain::Make_DodgeBranch()
 {
     return CBTSequence::Create({
         CBTCondition::Create([this](CBlackboard*) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_DodgeRequest(); }),
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            if (pMeta->Is_AttackBusy())
+                return false;
+            return pMeta->Consume_DodgeRequest(); }),
         Make_Dodge(),
         Clip("Wait", SPD, 0.2f),
         });
@@ -1259,7 +1262,9 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperBranch()
 {
     return CBTSequence::Create({
         CBTCondition::Create([this](CBlackboard* pBB) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_UpperReady()
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            return !pMeta->Is_AttackBusy()
+                && pMeta->Is_UpperReady()
                 && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
         Make_UpperCalibur(),
         Clip("Wait", SPD, 0.2f),
@@ -1297,7 +1302,8 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockBranch()
 {
     return CBTSequence::Create({
         CBTCondition::Create([this](CBlackboard*) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_RockReady(); }),
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            return !pMeta->Is_AttackBusy() && pMeta->Is_RockReady(); }),
         Make_RockDrop(),
         Clip("Wait", SPD, 0.2f),
         });

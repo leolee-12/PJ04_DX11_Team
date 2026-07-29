@@ -125,7 +125,8 @@ void CProjectile_Rock::Update(_float fTimeDelta)
             m_eState = STATE::BREAKING;
             m_fHitTimer = HIT_WINDOW;
             m_pAnimatorCom->Play(ANIM_BREAK, false, true, 0.1f, 1.f);
-            //if (m_pHitBox) m_pHitBox->Set_Enabled(true);
+
+            Fire_ImpactFeedback();
 
             if (m_pLinkedDecal)
             {
@@ -168,6 +169,18 @@ HRESULT CProjectile_Rock::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
         return E_FAIL;
     return S_OK;
+}
+
+void CProjectile_Rock::Fire_ImpactFeedback()
+{
+    if (s_bImpactFired)
+        return;
+    s_bImpactFired = true;
+
+    m_pGameInstance_Proxy->Play_SFX(SND_IMPACT, 0.3f);
+
+    CAMERA_SHAKE_DESC shake{ IMPACT_TRAUMA, IMPACT_SHAKE_SEC };
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
 }
 
 HRESULT CProjectile_Rock::Render()

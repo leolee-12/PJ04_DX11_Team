@@ -19,10 +19,6 @@ protected:
 	CEnvTrigger_EventPublisher(const CEnvTrigger_EventPublisher& Prototype);
 	virtual ~CEnvTrigger_EventPublisher() = default;
 
-public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-
 protected:
 	virtual void* Get_EnterPayload() { return nullptr; }
 	virtual void* Get_ExitPayload() { return nullptr; }

@@ -360,6 +360,8 @@ HRESULT CBoss_Armadillo::Ready_AnimEvents()
             return;
         if (Handle_DropStarsAnimEvent(e, phase))
             return;
+        if (Handle_CamShakeAnimEvent(e, phase))
+            return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))
         {
