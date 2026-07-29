@@ -1245,6 +1245,51 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CCrashEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCrashEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_GROUND_SMOKE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Cylinder3.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_SPHERE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Spere.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_RING_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Ring01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_CIRCLE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Circle01.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_SLASH_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/slash01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WAVE_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_wave01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_RING04_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_ring04.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE01_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_STAR00_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_star00.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE02_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle02.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_SHINE_CIRCLE_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_shinecircle01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE06_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle06.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_RING03_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_ring03.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE07_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle07.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE_GLOW_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/circleglow2.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WARP_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirectwarpcirkle_normal.dds"), 1));
+        )
+    );
+
 #pragma region 몬스터 이펙트
     
     // BladeKnight
