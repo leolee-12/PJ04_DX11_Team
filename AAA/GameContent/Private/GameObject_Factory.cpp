@@ -804,14 +804,63 @@ void CGameObject_Factory::Register_Effect()
                 CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
         )
     );
+    Register(CHammerFire::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerFire),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerFire::MODEL_PROTO_TAG_FIRE01, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/Common/Common_Fire01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerFire::MODEL_PROTO_TAG_FIRE03, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/Common/Common_Fire03.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFire_Scroll.iLevelID, Texture_HammerFire_Scroll.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFire_Scroll.szFileTag, Texture_HammerFire_Scroll.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFire_Mask.iLevelID, Texture_HammerFire_Mask.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFire_Mask.szFileTag, Texture_HammerFire_Mask.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFire_Distortion.iLevelID, Texture_HammerFire_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFire_Distortion.szFileTag, Texture_HammerFire_Distortion.iNumTex));
+        )
+    );
+    Register(CHammerFireSwing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerFireSwing),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_HammerFireSwing.iLevelID, Texture_HammerFireSwing.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerFireSwing.szFileTag, Texture_HammerFireSwing.iNumTex));
+        )
+    );
     Register(COnigorosiHammerFirst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(COnigorosiHammerFirst),
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, COnigorosiHammerFirst::MODEL_PROTO_TAG, CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSE/Effect/Hammer/Common/OnigorosiFirst.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_OnigorosiHammerFirst.iLevelID, Texture_OnigorosiHammerFirst.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_OnigorosiHammerFirst.szFileTag, Texture_OnigorosiHammerFirst.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID, Texture_HammerSwing_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Distortion.szFileTag, Texture_HammerSwing_Distortion.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_OnigorosiHammerFirst_Fire.iLevelID, Texture_OnigorosiHammerFirst_Fire.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_OnigorosiHammerFirst_Fire.szFileTag, Texture_OnigorosiHammerFirst_Fire.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID, Texture_HammerSwing_Shape.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Shape.szFileTag, Texture_HammerSwing_Shape.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID, Texture_HammerSwing_Edge.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
+        )
+    );
+    Register(COnigorosiHammerEnd::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(COnigorosiHammerEnd),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, COnigorosiHammerEnd::MODEL_PROTO_TAG, CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/Hammer/Common/OnigorosiEnd.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Distortion.iLevelID, Texture_HammerSwing_Distortion.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Distortion.szFileTag, Texture_HammerSwing_Distortion.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_OnigorosiHammerFirst_Fire.iLevelID, Texture_OnigorosiHammerFirst_Fire.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_OnigorosiHammerFirst_Fire.szFileTag, Texture_OnigorosiHammerFirst_Fire.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Shape.iLevelID, Texture_HammerSwing_Shape.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Shape.szFileTag, Texture_HammerSwing_Shape.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_HammerSwing_Edge.iLevelID, Texture_HammerSwing_Edge.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_HammerSwing_Edge.szFileTag, Texture_HammerSwing_Edge.iNumTex));
         )
     );
     Register(CCoasterWind::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCoasterWind),

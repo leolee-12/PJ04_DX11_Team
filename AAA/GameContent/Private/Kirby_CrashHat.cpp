@@ -28,6 +28,8 @@ HRESULT CKirby_CrashHat::Initialize(void* pArg)
 
     m_pAnimatorCom->Play("Deform", true, true);
 
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.f, 0.05f, 0.f, 1.f));
+
     return S_OK;
 }
 
