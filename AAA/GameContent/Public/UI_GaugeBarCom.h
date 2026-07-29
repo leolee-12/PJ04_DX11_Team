@@ -38,6 +38,7 @@ public:
 
     void  Appear(_float fCurrent, _float fMax);
     _bool Is_Appearing() const;
+    _bool Is_Filling() const;
     void  Reset_Empty();
     void  Snap_Value(_float fCurrent, _float fMax);
 
