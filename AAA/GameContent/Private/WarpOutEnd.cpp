@@ -1,26 +1,25 @@
-#include "WarpInEffect.h"
+#include "WarpOutEnd.h"
 #include "GameContent_const.h"
 
-#include "RectParticleCommon.h"
 #include "RectCommon.h"
 #include "MeshParticleCommon.h"
 
-CWarpInEffect::CWarpInEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CWarpOutEnd::CWarpOutEnd(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
 {
 }
 
-CWarpInEffect::CWarpInEffect(const CWarpInEffect& Prototype)
+CWarpOutEnd::CWarpOutEnd(const CWarpOutEnd& Prototype)
 	: CEffect_Container(Prototype)
 {
 }
 
-HRESULT CWarpInEffect::Initialize_Prototype()
+HRESULT CWarpOutEnd::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CWarpInEffect::Initialize(void* pArg)
+HRESULT CWarpOutEnd::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -31,40 +30,28 @@ HRESULT CWarpInEffect::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CWarpInEffect::Priority_Update(_float fTimeDelta)
+void CWarpOutEnd::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 }
 
-void CWarpInEffect::Update(_float fTimeDelta)
+void CWarpOutEnd::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 }
 
-void CWarpInEffect::Late_Update(_float fTimeDelta)
+void CWarpOutEnd::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 }
 
-HRESULT CWarpInEffect::Render()
+HRESULT CWarpOutEnd::Render()
 {
 	return __super::Render();
 }
 
-HRESULT CWarpInEffect::Ready_EffectPartObjects()
+HRESULT CWarpOutEnd::Ready_EffectPartObjects()
 {
-	CRectParticleCommon::RECT_PARTICLE_COMMON_DESC tLineDesc{};
-	tLineDesc.iVIBufferLevel = VI_Rect.iLevelID;
-	tLineDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
-	tLineDesc.bUseTextureCom = true;
-	tLineDesc.iTextureLevel = Texture_Kabu_CommonLine.iLevelID;
-	tLineDesc.wstrTextureTag = Texture_Kabu_CommonLine.szProtoTag;
-	tLineDesc.bUseMaskCom = false;
-	tLineDesc.bCustomShader = false;
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG,
-		L"LineParticle", &tLineDesc)))
-		return E_FAIL;
-
 	CRectCommon::RECT_COMMON_DESC tFlashDesc{};
 	tFlashDesc.iVIBufferLevel = VI_Rect.iLevelID;
 	tFlashDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
@@ -94,34 +81,34 @@ HRESULT CWarpInEffect::Ready_EffectPartObjects()
 	return S_OK;
 }
 
-CWarpInEffect* CWarpInEffect::Create(ID3D11Device* pDevice,
+CWarpOutEnd* CWarpOutEnd::Create(ID3D11Device* pDevice,
 	ID3D11DeviceContext* pContext)
 {
-	CWarpInEffect* pInstance = new CWarpInEffect(pDevice, pContext);
+	CWarpOutEnd* pInstance = new CWarpOutEnd(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created: CWarpInEffect");
+		MSG_BOX("Failed to Created: CWarpOutEnd");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CWarpInEffect::Clone(void* pArg)
+CGameObject* CWarpOutEnd::Clone(void* pArg)
 {
-	CWarpInEffect* pInstance = new CWarpInEffect(*this);
+	CWarpOutEnd* pInstance = new CWarpOutEnd(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned: CWarpInEffect");
+		MSG_BOX("Failed to Cloned: CWarpOutEnd");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CWarpInEffect::Free()
+void CWarpOutEnd::Free()
 {
 	__super::Free();
 }

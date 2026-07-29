@@ -11,6 +11,9 @@ NS_BEGIN(Client)
 class CMapStage;
 struct MAP_LOAD_RESULT;
 
+using RENDERGLOBALS_VALUES = vector<pair<string, _float4>>;
+using RENDERGLOBALS_TABLE = unordered_map<wstring, shared_ptr<const RENDERGLOBALS_VALUES>>;
+
 struct ENV_ENTRY 
 { 
     const _tchar* tag; 
@@ -61,6 +64,14 @@ HRESULT CLIENT_DLL Load_Level_FromManifest(
 
 HRESULT CLIENT_DLL Apply_RenderGlobals_FromFile(
     CGameInstance_Proxy* pProxy, const _tchar* strPath);
+
+HRESULT CLIENT_DLL Load_RenderGlobals_Preset(
+    const _tchar* strPath, RENDERGLOBALS_VALUES* pOut);
+
+HRESULT CLIENT_DLL Load_RenderGlobals_PresetFolder(
+    const _tchar* strFolder, RENDERGLOBALS_TABLE* pOut,
+    CGameInstance_Proxy* pProxy = nullptr);
+
 
 HRESULT CLIENT_DLL Load_Fonts(CGameInstance_Proxy* pProxy);
 

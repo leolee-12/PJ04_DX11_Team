@@ -99,12 +99,16 @@ void CShaderGlobal_Manager::Tween(const string& strName, const _float4& vTarget,
 {
     auto it = m_Index.find(strName);
     if (it == m_Index.end())
+    {
+#ifdef _DEBUG
+        OutputDebugStringA(("[ShaderGlobal] Unknown global : " + strName + "\n").c_str());
+#endif
         return;
+    }
 
     _uint iIdx = it->second;
 
-    // 즉시 세팅: 진행 중이던 보간도 정리
-    if (fDuration <= 0.f)
+    if (fDuration <= 0.f || GVAL::BOOL == m_Globals[iIdx].eType)
     {
         m_Globals[iIdx].vValue = vTarget;
         m_Tweens.erase(iIdx);
@@ -112,7 +116,7 @@ void CShaderGlobal_Manager::Tween(const string& strName, const _float4& vTarget,
     }
 
     TWEEN tw;
-    tw.vStart = m_Globals[iIdx].vValue;   // 현재값에서 시작
+    tw.vStart = m_Globals[iIdx].vValue;   // 현재값에서 출발
     tw.vTarget = vTarget;
     tw.fElapsed = 0.f;
     tw.fDuration = fDuration;

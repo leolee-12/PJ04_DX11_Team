@@ -110,6 +110,10 @@ public:
 
     void                                    Play_AppearSweep(_float fTargetRatio, _float fSpeed = 0.8f);
     _bool                                   Is_AppearSweeping() const { return m_bAppearSweep; }
+    _bool                                   Is_Filling() const
+    {
+        return GHOST_MODE::FILL == m_eGhostMode && m_fGhostHoldAcc >= m_fGhostHold;
+    }
     void                                    Reset_Empty();
     void                                    Snap(_float fRatio);
 

@@ -14,6 +14,7 @@ class CLIENT_DLL CUI_KirbyStatus final : public CUIContainerObject
 
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_UI_KirbyStatus";
+    static constexpr const _tchar* SND_LIFECURE = L"UiBasic_LifeCure.wav";
 
 private:
     CUI_KirbyStatus(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -37,10 +38,16 @@ protected:
 private:
     HRESULT Ready_Components();
 
+    void    Start_HealSFX();
+    void    Stop_HealSFX();
+
 private:
     CUI_GaugeBarCom* m_pGaugeBar = { nullptr };
     _float m_fDefaultMaxHP = { 100.f };
     _float m_fDefaultCurrHP = { 100.f };
+
+    CSound_Handle m_hHealSFX = {};
+    _bool         m_bHealSFXPlaying = { false };
 
 public:
     static CUI_KirbyStatus* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

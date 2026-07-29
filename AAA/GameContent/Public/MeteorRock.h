@@ -27,6 +27,8 @@ public:
     virtual HRESULT Render() override;
     virtual HRESULT Render_Shadow() override;
 
+    virtual void Launch(const _float3& vPos, const _float3& vDir) override; 
+
     void Configure(_float fSpeed, _float fLifeSec, _bool bBreakOnLand, _float fHitRadius);
     void Set_TargetPos(const _float3& vTarget) { m_vTargetPos = vTarget; }
 
@@ -39,6 +41,7 @@ protected:
     virtual HRESULT Ready_HitBox() override;
 
     void Enter_Landed();
+    void Spawn_ExplosionFx();
     HRESULT Bind_ShaderResources();
 
 
@@ -46,16 +49,24 @@ protected:
     METEOR_STATE m_eState = { METEOR_STATE::FALLING };
 
     _float m_fLingerTimer = { 0.f };
+    _float m_fVibrationElapsed = { 0.f };
     _float3 m_vTargetPos = {};
+    _float3 m_vDir = {};
     _bool m_bBreakOnLand = { false };
 
     CShader* m_pShaderCom = { nullptr };
     CModel* m_pModelCom = { nullptr };
 
-    static constexpr _float LINGER_SEC = 1.5f;
+    static constexpr _float LINGER_SEC = 0.05f;
     static constexpr _float SPIN_DEG = 60.f;
-    static constexpr _float STUCK_PULLBACK = 0.1f;
 
+    static constexpr _float VIBRATION_AMPLITUDE = 0.05f;
+    static constexpr _float VIBRATION_FREQ_X = 120.f;
+    static constexpr _float VIBRATION_FREQ_Z = 120.f;
+
+    static constexpr _float SHAKE_BASE_TRAUMA = 0.5f;
+    static constexpr _float SHAKE_FULL_RADIUS = 20.f;
+    static constexpr _float SHAKE_ZERO_RADIUS = 50.f;
 protected:
     virtual void Free() override;
 };

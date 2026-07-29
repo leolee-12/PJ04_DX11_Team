@@ -96,11 +96,6 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 #endif
 }
 
-void CEnvObject_Trigger::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
-{
-	__super::Copy_PrototypeName(pOutData);
-}
-
 #pragma region Editable
 HRESULT CEnvObject_Trigger::On_EditTransformChanged()
 {
