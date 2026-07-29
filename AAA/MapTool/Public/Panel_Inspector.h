@@ -26,7 +26,7 @@ public:
 	virtual void	Render() override;
 
 private:
-	_bool   Draw_Properties(IReflectable* pHolder);
+	_bool   Draw_Properties(_In_ IReflectable* pHolder);
 	_bool   Draw_Transform(CGameObject* pObject, const string & strSuffix = "");
 	void    Draw_EditableObjectPolicyPanel(CGameObject* pObject);
 	void    Draw_EditableCustomPanel(CLevel_Edit* pLevel, CGameObject* pObject);
