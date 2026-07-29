@@ -7,6 +7,7 @@
 #include "Kirby_DeformCylinder_Main.h"
 #include "Kirby_DeformRollerCoaster_Main.h"
 #include "Kirby_BombHat.h"
+#include "Kirby_CrashHat.h"
 #include "Kirby_IceHat.h"
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"

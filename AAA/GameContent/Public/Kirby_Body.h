@@ -55,6 +55,7 @@ private:
 	HRESULT Ready_Components();
 
 	HRESULT Set_VisibleMeshes();
+	virtual _bool Should_RenderShadowMesh(_uint iMeshIndex) override;
 	virtual HRESULT Render_KirbyMesh(_uint iMeshIndex);
 
 private:

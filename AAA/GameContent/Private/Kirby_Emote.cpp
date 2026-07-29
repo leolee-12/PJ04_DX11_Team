@@ -8,6 +8,8 @@
 
 #include "Kirby_Deform.h"
 
+#include "WaddleDee.h"
+
 CKirby_Emote::CKirby_Emote()
 {
 }
@@ -29,18 +31,22 @@ void CKirby_Emote::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    m_eEmoteStateFlag = iFlag;
+    m_bInteracted = false;
 
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
     switch (iFlag)
     {
         case EMOTE_STATE_FLAG::EMOTE_TOP:
             pAnimator->Play("EmoteWaveHand", false, true, 0.1f, 1.5f);
+            m_fInteractedRatio = 0.1f;
             break;
         case EMOTE_STATE_FLAG::EMOTE_DOWN:
             pAnimator->Play("WaitSit", false, true, 0.1f, 1.5f);
             break;
         case EMOTE_STATE_FLAG::EMOTE_LEFT:
             pAnimator->Play("WaitYay", false, true, 0.1f, 1.5f);
+            m_fInteractedRatio = 0.1f;
             break;
         case EMOTE_STATE_FLAG::EMOTE_RIGHT:
             pAnimator->Play("LookAround", false, true, 0.1f, 1.5f);
@@ -49,6 +55,17 @@ void CKirby_Emote::Enter(CKirby* pKirby, _int iFlag)
             MSG_BOX("Bug: CKirby_Emote");
             Transition_Fall_OR_Wait_OR_Run(pKirby);
             return;
+    }
+
+    if(m_pQueryBox == nullptr)
+    {
+        CCollider::COLLIDER_DESC tBoxDesc{};
+        tBoxDesc.pOwner = pKirby;
+        tBoxDesc.vCenter = { 0.f, 1.f, 0.f };
+        tBoxDesc.vSize = { 3.f, 2.f, 3.f };
+
+        m_pQueryBox = static_cast<CCollider*>(m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::COMPONENT,
+            Collider_AABB.iLevelID, Collider_AABB.szProtoTag, &tBoxDesc));
     }
 }
 
@@ -62,7 +79,39 @@ void CKirby_Emote::Update(CKirby* pKirby, const _float fTimeDelta)
         return;
     }
 
+
+    const _bool bReactionEmote = m_eEmoteStateFlag == EMOTE_STATE_FLAG::EMOTE_TOP ||
+        m_eEmoteStateFlag == EMOTE_STATE_FLAG::EMOTE_LEFT;
+
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    _float fRatio = pAnimator->Get_Progress();
+    if (bReactionEmote && fRatio >= m_fInteractedRatio && !m_bInteracted && m_pQueryBox)
+    {
+        m_pQueryBox->Update(XMLoadFloat4x4(pKirby->Get_Transform()->Get_WorldMatrixPtr()));
+
+        vector<CCollider*> Hits;
+        m_pGameInstance_Proxy->Query_Overlap(m_pQueryBox, ETOUI(COLLISION_LAYER::ENV_HURT), &Hits);
+
+        for (CCollider* pCollider : Hits)
+        {
+            if (pCollider == nullptr)
+                continue;
+
+            CGameObject* pGameObject = pCollider->Get_Owner();
+            if (pGameObject == nullptr)
+                continue;
+
+            CWaddleDee* pWaddleDee =dynamic_cast<CWaddleDee*>(pGameObject);
+            if (pWaddleDee == nullptr)
+                continue;
+
+            // m_eEmoteStateFlag 이걸로 분기
+            //pWaddleDee->
+        }
+
+        m_bInteracted = true;
+    }
+
     if (pAnimator->Is_Finished())
     {
         Transition_Fall_OR_Wait_OR_Run(pKirby);
@@ -176,5 +225,7 @@ CKirby_Emote* CKirby_Emote::Create()
 
 void CKirby_Emote::Free()
 {
+    Safe_Release(m_pQueryBox);
+
     __super::Free();
 }

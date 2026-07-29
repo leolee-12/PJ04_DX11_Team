@@ -83,6 +83,18 @@ HRESULT CKirby_DeformCylinder_Demo::Render()
     return S_OK;
 }
 
+_bool CKirby_DeformCylinder_Demo::Should_RenderShadowMesh(_uint iMeshIndex)
+{
+    switch (iMeshIndex)
+    {
+        case LIMBS:  return true;
+        case BODY_A: return m_bBodyAOn;
+        case BODY_B: return m_bBodyBOn;
+    }
+
+    return false;
+}
+
 HRESULT CKirby_DeformCylinder_Demo::Ready_AnimEvents(CKirby* pKirby)
 {
     m_pAnimatorCom->Set_EventCallback(

@@ -54,6 +54,8 @@ public:
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation);
 	_bool Get_ReqEndAttackState() { return m_bReqEndAttackState; }
 
+	virtual void Update_RunState(CKirby* pKirby, _float fTimeDelta) {}
+
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
 

@@ -47,6 +47,7 @@ namespace
         { TEXT("MetaSuperChargeEffect"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperChargeEffect.JSON") },
         { TEXT("MetaSlash1"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash1.JSON") },
         { TEXT("MetaSlash2"),             TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSlash2.JSON") },
+        { TEXT("MetaDecisiveSlash"),     TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaDecisiveSlash.JSON") },
         { TEXT("MetaSuperSpinSlash"),      TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSuperSpinSlash.JSON") },
         { TEXT("MetaSwordJumpSpin"),          TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpin.JSON") },
         { TEXT("MetaSwordJumpSpinTrail1"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpinTrail1.JSON") },
@@ -61,6 +62,8 @@ namespace
         { TEXT("CoasterWind"),            TEXT("../../Resources/YSE/EffectContainer/CoasterWind.json") },
         { TEXT("HammerSwing"),            TEXT("../../Resources/YSE/EffectContainer/HammerSwing.JSON") },
         { TEXT("HammerSwingFinal"),       TEXT("../../Resources/YSE/EffectContainer/HammerSwingFinal.JSON") },
+        { TEXT("WheelHammer"),            TEXT("../../Resources/YSE/EffectContainer/WheelHammer.JSON") },
+        { TEXT("OnigorosiHammerFirst"),   TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerFirst.JSON") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/EffectContainerJSON/YSE/GetAbilityEffect.JSON") },
         { TEXT("GetDeformEffect"),        TEXT("../../Resources/EffectContainerJSON/YSE/GetDeformEffect .JSON") },
@@ -163,6 +166,14 @@ namespace
         { TEXT("Meta_DemoUpperFinal"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperFinal.JSON") },
         { TEXT("Meta_Locking"),               TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Locking.JSON") },
         { TEXT("Meta_LockingSpark"),          TEXT("../../Resources/YSH/Effects/Metaknight/Meta_LockingSpark.JSON") },
+        { TEXT("Meta_MoonShot"),              TEXT("../../Resources/YSH/Effects/Metaknight/Meta_MoonShot.JSON") },
+
+        { TEXT("Meta_Slash1"),                TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Slash1.JSON") },
+        { TEXT("Meta_Slash2"),                TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Slash2.JSON") },
+        { TEXT("Meta_Slash3"),                TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Slash3.JSON") },
+
+        { TEXT("Meta_Rock"),                  TEXT("../../Resources/YSH/Effects/Metaknight/Meta_Rock.JSON") },
+        { TEXT("Meta_FallCharge"),            TEXT("../../Resources/YSH/Effects/Metaknight/Meta_FallCharge.JSON") },
 
         { TEXT("Meta_DemoUpperAtk1"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk1.JSON") },
         { TEXT("Meta_DemoUpperAtk2"),         TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk2.JSON") },

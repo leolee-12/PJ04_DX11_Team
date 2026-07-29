@@ -78,6 +78,9 @@ private:
 	_bool	m_bTransformDirty = { true };
 	_bool	m_bRotationInvariant = { false };
 
+	_bool	m_bForceEvaluation = { true };
+	_uint	m_iEvaluationPhase = { 0u };
+
 	CHANNEL_RESULT  m_Results[ETOUI(CHANNEL::COUNT)] = {};
 
 private:

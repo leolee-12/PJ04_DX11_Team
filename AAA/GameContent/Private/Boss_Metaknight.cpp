@@ -103,6 +103,8 @@ void CBoss_Metaknight::Update(_float fTimeDelta)
         Appear();
     if (m_pGameInstance_Proxy->Key_Down(DIK_9))
         Die();
+    if (m_pGameInstance_Proxy->Key_Down(DIK_7))
+        Set_Active(false);
 #endif
     Tick_Cooldowns(fTimeDelta);
     Tick_Locking(fTimeDelta);
@@ -377,6 +379,14 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
                 if (phase != ANIM_EVENT_PHASE::POINT) break;
                 
                 m_pBody->OffMask();
+                break;
+            }
+
+            case EANIM_EVENT::Projectile:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                Fire_GigaMoonShot();
                 break;
             }
         }

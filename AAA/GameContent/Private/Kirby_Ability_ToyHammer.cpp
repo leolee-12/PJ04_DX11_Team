@@ -458,13 +458,22 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         {
             pAnimator->Play("WheelHammer", false, true, 0.f, 2.5f);
             pToyHammerAnimator->Play("WheelHammer", false, true, 0.f, 2.5f);
+
+            CTransform* pTransform = pKirby->Get_Transform();
+            CEffect_Loader::GetInstance()->Spawn(L"WheelHammer", pKirby->Get_LevelIndex(),
+                _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_RenderWorldMatrixPtr());
+
+            pKirby->Get_Movement()->Set_VelocityY(0.f);
+            pKirby->Get_Movement()->Add_Velocity(XMVectorSet(0.f, 8.f, 0.f, 0.f));
+
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_END:
         {
             m_bWheelHammerEndOverlayApplied = false;
-            pAnimator->Play("WheelHammerEnd", false, true, 0.03f, 1.5f);
-            pToyHammerAnimator->Play("WheelHammerEnd", false, true, 0.03f, 1.5f);
+            pAnimator->Play("WheelHammerEnd", false, true, 0.03f, 2.f);
+            pToyHammerAnimator->Play("WheelHammerEnd", false, true, 0.03f, 2.f);
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:

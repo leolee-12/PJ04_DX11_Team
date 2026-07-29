@@ -53,6 +53,9 @@ public:
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
+public:
+	virtual void Update_RunState(CKirby* pKirby, _float fTimeDelta) override;
+
 private:
 	_float m_fMaxBoostTime{};
 	_float m_fAccBoostTime{};
@@ -66,6 +69,8 @@ private:
 
 	CEffect_Container* m_pBoostGas{};
 	CEffect_Container* m_pBoostWind{};
+
+	_float m_fRollDegree{};
 
 private:
 	void Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext);
@@ -81,6 +86,8 @@ private:
 	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer, const _tchar* EffectTag);
 
 	_bool Check_FrontCollision(CKirby* pKirby);
+
+	void Roll_Wheel(CKirby* pKirby, _float fTimeDelta);
 
 public:
 	static CKirby_Deform_Car* Create();

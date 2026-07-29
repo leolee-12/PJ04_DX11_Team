@@ -62,6 +62,36 @@ void CKirby_Deform_Model::Late_Update(_float fTimeDelta)
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
+HRESULT CKirby_Deform_Model::Render_Shadow()
+{
+    if (FAILED(m_pKirbyShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+        return E_FAIL;
+
+    const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        if (!Should_RenderShadowMesh(i))
+            continue;
+
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", i)))
+            return E_FAIL;
+
+        if (FAILED(m_pKirbyShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::ANIM_SHADOW))))
+            return E_FAIL;
+
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
+    }
+
+    return S_OK;
+}
+
 const _float4x4* CKirby_Deform_Model::Get_BoneMatrixPtr(const _char* pBoneName) const
 {
     if (m_pModelCom == nullptr)

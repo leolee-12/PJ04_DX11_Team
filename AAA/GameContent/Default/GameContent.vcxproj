@@ -59,6 +59,8 @@
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
     <ClInclude Include="..\Public\Effect_Include.h" />
+    <ClInclude Include="..\public\EnvTrigger_Debug.h" />
+    <ClInclude Include="..\public\EnvTrigger_LevelChange.h" />
     <ClInclude Include="..\Public\Env_Include.h" />
     <ClInclude Include="..\public\Excalibur.h" />
     <ClInclude Include="..\public\Excalibur_Body.h" />
@@ -80,6 +82,9 @@
     <ClInclude Include="..\public\Meta_DemoUpperFinal.h" />
     <ClInclude Include="..\public\Meta_DemoUpperUp.h" />
     <ClInclude Include="..\public\Meta_IntroLocking.h" />
+    <ClInclude Include="..\public\Meta_MoonShot.h" />
+    <ClInclude Include="..\public\Meta_Rock.h" />
+    <ClInclude Include="..\public\Meta_Slash.h" />
     <ClInclude Include="..\public\Meta_UpperCharge.h" />
     <ClInclude Include="..\public\MoonShot.h" />
     <ClInclude Include="..\Public\MeteorExplosion.h" />
@@ -251,11 +256,14 @@
     <ClInclude Include="..\Public\SystemObject_Include.h" />
     <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\HammerSwing.h" />
+    <ClInclude Include="..\Public\WheelHammer.h" />
+    <ClInclude Include="..\Public\OnigorosiHammerFirst.h" />
     <ClInclude Include="..\Public\SwordJumpSpin.h" />
     <ClInclude Include="..\Public\SwordSpinSlash.h" />
     <ClInclude Include="..\Public\SwordSuperSpinSlash.h" />
     <ClInclude Include="..\Public\MetaSlash1.h" />
     <ClInclude Include="..\Public\MetaSlash2.h" />
+    <ClInclude Include="..\Public\MetaDecisiveSlash.h" />
     <ClInclude Include="..\Public\MetaSuperSpinSlash.h" />
     <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
@@ -433,6 +441,7 @@
     <ClInclude Include="..\public\GigantEdge_Sword.h" />
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Bomb.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Crash.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sleep.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
@@ -478,6 +487,7 @@
     <ClInclude Include="..\Public\Kirby_ToyHammer.h" />
     <ClInclude Include="..\Public\Kirby_ToyHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
+    <ClInclude Include="..\Public\Kirby_CrashHat.h" />
     <ClInclude Include="..\Public\Kirby_IceHat.h" />
     <ClInclude Include="..\Public\Kirby_SleepHat.h" />
     <ClInclude Include="..\public\UI_Eraser.h" />
@@ -589,6 +599,8 @@
     <ClCompile Include="..\private\Camera_Coaster.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
+    <ClCompile Include="..\private\EnvTrigger_Debug.cpp" />
+    <ClCompile Include="..\private\EnvTrigger_LevelChange.cpp" />
     <ClCompile Include="..\private\Excalibur.cpp" />
     <ClCompile Include="..\private\Excalibur_Body.cpp" />
     <ClCompile Include="..\private\Excalibur_GetIt.cpp" />
@@ -619,6 +631,9 @@
     <ClCompile Include="..\private\Meta_DemoUpperFinal.cpp" />
     <ClCompile Include="..\private\Meta_DemoUpperUp.cpp" />
     <ClCompile Include="..\private\Meta_IntroLocking.cpp" />
+    <ClCompile Include="..\private\Meta_MoonShot.cpp" />
+    <ClCompile Include="..\private\Meta_Rock.cpp" />
+    <ClCompile Include="..\private\Meta_Slash.cpp" />
     <ClCompile Include="..\private\Meta_UpperCharge.cpp" />
     <ClCompile Include="..\private\MoonShot.cpp" />
     <ClCompile Include="..\Private\MeteorExplosion.cpp" />
@@ -777,11 +792,14 @@
     <ClCompile Include="..\Private\DistortionCommon.cpp" />
     <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\HammerSwing.cpp" />
+    <ClCompile Include="..\Private\WheelHammer.cpp" />
+    <ClCompile Include="..\Private\OnigorosiHammerFirst.cpp" />
     <ClCompile Include="..\Private\SwordJumpSpin.cpp" />
     <ClCompile Include="..\Private\SwordSpinSlash.cpp" />
     <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp" />
     <ClCompile Include="..\Private\MetaSlash1.cpp" />
     <ClCompile Include="..\Private\MetaSlash2.cpp" />
+    <ClCompile Include="..\Private\MetaDecisiveSlash.cpp" />
     <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp" />
     <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
@@ -907,6 +925,7 @@
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Crash.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sleep.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
@@ -991,6 +1010,7 @@
     <ClCompile Include="..\Private\Kirby_ToyHammer.cpp" />
     <ClCompile Include="..\Private\Kirby_ToyHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_CrashHat.cpp" />
     <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
     <ClCompile Include="..\Private\Kirby_SleepHat.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />

@@ -14,6 +14,7 @@
 // Parts
 #include "Kirby_Body.h"
 #include "Kirby_BombHat.h"
+#include "Kirby_CrashHat.h"
 #include "Kirby_IceHat.h"
 #include "Kirby_SleepHat.h"
 #include "Kirby_Sword.h"
@@ -39,6 +40,7 @@
 #include "Kirby_Ability_Sword.h"
 #include "Kirby_Ability_MetaKnightSword.h"
 #include "Kirby_Ability_Bomb.h"
+#include "Kirby_Ability_Crash.h"
 #include "Kirby_Ability_Ice.h"
 #include "Kirby_Ability_Sleep.h"
 #include "Kirby_Ability_ToyHammer.h"
@@ -260,6 +262,8 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
     {
         case COPY_ABILITY_TYPE::BOMB:
             return Find_OnOffPart(CKirby_BombHat::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::CRASH:
+            return Find_OnOffPart(CKirby_CrashHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::ICE:
             return Find_OnOffPart(CKirby_IceHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::SLEEP:
@@ -757,6 +761,16 @@ HRESULT CKirby::Ready_PartObjects()
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_BombHat::PROTOTYPE_TAG, CKirby_BombHat::Kirby_PartTag, &BombHatDesc)))
         return E_FAIL;
 
+    // CrashHat
+    CKirby_CrashHat::KIRBY_CRASH_HAT_DESC CrashHatDesc{};
+    CrashHatDesc.pParentMatrix = &m_RenderWorldMatrix;
+    CrashHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    CrashHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    CrashHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_CrashHat::PROTOTYPE_TAG, CKirby_CrashHat::Kirby_PartTag, &CrashHatDesc)))
+        return E_FAIL;
+
     // IceHat
     CKirby_IceHat::KIRBY_ICE_HAT_DESC IceHatDesc{};
     IceHatDesc.pParentMatrix = &m_RenderWorldMatrix;
@@ -813,6 +827,7 @@ HRESULT CKirby::Ready_Ability()
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))   return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::METAKNIGHT_SWORD, CKirby_Ability_MetaKnightSword::Create()))) return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::BOMB, CKirby_Ability_Bomb::Create())))     return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::CRASH, CKirby_Ability_Crash::Create())))   return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::ICE, CKirby_Ability_Ice::Create())))       return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SLEEP, CKirby_Ability_Sleep::Create())))   return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::TOY_HAMMER, CKirby_Ability_ToyHammer::Create()))) return E_FAIL;

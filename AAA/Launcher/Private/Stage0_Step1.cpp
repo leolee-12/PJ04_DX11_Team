@@ -11,10 +11,12 @@ namespace
         if (strLevelTag == L"STAGE0_STEP2") return LEVEL::STAGE0_STEP2;
         if (strLevelTag == L"TOWN_STEP1") return LEVEL::TOWN_STEP1;
         if (strLevelTag == L"TOWN_STEP2") return LEVEL::TOWN_STEP2;
-        if (strLevelTag == L"BOSS_STAGE1" ) return LEVEL::BOSS_STAGE1;
+        if (strLevelTag == L"TOWN_STEP3") return LEVEL::TOWN_STEP3;
+        if (strLevelTag == L"BOSS_STAGE1") return LEVEL::BOSS_STAGE1;
         if (strLevelTag == L"STAGE1_STEP1") return LEVEL::STAGE1_STEP1;
         if (strLevelTag == L"STAGE1_STEP2") return LEVEL::STAGE1_STEP2;
         if (strLevelTag == L"STAGE1_STEP3") return LEVEL::STAGE1_STEP3;
+        if (strLevelTag == L"ENDING") return LEVEL::ENDING;
         if (strLevelTag == L"TEST") return LEVEL::TEST;
         return LEVEL::END;
     }
