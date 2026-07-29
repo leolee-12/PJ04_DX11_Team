@@ -16,6 +16,9 @@ namespace
     constexpr _float fMaxFlameChargeTime = 1.9f;
     constexpr _float fMaxFlameTime = 3.9f;
     constexpr _float fMaxDamageTime = 3.5f;
+
+    constexpr _float fMaxDamageHeight = 5.f;
+    constexpr _uint iDamageRotCount = 4.f;
 }
 
 CKirby_Ability_Crash::CKirby_Ability_Crash()
@@ -151,6 +154,13 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
         {            
             m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Stop();
+            pMovement->Set_UseGravity(false);
+
+            XMStoreFloat3(&m_vDamageStartPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
+
+            m_iAccDamageRotCount = 0;
             m_fAccDamageTime = 0.f;
             if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
             {
@@ -162,10 +172,6 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
                 tInfo.fBlend = 0.1f;
                 tInfo.fSpeed = 1.5f;
                 pAnimator->Enqueue(tInfo);
-            }
-            else if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::JUMP)
-            {
-                pKirby->Get_Movement()->Force_Jump();
             }
 
             break;
@@ -199,54 +205,54 @@ void CKirby_Ability_Crash::Update_CrashState(CKirby* pKirby, _float fTimeDelta)
         case CRASH_STATE::FLAME_CHARGE:
         {
             if (m_bKeyUpAttackEnd)
-            {
                 Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
-                return;
-            }
-
-            if (m_fAccFlameChargeTime >= fMaxFlameChargeTime)
-            {
+            else if (m_fAccFlameChargeTime >= fMaxFlameChargeTime)
                 Change_CrashState(pKirby, CRASH_STATE::FLAME_START);
-                return;
-            }
-
-            m_fAccFlameChargeTime += fTimeDelta;
-
+            else
+                m_fAccFlameChargeTime += fTimeDelta;
             break;
         }
         case CRASH_STATE::FLAME_START:
         {
             if (m_bKeyUpAttackEnd)
-            {
                 Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
-                return;
-            }
-
-            if (pAnimator->Is_Finished())
+            else if (pAnimator->Is_Finished())
                 Change_CrashState(pKirby, CRASH_STATE::FLAME);
-
             break;
         }
         case CRASH_STATE::FLAME:
         {
             if (m_bKeyUpAttackEnd)
-            {
                 Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
-                return;
-            }
-
-            if (m_fAccFlameTime >= fMaxFlameTime)
-            {
+            else if (m_fAccFlameTime >= fMaxFlameTime)
                 Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
-                return;
-            }
-
-            m_fAccFlameTime += fTimeDelta;
-
+            else
+                m_fAccFlameTime += fTimeDelta;
             break;
         }
         case CRASH_STATE::DAMAGE:
         {
+            _float fRatio = m_fAccDamageTime / fMaxDamageTime;
+            Helper::FloatClamp(fRatio, 0.f, 1.f);
+            if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::JUMP)
+            {
+                _float fMoveRatio{};
+                if (fRatio <= 0.5f)
+                    fMoveRatio = Helper::FloatSmoothStep(0.f, 0.5f, fRatio);
+                else
+                    fMoveRatio = 1.f - Helper::FloatSmoothStep(0.5f, 1.f, fRatio);
+
+                const _float fHeight = fMaxDamageHeight * fMoveRatio;
+                _vector vPos = XMLoadFloat3(&m_vDamageStartPos);
+                vPos = XMVectorSetY(vPos, m_vDamageStartPos.y + fHeight);
+                pKirby->Get_Transform()->Set_State(STATE::POSITION, vPos);
+                pKirby->Get_Movement()->Sync_To_Controller();
+
+                // Rot
+                _float fRotDegree = fmodf(fRatio * static_cast<_float>(iDamageRotCount) * 360.f, 360.f);
+                pAnimator->SetBoneRotation("RotL", fRotDegree, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+            }
+
             if (m_fAccDamageTime >= fMaxDamageTime)
             {
                 Change_CrashState(pKirby, CRASH_STATE::FLAME_END);
@@ -279,8 +285,17 @@ void CKirby_Ability_Crash::Exit_CrashState(CKirby* pKirby, CRASH_STATE eState)
         case CRASH_STATE::FLAME:
             break;
         case CRASH_STATE::DAMAGE:
+        {
             m_pGameInstance_Proxy->Set_TimeScale(1.f);
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Stop();
+            pMovement->Set_UseGravity(true);
+
+            pKirby->Get_Transform()->Set_State(STATE::POSITION, XMLoadFloat3(&m_vDamageStartPos));
+            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+            pAnimator->SetBoneRotation("RotL", 0.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
             break;
+        }
         case CRASH_STATE::FLAME_END:
             break;
     }

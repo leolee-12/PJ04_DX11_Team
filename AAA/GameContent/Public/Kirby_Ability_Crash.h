@@ -55,10 +55,13 @@ private:
 	_float m_fAccFlameChargeTime{};
 	_float m_fAccFlameTime{};
 	_float m_fAccDamageTime{};
+	_uint m_iAccDamageRotCount{};
 
 	_bool m_bKeyUpAttackEnd{};
 
 	CRASH_DAMAGE_MODE m_eCrashDamageMode{};
+
+	_float3 m_vDamageStartPos{};
 
 public:
 	static CKirby_Ability_Crash* Create();
