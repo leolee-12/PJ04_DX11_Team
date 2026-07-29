@@ -186,7 +186,7 @@ protected:
 	// Distance Culling 
 	MONSTER_CULL_STATE          m_CullState = {};
 	_float                      m_fCullDist = { 0.f };
-	_float                      m_fFadeRange = { 8.f };
+	_float                      m_fFadeRange = { 10.f };
 	_float                      m_fBandHalf = { 65.f };					// 30 프레임 
 	_float                      m_fBandQuarter = { 80.f };				// 15 프레임 
 	_float                      m_fAnimAccum = { 0.f };

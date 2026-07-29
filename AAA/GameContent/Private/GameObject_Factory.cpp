@@ -508,7 +508,7 @@ void CGameObject_Factory::Register_Container()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBullet::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Gigatzo/Bullet/Gigatzo_Bullet.ysh",
-                    XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+                    XMMatrixScaling(1.25f, 1.25f, 1.25f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
