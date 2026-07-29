@@ -718,6 +718,34 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	return true;
 }
 
+_bool CMonster::Handle_CamShakeAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+	if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::CamShake)
+		return false;
+
+	if (e.bIsRange)
+	{
+		_float fLevel = 0.f;
+		if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+			fLevel = (e.iIntParam > 0 ? e.iIntParam : 50) / 100.f;
+
+		if (ePhase == ANIM_EVENT_PHASE::BEGIN || ePhase == ANIM_EVENT_PHASE::END)
+			m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
+
+		return true;
+	}
+
+	if (ePhase != ANIM_EVENT_PHASE::POINT)
+		return true;
+
+	CAMERA_SHAKE_DESC Shake{};
+	Shake.fTrauma = (e.iIntParam > 0 ? e.iIntParam : 20) / 100.f;
+	Shake.fDuration = 0.f;
+	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);
+
+	return true;
+}
+
 void CMonster::Start_LaunchSmokeFx()
 {
 	if (!m_bActive || nullptr == m_pTransformCom)

@@ -321,6 +321,8 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
             return;
         if (Handle_FxAnimEvent(e, phase))
             return;
+        if (Handle_CamShakeAnimEvent(e, phase))
+            return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))
         {
@@ -337,29 +339,6 @@ HRESULT CBoss_Metaknight::Ready_AnimEvents()
                 {
                     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
                     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
-                }
-                break;
-            }
-
-            case EANIM_EVENT::CamShake:
-            {
-                if (e.bIsRange)
-                {
-                    _float lvl = 0.f;
-                    if (phase == ANIM_EVENT_PHASE::BEGIN)
-                        lvl = (e.iIntParam > 0 ? e.iIntParam : 50) / 100.f;
-
-                    if (phase == ANIM_EVENT_PHASE::BEGIN || phase == ANIM_EVENT_PHASE::END)
-                        m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &lvl);
-                }
-                else
-                {
-                    if (phase != ANIM_EVENT_PHASE::POINT) break;
-
-                    CAMERA_SHAKE_DESC shake{};
-                    shake.fTrauma = (e.iIntParam > 0 ? e.iIntParam : 20) / 100.f;
-                    shake.fDuration = 0.f;
-                    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
                 }
                 break;
             }

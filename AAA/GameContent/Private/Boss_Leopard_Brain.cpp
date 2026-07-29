@@ -225,6 +225,9 @@ CBTNode* CBoss_Leopard_Brain::Make_ChargeDash()
         CBTAction::Create([this](CBlackboard*, _float) {
             m_pOwner->Play_OneShotSFX(CBoss_Leopard::SND_JUMPATTACK_LANDING, 0.3f);
             CDropStar_Manager::GetInstance()->Spawn_Preset(m_pOwner->Get_LevelIndex(), XMLoadFloat4x4(m_pOwner->Get_Transform()->Get_WorldMatrixPtr()), L"LeopardLanding");
+
+            static_cast<CBoss_Leopard*>(m_pOwner)->Fire_CamShake();
+
             return BT_STATUS::SUCCESS;
         }),
         Make_Groggy(), Clip("JumpAttackEnd", SPD),

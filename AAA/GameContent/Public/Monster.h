@@ -227,6 +227,7 @@ protected:
 
 	_bool						Handle_SoundAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 	_bool						Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool                       Handle_CamShakeAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
 	virtual const _float4x4*	Get_FxParentMatrix(const _wstring& strFx) const
 	{
