@@ -80,10 +80,18 @@ namespace
 	constexpr const _char* s_strWalkClip = "Walk";
 	constexpr const _char* s_strAngryClip = "ImpatienceOneTime";
 
+	constexpr const _tchar* s_szDamageSoundKey = L"TownWaddleDee_Damage.wav";
+
 	constexpr const _char* s_EmoteClips[] =
 	{
 		"WaveHand",
 		"Yay"
+	};
+
+	constexpr const _tchar* s_EmoteSoundKeys[] =
+	{
+		  L"TownArena_WaddleDeeVoiceCheers1.wav",
+		  L"TownArena_WaddleDeeVoiceCheers2.wav"
 	};
 
 	struct HIT_ANIM_SET
@@ -149,6 +157,7 @@ namespace
 	static_assert(s_iNormalHitAnimSetCount > 0);
 	static_assert(s_iArenaBattleAnimClipCount > 0);
 	static_assert(sizeof(s_EmoteClips) / sizeof(s_EmoteClips[0]) == ETOUI(CWaddleDee::WADDLEDEE_EMOTE::_COUNT));
+	static_assert(sizeof(s_EmoteSoundKeys) / sizeof(s_EmoteSoundKeys[0]) == ETOUI(CWaddleDee::WADDLEDEE_EMOTE::_COUNT));
 }
 
 CWaddleDee::CWaddleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -291,6 +300,7 @@ void CWaddleDee::Damaged(const ATTACK_INFO&)
 	XMStoreFloat3(&m_vLookOrigin, XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
 
 	Change_State(WADDLEDEE_STATE::HIT);
+	m_pGameInstance_Proxy->Play_SFX(s_szDamageSoundKey, 0.25f);
 }
 
 void CWaddleDee::Set_Active(_bool bActive)
@@ -333,6 +343,7 @@ void CWaddleDee::React_Emote(WADDLEDEE_EMOTE eEmote)
 
 	m_strInteractClip = s_EmoteClips[iEmoteIndex];
 	Change_State(WADDLEDEE_STATE::GREET);
+	m_pGameInstance_Proxy->Play_SFX(s_EmoteSoundKeys[iEmoteIndex], 0.15f);
 }
 
 void CWaddleDee::On_Deserialized()

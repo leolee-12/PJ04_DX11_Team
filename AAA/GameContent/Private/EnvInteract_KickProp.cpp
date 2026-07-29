@@ -62,6 +62,21 @@ void CEnvInteract_KickProp::Late_Update(_float fTimeDelta)
 
 		m_bKickPending = false;
 		m_bKicked = true;
+
+		const _wstring& wstrObjectName = m_tDesc.wstrObjectName;
+		const _tchar* pSoundKeyword = L"Plastic";
+
+		if (_wstring::npos != wstrObjectName.find(L"EmptyCan"))
+			pSoundKeyword = L"Can";
+		else if (_wstring::npos != wstrObjectName.find(L"Tire"))
+			pSoundKeyword = L"Rubber";
+		else if (_wstring::npos != wstrObjectName.find(L"Paper") || _wstring::npos != wstrObjectName.find(L"RackFolder"))
+			pSoundKeyword = L"Paper";
+
+		const _wstring wstrSoundKey = _wstring(L"GimmickInteractiveDecorParts_") + pSoundKeyword
+			+ std::to_wstring(m_pGameInstance_Proxy->RandomInt(1, 5)) + L".wav";
+
+		m_pGameInstance_Proxy->Play_SFX3D(wstrSoundKey.c_str(), m_pTransformCom->Get_State(STATE::POSITION), 0.25f);
 	}
 
 	if (m_bKicked)
