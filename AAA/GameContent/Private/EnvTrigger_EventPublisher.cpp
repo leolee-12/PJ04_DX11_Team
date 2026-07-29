@@ -20,16 +20,6 @@ CEnvTrigger_EventPublisher::CEnvTrigger_EventPublisher(const CEnvTrigger_EventPu
 	m_strProtoTag = PROTOTYPE_TAG;
 }
 
-HRESULT CEnvTrigger_EventPublisher::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
-}
-
-HRESULT CEnvTrigger_EventPublisher::Initialize(void* pArg)
-{
-	return __super::Initialize(pArg);
-}
-
 void CEnvTrigger_EventPublisher::OnTriggerEnter(CCollider* pOther)
 {
 	if (false == Is_PlayerActivator(pOther))

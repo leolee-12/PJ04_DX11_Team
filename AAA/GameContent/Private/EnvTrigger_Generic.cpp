@@ -16,21 +16,6 @@ CEnvTrigger_Generic::CEnvTrigger_Generic(const CEnvTrigger_Generic& Prototype)
 	m_strProtoTag = PROTOTYPE_TAG;
 }
 
-HRESULT CEnvTrigger_Generic::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
-}
-
-HRESULT CEnvTrigger_Generic::Initialize(void* pArg)
-{
-	return __super::Initialize(pArg);
-}
-
-void CEnvTrigger_Generic::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
-{
-	__super::Copy_PrototypeName(pOutData);
-}
-
 void CEnvTrigger_Generic::OnTriggerEnter(CCollider* pOther)
 {
 #ifdef _DEBUG

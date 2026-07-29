@@ -19,11 +19,6 @@ CEnvVolume_Light::CEnvVolume_Light(const CEnvVolume_Light& Prototype)
 	m_strProtoTag = PROTOTYPE_TAG;
 }
 
-HRESULT CEnvVolume_Light::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
-}
-
 HRESULT CEnvVolume_Light::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
@@ -34,11 +29,6 @@ HRESULT CEnvVolume_Light::Initialize(void* pArg)
 	m_fOutTransitionSec = m_tDesc.tEffect.fOutTransitionSec > 0.f ? m_tDesc.tEffect.fOutTransitionSec : m_tDesc.tEffect.fTransitionSec;
 
 	return S_OK;
-}
-
-void CEnvVolume_Light::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
-{
-	__super::Copy_PrototypeName(pOutData);
 }
 
 #ifdef _DEBUG
