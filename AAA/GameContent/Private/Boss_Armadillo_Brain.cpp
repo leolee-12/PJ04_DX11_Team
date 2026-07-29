@@ -9,6 +9,7 @@
 #include "Boss_Metaknight_Brain.h"
 
 #include "DropStar_Manager.h"
+#include "Effect_Loader.h"
 
 CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int)
 {
@@ -232,13 +233,17 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
         pFallLoop, Clip("HitWallLanding", SPD),
         CBTAction::Create([this](CBlackboard*, _float) { 
             m_pOwner->Play_SectionLoopSFX(CBoss_Armadillo::SND_STUNLOOP, 0.03f, 0.45f, 0.25f);
+            m_pOwner->Spawn_LoopFx(L"FaintEffect", "ControlL");
             return BT_STATUS::SUCCESS;
             },
-            [this]() { m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_STUNLOOP); 
+            [this]() { 
+                m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_STUNLOOP); 
+                m_pOwner->Stop_LoopFx(L"FaintEffect");
             }),
         Loop("HitWallLoop", GROGGY_TIME, SPD),
         CBTAction::Create([this](CBlackboard*, _float) {
             m_pOwner->Stop_LoopSFX(CBoss_Armadillo::SND_STUNLOOP);
+            m_pOwner->Stop_LoopFx(L"FaintEffect");
             return BT_STATUS::SUCCESS;
         }),
         Clip("HitWallEnd", SPD),

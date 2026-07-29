@@ -140,6 +140,8 @@ public:
 	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
 	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
+	void						Spawn_LoopFx(const _tchar* pKey, const _char* pBone = nullptr, const _float3& vOffset = {});
+	void						Stop_LoopFx(const _tchar* pKey, _bool bImmediate = false);
 	void						Stop_AllFx(_bool bImmediate);
 	void						Start_LaunchSmokeFx();
 	void						Play_LandingSmokeFx();

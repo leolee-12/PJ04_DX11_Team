@@ -779,6 +779,68 @@ void CMonster::Stop_LaunchSmokeFx(_bool bImmediate)
 	hSlot.Clear();
 }
 
+void CMonster::Spawn_LoopFx(const _tchar* pKey, const _char* pBone, const _float3& vOffset)
+{
+	if (!m_bActive || nullptr == pKey || nullptr == m_pTransformCom)
+		return;
+
+	auto pLoader = CEffect_Loader::GetInstance();
+
+	FX_HANDLE& hSlot = m_Effects[pKey];
+	if (pLoader->Is_Current(hSlot))
+		return;
+
+	hSlot.Clear();
+
+	_vector vOrigin = m_pTransformCom->Get_State(STATE::POSITION);
+
+	if (nullptr != pBone)
+	{
+		auto it = m_PartObjects.find(L"Body");
+
+		CMonsterPart* pBody = (it != m_PartObjects.end())
+			? dynamic_cast<CMonsterPart*>(it->second) : nullptr;
+
+		const _float4x4* pBoneMat = (nullptr != pBody)
+			? pBody->Get_BoneMatrixPtr(pBone) : nullptr;
+
+		if (nullptr != pBoneMat)
+		{
+			const _matrix matBoneWorld = XMLoadFloat4x4(pBoneMat) *
+				XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+			vOrigin = matBoneWorld.r[3];
+		}
+	}
+
+	_float3 vPos{};
+	XMStoreFloat3(&vPos, vOrigin + XMLoadFloat3(&vOffset));
+
+	pLoader->Spawn(pKey, Get_LevelIndex(), vPos,
+		_float3{}, _float3{}, nullptr, nullptr, &hSlot);
+}
+
+void CMonster::Stop_LoopFx(const _tchar* pKey, _bool bImmediate)
+{
+	if (nullptr == pKey)
+		return;
+
+	auto it = m_Effects.find(pKey);
+	if (it == m_Effects.end())
+		return;
+
+	auto pLoader = CEffect_Loader::GetInstance();
+	if (pLoader->Is_Current(it->second))
+	{
+		if (bImmediate)
+			it->second.p->EffectContainer_Stop();
+		else
+			it->second.p->EffectContainer_StopAfterEmission();
+	}
+
+	it->second.Clear();
+}
+
 void CMonster::Stop_AllFx(_bool bImmediate)
 {
 	auto pLoader = CEffect_Loader::GetInstance();
