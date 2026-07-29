@@ -50,6 +50,7 @@
 #include "MoonShot.h"
 #include "HammerSwing.h"
 #include "WheelHammer.h"
+#include "HammerFire.h"
 #include "OnigorosiHammerFirst.h"
 #include "OnigorosiHammerEnd.h"
 #include "SwordJumpSpin.h"

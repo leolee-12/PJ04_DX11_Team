@@ -44,6 +44,8 @@ void CKirby_ToyHammer::Late_Update(_float fTimeDelta)
     if (!m_bOn)
         return;
 
+    Cal_HammerHeadEffectSocket();
+
     if (m_pHitBox && m_pHitBox->Is_Enabled())
     {
         m_pHitBox->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
@@ -100,6 +102,18 @@ _bool CKirby_ToyHammer::Should_RenderShadowMesh(_uint iMeshIndex)
     }
 
     return false;
+}
+
+void CKirby_ToyHammer::Cal_HammerHeadEffectSocket()
+{
+    //const _float4x4* pHammerHeadBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadJ");
+    const _float4x4* pHammerHeadBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammertopJ");
+
+    const _matrix HammerHeadWorldMatrix = XMLoadFloat4x4(pHammerHeadBoneMatrix) * XMLoadFloat4x4(&m_CombinedWorldMatrix);
+
+    // 크기, 회전 제거
+    const _vector vHeadPosition = HammerHeadWorldMatrix.r[3];
+    XMStoreFloat4x4(&m_HammerHeadWorldMatrix, XMMatrixTranslationFromVector(vHeadPosition));
 }
 
 void CKirby_ToyHammer::Set_PartMode(CKirby* pKirby, KIRBY_PART_MODE ePartMode)

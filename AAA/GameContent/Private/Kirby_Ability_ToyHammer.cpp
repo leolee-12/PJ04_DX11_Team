@@ -121,6 +121,8 @@ void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
 {
     Change_ChargeAniState(pKirby, CHARGE_ANI_STATE::NONE);
 
+    Effect_FadeOut(m_pHammerFire, 0.1f);
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
@@ -654,11 +656,19 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             {
                 m_eChargeLevel = CHARGE_LEVEL::LV3;
                 m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge3.wav", 0.25f);
+
+                CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
+
+                CEffect_Loader::GetInstance()->Spawn(L"HammerFire", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                    pToyHammer->Get_HammerHeadWorldMatrixPtr(), &m_pHammerFire);
             }
             else if (m_eChargeLevel == CHARGE_LEVEL::LV3 && m_fChargeTime >= fChargeLevel4Time)
             {
                 m_eChargeLevel = CHARGE_LEVEL::LV4;
                 m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_ChargeBurst.wav", 0.25f);
+
+                Effect_FadeOut(m_pHammerFire, 0.1f);
 
                 CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
 
