@@ -99,6 +99,8 @@ HRESULT CBoss_Leopard::Ready_AnimEvents()
             return;
         if (Handle_DropStarsAnimEvent(e, phase))
             return;
+        if (Handle_CamShakeAnimEvent(e, phase))
+            return;
 
         if (phase != ANIM_EVENT_PHASE::POINT)
             return;
@@ -281,6 +283,12 @@ void CBoss_Leopard::Spotlight_LockTarget(_fvector vWorldPos)
     if (!m_pSpotRig) return;
     m_eSpotTarget = SPOT_FIXED;
     m_pSpotRig->Set_Target(vWorldPos);
+}
+
+void CBoss_Leopard::Fire_CamShake()
+{
+    CAMERA_SHAKE_DESC Shake{ 1.f, 0.7f };
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);
 }
 
 CMonsterBrain* CBoss_Leopard::Create_Brain()
