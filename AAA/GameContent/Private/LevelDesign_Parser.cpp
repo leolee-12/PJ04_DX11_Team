@@ -489,6 +489,11 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 			JsonUtils::Try_ReadString(jEntry, strMainPath + ".VariationType", &pDesc->AudioArea.strVariationType);
 		}
 
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeTown")	&& !strMainPath.empty())
+		{
+			JsonUtils::Try_ReadString(jEntry, strMainPath + ".VariationTypeTown", &pDesc->AudioArea.strVariationType);
+		}
+
 		if (!JsonUtils::Try_ReadString(jEntry, "ShapeType",	&pDesc->AudioArea.strShapeType)	&& !strMainPath.empty())
 		{
 			JsonUtils::Try_ReadString(jEntry, strMainPath + ".ShapeType", &pDesc->AudioArea.strShapeType);

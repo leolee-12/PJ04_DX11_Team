@@ -39,6 +39,12 @@ namespace
 		{ L"AreaSeLavaWaterFall",	L"LavaWaterFall",		kAnySoundId,		L"EnvLavaWaterFall_Lava1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.18f,	25.f	},
 		{ L"AreaSeSandWaterFall",	L"SandWaterFall",		kAnySoundId,		L"EnvSandWaterFall_SandFall1.wav",		AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.05f,	15.f	},
 		{ L"AreaSeWorldMap",		L"WorldMap",			kAnySoundId,		L"EnvWorldMap_World1Wind.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f,	10.f	},
+		{ L"AreaSeTown",			L"Wind",				kAnySoundId,		L"EnvTownWind_Wind.wav",				AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.15f,	8.f		},
+		{ L"AreaSeTown",			L"Arena",				kAnySoundId,		L"EnvTownArena_BattleSound.wav",		AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.12f,	8.f		},
+		{ L"AreaSeTown",			L"AbilityRoom",			kAnySoundId,		L"EnvTownAbilityRoom_MakingHat.wav",	AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.12f,	8.f		},
+		{ L"AreaSeTown",			L"Forest",				kAnySoundId,		L"EnvTownForest_SongBirds.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.15f,	12.f	},
+		{ L"AreaSeTown",			L"FoodShop",			kAnySoundId,		L"EnvTownFoodShop_MakeDish.wav",		AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.12f,	8.f		},
+		{ L"AreaSeTown",			L"Sea",					kAnySoundId,		L"EnvTownSea_SeaWave1.wav",				AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.12f,	20.f	},
 	};
 
 	_bool Matches_OptionalText(const _wstring& strValue, const _tchar* pExpected)
@@ -486,6 +492,7 @@ void CLD_AudioArea::Register_LevelDesignSpecs()
 		L"AreaSeLavaWaterFall",
 		L"AreaSeSandWaterFall",
 		L"AreaSeWorldMap",
+		L"AreaSeTown"
 	};
 
 	for (const _wstring& strObjectName : ObjectNames)
