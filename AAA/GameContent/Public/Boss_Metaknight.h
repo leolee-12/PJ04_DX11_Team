@@ -180,6 +180,7 @@ public:
     void End_Demo(EDemo eDemo);
 
     void Set_ParryWindow(_bool bOn);
+    void Enable_CatchPhase(_bool bOn);
 
     void Begin_LockingSync();
     void Sync_LockingProgress(_float fGauge01, _float fVisual01);

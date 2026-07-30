@@ -766,6 +766,12 @@ void CBoss_Metaknight::Set_ParryWindow(_bool bOn)
     m_pHurtBox->Reset_Bounding(Desc);
 }
 
+void CBoss_Metaknight::Enable_CatchPhase(_bool bOn)
+{
+    Enable_CatchBox(bOn);
+    Set_ParryWindow(bOn);
+}
+
 void CBoss_Metaknight::Begin_LockingSync()
 {
     CAnimator* pAnim = Get_BodyAnimator();

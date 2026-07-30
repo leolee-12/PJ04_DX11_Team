@@ -835,7 +835,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperCalibur()
         [this, bCaught](CBlackboard*, _float) {
             auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
             pMeta->Set_AttackBusy(true);
-            pMeta->Set_ParryWindow(true);
             pMeta->Reset_CatchHit();
             pMeta->Start_PatternCooldowns(CBoss_Metaknight::s_fUpperCooldown);
             *bCaught = false;
@@ -964,7 +963,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
                 Anim()->Play("UpperCaliburRaisingMove", true, true, 0.1f, SPD);
 
                 pMeta->Reset_CatchHit();
-                pMeta->Enable_CatchBox(true);
+                pMeta->Enable_CatchPhase(true);
 
                 *bCaught = false;
                 *fT = 0.f;
@@ -977,7 +976,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
 
             if (pMeta->Is_CatchHit())
             {
-                pMeta->Enable_CatchBox(false);
+                pMeta->Enable_CatchPhase(false);
                 *bCaught = true;
                 *bOn = false;
                 return BT_STATUS::SUCCESS;
@@ -988,7 +987,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
 
             if (fRun >= UC_RUSH_MAX_DIST || *fT >= UC_RUSH_TIMEOUT)
             {
-                pMeta->Enable_CatchBox(false);
+                pMeta->Enable_CatchPhase(false);
                 *bCaught = false;
                 *bOn = false;
                 return BT_STATUS::SUCCESS;
@@ -998,7 +997,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
         [this, bOn, fT] {
             *bOn = false; *fT = 0.f;
             auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
-            pMeta->Enable_CatchBox(false);
+            pMeta->Enable_CatchPhase(false);
             m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
             m_pOwner->Get_Movement()->Set_LockFacing(false);
         });
