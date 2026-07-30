@@ -101,6 +101,7 @@ _bool CBoss_Armadillo::Is_Intro_Finished() const
 void CBoss_Armadillo::Play_Death()
 {
     Stop_AllSounds();
+    Stop_AllFx(true);
 
     Enable_Colliders(false);
     if (auto* p = Get_HitBoxPart())

@@ -150,7 +150,10 @@ void CMonster::On_Deserialized()
 void CMonster::Set_Active(_bool bActive)
 {
 	if (!bActive)
+	{
 		Stop_AllSounds();
+		Stop_AllFx(true);
+	}
 
 	__super::Set_Active(bActive);
 }
@@ -841,8 +844,12 @@ void CMonster::Spawn_LoopFx(const _tchar* pKey, const _char* pBone, const _float
 		}
 	}
 
+	_vector vRight = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::RIGHT), 0.f));
+	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
+	vOrigin += vRight * vOffset.x + XMVectorSet(0.f, vOffset.y, 0.f, 0.f) + vLook * vOffset.z;
+
 	_float3 vPos{};
-	XMStoreFloat3(&vPos, vOrigin + XMLoadFloat3(&vOffset));
+	XMStoreFloat3(&vPos, vOrigin);
 
 	pLoader->Spawn(pKey, Get_LevelIndex(), vPos,
 		_float3{}, _float3{}, nullptr, nullptr, &hSlot);
