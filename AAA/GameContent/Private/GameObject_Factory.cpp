@@ -799,6 +799,23 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CHammerImpactGround::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerImpactGround),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::MODEL_RING_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Hammer/Common/Common_Ring01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::TEXTURE_WARP_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Hammer/Toy/indirectwarpring_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::TEXTURE_RING_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Hammer/Common/HammerImpactGround_Ring.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::TEXTURE_STAR_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Hammer/Common/common_star00.dds"), 1));
+        )
+    );
+
     Register(CWheelHammer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWheelHammer),
         LOADER
         (
@@ -1461,6 +1478,16 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cylinder_DrainM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CylinderBreak/DrainM.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cylinder_PieceM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CylinderBreak/PieceM.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, Model_SmokeSphereOriginal.szProtoTag, CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CSplit_Cage::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Cage),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CagePiece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CageBreak/CageL_Anim_CagePiece01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CagePiece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CageBreak/CageL_Anim_CagePiece02.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CagePiece03"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CageBreak/CageL_Anim_CagePiece03.ysh"));
         )
     );
 
