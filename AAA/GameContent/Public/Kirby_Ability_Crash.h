@@ -63,6 +63,8 @@ private:
 
 	_float3 m_vDamageStartPos{};
 
+	CSound_Handle m_hChargeSound{};
+
 public:
 	static CKirby_Ability_Crash* Create();
 private:

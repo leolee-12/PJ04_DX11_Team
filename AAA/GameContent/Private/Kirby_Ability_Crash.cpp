@@ -18,7 +18,7 @@ namespace
     constexpr _float fMaxDamageTime = 3.5f;
 
     constexpr _float fMaxDamageHeight = 5.f;
-    constexpr _uint iDamageRotCount = 4.f;
+    constexpr _uint iDamageRotCount = 4;
 
     constexpr _float fMaxHoverHeight = 1.2f;
     constexpr _float fHoverSearchDistance = 1.3f;
@@ -148,6 +148,8 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
     switch (eState)
     {
         case CRASH_STATE::FLAME_CHARGE_START:
+            m_hChargeSound = m_pGameInstance_Proxy->Play_SFX(L"HeroCrashBasic_Charge1.wav", 0.6f);            
+
             m_eCrashDamageMode = CRASH_DAMAGE_MODE::DEFAULT;
             pAnimator->Play("FlameChargeStart", false, false, 0.1f, 1.5f);
             break;
@@ -167,18 +169,31 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
             break;
         case CRASH_STATE::DAMAGE:
         {            
-            pKirby->Get_Movement()->Set_HoverMode(false);
-
             m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
+            // Movement
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Stop();
             pMovement->Set_UseGravity(false);
+            pMovement->Set_HoverMode(false);
 
+            // Val
             XMStoreFloat3(&m_vDamageStartPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
-
             m_iAccDamageRotCount = 0;
             m_fAccDamageTime = 0.f;
+
+            // Sound
+            if (m_hChargeSound.Is_Valid())
+                m_hChargeSound.Stop();
+
+            if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
+                m_pGameInstance_Proxy->Play_SFX(L"HeroCrash_Flame1.wav", 0.6f);
+            else if (m_fAccFlameTime < fMaxFlameTime)
+                m_pGameInstance_Proxy->Play_SFX(L"HeroCrashTime_Attack.wav", 0.6f);
+            else
+                m_pGameInstance_Proxy->Play_SFX(L"HeroCrashTime_BigAttack.wav", 0.6f);
+
+            // Ani
             if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
             {
                 pAnimator->Play("FlameStart", false, false, 0.1f, 2.5f);
