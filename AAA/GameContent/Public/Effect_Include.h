@@ -26,6 +26,7 @@
 #include "Split_Stone.h"
 #include "Split_Bush.h"
 #include "Split_Coaster.h"
+#include "Split_Cage.h"
 #include "Split_Cylinder.h"
 #include "LensFlare.h"
 #include "ItemEffect.h"

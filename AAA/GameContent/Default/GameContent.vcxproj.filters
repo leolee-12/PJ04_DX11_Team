@@ -3099,6 +3099,9 @@
     <ClInclude Include="..\Public\Split_Bush.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Cage.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Split_Coaster.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
@@ -4638,6 +4641,9 @@
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\00. SpitObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Bush.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Split_Cage.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Coaster.cpp">
