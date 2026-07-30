@@ -112,13 +112,13 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"FlameA_Copy1", &tFlame)))
 		return E_FAIL;
 
-	CMeshCommon::MESH_COMMON_DESC tRing =
-		Make_MeshDesc(m_iPrototypeLevel, MODEL_RING_TAG, false, true);
-	tRing.bUseTextureCom = true;
-	tRing.iTextureLevel = m_iPrototypeLevel;
-	tRing.wstrTextureTag = TEXTURE_RING04_TAG;
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tRingShock =
+		Make_MeshEmitterDesc(m_iPrototypeLevel, MODEL_RING_TAG, false, true);
+	tRingShock.bUseTextureCom = true;
+	tRingShock.iTextureLevel = m_iPrototypeLevel;
+	tRingShock.wstrTextureTag = TEXTURE_SHINE_CIRCLE_TAG;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"RingShock", &tRing)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"RingShock", &tRingShock)))
 		return E_FAIL;
 
 	CMeshCommon::MESH_COMMON_DESC tLine =
@@ -149,12 +149,6 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 	tCenter.wstrMaskTag = TEXTURE_CIRCLE06_TAG;
 
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"Center", &tCenter)))
-		return E_FAIL;
-
-	CMeshCommon::MESH_COMMON_DESC tFirstRing = tRing;
-	tFirstRing.wstrTextureTag = TEXTURE_RING03_TAG;
-
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"FirstRing", &tFirstRing)))
 		return E_FAIL;
 
 	CMeshCommon::MESH_COMMON_DESC tShine =
@@ -195,6 +189,43 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 		Make_RectDesc(m_iPrototypeLevel, TEXTURE_CIRCLE02_TAG);
 
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"Screen", &tScreen)))
+		return E_FAIL;
+
+	CRectCommon::RECT_COMMON_DESC tAfter =
+		Make_RectDesc(m_iPrototypeLevel, TEXTURE_CIRCLE02_TAG);
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"After", &tAfter)))
+		return E_FAIL;
+
+	CRectEmitterCommon::RECT_EMITTER_COMMON_DESC tStar =
+		Make_RectEmitterDesc(m_iPrototypeLevel, TEXTURE_STAR03_TAG);
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"Star", &tStar)))
+		return E_FAIL;
+
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tStone =
+		Make_MeshEmitterDesc(m_iPrototypeLevel, MODEL_BREAKABLE_ROCK_TAG, true, false);
+	tStone.bUseNormalTexture = true;
+	tStone.bCustomShader = true;
+	tStone.iShaderLevel = Shader_EffectRock.iLevelID;
+	tStone.wstrShaderTag = Shader_EffectRock.szProtoTag;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Stone", &tStone)))
+		return E_FAIL;
+
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tThunder =
+		Make_MeshEmitterDesc(m_iPrototypeLevel, MODEL_THUNDER_SPIRAL_TAG, false, true);
+	tThunder.bUseTextureCom = true;
+	tThunder.iTextureLevel = m_iPrototypeLevel;
+	tThunder.wstrTextureTag = TEXTURE_THUNDER_STRAIGHT_TAG;
+	tThunder.bUseMaskCom = true;
+	tThunder.iMaskLevel = m_iPrototypeLevel;
+	tThunder.wstrMaskTag = TEXTURE_INDIRECT_NORMAL_TAG;
+	tThunder.bCustomShader = true;
+	tThunder.iShaderLevel = Shader_SpecialEffect.iLevelID;
+	tThunder.wstrShaderTag = Shader_SpecialEffect.szProtoTag;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Thunder", &tThunder)))
 		return E_FAIL;
 
 	return S_OK;

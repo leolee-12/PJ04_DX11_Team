@@ -291,14 +291,6 @@ float4 ApplyUVEdgeFade(
     return vTextureValue;
 }
 
-float4 ApplyLensFlareRingSoftness(float4 vTextureValue)
-{
-    float fSoftness = clamp(g_fMaskStrength, 0.05f, 4.f);
-    float4 vExponent = float4(fSoftness, fSoftness, fSoftness, fSoftness);
-
-    return pow(saturate(vTextureValue), vExponent);
-}
-
 float2 RotateEffectUV(float2 vTexcoord, float fDegree)
 {
     float fSin = 0.f;
@@ -351,9 +343,6 @@ float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler, bool bLe
               vTextureValue, vTexcoord, g_bUseTextureUVEdgeFade,
               g_iTextureUVEdgeFadeAxis, g_fTextureUVEdgeFadeStartRange,
               g_fTextureUVEdgeFadeEndRange, g_fTextureUVEdgeFadePower);
-
-        if (bLensFlareRing == true)
-            vTextureValue = ApplyLensFlareRingSoftness(vTextureValue);
 
         vColor *= vTextureValue;
     }
@@ -477,8 +466,32 @@ PS_COLOR_OUT PS_LENSFLARE_RING_MIRROR(PS_IN In)
 {
     PS_COLOR_OUT Out;
 
-    Out.vColor = ComposeEffectColor(In.vTexcoord, MirrorSampler, true);
-    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
+      // 여기까지는 Texture × Mask × Color × Intensity 결과.
+    float4 vComposed = ComposeEffectColor(In.vTexcoord, MirrorSampler, true);
+
+      // Color_E 크기가 링 두께 계산에 섞이지 않도록 색상 크기 제거.
+    float fTintPeak = max(g_vColor.r, max(g_vColor.g, g_vColor.b));
+    float3 vTint = fTintPeak > 0.0001f
+          ? saturate(g_vColor / fTintPeak)
+          : float3(0.f, 0.f, 0.f);
+
+      // ComposeEffectColor가 적용한 Alpha_E를 제거하고 텍스처/마스크 알파만 복원.
+    float fShapeAlpha = g_fAlpha > 0.0001f
+          ? saturate(vComposed.a / g_fAlpha)
+          : 0.f;
+
+      // Intensity가 적용된 결과를 먼저 0~1 형태로 확정.
+      // Intensity를 올리면 더 많은 경계 픽셀이 1에 가까워져 링이 두꺼워짐.
+    float fIntensityPeak = max(vComposed.r, max(vComposed.g, vComposed.b));
+    float fCoverage = fTintPeak > 0.0001f
+          ? saturate((fIntensityPeak / fTintPeak) * fShapeAlpha)
+          : 0.f;
+
+      // 형태 확정 후 Strength_M을 전체 밝기에만 적용.
+    Out.vColor.rgb = vTint * fCoverage * saturate(g_fMaskStrength);
+
+      // Additive blend의 최종 Fade 값. Coverage 계산에는 영향 없음.
+    Out.vColor.a = saturate(g_fAlpha);
 
     return Out;
 }
