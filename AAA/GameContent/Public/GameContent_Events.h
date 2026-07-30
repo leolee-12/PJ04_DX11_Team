@@ -58,6 +58,7 @@ namespace Client
         // 카메라
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
+        inline constexpr const _tchar* Camera_ZoomPunch = L"Camera.ZoomPunch";
         inline constexpr const _tchar* BossCam_Focus = L"BossCam_Focus";
         inline constexpr const _tchar* BossCam_Config = L"BossCam_Config";
         inline constexpr const _tchar* BossCam_TopView = L"BossCam_TopView";
@@ -197,6 +198,17 @@ namespace Client
         CAnimator*         pProgress = nullptr;                 // progress 소스(고릴라 애니메이터)
         const _float4x4*   pAnchorWorld = nullptr;        // 로컬->월드 앵커(고릴라 월드행렬)
         _float             fSpeed = 1.f;
+    };
+
+    struct CAMERA_ZOOMPUNCH_DESC
+    {
+        _float fFovAdd = { 7.f };      // 추가 화각(도)
+        _float fDolly = { 1.5f };      // 뒤로 물러나는 거리
+        _float fBlur = { 0.6f };       // 가장자리 방사 블러 게인(0~1)
+        _float fInDur = { 0.08f };
+        _float fHoldDur = { 0.06f };
+        _float fOutDur = { 0.3f };
+        _bool  bIgnoreTimeScale = { true };
     };
 
     struct BOSSCAM_FOCUS_DESC

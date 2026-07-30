@@ -25,7 +25,7 @@ public:
 
 #pragma region 설정 상수값
     // --- 공통 ---
-    static constexpr _float s_fDefaultAnimSpeed = 1.5f;
+    static constexpr _float s_fDefaultAnimSpeed = 2.f;
     static constexpr _float s_fCCT_Radius = 0.75f;
     static constexpr _float s_fCCT_Height = 0.1f;
     static constexpr const _char* WEAPON_BONE = "RHaveL";
@@ -148,6 +148,7 @@ public:
     void      Play_EscapeMantSequence();
 
     void    Set_DodgeInvincible(_bool bOn) { m_bDodgeInvuln = bOn; }
+    void    Fire_DodgeZoom();
     void    Set_AttackBusy(_bool bOn) { m_bAttackBusy = bOn; }
     _bool   Is_AttackBusy() const { return m_bAttackBusy; }
     _bool Consume_DodgeRequest()

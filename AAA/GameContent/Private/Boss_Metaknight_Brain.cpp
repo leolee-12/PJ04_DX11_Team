@@ -272,6 +272,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_Dodge()
                 Anim()->Play("Dodge", false, true, 0.05f, SPD);
                 mv->Set_LockFacing(true);
                 pBoss->Set_DodgeInvincible(true);
+                pBoss->Fire_DodgeZoom();
 
                 *bRight = (rand() & 1) != 0;
                 _vector vTan = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), Dir_ToTargetXZ());
@@ -820,6 +821,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperCalibur()
             pMeta->Set_AttackBusy(true);
             pMeta->Set_ParryWindow(true);
             pMeta->Reset_CatchHit();
+            pMeta->Start_PatternCooldowns(CBoss_Metaknight::s_fUpperCooldown);
             *bCaught = false;
             return BT_STATUS::SUCCESS;
         },
@@ -835,7 +837,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperCalibur()
         pMeta->Set_AttackBusy(false);
         m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
         m_pOwner->Get_Movement()->Set_LockFacing(false);
-        pMeta->Start_PatternCooldowns(CBoss_Metaknight::s_fUpperCooldown);
         return BT_STATUS::SUCCESS;
         });
 

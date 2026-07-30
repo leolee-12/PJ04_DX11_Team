@@ -77,7 +77,7 @@ HRESULT CBoss_Metaknight::Initialize(void* pArg)
 
     m_strBossName = L"메타나이트";
     //m_fMaxHP = 2000.f;
-    m_fMaxHP = 200.f;
+    m_fMaxHP = 20000.f;
     m_fCurHP = m_fMaxHP;
 
     m_pTransformCom->Set_Scale(1.3f, 1.3f, 1.3f);
@@ -573,6 +573,19 @@ void CBoss_Metaknight::Play_EscapeMantSequence()
     tInfo.fBlend = 0.f;
     tInfo.fSpeed = s_fDefaultAnimSpeed;
     pAnim->Enqueue(tInfo);
+}
+
+void CBoss_Metaknight::Fire_DodgeZoom()
+{
+    CAMERA_ZOOMPUNCH_DESC Zoom{};
+    Zoom.fFovAdd = 5.f;
+    Zoom.fDolly = 1.6f;
+    Zoom.fBlur = 0.5f;
+    Zoom.fInDur = 0.07f;
+    Zoom.fHoldDur = 0.f;
+    Zoom.fOutDur = 0.35f;
+    Zoom.bIgnoreTimeScale = true;
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_ZoomPunch, &Zoom);
 }
 
 void CBoss_Metaknight::Fire_GigaMoonShot()
