@@ -13,9 +13,9 @@
 namespace
 {
      constexpr _float fHammerMaxHorizontalSpeed = 2.f;
-     constexpr _float fAttackFinalMaxHorizontalSpeed = 12.f;
+     constexpr _float fAttackFinalMaxHorizontalSpeed = 10.f;
      constexpr _float fChargeAttack3MaxHorizontalSpeed = 12.f;
-     constexpr _float fAttackRot_Speed_Degree = 30.f;
+     constexpr _float fAttackRot_Speed_Degree = 90.f;
 
      constexpr _float fChargeLevel2Time = 0.58f;
      constexpr _float fChargeLevel3Time = 1.4933333f;
@@ -502,6 +502,7 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::ATTACK_FINAL:
         {
+            m_bIsHit = false;
             m_bAttackFinalEndOverlayApplied = false;
             m_bAttackFinalAddVelocity = false;
             pAnimator->Play("HammerAttackFinalToy", false, true, 0.1f, 2.5f);
@@ -699,7 +700,7 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             {
                 pKirby->Reset_MoveDir();
 
-                if(!m_bAttackFinalAddVelocity)
+                if (!m_bAttackFinalAddVelocity)
                 {
                     CMovement_Child* pMovement = pKirby->Get_Movement();
                     pMovement->Set_MaxHorizontalSpeed(fAttackFinalMaxHorizontalSpeed);
@@ -707,6 +708,26 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                     MoveLookDir(pKirby, 30.f);
 
                     m_bAttackFinalAddVelocity = true;
+                }
+            }
+
+            if (!m_bIsHit && fRatio >= 0.35f && fRatio <= 0.45f)
+            {
+                _float3 vHitPos{};
+                m_bIsHit = Check_HammerHitGround(pKirby, 0.707f, 0.3f, &vHitPos);
+
+                if (m_bIsHit)
+                {
+                    CTransform* pTransform = pKirby->Get_Transform();
+                    _vector vKirbyPos = pTransform->Get_State(STATE::POSITION);
+                    const _float fRaise = vHitPos.y - XMVectorGetY(vKirbyPos);
+
+                    if (fRaise > 0.f)
+                    {
+                        vKirbyPos = XMVectorSetY(vKirbyPos, vHitPos.y);
+                        pTransform->Set_State(STATE::POSITION, vKirbyPos);
+                        pKirby->Get_Movement()->Sync_To_Controller();
+                    }
                 }
             }
 

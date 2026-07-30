@@ -14,6 +14,12 @@
 
 #include "Effect_Loader.h"
 
+namespace
+{
+    constexpr _float fMinSpeed = 14.f;
+    constexpr _float fMaxSpeed = 80.f;
+}
+
 CKirby_Deform_RollerCoaster::CKirby_Deform_RollerCoaster()
 {
 }
@@ -186,6 +192,17 @@ void CKirby_Deform_RollerCoaster::Exit_DeformState_Deform_End(CKirby* pKirby, co
 {
 }
 
+void CKirby_Deform_RollerCoaster::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    pKirby->Add_HP(-tInfo.fDamage);
+    pKirby->Start_DamageInvincibility();
+
+    //if (m_eRollerCoasterState == DEFORM_ROLLERCOASTER_STATE::RUNNING)
+    //{
+    //    m_fAccRailSpeed = fMinSpeed;
+    //}
+}
+
 void CKirby_Deform_RollerCoaster::Change_CoasterState(CKirby* pKirby, DEFORM_ROLLERCOASTER_STATE eNext)
 {
     if (m_eRollerCoasterState == eNext)
@@ -301,8 +318,6 @@ _bool CKirby_Deform_RollerCoaster::Update_OnRail(CKirby* pKirby, _float fTimeDel
     constexpr _float fSlopeAcceleration = 80.f;
     m_fAccRailSpeed += m_fSlopeRatio * fSlopeAcceleration * fTimeDelta;
 
-    constexpr _float fMinSpeed = 14.f;
-    constexpr _float fMaxSpeed = 60.f;
     Helper::FloatClamp(m_fAccRailSpeed, fMinSpeed, fMaxSpeed);
 
     m_fCurFrameMoveDist = m_fAccRailSpeed * fTimeDelta;
