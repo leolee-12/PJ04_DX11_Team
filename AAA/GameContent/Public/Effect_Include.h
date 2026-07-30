@@ -51,6 +51,7 @@
 #include "EssenceAura.h"
 #include "MoonShot.h"
 #include "HammerSwing.h"
+#include "HammerImpactGround.h"
 #include "WheelHammer.h"
 #include "HammerFire.h"
 #include "HammerFireSwing.h"

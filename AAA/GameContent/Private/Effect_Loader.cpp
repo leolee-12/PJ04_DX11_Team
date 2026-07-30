@@ -62,6 +62,7 @@ namespace
         { TEXT("CoasterWind"),            TEXT("../../Resources/YSE/EffectContainer/CoasterWind.json") },
         { TEXT("HammerSwing"),            TEXT("../../Resources/YSE/EffectContainer/HammerSwing.JSON") },
         { TEXT("HammerSwingFinal"),       TEXT("../../Resources/YSE/EffectContainer/HammerSwingFinal.JSON") },
+        { TEXT("HammerImpactGround"),      TEXT("../../Resources/YSE/EffectContainer/HammerImpactGround.JSON") },
         { TEXT("WheelHammer"),            TEXT("../../Resources/YSE/EffectContainer/WheelHammer.JSON") },
         { TEXT("HammerFire"),             TEXT("../../Resources/YSE/EffectContainer/HammerFire.JSON") },
         { TEXT("HammerFireSwing"),        TEXT("../../Resources/YSE/EffectContainer/HammerFireSwing.JSON") },

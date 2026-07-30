@@ -50,6 +50,9 @@ public:
 	virtual _bool Has_SpitStartAni() { return false; }
 
 public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+public:
 	virtual _bool Should_ForceEnterAttackState() override { return true; }
 
 private:
