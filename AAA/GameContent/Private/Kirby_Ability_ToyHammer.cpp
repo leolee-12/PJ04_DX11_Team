@@ -368,13 +368,9 @@ _bool CKirby_Ability_ToyHammer::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_
                     if (m_eToyHammerState != TOY_HAMMER_STATE::ATTACK)
                         return true;
 
-                    CTransform* pTransform = pKirby->Get_Transform();
-                    const _vector vForward = XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
-                    _float3 vPosition{};
-                    _float3 vLook{};
-                    XMStoreFloat3(&vPosition, pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f) - vForward * 0.3f);
-                    XMStoreFloat3(&vLook, vForward);
-                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwing", pKirby->Get_LevelIndex(), vPosition, vLook);
+                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwing", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 1.f, -0.3f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                        pKirby->Get_RenderWorldMatrixPtr());
                     return true;
                 }
 
@@ -383,13 +379,9 @@ _bool CKirby_Ability_ToyHammer::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_
                     if (m_eToyHammerState != TOY_HAMMER_STATE::ATTACK_FINAL)
                         return true;
 
-                    CTransform* pTransform = pKirby->Get_Transform();
-                    const _vector vForward = XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
-                    _float3 vPosition{};
-                    _float3 vLook{};
-                    XMStoreFloat3(&vPosition, pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f) + vForward);
-                    XMStoreFloat3(&vLook, vForward);
-                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwingFinal", pKirby->Get_LevelIndex(), vPosition, vLook);
+                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwingFinal", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 1.f, 1.f), _float3{}, _float3{},
+                        pKirby->Get_RenderWorldMatrixPtr());
                     return true;
                 }
 
@@ -489,6 +481,7 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         case TOY_HAMMER_STATE::ATTACK:
         {
             Clear_Overlay(pKirby, 1, 0.f);
+            m_bIsHit = false;
             ++m_iNormalAttackCount;
             pAnimator->Play("HammerAttackToy", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("HammerAttack", false, true, 0.1f, 2.5f);
@@ -502,9 +495,9 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::ATTACK_MISS:
         {
-            //m_iNormalAttackCount = 0;
-            //pAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
-            //pToyHammerAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
+            m_iNormalAttackCount = 0;
+            pAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
+            pToyHammerAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
             break;
         }
         case TOY_HAMMER_STATE::ATTACK_FINAL:
@@ -631,7 +624,35 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::ATTACK:
         {
-            AniEndChangeState(TOY_HAMMER_STATE::ATTACK_END);
+            if (!m_bIsHit)
+            {
+                _float3 vHitPos{};
+                m_bIsHit = Check_HammerHitGround(pKirby, -1.f, &vHitPos);
+
+                if (m_bIsHit)
+                {
+                    CTransform* pTransform = pKirby->Get_Transform();
+                    _vector vKirbyPos = pTransform->Get_State(STATE::POSITION);
+                    const _float fRaise = vHitPos.y - XMVectorGetY(vKirbyPos);
+
+                    if (fRaise > 0.f)
+                    {
+                        vKirbyPos = XMVectorSetY(vKirbyPos, vHitPos.y);
+                        pTransform->Set_State(STATE::POSITION, vKirbyPos);
+                        pKirby->Get_Movement()->Sync_To_Controller();
+                    }
+
+                }
+            }
+
+            if (pAnimator->Is_Finished())
+            {
+                if (m_bIsHit)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_END);
+                else
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_MISS);
+            }
+
             break;
         }
         case TOY_HAMMER_STATE::ATTACK_END:
@@ -660,19 +681,7 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::ATTACK_MISS:
         {
-            //if (pAnimator->Is_Finished())
-            //{
-            //    if (m_bReserveNextAttack)
-            //    {
-            //        Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_START);
-            //        m_bReserveNextAttack = false;
-            //    }
-            //    else
-            //    {
-            //        Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
-            //    }
-            //}
-
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
             break;
         }
         case TOY_HAMMER_STATE::ATTACK_FINAL:
@@ -1013,7 +1022,7 @@ void CKirby_Ability_ToyHammer::MoveLookDir(CKirby* pKirby, _float fSpeed)
     pKirby->Get_Movement()->Add_Velocity(vDir * fSpeed);
 }
 
-_bool CKirby_Ability_ToyHammer::Check_HammerHitGround(CKirby* pKirby, _float fNormalY)
+_bool CKirby_Ability_ToyHammer::Check_HammerHitGround(CKirby* pKirby, _float fNormalY, _float3* pOutHitPos)
 {
     CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));  
 
@@ -1023,6 +1032,11 @@ _bool CKirby_Ability_ToyHammer::Check_HammerHitGround(CKirby* pKirby, _float fNo
 
     if (bResult)
     {
+        if (pOutHitPos != nullptr)
+        {
+            *pOutHitPos = vHitPos;
+        }
+
         _vector vEffectLook = XMVectorSetY(pKirby->Get_Transform()->Get_State(STATE::LOOK), 0.f);
         if (XMVectorGetX(XMVector3LengthSq(vEffectLook)) < Helper::fEpsilon)
             vEffectLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);

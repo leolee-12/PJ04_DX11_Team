@@ -52,6 +52,7 @@ private:
 
     _bool m_bReserveNextAttack{};
     _bool m_bIsCharging{};
+    _bool m_bIsHit{};
 
     _bool m_bAttackEndOverlayApplied{};
     _bool m_bAttackFinalEndOverlayApplied{};
@@ -81,7 +82,7 @@ private:
 
     void MoveLookDir(CKirby* pKirby, _float fSpeed);
 
-    _bool Check_HammerHitGround(CKirby* pKirby, _float fNormalY = 0.f);
+    _bool Check_HammerHitGround(CKirby* pKirby, _float fNormalY = 0.f, _float3* pOutHitPos = nullptr);
 
 public:
     static CKirby_Ability_ToyHammer* Create();

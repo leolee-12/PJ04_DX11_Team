@@ -240,7 +240,7 @@ _bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float3* pOutPos
     XMStoreFloat3(&vSweepStart, vLeftPosition);
     XMStoreFloat3(&vSweepDirection, XMVector3Normalize(vLeftPosition - vRightPosition));
 
-    constexpr _float fSweepRadius = 0.12f;
+    constexpr _float fSweepRadius = 0.2f;
     constexpr _float fSweepDistance = 0.05f;
 
     _float3 vHitNormal{};
@@ -260,6 +260,9 @@ _bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float3* pOutPos
 
     if (pOutNormal != nullptr)
         *pOutNormal = vHitNormal;
+
+    if (vHitNormal.y <= 0.5f)
+        int a = 10;
 
     return vHitNormal.y >= fNormalY;
 }
