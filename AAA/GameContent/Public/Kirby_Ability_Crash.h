@@ -9,7 +9,14 @@ class CKirby;
 class CLIENT_DLL CKirby_Ability_Crash final : public CKirby_Ability
 {
 private:
-	enum class CRASH_STATE { FLAME_CHARGE_START, FLAME_CHARGE, FLAME_START, FLAME, FLAME_END, CRASH_STATE_END };
+	enum class CRASH_STATE
+	{
+		FLAME_CHARGE_START, FLAME_CHARGE,
+		FLAME_START, FLAME, DAMAGE, FLAME_END,
+		CRASH_STATE_END
+	};
+
+	enum class CRASH_DAMAGE_MODE { DEFAULT, JUMP };
 
 private:
 	CKirby_Ability_Crash();
@@ -27,14 +34,42 @@ public:
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;
+	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
+	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
+
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+public:
+	virtual _bool Ignore_TimeScale() override { return true; }
+
 private:
 	void Change_CrashState(CKirby* pKirby, CRASH_STATE eNext);
 	void Enter_CrashState(CKirby* pKirby, CRASH_STATE eState);
 	void Update_CrashState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_CrashState(CKirby* pKirby, CRASH_STATE eState);
 
-	CRASH_STATE m_eCrashState{};
+	void Update_FlameChrageMoveAni(CKirby* pKirby);
 
+	void Apply_CrashHit(CKirby* pKirby);
+
+private:
+	CRASH_STATE m_eCrashState{ CRASH_STATE::CRASH_STATE_END };
+	CRASH_DAMAGE_MODE m_eCrashDamageMode{};
+
+	_float m_fAccFlameChargeTime{};
+	_float m_fAccFlameTime{};
+	_float m_fAccDamageTime{};
+
+	_uint m_iAccDamageRotCount{};
+	_float3 m_vDamageStartPos{};
+
+	_bool m_bKeyUpAttackEnd{};
+	_bool m_bPlayFrameChargeMoveAni{};
+	_bool m_bAttackActivated{};
+
+	CCollider* m_pCrashHitBox{};
+	CSound_Handle m_hChargeSound{};
 public:
 	static CKirby_Ability_Crash* Create();
 private:

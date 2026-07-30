@@ -99,13 +99,25 @@ void CKirby_Slide::On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, C
                 ATTACK_INFO tAttackDesc{};
                 tAttackDesc.eHitType = HIT_TYPE::SLIDE;
                 tAttackDesc.pAttacker = pKirby;
-                _vector vKirbyPos = pKirby->Get_Transform()->Get_State(STATE::POSITION);
-                XMStoreFloat3(&tAttackDesc.vAttackerPos, vKirbyPos);
+                XMStoreFloat3(&tAttackDesc.vAttackerPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
                 tAttackDesc.fDamage = 10.f;
-                tAttackDesc.fKnockback = 3.f;
+                tAttackDesc.fKnockback = 10.f;
                 pMonster->Damaged(tAttackDesc);
 
                 Change_SlideState(pKirby, SLIDE_STATE::BACK_JUMP);
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::ENV_HURT))
+            {
+                if (auto* pDamageable = dynamic_cast<IDamageable*>(pGameObject))
+                {
+                    ATTACK_INFO tAttackDesc{};
+                    tAttackDesc.eHitType = HIT_TYPE::SLIDE;
+                    tAttackDesc.pAttacker = pKirby;
+                    XMStoreFloat3(&tAttackDesc.vAttackerPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
+                    tAttackDesc.fDamage = 10.f;
+                    tAttackDesc.fKnockback = 10.f;
+                    pDamageable->Damaged(tAttackDesc);
+                }
             }
             break;
         }

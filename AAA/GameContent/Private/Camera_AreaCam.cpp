@@ -123,7 +123,7 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
         m_fFovCurDeg = fFovDeg;
     m_fFovCurDeg += (fFovDeg - m_fFovCurDeg) * min(1.f, fTimeDelta * 5.f);
     m_fFovy = XMConvertToRadians(m_fFovCurDeg);
-    Recalculate_ProjMatrix();
+    Apply_ZoomFov();
 
     _vector vE = XMLoadFloat3(&m_eyeCur);
     _vector vDir = XMVectorSubtract(XMLoadFloat3(&m_atCur), vE);
