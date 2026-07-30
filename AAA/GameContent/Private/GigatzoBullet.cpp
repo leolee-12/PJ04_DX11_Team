@@ -20,9 +20,15 @@ CGigatzoBullet::CGigatzoBullet(const CGigatzoBullet& Prototype)
 
 void CGigatzoBullet::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);   
+    __super::Update(fTimeDelta);
     if (!m_bAlive)
         return;
+
+    const _vector vAxis = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
+    const _matrix matSpin = XMMatrixRotationAxis(vAxis, XMConvertToRadians(SPIN_DEG) * fTimeDelta);
+
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVector3TransformNormal(m_pTransformCom->Get_State(STATE::RIGHT), matSpin));
+    m_pTransformCom->Set_State(STATE::LOOK,  XMVector3TransformNormal(m_pTransformCom->Get_State(STATE::LOOK), matSpin));
 
     if (m_pAnimatorCom)
     {
@@ -138,9 +144,7 @@ void CGigatzoBullet::On_Activated()
 
 void CGigatzoBullet::On_Impact()
 {
-    // Effect Ãß°¡
-
-
+    m_pGameInstance_Proxy->Play_SFX(SND_BULLETBREAK, 0.5f);
     Kill();
 }
 

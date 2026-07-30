@@ -65,6 +65,7 @@
 #include "MetaSuperSpinSlash.h"
 #include "MeteorExplosion.h"
 #include "FaintEffect.h"
+#include "MeteorAura.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"

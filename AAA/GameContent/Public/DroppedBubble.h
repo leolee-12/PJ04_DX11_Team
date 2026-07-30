@@ -43,7 +43,7 @@ public:
 	void						On_Swallowed();
 
 protected:
-	virtual void				SetUp_Collider_CallBack() override {};
+	virtual void				SetUp_Collider_CallBack() override;
 
 private:
 	void						Update_Captured(_float fTimeDelta);
@@ -82,6 +82,9 @@ private:
 	static constexpr _int       s_iMaxBounce = { 6 };
 
 	static constexpr _float		s_fFootOffset = { 0.45f };
+	static constexpr _float		s_fPushSpeed = { 5.f };
+	static constexpr _float		s_fGroundFriction = { 3.f };
+	static constexpr _float		s_fStickDown = { -2.f };
 
 public:
 	static CDroppedBubble*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

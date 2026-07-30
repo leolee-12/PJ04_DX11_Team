@@ -68,6 +68,8 @@
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
     <ClInclude Include="..\Public\FaintEffect.h" />
+    <ClInclude Include="..\Public\GigatzoBulletEffect.h" />
+    <ClInclude Include="..\Public\MeteorAura.h" />
     <ClInclude Include="..\Public\Kirby_Emote.h" />
     <ClInclude Include="..\Public\Kirby_Include.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
@@ -614,11 +616,13 @@
     <ClCompile Include="..\private\Excalibur_Body.cpp" />
     <ClCompile Include="..\private\Excalibur_GetIt.cpp" />
     <ClCompile Include="..\Private\Gigatzo.cpp" />
+    <ClCompile Include="..\Private\GigatzoBulletEffect.cpp" />
     <ClCompile Include="..\Private\GigatzoBullet.cpp" />
     <ClCompile Include="..\Private\Gigatzo_Body.cpp" />
     <ClCompile Include="..\Private\Gigatzo_Brain.cpp" />
     <ClCompile Include="..\Private\Gigatzo_State_Attack.cpp" />
     <ClCompile Include="..\Private\FaintEffect.cpp" />
+    <ClCompile Include="..\Private\MeteorAura.cpp" />
     <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />

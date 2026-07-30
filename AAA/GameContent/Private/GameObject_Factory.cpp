@@ -1640,6 +1640,22 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CFaintEffect::SMOKE_MODEL_TAG,
                         CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Boss/SmokeLowPoly.ysh"));
         ));
+
+    Register(CMeteorAura::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMeteorAura),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorAura::SHELL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Meteor_Spere/Meteor_Spere.ysh",
+                            XMMatrixRotationX(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorAura::FIRE01_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Meteor_Fire01/Meteor_Fire01.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorAura::FIRE02_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Meteor_Fire02/Meteor_Fire02.ysh"));
+        ));
 }
 
 void CGameObject_Factory::Register_BossEffect()

@@ -193,6 +193,35 @@ void CDroppedBubble::Despawn()
 
 }
 
+void CDroppedBubble::SetUp_Collider_CallBack()
+{
+	if (nullptr == m_pCollider)
+		return;
+
+	m_pCollider->Set_OnStay([this](CCollider* pOther)
+	{
+		if (ETOUI(COLLISION_LAYER::PLAYER_HURT)
+			!= pOther->Get_RegisteredGroup())
+			return;
+		if (m_bCaptured || !m_bAvailable)
+			return;
+
+		_vector vFrom = pOther->Get_Owner()
+			->Get_Transform()->Get_State(STATE::POSITION);
+		_vector vTo =
+			m_pTransformCom->Get_State(STATE::POSITION);
+
+		_vector vDir = XMVectorSetY(vTo - vFrom, 0.f);
+		if (XMVectorGetX(XMVector3LengthSq(vDir)) < 1e-6f)
+			return;
+
+		_float3 d{};
+		XMStoreFloat3(&d, XMVector3Normalize(vDir));
+		m_vVelocity.x = d.x * s_fPushSpeed;
+		m_vVelocity.z = d.z * s_fPushSpeed;
+	});
+}
+
 HRESULT CDroppedBubble::Ready_Controller()
 {
 	CController::CONTROLLER_DESC cd{};
@@ -216,46 +245,62 @@ void CDroppedBubble::Update_Movement(_float fTimeDelta)
 {
 	if (nullptr == m_pController)
 		return;
-	if (m_bIsGrounded)
-		return;
+
+	const _bool bWasGrounded = m_bIsGrounded;
 
 	m_vVelocity.y += s_fGravity * fTimeDelta;
 
-	_float k = 1.f - s_fAirDrag * fTimeDelta;
+	const _float fDamp = bWasGrounded
+		? s_fGroundFriction : s_fAirDrag;
+	_float k = 1.f - fDamp * fTimeDelta;
 	if (k < 0.f)
 		k = 0.f;
+
 	m_vVelocity.x *= k;
-	m_vVelocity.y *= k;
 	m_vVelocity.z *= k;
+	if (!bWasGrounded)
+		m_vVelocity.y *= k;
 
 	_vector vDisp =
 		XMLoadFloat3(&m_vVelocity) * fTimeDelta;
 	_uint iFlags =
 		m_pController->Move(vDisp, 0.001f, fTimeDelta);
 
-	m_pTransformCom->Set_State(STATE::POSITION,	m_pController->Get_FootPosition() + XMVectorSet(0.f, s_fFootOffset, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::POSITION,
+		m_pController->Get_FootPosition()
+		+ XMVectorSet(0.f, s_fFootOffset, 0.f, 0.f));
 
-	_bool bDown = (iFlags &	physx::PxControllerCollisionFlag::eCOLLISION_DOWN) != 0;
+	const _bool bDown = (iFlags &
+		physx::PxControllerCollisionFlag::eCOLLISION_DOWN) != 0;
 
-	if (bDown && m_vVelocity.y < 0.f)
+	if (!bDown)
 	{
-		_float fHit = -m_vVelocity.y;
-		++m_iBounceCount;
+		m_bIsGrounded = false;
+		return;
+	}
 
-		if (fHit < s_fRestSpeed
-			|| m_iBounceCount >= s_iMaxBounce)
-		{
-			m_vVelocity = { 0.f, 0.f, 0.f };
-			m_bIsGrounded = true;
-			On_Rest();
-		}
-		else
-		{
-			m_vVelocity.y = fHit * s_fRestitution;
-			m_vVelocity.x *= s_fHorizDamp;
-			m_vVelocity.z *= s_fHorizDamp;
-			On_Bounce(m_iBounceCount);
-		}
+	if (bWasGrounded)
+	{
+		m_vVelocity.y = s_fStickDown;
+		return;
+	}
+
+	const _float fHit = -m_vVelocity.y;
+	++m_iBounceCount;
+
+	if (fHit < s_fRestSpeed
+		|| m_iBounceCount >= s_iMaxBounce)
+	{
+		m_vVelocity.y = s_fStickDown;
+		m_bIsGrounded = true;
+		On_Rest();
+	}
+	else
+	{
+		m_vVelocity.y = fHit * s_fRestitution;
+		m_vVelocity.x *= s_fHorizDamp;
+		m_vVelocity.z *= s_fHorizDamp;
+		On_Bounce(m_iBounceCount);
 	}
 }
 
