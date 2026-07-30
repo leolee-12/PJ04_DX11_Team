@@ -226,19 +226,22 @@ void CKirby_ToyHammer::Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType)
 
 _bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY)
 {
-    const _float4x4* pHeadFrontBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadRJ");
-    if (pHeadFrontBoneMatrix == nullptr)
+    const _float4x4* pLeftBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadLJ");
+    const _float4x4* pRightBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadRJ");
+    if (pLeftBoneMatrix == nullptr || pRightBoneMatrix == nullptr)
         return false;
 
-    const _matrix HeadFrontWorldMatrix = XMLoadFloat4x4(pHeadFrontBoneMatrix) * XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    const _matrix CombinedWorldMatrix = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    const _vector vLeftPosition = (XMLoadFloat4x4(pLeftBoneMatrix) * CombinedWorldMatrix).r[3];
+    const _vector vRightPosition = (XMLoadFloat4x4(pRightBoneMatrix) * CombinedWorldMatrix).r[3];
 
     _float3 vSweepStart{};
-    XMStoreFloat3(&vSweepStart, HeadFrontWorldMatrix.r[3]);
-
+    _float3 vSweepDirection{};
+    XMStoreFloat3(&vSweepStart, vRightPosition);
+    XMStoreFloat3(&vSweepDirection, XMVector3Normalize(vRightPosition - vLeftPosition));
 
     constexpr _float fSweepRadius = 0.12f;
     constexpr _float fSweepDistance = 0.1f;
-    constexpr _float3 vSweepDirection = { 0.f, -1.f, 0.f };
 
     _float3 vHitNormal{};
     if (!m_pGameInstance_Proxy->Sweep_Sphere(vSweepStart, fSweepRadius, vSweepDirection, fSweepDistance, &vHitNormal, nullptr, true, false))
