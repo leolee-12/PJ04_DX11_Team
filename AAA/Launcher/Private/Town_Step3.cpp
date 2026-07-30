@@ -23,6 +23,8 @@ HRESULT CTown_Step3::Initialize()
 
     m_pGameInstance_Proxy->Publish(EventTag::CutFade_Out, nullptr);
 
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_TownNewWorld1.marker.wav", 3.f, 0.2f);
+
     return S_OK;
 }
 

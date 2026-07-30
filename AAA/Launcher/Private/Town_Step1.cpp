@@ -21,6 +21,8 @@ HRESULT CTown_Step1::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_DemoAttackTown1.marker.wav", 3.f, 0.2f);
+
     return S_OK;
 }
 
@@ -51,6 +53,19 @@ HRESULT CTown_Step1::Ready_Events()
             return;
         }
         });
+    
+    Subscribe_Event(TEXT("GigantEdge_Appear"), [this](void* p) {
+        m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_RoomGuarder_Interactive.dspadpcm.wav", 1.f, 0.2f);
+        });
+
+    Subscribe_Event(EventTag::Boss_Died, [this](void* p) {
+        m_pGameInstance_Proxy->Fade_BGM_Out(1.f);
+        });
+
+    Subscribe_Event(EventTag::Dialogue_Start, [this](void* p) {
+        m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_TownNewWorld1.marker.wav", 2.f, 0.2f);
+        });
+
     return S_OK;
 }
 

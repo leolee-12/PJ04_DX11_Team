@@ -104,6 +104,16 @@ namespace
         TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Ice"),
             CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+        // Toy Hammer
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_ToyHammer"),
+            CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/Hammer/ToyHammer.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+        // Crash Hat
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Crash"),
+            CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/Crash/CrashHat.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
     }
 }
 
