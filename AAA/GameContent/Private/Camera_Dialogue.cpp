@@ -114,7 +114,7 @@ void CCamera_Dialogue::Apply_Pose()
     m_pTransformCom->Set_WorldMatrix(CamWorld);
 
     m_fFovy = m_tCur.fFovy;
-    Recalculate_ProjMatrix();
+    Apply_ZoomFov();
 }
 
 CCamera_Dialogue* CCamera_Dialogue::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

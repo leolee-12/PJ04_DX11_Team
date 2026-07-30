@@ -27,6 +27,9 @@ public:
 	virtual void Exit(CKirby* pKirby) override;
 
 public:
+	virtual _bool Ignore_TimeScale(CKirby* pKirby) override;
+
+public:
 	virtual void  On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:

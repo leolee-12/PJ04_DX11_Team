@@ -301,8 +301,8 @@ _bool CKirby_Deform_RollerCoaster::Update_OnRail(CKirby* pKirby, _float fTimeDel
     constexpr _float fSlopeAcceleration = 80.f;
     m_fAccRailSpeed += m_fSlopeRatio * fSlopeAcceleration * fTimeDelta;
 
-    constexpr _float fMinSpeed = 20.f;
-    constexpr _float fMaxSpeed = 65.f;
+    constexpr _float fMinSpeed = 14.f;
+    constexpr _float fMaxSpeed = 60.f;
     Helper::FloatClamp(m_fAccRailSpeed, fMinSpeed, fMaxSpeed);
 
     m_fCurFrameMoveDist = m_fAccRailSpeed * fTimeDelta;

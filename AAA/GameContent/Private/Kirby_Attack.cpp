@@ -60,6 +60,13 @@ void CKirby_Attack::Exit(CKirby* pKirby)
     pKirby->Get_ActiveAttackMode()->Exit_AttackState(pKirby);
 }
 
+_bool CKirby_Attack::Ignore_TimeScale(CKirby* pKirby)
+{
+    CKirby_AttackMode* pAttackMode = pKirby->Get_ActiveAttackMode();
+
+    return pAttackMode && pAttackMode->Ignore_TimeScale();
+}
+
 void CKirby_Attack::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
         pKirby->Get_ActiveAttackMode()->On_Damaged_KirbyState(pKirby, tInfo);

@@ -80,7 +80,10 @@ protected:
 private:
     HRESULT                 Render_Sword();
     HRESULT                 Render_Bomb();
-    HRESULT                 Render_Ice();       // юс╫ц
+    HRESULT                 Render_Ice();       
+    HRESULT                 Render_Hammer();
+    HRESULT                 Render_Crash();
+
 
 public:
     static CAbility_Model*  Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -54,9 +54,9 @@ protected:
 
 
 private:
-	_float4					m_vDiffuse = { 1.f, 0.85f, 0.15f, 1.f };
-	_float3					m_vMRA = { 0.f, 0.45f, 1.f };
-	_float4					m_vEmissive = { 0.35f, 0.28f, 0.f, 1.f };
+	static constexpr const _float4	s_vDiffuse = { 1.f, 0.25f, 0.02f, 1.f };
+	static constexpr const _float3	s_vMRA = { 0.f, 0.45f, 1.f };
+	static constexpr const _float4	s_vEmissive = { 1.5f, 0.62f, 0.05f, 1.f };
 
 	_int					m_iShadowPassIdx = { 7 };
 

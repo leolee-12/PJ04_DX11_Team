@@ -39,7 +39,7 @@ HRESULT CBouncy::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
-	m_fCullDist = 95.f;
+	m_fCullDist = 175.f;
 
     if (m_pMovement)
         m_pMovement->Set_Stats(6.f, 720.f, -20.f, 11.f);

@@ -358,6 +358,9 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect">
       <UniqueIdentifier>{1c50b743-da4b-4840-be0b-ed12450b89df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect\CageBreak">
+      <UniqueIdentifier>{bf2d61ec-fe6e-41f2-a888-234eff996917}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect\CageGlowEffect">
       <UniqueIdentifier>{732f78e3-2105-4db3-b1a1-b91ef2c7f0a4}</UniqueIdentifier>
     </Filter>
@@ -369,6 +372,9 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
       <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint">
+      <UniqueIdentifier>{52951569-d865-4ff0-92b9-e5d169a4ccc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
@@ -2121,6 +2127,9 @@
     <ClInclude Include="..\public\Excalibur_GetIt.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\GetIt</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\FaintEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\FlowerPetals.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
@@ -3739,6 +3748,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Excalibur_GetIt.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\GetIt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FaintEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FlowerPetals.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
