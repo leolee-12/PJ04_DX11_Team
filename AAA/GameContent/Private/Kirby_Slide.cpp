@@ -117,8 +117,6 @@ void CKirby_Slide::On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, C
                     tAttackDesc.fDamage = 10.f;
                     tAttackDesc.fKnockback = 10.f;
                     pDamageable->Damaged(tAttackDesc);
-
-                    Change_SlideState(pKirby, SLIDE_STATE::BACK_JUMP);
                 }
             }
             break;

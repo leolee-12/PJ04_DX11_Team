@@ -136,6 +136,7 @@ void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
     Change_ChargeAniState(pKirby, CHARGE_ANI_STATE::NONE);
 
     Effect_FadeOut(m_pHammerFire, 0.1f);
+    Effect_Stop(m_pHammerFireSwing);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);

@@ -51,22 +51,24 @@ private:
 
 	void Update_FlameChrageMoveAni(CKirby* pKirby);
 
+	void Apply_CrashHit(CKirby* pKirby);
+
 private:
 	CRASH_STATE m_eCrashState{ CRASH_STATE::CRASH_STATE_END };
+	CRASH_DAMAGE_MODE m_eCrashDamageMode{};
 
 	_float m_fAccFlameChargeTime{};
 	_float m_fAccFlameTime{};
 	_float m_fAccDamageTime{};
+
 	_uint m_iAccDamageRotCount{};
-
-	_bool m_bKeyUpAttackEnd{};
-
-	_bool m_bPlayFrameChrageMoveAni{};
-
-	CRASH_DAMAGE_MODE m_eCrashDamageMode{};
-
 	_float3 m_vDamageStartPos{};
 
+	_bool m_bKeyUpAttackEnd{};
+	_bool m_bPlayFrameChargeMoveAni{};
+	_bool m_bAttackActivated{};
+
+	CCollider* m_pCrashHitBox{};
 	CSound_Handle m_hChargeSound{};
 
 public:

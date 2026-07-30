@@ -50,6 +50,7 @@ void CKirby_Ability_Crash::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_bReqEndAttackState = false;
 
+    m_bAttackActived = false;
     m_bKeyUpAttackEnd = false;
 
     m_fAccFlameChargeTime = 0.f;
@@ -58,7 +59,7 @@ void CKirby_Ability_Crash::Enter_AttackState(CKirby* pKirby, _int iFlag)
     pKirby->Set_UseRenderGroundAlign(false);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Set_GravityScale(0.3f);
+    pMovement->Set_GravityScale(0.7f);
     pMovement->Set_MaxHorizontalSpeed(fCrashMaxHorizontalSpeed);
     pMovement->Set_UseGroundFriction(false);
     pMovement->Set_LinearDrag(fCrashLinearDrag);
@@ -86,12 +87,27 @@ void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
 
     pKirby->Set_UseRenderGroundAlign(true);
 
+    // Sound
+    if (m_hChargeSound.Is_Valid())
+        m_hChargeSound.Stop();
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_HoverMode(false);
     pMovement->Set_GravityScale(1.f);
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     pMovement->Set_UseGroundFriction(true);
     pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
+
+    if(m_bAttackActived)
+    {
+        pKirby->Set_AbilityPartsActive(COPY_ABILITY_TYPE::CRASH, false);
+        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::NORMAL);
+        pKirby->Apply_ChangeKirbyAbility();
+
+        KIRBY_NAME_UPDATED tNameDesc{};
+        tNameDesc.strAtkModeName = pKirby->Get_KirbyAbility()->Get_AttackModeName();
+        m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
+    }
 }
 
 _bool CKirby_Ability_Crash::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -358,18 +374,28 @@ void CKirby_Ability_Crash::Exit_CrashState(CKirby* pKirby, CRASH_STATE eState)
         case CRASH_STATE::DAMAGE:
         {
             m_pGameInstance_Proxy->Set_TimeScale(1.f);
-            CMovement_Child* pMovement = pKirby->Get_Movement();
-            pMovement->Stop();
-            pMovement->Set_UseGravity(true);
 
+            CMovement_Child* pMovement = pKirby->Get_Movement();      
             pKirby->Get_Transform()->Set_State(STATE::POSITION, XMLoadFloat3(&m_vDamageStartPos));
             pMovement->Sync_To_Controller();
+
+            pMovement->Set_UseGravity(true);
+            pMovement->Set_GravityScale(1.f);
+            pMovement->Set_UseGroundFriction(true);
+            pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
+
             CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
             pAnimator->SetBoneRotation("RotL", 0.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+
+            Apply_CrashHit(pKirby);
+
             break;
         }
         case CRASH_STATE::FLAME_END:
+        {
+
             break;
+        }
     }
 }
 
@@ -391,6 +417,52 @@ void CKirby_Ability_Crash::Update_FlameChrageMoveAni(CKirby* pKirby)
         }
 }
 
+void CKirby_Ability_Crash::Apply_CrashHit(CKirby* pKirby)
+{
+    m_bAttackActived = true;
+    
+    if (m_pCrashHitBox == nullptr)
+    {
+        CCollider::COLLIDER_DESC tDesc{};
+        tDesc.pOwner = pKirby;
+        tDesc.fRadius = 80.f;
+        m_pCrashHitBox = static_cast<CCollider*>(m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::COMPONENT,
+            Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, &tDesc));
+    }
+
+    if (m_pCrashHitBox == nullptr)
+        return;
+
+    m_pCrashHitBox->Update(XMLoadFloat4x4(pKirby->Get_Transform()->Get_WorldMatrixPtr()));
+
+    vector<CGameObject*> Targets;
+    m_pGameInstance_Proxy->Query_OverlapOwners(
+        m_pCrashHitBox,
+        { ETOUI(COLLISION_LAYER::MONSTER_HURT),ETOUI(COLLISION_LAYER::ENV_HURT) },
+        &Targets
+    );
+
+    ATTACK_INFO tAttackInfo{};
+    tAttackInfo.pAttacker = pKirby;
+
+    if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
+        tAttackInfo.fDamage = 1000.f;
+    else if (m_fAccFlameTime < fMaxFlameTime)
+        tAttackInfo.fDamage = 1500.f;
+    else
+        tAttackInfo.fDamage = 2000.f;
+
+    tAttackInfo.fKnockback = 5.f;
+    XMStoreFloat3(&tAttackInfo.vAttackerPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
+    tAttackInfo.eHitType = HIT_TYPE::CRASH;
+
+    for (CGameObject* pTarget : Targets)
+    {
+        if (auto* pDamageable = dynamic_cast<IDamageable*>(pTarget))
+            pDamageable->Damaged(tAttackInfo);
+    }
+}
+
 CKirby_Ability_Crash* CKirby_Ability_Crash::Create()
 {
     CKirby_Ability_Crash* pInstance = new CKirby_Ability_Crash();
@@ -406,5 +478,7 @@ CKirby_Ability_Crash* CKirby_Ability_Crash::Create()
 
 void CKirby_Ability_Crash::Free()
 {
+    Safe_Release(m_pCrashHitBox);
+
     __super::Free();
 }
