@@ -15,8 +15,8 @@ HRESULT CBoss_Metaknight_Sword::Initialize(void* pArg)
 
     CAPSULE_DESC CapsuleDesc{};
     CapsuleDesc.vCenter = { 0.f, 0.f, 0.f };
-    CapsuleDesc.fHeight = 1.2f;
-    CapsuleDesc.fRadius = 0.35f;
+    CapsuleDesc.fHeight = 1.5f;
+    CapsuleDesc.fRadius = 0.5f;
     CapsuleDesc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f };
     if (FAILED(Ready_HitBox(CapsuleDesc)))
         return E_FAIL;
@@ -27,6 +27,7 @@ HRESULT CBoss_Metaknight_Sword::Initialize(void* pArg)
     PickDesc.vCenter = { 0.f, 0.f, 0.f };
     PickDesc.fRadius = 0.6f;
     PickDesc.fHeight = 0.6f;
+    PickDesc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f };
     m_pPickBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
         TEXT("PickBox_Com"), &PickDesc);
     if (nullptr == m_pPickBox)

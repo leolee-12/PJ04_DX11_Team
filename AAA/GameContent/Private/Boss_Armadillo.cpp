@@ -101,6 +101,7 @@ _bool CBoss_Armadillo::Is_Intro_Finished() const
 void CBoss_Armadillo::Play_Death()
 {
     Stop_AllSounds();
+    Stop_AllFx(true);
 
     Enable_Colliders(false);
     if (auto* p = Get_HitBoxPart())
@@ -359,6 +360,8 @@ HRESULT CBoss_Armadillo::Ready_AnimEvents()
         if (Handle_FxAnimEvent(e, phase))
             return;
         if (Handle_DropStarsAnimEvent(e, phase))
+            return;
+        if (Handle_CamShakeAnimEvent(e, phase))
             return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))

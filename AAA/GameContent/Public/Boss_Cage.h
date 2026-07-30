@@ -83,6 +83,7 @@ private:
     _bool      m_bAnimPrimed = { false };           // 본 1프레임 갱신 후 Pause 완료 여부
     _float     m_fFloatHeight = { 0.f };
     _float     m_fDescendSpeed = { 3.f };
+    _float     m_fWaddleDeeVoiceTimer = { 0.f };
 
     _bool      m_bHeadTurnFired = { false };
 

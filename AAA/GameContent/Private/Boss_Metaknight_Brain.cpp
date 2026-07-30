@@ -27,9 +27,9 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     //    });
     
     // 에디터 애니매이션 편집용
-    return CBTReactiveSelector::Create({
-        Clip("Wait", SPD, 0.f),
-        });
+    //return CBTReactiveSelector::Create({
+    //    Clip("Wait", SPD, 0.f),
+    //    });
 
     CBTNode* pCombat = CBTSequence::Create({
         Make_GigaBranch(),
@@ -51,7 +51,7 @@ CBTNode* CBoss_Metaknight_Brain::Build_PhaseTree(_int iPhase)
     return CBTReactiveSelector::Create({
         Make_LockOutcomeBranch(),
         Make_DodgeBranch(),
-        Make_RockBranch(),
+        //Make_RockBranch(),
         Make_UpperBranch(),
         pCombat,
         });
@@ -272,6 +272,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_Dodge()
                 Anim()->Play("Dodge", false, true, 0.05f, SPD);
                 mv->Set_LockFacing(true);
                 pBoss->Set_DodgeInvincible(true);
+                pBoss->Fire_DodgeZoom();
 
                 *bRight = (rand() & 1) != 0;
                 _vector vTan = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), Dir_ToTargetXZ());
@@ -325,7 +326,15 @@ CBTNode* CBoss_Metaknight_Brain::Make_SwordCombo(_int iHits)
 {
     CBTNode* pOpen = CBTSequence::Create({
         //FaceWindup("Attack1Start", 540.f, SPD),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Play_SectionLoopSFX(CBoss_Metaknight::SND_ATTACK1CHARGE1, 0.047f, 0.403f, 0.4f);
+            return BT_STATUS::SUCCESS;
+        },[this]() {m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_ATTACK1CHARGE1);}),
         Clip("Attack1Charge", 2.f, 0.2f),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_ATTACK1CHARGE1);
+            return BT_STATUS::SUCCESS;
+        }),
         Make_SwordHit(true),
         Make_AttackLunge("Attack1"),
         });
@@ -470,7 +479,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaFly()
                 else if (*iPhase == 1)
                 {
                     Anim()->Play("HoverDashEnd", false, true, 0.15f, SPD);
-                    m_pOwner->Release_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
+                    m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_HOVERDASH);
 
                     _vector vLook = XMVector3Normalize(XMVectorSetY(
                         m_pOwner->Get_Transform()->Get_State(STATE::LOOK), 0.f));
@@ -522,7 +531,15 @@ CBTNode* CBoss_Metaknight_Brain::Make_GigaMoonShot()
         Make_GigaFly(),
         Clip("Landing", SPD, 0.2f),
         pFace,
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Play_LoopSFX(CBoss_Metaknight::SND_GIGAMOONSHOT_CHARGE, 0.2f);
+            return BT_STATUS::SUCCESS;
+        },[this] { m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_GIGAMOONSHOT_CHARGE); }),
         Clip("GigaMoonCharge", SPD, 0.2f),
+        CBTAction::Create([this](CBlackboard*, _float) {
+            m_pOwner->Stop_LoopSFX(CBoss_Metaknight::SND_GIGAMOONSHOT_CHARGE);
+            return BT_STATUS::SUCCESS;
+        }),
         Clip("GigaMoonShot", SPD, 0.2f),
         pEnd,
         });
@@ -818,8 +835,8 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperCalibur()
         [this, bCaught](CBlackboard*, _float) {
             auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
             pMeta->Set_AttackBusy(true);
-            pMeta->Set_ParryWindow(true);
             pMeta->Reset_CatchHit();
+            pMeta->Start_PatternCooldowns(CBoss_Metaknight::s_fUpperCooldown);
             *bCaught = false;
             return BT_STATUS::SUCCESS;
         },
@@ -835,7 +852,6 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperCalibur()
         pMeta->Set_AttackBusy(false);
         m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
         m_pOwner->Get_Movement()->Set_LockFacing(false);
-        pMeta->Start_PatternCooldowns(CBoss_Metaknight::s_fUpperCooldown);
         return BT_STATUS::SUCCESS;
         });
 
@@ -947,7 +963,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
                 Anim()->Play("UpperCaliburRaisingMove", true, true, 0.1f, SPD);
 
                 pMeta->Reset_CatchHit();
-                pMeta->Enable_CatchBox(true);
+                pMeta->Enable_CatchPhase(true);
 
                 *bCaught = false;
                 *fT = 0.f;
@@ -960,7 +976,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
 
             if (pMeta->Is_CatchHit())
             {
-                pMeta->Enable_CatchBox(false);
+                pMeta->Enable_CatchPhase(false);
                 *bCaught = true;
                 *bOn = false;
                 return BT_STATUS::SUCCESS;
@@ -971,7 +987,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
 
             if (fRun >= UC_RUSH_MAX_DIST || *fT >= UC_RUSH_TIMEOUT)
             {
-                pMeta->Enable_CatchBox(false);
+                pMeta->Enable_CatchPhase(false);
                 *bCaught = false;
                 *bOn = false;
                 return BT_STATUS::SUCCESS;
@@ -981,7 +997,7 @@ CBTNode* CBoss_Metaknight_Brain::Make_UC_Rush(shared_ptr<bool> bCaught, shared_p
         [this, bOn, fT] {
             *bOn = false; *fT = 0.f;
             auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
-            pMeta->Enable_CatchBox(false);
+            pMeta->Enable_CatchPhase(false);
             m_pOwner->Get_Movement()->Set_MoveSpeed(BASE_SPEED);
             m_pOwner->Get_Movement()->Set_LockFacing(false);
         });
@@ -1216,7 +1232,10 @@ CBTNode* CBoss_Metaknight_Brain::Make_DodgeBranch()
 {
     return CBTSequence::Create({
         CBTCondition::Create([this](CBlackboard*) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Consume_DodgeRequest(); }),
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            if (pMeta->Is_AttackBusy())
+                return false;
+            return pMeta->Consume_DodgeRequest(); }),
         Make_Dodge(),
         Clip("Wait", SPD, 0.2f),
         });
@@ -1243,7 +1262,9 @@ CBTNode* CBoss_Metaknight_Brain::Make_UpperBranch()
 {
     return CBTSequence::Create({
         CBTCondition::Create([this](CBlackboard* pBB) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_UpperReady()
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            return !pMeta->Is_AttackBusy()
+                && pMeta->Is_UpperReady()
                 && pBB->Get<_float>("DistToTarget", FLT_MAX) > COMBO_RANGE; }),
         Make_UpperCalibur(),
         Clip("Wait", SPD, 0.2f),
@@ -1281,7 +1302,8 @@ CBTNode* CBoss_Metaknight_Brain::Make_RockBranch()
 {
     return CBTSequence::Create({
         CBTCondition::Create([this](CBlackboard*) {
-            return static_cast<CBoss_Metaknight*>(m_pOwner)->Is_RockReady(); }),
+            auto* pMeta = static_cast<CBoss_Metaknight*>(m_pOwner);
+            return !pMeta->Is_AttackBusy() && pMeta->Is_RockReady(); }),
         Make_RockDrop(),
         Clip("Wait", SPD, 0.2f),
         });

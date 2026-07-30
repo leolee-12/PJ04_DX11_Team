@@ -25,6 +25,10 @@ public:
     static constexpr _float HIT_WINDOW = 0.15f;                     
     static constexpr const _char* ANIM_BREAK = "Disappearance";  
 
+    static constexpr const _tchar* SND_IMPACT = L"CharaMetaknight_BurstTornade3.wav";
+    static constexpr _float IMPACT_TRAUMA = 2.f;
+    static constexpr _float IMPACT_SHAKE_SEC = 1.f;
+
     enum class STATE { FALLING, BREAKING };
 
 private:
@@ -42,6 +46,8 @@ public:
     void Drop(const _float3& vTile, _float fSpawnHeight);  
     void Set_LinkedDecal(CAttackDecal* p) { m_pLinkedDecal = p; }
 
+    static void Reset_ImpactLatch() { s_bImpactFired = false; }
+
 protected:
     virtual HRESULT Ready_Visual() override;
     virtual HRESULT Ready_HitBox() override;
@@ -50,6 +56,7 @@ protected:
 
 private:
     HRESULT Bind_ShaderResources();
+    void    Fire_ImpactFeedback();
 
 private:
     CAttackDecal* m_pLinkedDecal = { nullptr };
@@ -63,6 +70,8 @@ private:
     _float m_fHitTimer = { 0.f };
 
     _int   m_iBodyMesh = { 0 };
+
+    static inline _bool s_bImpactFired = { false };
 
 public:
     static CProjectile_Rock* Create(ID3D11Device*, ID3D11DeviceContext*);

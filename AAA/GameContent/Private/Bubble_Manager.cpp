@@ -29,9 +29,11 @@ const _tchar* CBubble_Manager::Model_Of(COPY_ABILITY_TYPE eAbility) const
 {
     switch (eAbility)
     {
-    case COPY_ABILITY_TYPE::SWORD: return L"Prototype_Component_Ability_Model_Sword";
-    case COPY_ABILITY_TYPE::BOMB:  return L"Prototype_Component_Ability_Model_Bomb";
-    case COPY_ABILITY_TYPE::ICE:   return L"Prototype_Component_Ability_Model_Ice";
+    case COPY_ABILITY_TYPE::SWORD:          return L"Prototype_Component_Ability_Model_Sword";
+    case COPY_ABILITY_TYPE::BOMB:           return L"Prototype_Component_Ability_Model_Bomb";
+    case COPY_ABILITY_TYPE::ICE:            return L"Prototype_Component_Ability_Model_Ice";
+    case COPY_ABILITY_TYPE::TOY_HAMMER:     return L"Prototype_Component_Ability_Model_ToyHammer";
+    case COPY_ABILITY_TYPE::CRASH:          return L"Prototype_Component_Ability_Model_Crash";
     }
     return nullptr;
 }

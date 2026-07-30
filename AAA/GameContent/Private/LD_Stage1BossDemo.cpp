@@ -121,8 +121,7 @@ _bool CLD_Stage1BossDemo::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const jso
 	return true;
 }
 
-CGameObject* CLD_Stage1BossDemo::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext*
-	pContext)
+CGameObject* CLD_Stage1BossDemo::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	return CLD_Stage1BossDemo::Create(pDevice, pContext);
 }
@@ -203,6 +202,8 @@ void CLD_Stage1BossDemo::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PH
 
 	case EANIM_EVENT::OnOffMesh:
 	{
+		m_pGameInstance_Proxy->Play_SFX3D(L"DemoBossLv1_DemoGlassBreak.wav", m_pTransformCom->Get_State(STATE::POSITION), 0.25f);
+
 		Set_AllMeshesVisible(true);
 
 		static constexpr _uint AfterMeshIndices[] = { 47u, 48u };

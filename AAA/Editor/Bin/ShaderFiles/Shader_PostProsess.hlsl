@@ -70,6 +70,10 @@ Texture2D g_DistortionTexture;
 
 float g_fSpotlightDarken;
 
+float g_fRadialBlur = 0.f; // 0 = 끔, 1 = 최대
+float g_fRadialInner = 0.3f; // 이 반경(0=중심, 1=코너) 안쪽은 선명 유지
+float g_fRadialScale = 0.09f; // 최대 스트릭 길이(UV 단위)
+
     //============================ Common VS ============================
 struct VS_IN
 {
@@ -153,6 +157,37 @@ float3 ApplySaturation(float3 c, float s)
     return lerp(luma.xxx, c, s);
 }
 
+// 회피 블러 헬퍼
+float3 RadialBlurScene(float2 uv)
+{
+    const int TAPS = 8;
+
+    float2 d = uv - float2(0.5f, 0.5f);
+    float aspect = g_vTexelSize.y / max(g_vTexelSize.x, 1e-6f);
+    float2 dn = float2(d.x * aspect, d.y);
+
+    float r = saturate(length(dn) / length(float2(0.5f * aspect, 0.5f)));
+
+    float edge = saturate((r - g_fRadialInner) / max(1e-4f, 1.f - g_fRadialInner));
+    float amt = g_fRadialBlur * edge * edge * g_fRadialScale;
+
+    if (amt <= 1e-5f)
+        return g_SceneTexture.Sample(ClampSampler, uv).rgb;
+
+    float3 sum = 0.f;
+    float wsum = 0.f;
+
+    [unroll]
+    for (int i = 0; i < TAPS; ++i)
+    {
+        float t = i / (float) (TAPS - 1);
+        float w = 1.f - 0.55f * t;
+        sum += g_SceneTexture.Sample(ClampSampler, uv - d * (amt * t)).rgb * w;
+        wsum += w;
+    }
+    return sum / wsum;
+}
+
 
   //============================ Bloom Bright (pass 0) ============================
 float4 PS_BLOOMBRIGHT(PS_IN In) : SV_TARGET0
@@ -185,6 +220,10 @@ float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
     float4 scene = g_SceneTexture.Sample(ClampSampler, In.vTexcoord);
     if (0.f == scene.a)
         discard;
+
+    if (g_fRadialBlur > 0.001f)                
+        scene.rgb = RadialBlurScene(In.vTexcoord);
+    
     float3 bloom = g_BloomTexture.Sample(ClampSampler, In.vTexcoord).rgb;
 
     float3 color = scene.rgb + bloom * g_fBloomIntensity;

@@ -37,7 +37,7 @@ HRESULT CSirKibble::Initialize(void* pArg)
         return E_FAIL;
 
     m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
-    m_fCullDist = 95.f;
+    m_fCullDist = 175.f;
 
     if (m_pMovement)
         m_pMovement->Set_Stats(0.f, 360.f, -20.f, 0.f);

@@ -22,6 +22,7 @@
 #include "BombFuseEffect.h"
 #include "FlowerPetals.h"
 #include "Split_Starblock.h"
+#include "Split_Trash.h"
 #include "Split_Stone.h"
 #include "Split_Bush.h"
 #include "Split_Coaster.h"
@@ -29,6 +30,7 @@
 #include "LensFlare.h"
 #include "ItemEffect.h"
 #include "VanishEffect.h"
+#include "CrashEffect.h"
 #include "BombHitAim.h"
 #include "BombAimDot.h"
 #include "BreakWallEffect.h"
@@ -62,6 +64,7 @@
 #include "MetaDecisiveSlash.h"
 #include "MetaSuperSpinSlash.h"
 #include "MeteorExplosion.h"
+#include "FaintEffect.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"

@@ -127,6 +127,7 @@ namespace WorldShaderFlags
 	inline constexpr _uint Dither = 1u << 0;
 	inline constexpr _uint NearDither = 1u << 1;
 	inline constexpr _uint LavaEdgeDither = 1u << 2;
+	inline constexpr _uint EmissiveMono = 1u << 3;
 }
 
 enum class SHADOW_ALPHA_SOURCE : _uint
@@ -168,6 +169,7 @@ enum class WORLD_PASS : _int
 	BLEND_UKWN_BARRIER,	// 21 - 배틀 경계: 카메라 근접 페이드 + 상승 물방울
 	LAVA_SURFACE,		// 22 - MRA.G 크러스트 마스크 + flow 왜곡 용암 표면
 	CUT_CROSSFADE,		// 23 - UNKNOWN(Src) <-> ExtraR(Dst) 크로스페이드. 엔딩 크레딧 액자 사진
+	DMN_EMISSIVE,		// 24 - DMN + EMISSIVE 텍스처를 GBuffer Emissive에 기록
 
 	COUNT
 };
@@ -205,6 +207,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::BLEND_UKWN_BARRIER,	"BLEND_UKWN_BARRIER",   UKWN },
 	{ WORLD_PASS::LAVA_SURFACE,			"LAVA_SURFACE",			DIFF | MRA | NORM },
 	{ WORLD_PASS::CUT_CROSSFADE,		"CUT_CROSSFADE",		UKWN },
+	{ WORLD_PASS::DMN_EMISSIVE,			"DMN_EMISSIVE",			DIFF | MRA | NORM },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -237,6 +240,7 @@ inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
 	case WORLD_PASS::DIFF:
 	case WORLD_PASS::DMN:
 	case WORLD_PASS::DCUT_COLOR:
+	case WORLD_PASS::DMN_EMISSIVE:
 		return SHADOW_ALPHA_SOURCE::DIFFUSE;
 
 	case WORLD_PASS::DMNU:
@@ -275,6 +279,19 @@ inline _bool Uses_WorldExtraRSlot(_int iPass)
 	case WORLD_PASS::UKWN2_SAND_OPAQUE:
 	case WORLD_PASS::BLEND_UKWN_BARRIER:
 	case WORLD_PASS::CUT_CROSSFADE:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+inline _bool Uses_WorldEmissiveSlot(_int iPass)
+{
+	switch (static_cast<WORLD_PASS>(iPass))
+	{
+	case WORLD_PASS::BLEND_DCUT_UMN:
+	case WORLD_PASS::DMN_EMISSIVE:
 		return true;
 
 	default:

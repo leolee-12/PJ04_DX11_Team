@@ -62,7 +62,9 @@ HRESULT CShaderGlobal_Manager::Initialize()
 
     Register({ "g_fSpotlightDarken", "Spotlight Darken",  GVAL::FLOAT,  { 0.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
-    
+    Register({ "g_fRadialBlur",  "RadialBlur Amount", GVAL::FLOAT, { 0.f,   0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fRadialInner", "RadialBlur Inner",  GVAL::FLOAT, { 0.3f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fRadialScale", "RadialBlur Length", GVAL::FLOAT, { 0.18f, 0.f, 0.f, 0.f }, { 0.f, 0.3f } });
 
     return S_OK;
 }
