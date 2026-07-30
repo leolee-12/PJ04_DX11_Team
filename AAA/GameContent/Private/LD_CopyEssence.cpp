@@ -338,10 +338,12 @@ HRESULT CLD_CopyEssence::Render_Model()
 
 void CLD_CopyEssence::Apply_AbilityKind(const _wstring& strKind)
 {
-	if (strKind == L"Sword")     m_eAbility = COPY_ABILITY_TYPE::SWORD;
-	else if (strKind == L"Bomb") m_eAbility = COPY_ABILITY_TYPE::BOMB;
-	else if (strKind == L"Ice")  m_eAbility = COPY_ABILITY_TYPE::ICE;
-	else                         m_eAbility = COPY_ABILITY_TYPE::NORMAL;
+	if (strKind == L"Sword")		m_eAbility = COPY_ABILITY_TYPE::SWORD;
+	else if (strKind == L"Bomb")	m_eAbility = COPY_ABILITY_TYPE::BOMB;
+	else if (strKind == L"Ice")		m_eAbility = COPY_ABILITY_TYPE::ICE;
+	else if (strKind == L"Hammer")	m_eAbility = COPY_ABILITY_TYPE::TOY_HAMMER;
+	else if (strKind == L"Crash")	m_eAbility = COPY_ABILITY_TYPE::CRASH;
+	else							m_eAbility = COPY_ABILITY_TYPE::NORMAL;
 }
 
 void CLD_CopyEssence::Spawn_AbilityBubble()
