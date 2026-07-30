@@ -145,7 +145,7 @@ void CCamera_Cutscene::Apply_Pose()
     m_pTransformCom->Set_WorldMatrix(CamWorld);
 
     m_fFovy = fovL;
-    Recalculate_ProjMatrix();
+    Apply_ZoomFov();
 }
 
 CCamera_Cutscene* CCamera_Cutscene::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

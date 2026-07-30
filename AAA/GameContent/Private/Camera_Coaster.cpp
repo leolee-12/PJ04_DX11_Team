@@ -68,7 +68,7 @@ void CCamera_Coaster::Priority_Update(_float fTimeDelta)
     XMStoreFloat3(&m_eyeVel, eVel); XMStoreFloat3(&m_atVel, aVel);
 
     m_fFovy = XMConvertToRadians(m_fFovDeg);
-    Recalculate_ProjMatrix();
+    Apply_ZoomFov();
 
     _vector vE = XMLoadFloat3(&m_eyeCur);
     _vector vLook = XMVectorSubtract(XMLoadFloat3(&m_atCur), vE);

@@ -25,7 +25,7 @@ public:
 
 #pragma region 설정 상수값
     // --- 공통 ---
-    static constexpr _float s_fDefaultAnimSpeed = 1.5f;
+    static constexpr _float s_fDefaultAnimSpeed = 2.f;
     static constexpr _float s_fCCT_Radius = 0.75f;
     static constexpr _float s_fCCT_Height = 0.1f;
     static constexpr const _char* WEAPON_BONE = "RHaveL";
@@ -70,8 +70,8 @@ public:
     static constexpr _float s_fDodgeCooldown = 4.f;
     static constexpr _float s_fGigaCooldown = 20.f;
     static constexpr _float s_fRockCooldown = 40.f;
-    static constexpr _float s_fUpperCooldown = 60.f;
-    //static constexpr _float s_fUpperCooldown = 3.f;
+    //static constexpr _float s_fUpperCooldown = 60.f;
+    static constexpr _float s_fUpperCooldown = 3.f;
 
     // 사망
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;
@@ -149,6 +149,7 @@ public:
     void      Play_EscapeMantSequence();
 
     void    Set_DodgeInvincible(_bool bOn) { m_bDodgeInvuln = bOn; }
+    void    Fire_DodgeZoom();
     void    Set_AttackBusy(_bool bOn) { m_bAttackBusy = bOn; }
     _bool   Is_AttackBusy() const { return m_bAttackBusy; }
     _bool Consume_DodgeRequest()
@@ -179,6 +180,7 @@ public:
     void End_Demo(EDemo eDemo);
 
     void Set_ParryWindow(_bool bOn);
+    void Enable_CatchPhase(_bool bOn);
 
     void Begin_LockingSync();
     void Sync_LockingProgress(_float fGauge01, _float fVisual01);

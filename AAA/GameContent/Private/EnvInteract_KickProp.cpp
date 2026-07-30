@@ -160,9 +160,6 @@ HRESULT CEnvInteract_KickProp::Ready_DynamicActor()
 	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
 		return E_FAIL;
 
-	if (m_pGameInstance_Proxy->Is_EditMode())
-		return S_OK;
-
 	if (nullptr != m_pRigidBodyCom)
 		return E_FAIL;
 

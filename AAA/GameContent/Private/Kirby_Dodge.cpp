@@ -108,6 +108,16 @@ void CKirby_Dodge::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInf
     {
         --m_iEvasionCount;
         m_pGameInstance_Proxy->Lerp_TimeScale(0.2f, 1.f, 1.5f);
+
+        CAMERA_ZOOMPUNCH_DESC zoom{};
+        zoom.fFovAdd = 8.f;
+        zoom.fDolly = 2.f;
+        zoom.fBlur = 0.9f;
+        zoom.fInDur = 0.07f;
+        zoom.fHoldDur = 0.45f;
+        zoom.fOutDur = 0.55f;
+        zoom.bIgnoreTimeScale = true;
+        m_pGameInstance_Proxy->Publish(EventTag::Camera_ZoomPunch, &zoom);
     }
 }
 
