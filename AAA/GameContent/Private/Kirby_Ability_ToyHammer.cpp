@@ -598,10 +598,6 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_VelocityY(20.f);
-
-            _float3 vHammerImpactPosition{};
-            XMStoreFloat3(&vHammerImpactPosition, pKirby->Get_Transform()->Get_State(STATE::POSITION));
-            CEffect_Loader::GetInstance()->Spawn(L"HammerImpactGround", pKirby->Get_LevelIndex(), vHammerImpactPosition);
             break;
         }
         case TOY_HAMMER_STATE::TOY_HAMER_STATE_END:
@@ -838,10 +834,9 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
         {
-            CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
-            if(pToyHammer->Is_HammerHeadCollision())
+            if(Check_HammerHitGround(pKirby, 0.5f))
                 Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::REBOUND);
-            if(pKirby->Get_Movement()->Is_Grounded() || !m_bWheelHammerPressing)
+            else if(pKirby->Get_Movement()->Is_Grounded() || !m_bWheelHammerPressing)
                 Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
 
             break;
@@ -1016,6 +1011,51 @@ void CKirby_Ability_ToyHammer::MoveLookDir(CKirby* pKirby, _float fSpeed)
     vDir = XMVector3Normalize(XMVectorSetY(vDir, 0.f));
 
     pKirby->Get_Movement()->Add_Velocity(vDir * fSpeed);
+}
+
+_bool CKirby_Ability_ToyHammer::Check_HammerHitGround(CKirby* pKirby, _float fNormalY)
+{
+    CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));  
+
+    _float3 vHitPos{};
+    _float3 vNormal{};
+    _bool bResult = pToyHammer->Is_HammerHeadCollision(fNormalY, &vHitPos, &vNormal);
+
+    if (bResult)
+    {
+        _vector vEffectLook = XMVectorSetY(pKirby->Get_Transform()->Get_State(STATE::LOOK), 0.f);
+        if (XMVectorGetX(XMVector3LengthSq(vEffectLook)) < Helper::fEpsilon)
+            vEffectLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+        vEffectLook = XMVector3Normalize(vEffectLook);
+        
+        _float3 vEffectDir{};
+        XMStoreFloat3(&vEffectDir, vEffectLook);
+
+        _vector vEffectUp = XMVector3Normalize(XMLoadFloat3(&vNormal));
+        _vector vEffectRight = XMVector3Normalize(XMVector3Cross(vEffectUp, vEffectLook));
+        vEffectLook = XMVector3Normalize(XMVector3Cross(vEffectRight, vEffectUp));
+
+
+        // 일단 Look 방향으로 스폰
+        XMStoreFloat3(&vHitPos, XMLoadFloat3(&vHitPos) + XMLoadFloat3(&vNormal) * 0.1f);
+
+        Engine::CEffect_Container* pEffect{};
+        CEffect_Loader::GetInstance()->Spawn(L"HammerImpactGround", pKirby->Get_LevelIndex(),
+            vHitPos, vEffectDir, _float3{}, nullptr, &pEffect);
+
+        // 45도 까지만 기울이고 나머지는 그냥 출력
+        if (pEffect != nullptr && vNormal.y >= 0.707f)
+        {
+            CTransform* pTransform = pEffect->Get_Transform();
+            const _float3 vScale = pTransform->Get_Scaled();
+
+            pTransform->Set_State(STATE::RIGHT, vEffectRight * vScale.x);
+            pTransform->Set_State(STATE::UP, vEffectUp * vScale.y);
+            pTransform->Set_State(STATE::LOOK, vEffectLook * vScale.z);
+        }
+    }
+
+    return bResult;
 }
 
 CKirby_Ability_ToyHammer* CKirby_Ability_ToyHammer::Create()

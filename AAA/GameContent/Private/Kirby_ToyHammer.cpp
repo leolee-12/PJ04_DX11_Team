@@ -224,7 +224,7 @@ void CKirby_ToyHammer::Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType)
     m_pHitBox->Reset_Bounding(tDesc);
 }
 
-_bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY)
+_bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float3* pOutPos, _float3* pOutNormal)
 {
     const _float4x4* pLeftBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadLJ");
     const _float4x4* pRightBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadRJ");
@@ -244,8 +244,22 @@ _bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY)
     constexpr _float fSweepDistance = 0.05f;
 
     _float3 vHitNormal{};
-    if (!m_pGameInstance_Proxy->Sweep_Sphere(vSweepStart, fSweepRadius, vSweepDirection, fSweepDistance, &vHitNormal, nullptr, true, false))
+    _float fHitDistance{};
+    if (!m_pGameInstance_Proxy->Sweep_Sphere(vSweepStart, fSweepRadius, vSweepDirection, fSweepDistance,
+        &vHitNormal, &fHitDistance, true, false))
+    {
         return false;
+    }
+
+    if (pOutPos != nullptr)
+    {
+        XMStoreFloat3(pOutPos, XMLoadFloat3(&vSweepStart) +
+            XMLoadFloat3(&vSweepDirection) * fHitDistance -
+            XMLoadFloat3(&vHitNormal) * fSweepRadius);
+    }
+
+    if (pOutNormal != nullptr)
+        *pOutNormal = vHitNormal;
 
     return vHitNormal.y >= fNormalY;
 }

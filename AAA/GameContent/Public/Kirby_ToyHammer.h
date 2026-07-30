@@ -60,7 +60,7 @@ public:
 public:
     void BurnHammer(_bool bBurn) { m_bBurn = bBurn; }
     void Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType);
-    _bool Is_HammerHeadCollision(_float fNormalY = 0.f);
+    _bool Is_HammerHeadCollision(_float fNormalY = 0.f, _float3* pOutPos = nullptr, _float3* pOutNormal = nullptr);
 
     const _float4x4* Get_HammerHeadWorldMatrixPtr() { return &m_HammerHeadWorldMatrix; }
 
