@@ -20,7 +20,8 @@ namespace
     constexpr _float fMaxDamageHeight = 5.f;
     constexpr _uint iDamageRotCount = 4.f;
 
-    constexpr _float fFlameRenderOffsetY = 1.f;
+    constexpr _float fMaxHoverHeight = 1.2f;
+    constexpr _float fHoverSearchDistance = 1.3f;
 }
 
 CKirby_Ability_Crash::CKirby_Ability_Crash()
@@ -53,6 +54,8 @@ void CKirby_Ability_Crash::Enter_AttackState(CKirby* pKirby, _int iFlag)
 
     pKirby->Set_UseRenderGroundAlign(false);
 
+    pKirby->Get_Movement()->Set_GravityScale(0.2f);
+
     m_eCrashState = CRASH_STATE::CRASH_STATE_END;
     Change_CrashState(pKirby, CRASH_STATE::FLAME_CHARGE_START);
 }
@@ -75,6 +78,10 @@ void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
     m_fAccDamageTime = 0.f;
 
     pKirby->Set_UseRenderGroundAlign(true);
+
+    pKirby->Get_Movement()->Set_HoverMode(false);
+
+    pKirby->Get_Movement()->Set_GravityScale(1.f);
 }
 
 _bool CKirby_Ability_Crash::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -149,6 +156,8 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
             pAnimator->Play("FlameCharge", true, false, 0.1f, 1.5f);
             break;
         case CRASH_STATE::FLAME_START:
+            pKirby->Get_Movement()->Set_HoverMode(true, fMaxHoverHeight, fHoverSearchDistance);
+
             m_eCrashDamageMode = CRASH_DAMAGE_MODE::JUMP;
             pAnimator->Play("FlameStart", false, false, 0.1f, 2.5f);
             break;
@@ -158,6 +167,8 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
             break;
         case CRASH_STATE::DAMAGE:
         {            
+            pKirby->Get_Movement()->Set_HoverMode(false);
+
             m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
             CMovement_Child* pMovement = pKirby->Get_Movement();

@@ -138,8 +138,12 @@ _bool CMovement_Child::Update_RigidBody(_float fTimeDelta)
     // x, y 속도 제한, 낙하 속도 제한
     Clamp_Velocity(vVelocity);
 
+    if (Apply_Hover(fTimeDelta))
+        vVelocity = XMVectorSetY(vVelocity, 0.f);
+
     // PhysX Controller
     Move_Controller(vVelocity, fTimeDelta, vVelocity);
+
     Update_CoyoteTimer(fTimeDelta);
 
     // 수정된 Velocity 저장
@@ -487,6 +491,20 @@ void CMovement_Child::Apply_Knockback(const _float3& vAttackerPos, _float fHoriz
     Set_VelocityY(fUpPower);
 }
 
+void CMovement_Child::Set_HoverMode(_bool bUse, _float fHeight, _float fSearchDistance)
+{
+    m_bUseHover = bUse;
+
+    m_fHoverHeight = fHeight;
+    m_fHoverSearchDistance = fSearchDistance;
+
+    if (m_fHoverHeight < 0.f)
+        m_fHoverHeight = 0.f;
+
+    if (m_fHoverSearchDistance < m_fHoverHeight)
+        m_fHoverSearchDistance = m_fHoverHeight;
+}
+
 void CMovement_Child::Integrate_Forces(_float fTimeDelta, _vector& vVelocity)
 {
     if (m_fMass <= EPSILON)
@@ -640,6 +658,49 @@ void CMovement_Child::Update_CoyoteTimer(_float fDeltaTime)
 
     if (m_fAccCoyoteTime < 0.f)
         m_fAccCoyoteTime = 0.f;
+}
+
+_bool CMovement_Child::Apply_Hover(_float fTimeDelta)
+{
+    if (!m_bUseHover)
+        return false;
+
+    _float fGroundGap{};
+    if (!Check_GroundBelow(m_fHoverSearchDistance, fGroundGap))
+        return false;
+
+    _float fCorrectionY = m_fHoverHeight - fGroundGap;
+
+    if (fCorrectionY <= EPSILON)
+        return false;
+
+    // 나중에 필요하면 변수로
+    constexpr _float fHoverUpSpeed = 1.f;
+    Helper::FloatClamp(fCorrectionY, 0.f, fHoverUpSpeed * fTimeDelta);
+
+
+    physx::PxControllerFilters Filters;
+    Filters.mFilterFlags = physx::PxQueryFlag::eSTATIC;
+    Filters.mCCTFilterCallback = &Engine::Get_CCTFilter();
+
+    // 변위만큼 이동
+    m_pController->move(physx::PxVec3(0.f, fCorrectionY, 0.f), 0.001f, fTimeDelta, Filters);
+
+
+    const physx::PxExtendedVec3& vFoot = m_pController->getFootPosition();
+
+    m_pTransform->Set_State(STATE::POSITION,
+        XMVectorSet
+        (
+            static_cast<_float>(vFoot.x),
+            static_cast<_float>(vFoot.y),
+            static_cast<_float>(vFoot.z),
+            1.f
+        )
+    );
+
+    m_bGrounded = false;
+    return true;
 }
 
 CMovement_Child* CMovement_Child::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
