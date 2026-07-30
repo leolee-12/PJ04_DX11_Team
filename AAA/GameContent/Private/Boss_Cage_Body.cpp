@@ -1,5 +1,6 @@
 #include "Boss_Cage_Body.h"
 #include "Animator.h"
+#include "Effect_Loader.h"
 #include "GameInstance.h"
 
 CBoss_Cage_Body::CBoss_Cage_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -54,6 +55,8 @@ void CBoss_Cage_Body::Ready_AnimEvent()
             if (e.iEventType == ETOI(EANIM_EVENT::OnOffMesh))
             {
                 m_bRender = false;
+                CEffect_Loader::GetInstance()->Spawn(L"Split_Cage", Get_LevelIndex(), _float3(0.f, 3.f, 0.f),
+                    _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), &m_CombinedWorldMatrix);
                 m_pGameInstance_Proxy->Play_SFX(L"DemoStageClear_CageBreak.wav", 0.45f);
             }
         }

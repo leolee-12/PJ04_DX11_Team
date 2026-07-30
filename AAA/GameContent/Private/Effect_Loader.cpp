@@ -110,6 +110,7 @@ namespace
         { TEXT("Split_Bush"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Bush_0.JSON") },
         { TEXT("Split_Coaster"),          TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Coaster_0.JSON") },
         { TEXT("Split_Cylinder"),         TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Cylinder_1.JSON") },
+        { TEXT("Split_Cage"),             TEXT("../../Resources/YSE/EffectContainer/CageBreak.JSON") },
         { TEXT("BreakWallEffect"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_BreakWallEffect_0.JSON") },
         { TEXT("ItemEffect"),             TEXT("../../Resources/EffectContainerJSON/MAP/Proto_ItemEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/EffectContainerJSON/CHJ/BubbleAura.JSON") },

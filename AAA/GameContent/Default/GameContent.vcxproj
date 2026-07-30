@@ -273,6 +273,7 @@
     <ClInclude Include="..\Public\RectParticleCommon.h" />
     <ClInclude Include="..\Public\MeshParticleCommon.h" />
     <ClInclude Include="..\Public\RectEmitterCommon.h" />
+    <ClInclude Include="..\Public\Split_Cage.h" />
     <ClInclude Include="..\Public\Split_Coaster.h" />
     <ClInclude Include="..\Public\Split_Cylinder.h" />
     <ClInclude Include="..\Public\Tornado_BK.h" />
@@ -812,6 +813,7 @@
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
     <ClCompile Include="..\Private\MeshParticleCommon.cpp" />
     <ClCompile Include="..\Private\RectEmitterCommon.cpp" />
+    <ClCompile Include="..\Private\Split_Cage.cpp" />
     <ClCompile Include="..\Private\Split_Coaster.cpp" />
     <ClCompile Include="..\Private\Split_Cylinder.cpp" />
     <ClCompile Include="..\Private\Tornado_BK.cpp" />

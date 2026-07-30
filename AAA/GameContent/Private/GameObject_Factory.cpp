@@ -1383,6 +1383,16 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CSplit_Cage::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Cage),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CagePiece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CageBreak/CageL_Anim_CagePiece01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CagePiece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CageBreak/CageL_Anim_CagePiece02.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CagePiece03"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CageBreak/CageL_Anim_CagePiece03.ysh"));
+        )
+    );
+
     // 16
     Register(CLensFlare::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CLensFlare),
         LOADER
