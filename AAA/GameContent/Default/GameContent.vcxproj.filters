@@ -373,6 +373,9 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
       <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorWarning">
+      <UniqueIdentifier>{b0c18de8-4098-441b-9ef4-28df1e9d57a9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint">
       <UniqueIdentifier>{52951569-d865-4ff0-92b9-e5d169a4ccc1}</UniqueIdentifier>
     </Filter>

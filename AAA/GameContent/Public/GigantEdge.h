@@ -63,6 +63,7 @@ protected:
     virtual _bool		   Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
     virtual void           On_Corpse_End() override;
+    virtual void           On_FxRangeEnd(const _wstring& strFx) override;
 
 private:
     CGigantEdge_Body*   m_pBody   = { nullptr };

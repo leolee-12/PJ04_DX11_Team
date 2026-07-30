@@ -106,6 +106,17 @@ void CGigantEdge::On_Corpse_End()
     m_pGameInstance_Proxy->Publish(EventTag::Cage_Descend, nullptr);
 }
 
+void CGigantEdge::On_FxRangeEnd(const _wstring& strFx)
+{
+    auto it = m_Effects.find(strFx);
+    if (it != m_Effects.end())
+    {
+        if (CEffect_Loader::GetInstance()->Is_Current(it->second))
+            it->second.p->Start_FadeOut(0.f);
+        it->second.Clear();
+    }
+}
+
 _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
 {
     if (!m_bGuarding) return false;
@@ -207,6 +218,12 @@ HRESULT CGigantEdge::Ready_AnimEvents()
             OutputDebugStringA(("[AnimEvt] clip=" + m_pBody->Get_Animator()->Get_CurrentAnimName()
                 + " type=" + std::to_string(Event.iEventType)
                 + " p=" + std::to_string(m_pBody->Get_Animator()->Get_Progress()) + "\n").c_str());
+
+            if (Handle_SoundAnimEvent(Event, Phase))
+                return;
+
+            if (Handle_FxAnimEvent(Event, Phase))
+                return;
 
             EANIM_EVENT eType = static_cast<EANIM_EVENT>(Event.iEventType);
             switch (eType)

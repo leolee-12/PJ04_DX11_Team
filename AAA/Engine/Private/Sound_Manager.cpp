@@ -86,6 +86,16 @@ FMOD::Channel* CSound_Manager::PlayInternal(const TCHAR* pSoundKey, float fVolum
 
 	pChannel->setVolume(fVolume);
 	pChannel->setMode(bLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+
+	switch (eBus)
+	{
+	case ESoundBus::BGM:            pChannel->setPriority(0);       break;
+	case ESoundBus::AMBIENT:        pChannel->setPriority(32);      break;
+	case ESoundBus::UI:             pChannel->setPriority(64);      break;
+	case ESoundBus::VOICE:          pChannel->setPriority(96);      break;
+	default:                        pChannel->setPriority(128);     break;
+	}
+
 	pChannel->setPaused(false);
 	return pChannel;
 }
