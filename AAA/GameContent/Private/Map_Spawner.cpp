@@ -4,6 +4,7 @@
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
 #include "EnvInteract_KickProp.h"
+#include "EnvInteract_BreakProp.h"
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
@@ -565,10 +566,19 @@ const MAP_SPAWN_ROUTE* CMap_Spawner::Resolve_EnvRoute(const MAP_SPAWN_TARGETS& T
 
 const _tchar* CMap_Spawner::Get_EnvObjectProtoTag(const ENV_OBJECT_DESC& Desc) const
 {
-	if (ENV_OBJECT_KIND::INTERACT == Desc.eKind
-		&& ENV_INTERACT_TYPE::PHYSICS_PROP == Desc.eInteractType)
+	if (ENV_OBJECT_KIND::INTERACT == Desc.eKind)
 	{
-		return CEnvInteract_KickProp::PROTOTYPE_TAG;
+		switch (Desc.eInteractType)
+		{
+		case ENV_INTERACT_TYPE::PHYSICS_PROP:
+			return CEnvInteract_KickProp::PROTOTYPE_TAG;
+
+		case ENV_INTERACT_TYPE::BREAKABLE:
+			return CEnvInteract_BreakProp::PROTOTYPE_TAG;
+
+		default:
+			break;
+		}
 	}
 
 	if (Desc.eKind != ENV_OBJECT_KIND::EFFECT)

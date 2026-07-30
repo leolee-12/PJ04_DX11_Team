@@ -252,6 +252,39 @@ PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_OPAQUE(PS_IN In)
+{
+    PS_OUT Out;
+    
+    vector vMtrlDiffuse =  g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg =
+          g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg;
+    float3 nTS =
+          float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+
+    float3 Nw = mul(nTS, TBN);
+
+    Out.vDiffuse = float4(vMtrlDiffuse.rgb, 1.f);
+    Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass ShadowPass // 0
@@ -282,5 +315,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_CONSTANT_MATERIAL();
+    }
+    pass OpaquePass // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_OPAQUE();
     }
 }

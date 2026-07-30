@@ -147,6 +147,17 @@ void CMonster::On_Deserialized()
 	XMStoreFloat3(&m_vBasePos, m_pTransformCom->Get_State(STATE::POSITION));
 }
 
+void CMonster::Set_Active(_bool bActive)
+{
+	if (!bActive)
+	{
+		Stop_AllSounds();
+		Stop_AllFx(true);
+	}
+
+	__super::Set_Active(bActive);
+}
+
 void CMonster::Set_Target(CGameObject* pTarget)
 {
 	m_BlackBoard.pTarget = pTarget;
@@ -718,6 +729,34 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	return true;
 }
 
+_bool CMonster::Handle_CamShakeAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+	if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::CamShake)
+		return false;
+
+	if (e.bIsRange)
+	{
+		_float fLevel = 0.f;
+		if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+			fLevel = (e.iIntParam > 0 ? e.iIntParam : 50) / 100.f;
+
+		if (ePhase == ANIM_EVENT_PHASE::BEGIN || ePhase == ANIM_EVENT_PHASE::END)
+			m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
+
+		return true;
+	}
+
+	if (ePhase != ANIM_EVENT_PHASE::POINT)
+		return true;
+
+	CAMERA_SHAKE_DESC Shake{};
+	Shake.fTrauma = (e.iIntParam > 0 ? e.iIntParam : 20) / 100.f;
+	Shake.fDuration = 0.f;
+	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);
+
+	return true;
+}
+
 void CMonster::Start_LaunchSmokeFx()
 {
 	if (!m_bActive || nullptr == m_pTransformCom)
@@ -769,6 +808,72 @@ void CMonster::Stop_LaunchSmokeFx(_bool bImmediate)
 	}
 
 	hSlot.Clear();
+}
+
+void CMonster::Spawn_LoopFx(const _tchar* pKey, const _char* pBone, const _float3& vOffset)
+{
+	if (!m_bActive || nullptr == pKey || nullptr == m_pTransformCom)
+		return;
+
+	auto pLoader = CEffect_Loader::GetInstance();
+
+	FX_HANDLE& hSlot = m_Effects[pKey];
+	if (pLoader->Is_Current(hSlot))
+		return;
+
+	hSlot.Clear();
+
+	_vector vOrigin = m_pTransformCom->Get_State(STATE::POSITION);
+
+	if (nullptr != pBone)
+	{
+		auto it = m_PartObjects.find(L"Body");
+
+		CMonsterPart* pBody = (it != m_PartObjects.end())
+			? dynamic_cast<CMonsterPart*>(it->second) : nullptr;
+
+		const _float4x4* pBoneMat = (nullptr != pBody)
+			? pBody->Get_BoneMatrixPtr(pBone) : nullptr;
+
+		if (nullptr != pBoneMat)
+		{
+			const _matrix matBoneWorld = XMLoadFloat4x4(pBoneMat) *
+				XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+			vOrigin = matBoneWorld.r[3];
+		}
+	}
+
+	_vector vRight = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::RIGHT), 0.f));
+	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
+	vOrigin += vRight * vOffset.x + XMVectorSet(0.f, vOffset.y, 0.f, 0.f) + vLook * vOffset.z;
+
+	_float3 vPos{};
+	XMStoreFloat3(&vPos, vOrigin);
+
+	pLoader->Spawn(pKey, Get_LevelIndex(), vPos,
+		_float3{}, _float3{}, nullptr, nullptr, &hSlot);
+}
+
+void CMonster::Stop_LoopFx(const _tchar* pKey, _bool bImmediate)
+{
+	if (nullptr == pKey)
+		return;
+
+	auto it = m_Effects.find(pKey);
+	if (it == m_Effects.end())
+		return;
+
+	auto pLoader = CEffect_Loader::GetInstance();
+	if (pLoader->Is_Current(it->second))
+	{
+		if (bImmediate)
+			it->second.p->EffectContainer_Stop();
+		else
+			it->second.p->EffectContainer_StopAfterEmission();
+	}
+
+	it->second.Clear();
 }
 
 void CMonster::Stop_AllFx(_bool bImmediate)

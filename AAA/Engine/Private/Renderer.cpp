@@ -1089,8 +1089,18 @@ HRESULT CRenderer::Render_Bloom()
     //    return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShaderPost, "g_BloomTexture")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, { "g_fBloomIntensity", "g_fExposure", "g_fToneMapMode" })))
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost,
+        { "g_fBloomIntensity", "g_fExposure", "g_fToneMapMode",
+          "g_fRadialBlur", "g_fRadialInner", "g_fRadialScale" })))
         return E_FAIL;
+
+    _float2 vFullTexel = { 1.f / static_cast<_float>(Render_Width()),
+                           1.f / static_cast<_float>(Render_Height()) };
+
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_vTexelSize", &vFullTexel, sizeof(_float2))))
+        return E_FAIL;
+
     const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
     _float fGradeOn = 0.f;
     if (env.pColorGradeLUT)

@@ -62,9 +62,11 @@ namespace
         { TEXT("CoasterWind"),            TEXT("../../Resources/YSE/EffectContainer/CoasterWind.json") },
         { TEXT("HammerSwing"),            TEXT("../../Resources/YSE/EffectContainer/HammerSwing.JSON") },
         { TEXT("HammerSwingFinal"),       TEXT("../../Resources/YSE/EffectContainer/HammerSwingFinal.JSON") },
+        { TEXT("HammerImpactGround"),      TEXT("../../Resources/YSE/EffectContainer/HammerImpactGround.JSON") },
         { TEXT("WheelHammer"),            TEXT("../../Resources/YSE/EffectContainer/WheelHammer.JSON") },
         { TEXT("HammerFire"),             TEXT("../../Resources/YSE/EffectContainer/HammerFire.JSON") },
         { TEXT("HammerFireSwing"),        TEXT("../../Resources/YSE/EffectContainer/HammerFireSwing.JSON") },
+        { TEXT("HammerBurnSmoke"),        TEXT("../../Resources/YSE/EffectContainer/HammerBurnSmoke.JSON") },
         { TEXT("OnigorosiHammerFirst"),   TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerFirst.JSON") },
         { TEXT("OnigorosiHammerSecond"),  TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerSecond.JSON") },
         { TEXT("OnigorosiHammerEnd"),     TEXT("../../Resources/YSE/EffectContainer/OnigorosiHammerEnd.JSON") },
@@ -104,6 +106,7 @@ namespace
         { TEXT("LensFlare"),              TEXT("../../Resources/Map/Effect/Proto_LensFlare_0.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Starblock_Big.JSON") },
+        { TEXT("Split_Trash"),            TEXT("../../Resources/Map/Effect/Proto_Split_Trash_0.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_0.JSON") },
         { TEXT("Split_Stone_Big"),        TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_Big.JSON") },
         { TEXT("Split_Stone_Ultra"),      TEXT("../../Resources/EffectContainerJSON/MAP/Proto_Split_Stone_Ultra.JSON") },
@@ -118,6 +121,7 @@ namespace
         { TEXT("MoveSmoke"),              TEXT("../../Resources/EffectContainerJSON/CHJ/MoveSmoke.JSON") },
         { TEXT("MonsterLandingSmoke"),    TEXT("../../Resources/EffectContainerJSON/CHJ/MonsterLandingSmoke.JSON") },
         { TEXT("VanishEffect"),           TEXT("../../Resources/Map/Effect/Proto_VanishEffect_0.JSON") },
+        //{ TEXT("CrashEffect"),            TEXT("../../Resources/Map/Effect/Crash/CrashEffect.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/EffectContainerJSON/CHJ/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/EffectContainerJSON/CHJ/Tornado_BK.JSON") },
@@ -125,6 +129,7 @@ namespace
         { TEXT("PickUpEffect"),           TEXT("../../Resources/EffectContainerJSON/CHJ/PickUpEffect.JSON") },
         { TEXT("DropStarEffect"),         TEXT("../../Resources/EffectContainerJSON/CHJ/DropStarEffect.JSON") },
         { TEXT("MeteorExplosion"),        TEXT("../../Resources/CHJ/Effect/EffectContainers/MeteorExplosion.JSON")},
+        { TEXT("FaintEffect"),            TEXT("../../Resources/CHJ/Effect/EffectContainers/FaintEffect.JSON")},
 
 #pragma region Armadillo Effects
         { TEXT("RutA"),                   TEXT("../../Resources/EffectContainerJSON/YSH/RutA.JSON") },

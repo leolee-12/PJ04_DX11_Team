@@ -33,6 +33,7 @@ float g_fUVRotate = 0.f;
 #define FLAG_DITHER 0x01u
 #define FLAG_NEAR_DITHER 0x02u
 #define FLAG_LAVA_EDGE_DITHER 0x04u
+  #define FLAG_EMISSIVE_MONO 0x08u
 
 uint g_iFlags = 0u;
 uint g_iUseInstanceDissolve = 0u;
@@ -744,6 +745,44 @@ PS_OUT PS_CUT_CROSSFADE(PS_IN In)
                 In.vNormal.xyz,
                 float4(0.f, 1.f, 1.f, 1.f),
                 float4(g_vEmissiveColor.rgb, 1.f));
+}
+
+// g_vEmissiveColor.rgb = 틴트(0,0,0 = 텍스처 원색 그대로), w = 세기(0 = 1배)
+// g_vMRA.x = 펄스 주기(초, 0이면 고정), g_vMRA.y = 펄스 최저 배율
+PS_OUT PS_DMN_EMISSIVE(PS_IN In)
+{
+    Apply_DitherFromPixelInput(In);
+
+    float2 vBaseUV = Get_BaseUV(In);
+
+    float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
+    if (vDiffuse.a < 0.1f)
+        discard;
+
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+
+    float3 vEmissive = g_EmissiveTexture.Sample(LinearSampler, vBaseUV).rgb;
+    [flatten]
+    if (0u != (g_iFlags & FLAG_EMISSIVE_MONO))
+        vEmissive = vEmissive.rrr;
+    
+    float3 vTint = any(g_vEmissiveColor.rgb > 0.f) ? g_vEmissiveColor.rgb : float3(1.f, 1.f, 1.f);
+    float fIntensity = (0.f < g_vEmissiveColor.w) ? g_vEmissiveColor.w : 1.f;
+
+    [branch]
+    if (0.f < g_vMRA.x)
+    {
+        float fWave = 0.5f + 0.5f * sin(6.2831853f * (g_fWorldTime / g_vMRA.x));
+        fIntensity *= lerp(saturate(g_vMRA.y), 1.f, fWave);
+    }
+
+    return Make_GBufferOutput(
+          In,
+          vDiffuse,
+          vNormal,
+          float4(vMRA, 1.f),
+          float4(vEmissive * vTint * fIntensity, 1.f));
 }
 
 

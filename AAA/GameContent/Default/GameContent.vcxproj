@@ -51,6 +51,7 @@
     <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\public\Camera_Coaster.h" />
+    <ClInclude Include="..\Public\CrashEffect.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
     <ClInclude Include="..\Public\Dekabu_Brain.h" />
@@ -59,12 +60,14 @@
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStarEffect.h" />
     <ClInclude Include="..\Public\Effect_Include.h" />
+    <ClInclude Include="..\Public\EnvInteract_BreakProp.h" />
     <ClInclude Include="..\public\EnvTrigger_Debug.h" />
     <ClInclude Include="..\public\EnvTrigger_LevelChange.h" />
     <ClInclude Include="..\Public\Env_Include.h" />
     <ClInclude Include="..\public\Excalibur.h" />
     <ClInclude Include="..\public\Excalibur_Body.h" />
     <ClInclude Include="..\public\Excalibur_GetIt.h" />
+    <ClInclude Include="..\Public\FaintEffect.h" />
     <ClInclude Include="..\Public\Kirby_Emote.h" />
     <ClInclude Include="..\Public\Kirby_Include.h" />
     <ClInclude Include="..\Public\Kirby_MetaKnightEncounter.h" />
@@ -154,6 +157,7 @@
     <ClInclude Include="..\Public\RabbitEnemy_Body.h" />
     <ClInclude Include="..\Public\RabbitEnemy_Brain.h" />
     <ClInclude Include="..\Public\RabbitEnemy_State_Jump.h" />
+    <ClInclude Include="..\Public\Split_Trash.h" />
     <ClInclude Include="..\Public\SwordHitEffect.h" />
     <ClInclude Include="..\public\Spotlight_Rig.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
@@ -256,6 +260,7 @@
     <ClInclude Include="..\Public\SystemObject_Include.h" />
     <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\HammerSwing.h" />
+    <ClInclude Include="..\Public\HammerImpactGround.h" />
     <ClInclude Include="..\Public\WheelHammer.h" />
     <ClInclude Include="..\Public\HammerFire.h" />
     <ClInclude Include="..\Public\HammerFireSwing.h" />
@@ -601,6 +606,8 @@
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\private\Camera_Coaster.cpp" />
+    <ClCompile Include="..\Private\CrashEffect.cpp" />
+    <ClCompile Include="..\Private\EnvInteract_BreakProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_PresetCatalog.cpp" />
     <ClCompile Include="..\private\EnvTrigger_Debug.cpp" />
@@ -613,6 +620,7 @@
     <ClCompile Include="..\Private\Gigatzo_Body.cpp" />
     <ClCompile Include="..\Private\Gigatzo_Brain.cpp" />
     <ClCompile Include="..\Private\Gigatzo_State_Attack.cpp" />
+    <ClCompile Include="..\Private\FaintEffect.cpp" />
     <ClCompile Include="..\Private\KasaCatchEffect.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
     <ClCompile Include="..\Private\Dekabu_Body.cpp" />
@@ -693,6 +701,7 @@
     <ClCompile Include="..\Private\RabbitEnemy_Body.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_Brain.cpp" />
     <ClCompile Include="..\Private\RabbitEnemy_State_Jump.cpp" />
+    <ClCompile Include="..\Private\Split_Trash.cpp" />
     <ClCompile Include="..\Private\SwordHitEffect.cpp" />
     <ClCompile Include="..\private\Spotlight_Rig.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
@@ -796,6 +805,7 @@
     <ClCompile Include="..\Private\DistortionCommon.cpp" />
     <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\HammerSwing.cpp" />
+    <ClCompile Include="..\Private\HammerImpactGround.cpp" />
     <ClCompile Include="..\Private\WheelHammer.cpp" />
     <ClCompile Include="..\Private\HammerFire.cpp" />
     <ClCompile Include="..\Private\HammerFireSwing.cpp" />

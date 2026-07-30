@@ -29,6 +29,8 @@ namespace
 
 
 	constexpr const _tchar* ITEM_EFFECT_ID = L"ItemEffect";
+	constexpr const _tchar* FOOD_APPEAR_SOUNDKEY = L"ItemBasic_FoodApper.wav";
+	constexpr const _tchar* FOOD_GET_SOUNDKEY = L"ItemBasic_GetFood.wav";
 
 	struct LD_FOOD_CATALOG
 	{
@@ -278,6 +280,7 @@ void CLevelDesign_Food::On_LDEventReceived(const _wstring& strEventTag)
 	m_pInhaler = nullptr;
 
 	Set_Active(true);
+	m_pGameInstance_Proxy->Play_SFX(FOOD_APPEAR_SOUNDKEY, 0.25f);
 
 	if (nullptr != m_pHurtBox)
 	{
@@ -467,7 +470,7 @@ void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
 	XMStoreFloat3(&vStartPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
 
 	pKirby->Add_HP(m_tFoodDesc.fHealAmount);
-
+	m_pGameInstance_Proxy->Play_SFX(FOOD_GET_SOUNDKEY, 0.25f);
 	Release_Effect();
 
 	if (m_pHurtBox)

@@ -13,9 +13,9 @@
 namespace
 {
      constexpr _float fHammerMaxHorizontalSpeed = 2.f;
-     constexpr _float fAttackFinalMaxHorizontalSpeed = 12.f;
+     constexpr _float fAttackFinalMaxHorizontalSpeed = 10.f;
      constexpr _float fChargeAttack3MaxHorizontalSpeed = 12.f;
-     constexpr _float fAttackRot_Speed_Degree = 30.f;
+     constexpr _float fAttackRot_Speed_Degree = 90.f;
 
      constexpr _float fChargeLevel2Time = 0.58f;
      constexpr _float fChargeLevel3Time = 1.4933333f;
@@ -136,6 +136,9 @@ void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
     Change_ChargeAniState(pKirby, CHARGE_ANI_STATE::NONE);
 
     Effect_FadeOut(m_pHammerFire, 0.1f);
+    Effect_Stop(m_pHammerFireSwing);
+
+    pKirby->Set_RotationLock(false);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
@@ -150,6 +153,7 @@ void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
     CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
     pToyHammer->End_Hit();
     pToyHammer->BurnHammer(false);
+
     CAnimator* pToyHammerAnimator = pToyHammer->Get_Animator();
     pToyHammerAnimator->Play("Reset", true, true, 0.05f, 1.5f);
 }
@@ -364,13 +368,9 @@ _bool CKirby_Ability_ToyHammer::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_
                     if (m_eToyHammerState != TOY_HAMMER_STATE::ATTACK)
                         return true;
 
-                    CTransform* pTransform = pKirby->Get_Transform();
-                    const _vector vForward = XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
-                    _float3 vPosition{};
-                    _float3 vLook{};
-                    XMStoreFloat3(&vPosition, pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f) - vForward * 0.3f);
-                    XMStoreFloat3(&vLook, vForward);
-                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwing", pKirby->Get_LevelIndex(), vPosition, vLook);
+                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwing", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 1.f, -0.3f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                        pKirby->Get_RenderWorldMatrixPtr());
                     return true;
                 }
 
@@ -379,13 +379,9 @@ _bool CKirby_Ability_ToyHammer::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_
                     if (m_eToyHammerState != TOY_HAMMER_STATE::ATTACK_FINAL)
                         return true;
 
-                    CTransform* pTransform = pKirby->Get_Transform();
-                    const _vector vForward = XMVector3Normalize(XMVectorSetY(pTransform->Get_State(STATE::LOOK), 0.f));
-                    _float3 vPosition{};
-                    _float3 vLook{};
-                    XMStoreFloat3(&vPosition, pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f) + vForward);
-                    XMStoreFloat3(&vLook, vForward);
-                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwingFinal", pKirby->Get_LevelIndex(), vPosition, vLook);
+                    CEffect_Loader::GetInstance()->Spawn(L"HammerSwingFinal", pKirby->Get_LevelIndex(),
+                        _float3(0.f, 1.f, 1.f), _float3{}, _float3{},
+                        pKirby->Get_RenderWorldMatrixPtr());
                     return true;
                 }
 
@@ -485,6 +481,7 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         case TOY_HAMMER_STATE::ATTACK:
         {
             Clear_Overlay(pKirby, 1, 0.f);
+            m_bIsHit = false;
             ++m_iNormalAttackCount;
             pAnimator->Play("HammerAttackToy", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("HammerAttack", false, true, 0.1f, 2.5f);
@@ -498,13 +495,14 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::ATTACK_MISS:
         {
-            //m_iNormalAttackCount = 0;
-            //pAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
-            //pToyHammerAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
+            m_iNormalAttackCount = 0;
+            pAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
+            pToyHammerAnimator->Play("HammerAttackMiss", false, true, 0.1f, 2.5f);
             break;
         }
         case TOY_HAMMER_STATE::ATTACK_FINAL:
         {
+            m_bIsHit = false;
             m_bAttackFinalEndOverlayApplied = false;
             m_bAttackFinalAddVelocity = false;
             pAnimator->Play("HammerAttackFinalToy", false, true, 0.1f, 2.5f);
@@ -579,15 +577,21 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
         {
+            pKirby->Set_RotationLock(true);
+
             pAnimator->Play("WheelHammerFall", false, true, 0.03f, 3.f);
             pToyHammerAnimator->Play("WheelHammerFall", false, true, 0.03f, 3.f);
             break;
         }
         case TOY_HAMMER_STATE::REBOUND:
         {
-            //// 임시
-            //CMovement_Child* pMovement = pKirby->Get_Movement();
-            //pMovement->Set_VelocityY(20.f);
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackHit1.wav", 0.25f);
+
+            pAnimator->Play("JumpEnd", false, true, 0.03f, 2.f);
+            pToyHammerAnimator->Play("Reset", true, true, 0.03f, 2.f);
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_VelocityY(20.f);
             break;
         }
         case TOY_HAMMER_STATE::TOY_HAMER_STATE_END:
@@ -621,7 +625,35 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::ATTACK:
         {
-            AniEndChangeState(TOY_HAMMER_STATE::ATTACK_END);
+            if (!m_bIsHit)
+            {
+                _float3 vHitPos{};
+                m_bIsHit = Check_HammerHitGround(pKirby, 0.707f, 0.3f, &vHitPos);
+
+                if (m_bIsHit)
+                {
+                    CTransform* pTransform = pKirby->Get_Transform();
+                    _vector vKirbyPos = pTransform->Get_State(STATE::POSITION);
+                    const _float fRaise = vHitPos.y - XMVectorGetY(vKirbyPos);
+
+                    if (fRaise > 0.f)
+                    {
+                        vKirbyPos = XMVectorSetY(vKirbyPos, vHitPos.y);
+                        pTransform->Set_State(STATE::POSITION, vKirbyPos);
+                        pKirby->Get_Movement()->Sync_To_Controller();
+                    }
+
+                }
+            }
+
+            if (pAnimator->Is_Finished())
+            {
+                if (m_bIsHit)
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_END);
+                else
+                    Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_MISS);
+            }
+
             break;
         }
         case TOY_HAMMER_STATE::ATTACK_END:
@@ -650,19 +682,7 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::ATTACK_MISS:
         {
-            //if (pAnimator->Is_Finished())
-            //{
-            //    if (m_bReserveNextAttack)
-            //    {
-            //        Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::ATTACK_START);
-            //        m_bReserveNextAttack = false;
-            //    }
-            //    else
-            //    {
-            //        Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
-            //    }
-            //}
-
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
             break;
         }
         case TOY_HAMMER_STATE::ATTACK_FINAL:
@@ -680,7 +700,7 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             {
                 pKirby->Reset_MoveDir();
 
-                if(!m_bAttackFinalAddVelocity)
+                if (!m_bAttackFinalAddVelocity)
                 {
                     CMovement_Child* pMovement = pKirby->Get_Movement();
                     pMovement->Set_MaxHorizontalSpeed(fAttackFinalMaxHorizontalSpeed);
@@ -688,6 +708,26 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                     MoveLookDir(pKirby, 30.f);
 
                     m_bAttackFinalAddVelocity = true;
+                }
+            }
+
+            if (!m_bIsHit && fRatio >= 0.35f && fRatio <= 0.45f)
+            {
+                _float3 vHitPos{};
+                m_bIsHit = Check_HammerHitGround(pKirby, 0.707f, 0.3f, &vHitPos);
+
+                if (m_bIsHit)
+                {
+                    CTransform* pTransform = pKirby->Get_Transform();
+                    _vector vKirbyPos = pTransform->Get_State(STATE::POSITION);
+                    const _float fRaise = vHitPos.y - XMVectorGetY(vKirbyPos);
+
+                    if (fRaise > 0.f)
+                    {
+                        vKirbyPos = XMVectorSetY(vKirbyPos, vHitPos.y);
+                        pTransform->Set_State(STATE::POSITION, vKirbyPos);
+                        pKirby->Get_Movement()->Sync_To_Controller();
+                    }
                 }
             }
 
@@ -757,6 +797,10 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
                 Effect_FadeOut(m_pHammerFire, 0.1f);
 
                 CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
+                CEffect_Loader::GetInstance()->Spawn(L"HammerBurnSmoke", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                    pToyHammer->Get_HammerHeadWorldMatrixPtr(), &m_pHammerFire);
+
                 pToyHammer->BurnHammer(true);
             }
 
@@ -820,20 +864,22 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
         {
-            if(pKirby->Get_Movement()->Is_Grounded())
-            {
-                Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
-                return;
-            }
-
-            if (!m_bWheelHammerPressing)
+            if(Check_HammerHitGround(pKirby, 0.5f))
+                Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::REBOUND);
+            else if(pKirby->Get_Movement()->Is_Grounded() || !m_bWheelHammerPressing)
                 Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
 
             break;
         }
         case TOY_HAMMER_STATE::REBOUND:
         {
-            //Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            if(pKirby->Get_Movement()->Is_Grounded())
+            {
+                Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+                return;
+            }
+
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
             break;
         }
     }
@@ -887,11 +933,12 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER:
+            break;
         case TOY_HAMMER_STATE::WHEELHAMMER_END:      
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
-            break;
         case TOY_HAMMER_STATE::REBOUND:
         {
+            pKirby->Set_RotationLock(false);
             break;
         }
     }
@@ -994,6 +1041,56 @@ void CKirby_Ability_ToyHammer::MoveLookDir(CKirby* pKirby, _float fSpeed)
     vDir = XMVector3Normalize(XMVectorSetY(vDir, 0.f));
 
     pKirby->Get_Movement()->Add_Velocity(vDir * fSpeed);
+}
+
+_bool CKirby_Ability_ToyHammer::Check_HammerHitGround(CKirby* pKirby, _float fNormalY, _float fExtraDistancem, _float3* pOutHitPos)
+{
+    CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));  
+
+    _float3 vHitPos{};
+    _float3 vNormal{};
+    _bool bResult = pToyHammer->Is_HammerHeadCollision(fNormalY, fExtraDistancem , &vHitPos, &vNormal);
+
+    if (bResult)
+    {
+        if (pOutHitPos != nullptr)
+        {
+            *pOutHitPos = vHitPos;
+        }
+
+        _vector vEffectLook = XMVectorSetY(pKirby->Get_Transform()->Get_State(STATE::LOOK), 0.f);
+        if (XMVectorGetX(XMVector3LengthSq(vEffectLook)) < Helper::fEpsilon)
+            vEffectLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+        vEffectLook = XMVector3Normalize(vEffectLook);
+        
+        _float3 vEffectDir{};
+        XMStoreFloat3(&vEffectDir, vEffectLook);
+
+        _vector vEffectUp = XMVector3Normalize(XMLoadFloat3(&vNormal));
+        _vector vEffectRight = XMVector3Normalize(XMVector3Cross(vEffectUp, vEffectLook));
+        vEffectLook = XMVector3Normalize(XMVector3Cross(vEffectRight, vEffectUp));
+
+
+        // 일단 Look 방향으로 스폰
+        XMStoreFloat3(&vHitPos, XMLoadFloat3(&vHitPos) + XMLoadFloat3(&vNormal) * 0.1f);
+
+        Engine::CEffect_Container* pEffect{};
+        CEffect_Loader::GetInstance()->Spawn(L"HammerImpactGround", pKirby->Get_LevelIndex(),
+            vHitPos, vEffectDir, _float3{}, nullptr, &pEffect);
+
+        // 45도 까지만 기울이고 나머지는 그냥 출력
+        if (pEffect != nullptr && vNormal.y >= 0.707f)
+        {
+            CTransform* pTransform = pEffect->Get_Transform();
+            const _float3 vScale = pTransform->Get_Scaled();
+
+            pTransform->Set_State(STATE::RIGHT, vEffectRight * vScale.x);
+            pTransform->Set_State(STATE::UP, vEffectUp * vScale.y);
+            pTransform->Set_State(STATE::LOOK, vEffectLook * vScale.z);
+        }
+    }
+
+    return bResult;
 }
 
 CKirby_Ability_ToyHammer* CKirby_Ability_ToyHammer::Create()

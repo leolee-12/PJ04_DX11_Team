@@ -257,7 +257,7 @@ void CKirby_StateMachine::Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility)
 
 _bool CKirby_StateMachine::Ignore_TimeScale_StateMachine()
 {
-    return m_pCurState->Ignore_TimeScale();
+    return m_pCurState->Ignore_TimeScale(m_pKirby);
 }
 
 HRESULT CKirby_StateMachine::Init_State()

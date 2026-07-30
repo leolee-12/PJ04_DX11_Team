@@ -62,6 +62,21 @@ void CEnvInteract_KickProp::Late_Update(_float fTimeDelta)
 
 		m_bKickPending = false;
 		m_bKicked = true;
+
+		const _wstring& wstrObjectName = m_tDesc.wstrObjectName;
+		const _tchar* pSoundKeyword = L"Plastic";
+
+		if (_wstring::npos != wstrObjectName.find(L"EmptyCan"))
+			pSoundKeyword = L"Can";
+		else if (_wstring::npos != wstrObjectName.find(L"Tire"))
+			pSoundKeyword = L"Rubber";
+		else if (_wstring::npos != wstrObjectName.find(L"Paper") || _wstring::npos != wstrObjectName.find(L"RackFolder"))
+			pSoundKeyword = L"Paper";
+
+		const _wstring wstrSoundKey = _wstring(L"GimmickInteractiveDecorParts_") + pSoundKeyword
+			+ std::to_wstring(m_pGameInstance_Proxy->RandomInt(1, 5)) + L".wav";
+
+		m_pGameInstance_Proxy->Play_SFX3D(wstrSoundKey.c_str(), m_pTransformCom->Get_State(STATE::POSITION), 0.25f);
 	}
 
 	if (m_bKicked)
@@ -131,9 +146,6 @@ HRESULT CEnvInteract_KickProp::Ready_InteractComponents()
 	if (nullptr == m_pGameInstance_Proxy)
 		return E_FAIL;
 
-	if (m_pGameInstance_Proxy->Is_EditMode())
-		return S_OK;
-
 	if (FAILED(Ready_DynamicActor()))
 		return E_FAIL;
 
@@ -147,9 +159,6 @@ HRESULT CEnvInteract_KickProp::Ready_DynamicActor()
 {
 	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
 		return E_FAIL;
-
-	if (m_pGameInstance_Proxy->Is_EditMode())
-		return S_OK;
 
 	if (nullptr != m_pRigidBodyCom)
 		return E_FAIL;
@@ -384,6 +393,7 @@ void CEnvInteract_KickProp::Handle_InteractColliderEnter(CCollider* pOther)
 		break;
 	}
 }
+
 void CEnvInteract_KickProp::Kick_FromPlayer(CGameObject* pPlayer)
 {
 	if (m_bKicked || m_bKickPending)

@@ -174,7 +174,7 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsPress())
                 return false;
 
-            if (pKirby->Get_Movement()->Get_VerticalVelocity() <= 0.f &&
+            if (pKirby->Get_Movement()->Get_VerticalVelocity() <= 5.f &&
                 Try_Transition_Ladder_CommandUp(pKirby))
                 return true;
 

@@ -127,6 +127,24 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. CoasterWind">
       <UniqueIdentifier>{0c876f5f-219a-4b8c-9c29-6065f339a1cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. SmokeSphereOriginalEmitter">
+      <UniqueIdentifier>{9d0fc513-6eee-432b-8b54-b472bfb1fc04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. OnLadderEffect">
+      <UniqueIdentifier>{4b622f74-20a8-4a20-bef5-f729f8d7191f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. GetAbilityEffect">
+      <UniqueIdentifier>{94eefdbc-2090-4d48-a274-d094d76d72a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\19. CarMilkyWay">
+      <UniqueIdentifier>{88986c88-48f9-45f5-8a25-875b592353d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\998. Sword">
+      <UniqueIdentifier>{9656a5a7-6aa1-49d1-8842-2c2eb0afbf56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\999. Hammer">
+      <UniqueIdentifier>{756b380c-f741-420a-9b01-e8663119818b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part">
       <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
     </Filter>
@@ -340,6 +358,9 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect">
       <UniqueIdentifier>{1c50b743-da4b-4840-be0b-ed12450b89df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect\CageBreak">
+      <UniqueIdentifier>{bf2d61ec-fe6e-41f2-a888-234eff996917}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\09. CageEffect\CageGlowEffect">
       <UniqueIdentifier>{732f78e3-2105-4db3-b1a1-b91ef2c7f0a4}</UniqueIdentifier>
     </Filter>
@@ -351,6 +372,9 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
       <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint">
+      <UniqueIdentifier>{52951569-d865-4ff0-92b9-e5d169a4ccc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
@@ -1657,24 +1681,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\999. Hammer">
-      <UniqueIdentifier>{756b380c-f741-420a-9b01-e8663119818b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\998. Sword">
-      <UniqueIdentifier>{9656a5a7-6aa1-49d1-8842-2c2eb0afbf56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. SmokeSphereOriginalEmitter">
-      <UniqueIdentifier>{9d0fc513-6eee-432b-8b54-b472bfb1fc04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. OnLadderEffect">
-      <UniqueIdentifier>{4b622f74-20a8-4a20-bef5-f729f8d7191f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. GetAbilityEffect">
-      <UniqueIdentifier>{94eefdbc-2090-4d48-a274-d094d76d72a3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\19. CarMilkyWay">
-      <UniqueIdentifier>{88986c88-48f9-45f5-8a25-875b592353d2}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1965,6 +1971,9 @@
     <ClInclude Include="..\Public\CommonHit.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CrashEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\CutsceneActor.h">
       <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClInclude>
@@ -2052,6 +2061,9 @@
     <ClInclude Include="..\Public\Env_SpotLight.h">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EnvInteract_BreakProp.h">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\EnvInteract_KickProp.h">
       <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClInclude>
@@ -2114,6 +2126,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Excalibur_GetIt.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\GetIt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FaintEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FlowerPetals.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
@@ -2183,6 +2198,18 @@
     </ClInclude>
     <ClInclude Include="..\public\GorillaNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HammerFire.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HammerFireSwing.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HammerImpactGround.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HammerSwing.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HitMark.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
@@ -2417,6 +2444,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SwordTrail.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_ToyHammer.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\05. ToyHammer</Filter>
@@ -2700,8 +2730,20 @@
     <ClInclude Include="..\public\Meta_UpperCharge.h">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MetaDecisiveSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\MetaknightNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MetaSlash1.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MetaSlash2.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MetaSuperSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeteorExplosion.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>
@@ -2805,6 +2847,9 @@
     <ClInclude Include="..\public\MonsterPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MoonShot.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Movement_Child.h">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClInclude>
@@ -2867,6 +2912,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\ObjectData.h">
       <Filter>97. DataSystem\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\OnigorosiHammerEnd.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\OnigorosiHammerFirst.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\OnLadderEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\17. OnLadderEffect</Filter>
@@ -3063,6 +3114,9 @@
     <ClInclude Include="..\Public\Split_Stone.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Trash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Spotlight_Rig.h">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
     </ClInclude>
@@ -3081,8 +3135,23 @@
     <ClInclude Include="..\Public\SwordCharge.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\96. SwordCharge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SwordChargeEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\SwordHitEffect.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordJumpSpin.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordSlash1.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordSuperSpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordTrail_BK.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
@@ -3267,59 +3336,11 @@
     <ClInclude Include="..\Public\Water_RenderBinder.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\World_BlendCollector.h">
-      <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\HammerFire.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\HammerFireSwing.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\HammerSwing.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\WheelHammer.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\OnigorosiHammerEnd.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\OnigorosiHammerFirst.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MetaDecisiveSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MetaSlash1.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MetaSlash2.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MetaSuperSpinSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordJumpSpin.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\MoonShot.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_SwordTrail.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordChargeEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordSpinSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordSuperSpinSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SwordSlash1.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    <ClInclude Include="..\Public\World_BlendCollector.h">
+      <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3599,6 +3620,9 @@
     <ClCompile Include="..\Private\CommonHit.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\CrashEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\CutsceneActor.cpp">
       <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClCompile>
@@ -3668,6 +3692,9 @@
     <ClCompile Include="..\Private\Env_SpotLight.cpp">
       <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\EnvInteract_BreakProp.cpp">
+      <Filter>00. GameObject\02. EnvObject\Interact</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp">
       <Filter>00. GameObject\02. EnvObject\Interact</Filter>
     </ClCompile>
@@ -3728,6 +3755,9 @@
     <ClCompile Include="..\private\Excalibur_GetIt.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Excalibur\Part\GetIt</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\FaintEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\FlowerPetals.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
@@ -3781,6 +3811,18 @@
     </ClCompile>
     <ClCompile Include="..\private\GorillaNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerFire.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerFireSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerImpactGround.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HitMark.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
@@ -3997,6 +4039,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_ToyHammer.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\05. ToyHammer</Filter>
@@ -4256,8 +4301,20 @@
     <ClCompile Include="..\private\Meta_UpperCharge.cpp">
       <Filter>00. GameObject\07. Boss\Boss\MetaKnight\Effect\UpperCharge</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\MetaDecisiveSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\MetaknightNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\MetaKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaSlash1.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaSlash2.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeteorExplosion.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>
@@ -4352,6 +4409,9 @@
     <ClCompile Include="..\private\MonsterPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\MoonShot.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Movement_Child.cpp">
       <Filter>02. Component\00. Movement_Kirby</Filter>
     </ClCompile>
@@ -4408,6 +4468,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp">
       <Filter>00. GameObject\06. Monster\08. NormalEnemy_Wild\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OnigorosiHammerEnd.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OnigorosiHammerFirst.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\OnLadderEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\17. OnLadderEffect</Filter>
@@ -4592,6 +4658,9 @@
     <ClCompile Include="..\Private\Split_Stone.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Split_Trash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Spotlight_Rig.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Leopard\Spot</Filter>
     </ClCompile>
@@ -4610,8 +4679,23 @@
     <ClCompile Include="..\Private\SwordCharge.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\96. SwordCharge</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SwordChargeEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\SwordHitEffect.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared\02. SwordHitEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordJumpSpin.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordSlash1.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordSpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordTrail_BK.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
@@ -4775,62 +4859,14 @@
     <ClCompile Include="..\Private\Water_RenderBinder.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\08. Fluid</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\WheelHammer.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\World_BlendCollector.cpp">
       <Filter>00. GameObject\02. EnvObject\BlendCollector</Filter>
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\HammerFire.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\HammerFireSwing.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\HammerSwing.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\WheelHammer.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\OnigorosiHammerEnd.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\OnigorosiHammerFirst.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MetaDecisiveSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MetaSlash1.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MetaSlash2.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\SwordJumpSpin.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\MoonShot.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\SwordChargeEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\SwordSpinSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\SwordSuperSpinSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\SwordSlash1.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

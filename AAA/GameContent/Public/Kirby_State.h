@@ -66,7 +66,7 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
 
 public:
-	virtual _bool Ignore_TimeScale() { return false; }
+	virtual _bool Ignore_TimeScale(CKirby* pKirby) { return false; }
 
 	virtual void Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc) {}
 	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc) {}
