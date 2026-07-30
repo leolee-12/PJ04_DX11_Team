@@ -138,6 +138,8 @@ void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
     Effect_FadeOut(m_pHammerFire, 0.1f);
     Effect_Stop(m_pHammerFireSwing);
 
+    pKirby->Set_RotationLock(false);
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
@@ -151,6 +153,7 @@ void CKirby_Ability_ToyHammer::Exit_AttackState(CKirby* pKirby)
     CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
     pToyHammer->End_Hit();
     pToyHammer->BurnHammer(false);
+
     CAnimator* pToyHammerAnimator = pToyHammer->Get_Animator();
     pToyHammerAnimator->Play("Reset", true, true, 0.05f, 1.5f);
 }
@@ -580,15 +583,21 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
         {
+            pKirby->Set_RotationLock(true);
+
             pAnimator->Play("WheelHammerFall", false, true, 0.03f, 3.f);
             pToyHammerAnimator->Play("WheelHammerFall", false, true, 0.03f, 3.f);
             break;
         }
         case TOY_HAMMER_STATE::REBOUND:
         {
-            //// юс╫ц
-            //CMovement_Child* pMovement = pKirby->Get_Movement();
-            //pMovement->Set_VelocityY(20.f);
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackHit1.wav", 0.25f);
+
+            pAnimator->Play("JumpEnd", false, true, 0.03f, 2.f);
+            pToyHammerAnimator->Play("Reset", true, true, 0.03f, 2.f);
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_VelocityY(20.f);
             break;
         }
         case TOY_HAMMER_STATE::TOY_HAMER_STATE_END:
@@ -825,20 +834,23 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
         }
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
         {
-            if(pKirby->Get_Movement()->Is_Grounded())
-            {
-                Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
-                return;
-            }
-
-            if (!m_bWheelHammerPressing)
+            CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
+            if(pToyHammer->Is_HammerHeadCollision())
+                Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::REBOUND);
+            if(pKirby->Get_Movement()->Is_Grounded() || !m_bWheelHammerPressing)
                 Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
 
             break;
         }
         case TOY_HAMMER_STATE::REBOUND:
         {
-            //Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+            if(pKirby->Get_Movement()->Is_Grounded())
+            {
+                Change_ToyHammerState(pKirby, TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
+                return;
+            }
+
+            AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
             break;
         }
     }
@@ -892,11 +904,12 @@ void CKirby_Ability_ToyHammer::Exit_ToyHammerState(CKirby* pKirby, TOY_HAMMER_ST
             break;
         }
         case TOY_HAMMER_STATE::WHEELHAMMER:
+            break;
         case TOY_HAMMER_STATE::WHEELHAMMER_END:      
         case TOY_HAMMER_STATE::WHEELHAMMER_FALL:
-            break;
         case TOY_HAMMER_STATE::REBOUND:
         {
+            pKirby->Set_RotationLock(false);
             break;
         }
     }
