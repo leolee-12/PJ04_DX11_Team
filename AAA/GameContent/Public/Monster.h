@@ -66,6 +66,8 @@ public:
 
 	virtual void				On_Deserialized() override;
 
+	virtual void				Set_Active(_bool bActive) override;
+
 public: 
 	// 외부에서 타겟 주입
 	void						Set_Target(CGameObject* pTarget);
@@ -138,6 +140,8 @@ public:
 	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
 	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
+	void						Spawn_LoopFx(const _tchar* pKey, const _char* pBone = nullptr, const _float3& vOffset = {});
+	void						Stop_LoopFx(const _tchar* pKey, _bool bImmediate = false);
 	void						Stop_AllFx(_bool bImmediate);
 	void						Start_LaunchSmokeFx();
 	void						Play_LandingSmokeFx();
@@ -186,7 +190,7 @@ protected:
 	// Distance Culling 
 	MONSTER_CULL_STATE          m_CullState = {};
 	_float                      m_fCullDist = { 0.f };
-	_float                      m_fFadeRange = { 8.f };
+	_float                      m_fFadeRange = { 10.f };
 	_float                      m_fBandHalf = { 65.f };					// 30 프레임 
 	_float                      m_fBandQuarter = { 80.f };				// 15 프레임 
 	_float                      m_fAnimAccum = { 0.f };

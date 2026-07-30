@@ -64,6 +64,7 @@
 #include "MetaDecisiveSlash.h"
 #include "MetaSuperSpinSlash.h"
 #include "MeteorExplosion.h"
+#include "FaintEffect.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"

@@ -38,6 +38,8 @@ public:
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
     }
 
+    virtual void            Damaged(const ATTACK_INFO& tInfo) override;
+
     virtual _float          Get_CapsuleRadius() const override { return 0.75f; }
     virtual _float          Get_CapsuleHeight() const override { return 0.35f; }
     virtual _float          Get_InteractRadius() const override { return 0.f; }
@@ -58,7 +60,6 @@ protected:
     virtual HRESULT         Ready_State() override;
     virtual HRESULT         Ready_AnimEvents() override;
 
-    virtual void			On_Damaged(const ATTACK_INFO& tInfo) override;
 
 
 private:
