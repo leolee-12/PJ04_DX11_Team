@@ -627,7 +627,7 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             if (!m_bIsHit)
             {
                 _float3 vHitPos{};
-                m_bIsHit = Check_HammerHitGround(pKirby, -1.f, &vHitPos);
+                m_bIsHit = Check_HammerHitGround(pKirby, 0.707f, 0.3f, &vHitPos);
 
                 if (m_bIsHit)
                 {
@@ -1022,13 +1022,13 @@ void CKirby_Ability_ToyHammer::MoveLookDir(CKirby* pKirby, _float fSpeed)
     pKirby->Get_Movement()->Add_Velocity(vDir * fSpeed);
 }
 
-_bool CKirby_Ability_ToyHammer::Check_HammerHitGround(CKirby* pKirby, _float fNormalY, _float3* pOutHitPos)
+_bool CKirby_Ability_ToyHammer::Check_HammerHitGround(CKirby* pKirby, _float fNormalY, _float fExtraDistancem, _float3* pOutHitPos)
 {
     CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));  
 
     _float3 vHitPos{};
     _float3 vNormal{};
-    _bool bResult = pToyHammer->Is_HammerHeadCollision(fNormalY, &vHitPos, &vNormal);
+    _bool bResult = pToyHammer->Is_HammerHeadCollision(fNormalY, fExtraDistancem , &vHitPos, &vNormal);
 
     if (bResult)
     {

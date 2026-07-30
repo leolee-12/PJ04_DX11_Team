@@ -82,7 +82,7 @@ private:
 
     void MoveLookDir(CKirby* pKirby, _float fSpeed);
 
-    _bool Check_HammerHitGround(CKirby* pKirby, _float fNormalY = 0.f, _float3* pOutHitPos = nullptr);
+    _bool Check_HammerHitGround(CKirby* pKirby, _float fNormalY = 0.f, _float fExtraDistance = 0.05f, _float3* pOutHitPos = nullptr);
 
 public:
     static CKirby_Ability_ToyHammer* Create();

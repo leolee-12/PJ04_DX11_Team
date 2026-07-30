@@ -224,7 +224,7 @@ void CKirby_ToyHammer::Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType)
     m_pHitBox->Reset_Bounding(tDesc);
 }
 
-_bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float3* pOutPos, _float3* pOutNormal)
+_bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float fExtraDistance, _float3* pOutPos, _float3* pOutNormal)
 {
     const _float4x4* pLeftBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadLJ");
     const _float4x4* pRightBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("HammerheadRJ");
@@ -235,13 +235,16 @@ _bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float3* pOutPos
     const _vector vLeftPosition = (XMLoadFloat4x4(pLeftBoneMatrix) * CombinedWorldMatrix).r[3];
     const _vector vRightPosition = (XMLoadFloat4x4(pRightBoneMatrix) * CombinedWorldMatrix).r[3];
 
+    const _vector vHammerDirection = XMVector3Normalize(vLeftPosition - vRightPosition);
+    const _float fHeadLength = XMVectorGetX(XMVector3Length(vLeftPosition - vRightPosition));
+
     _float3 vSweepStart{};
     _float3 vSweepDirection{};
-    XMStoreFloat3(&vSweepStart, vLeftPosition);
-    XMStoreFloat3(&vSweepDirection, XMVector3Normalize(vLeftPosition - vRightPosition));
+    XMStoreFloat3(&vSweepStart, vRightPosition);
+    XMStoreFloat3(&vSweepDirection, vHammerDirection);
 
-    constexpr _float fSweepRadius = 0.2f;
-    constexpr _float fSweepDistance = 0.05f;
+    constexpr _float fSweepRadius = 0.05f;
+    const _float fSweepDistance = fHeadLength + fExtraDistance;
 
     _float3 vHitNormal{};
     _float fHitDistance{};
@@ -250,6 +253,9 @@ _bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float3* pOutPos
     {
         return false;
     }
+
+    if (vHitNormal.y < fNormalY)
+        return false;
 
     if (pOutPos != nullptr)
     {
@@ -261,10 +267,7 @@ _bool CKirby_ToyHammer::Is_HammerHeadCollision(_float fNormalY, _float3* pOutPos
     if (pOutNormal != nullptr)
         *pOutNormal = vHitNormal;
 
-    if (vHitNormal.y <= 0.5f)
-        int a = 10;
-
-    return vHitNormal.y >= fNormalY;
+    return true;
 }
 
 HRESULT CKirby_ToyHammer::Ready_Components()
