@@ -216,11 +216,15 @@ void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CULLING_CHANNEL_QUE
 
 	if (Query.bUseFrustumFade)
 	{
+		const _uint iPlaneMask = (CHANNEL::SHADOW == eChannel)
+			 ? ((1u << ETOUI(CCulling_Manager::CULLING_PLANE::COUNT)) - 1u)
+			 : CCulling_Manager::CULLING_PLANE_MASK_MAIN_SIDE;
+
 		const CULLING_FADE_RESULT FrustumResult =
 			m_pGameInstance_Proxy->Evaluate_FrustumFadeAABB(
 				Query.eView,
 				m_WorldBounds,
-				CCulling_Manager::CULLING_PLANE_MASK_MAIN_SIDE);
+				iPlaneMask);
 
 		Result.fDissolve = max(Result.fDissolve, FrustumResult.fDissolve);
 

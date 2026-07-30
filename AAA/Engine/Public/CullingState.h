@@ -36,7 +36,7 @@ public:
 	struct CULLING_EVALUATION_INPUT
 	{
 		CULLING_CHANNEL_QUERY	Main = {};
-		CULLING_CHANNEL_QUERY	Shadow = { CULLING_VIEW::SHADOW_DIR, true, true, false };
+		CULLING_CHANNEL_QUERY	Shadow = { CULLING_VIEW::SHADOW_DIR, true, true, true };
 
 		_bool   bEvaluateMain = { true };
 		_bool   bEvaluateShadow = { false };
