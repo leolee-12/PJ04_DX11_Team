@@ -49,6 +49,8 @@ private:
 	void Update_CrashState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_CrashState(CKirby* pKirby, CRASH_STATE eState);
 
+	void Update_FlameChrageMoveAni(CKirby* pKirby);
+
 private:
 	CRASH_STATE m_eCrashState{ CRASH_STATE::CRASH_STATE_END };
 
@@ -58,6 +60,8 @@ private:
 	_uint m_iAccDamageRotCount{};
 
 	_bool m_bKeyUpAttackEnd{};
+
+	_bool m_bPlayFrameChrageMoveAni{};
 
 	CRASH_DAMAGE_MODE m_eCrashDamageMode{};
 
