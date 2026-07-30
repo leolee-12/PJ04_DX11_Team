@@ -60,6 +60,9 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
 
 public:
+	virtual _bool Ignore_TimeScale() { return false; }
+
+public:
 	const _wstring& Get_AttackModeName() { return m_wstrAttackModeName; }
 	virtual _bool Should_ForceEnterAttackState() { return false; }
 

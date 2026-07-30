@@ -181,6 +181,7 @@ public:
 
 	// Render Matrix
 	const _float4x4* Get_RenderWorldMatrixPtr() { return &m_RenderWorldMatrix; }
+	void Set_UseRenderGroundAlign(_bool bUse) { m_bUseRenderGroundAlign = bUse; }
 
 private:
 	HRESULT Ready_Components();
@@ -269,6 +270,7 @@ private:
 
 	_float4x4 m_RenderWorldMatrix{};
 	_float3 m_vRenderGroundNormal{ 0.f, 1.f, 0.f };
+	_bool m_bUseRenderGroundAlign{ true };
 
 	// Level Spawner
 	const void* m_pLastSpawner = { nullptr };

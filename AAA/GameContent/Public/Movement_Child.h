@@ -110,6 +110,8 @@ public:
     // ³Ë¹é
     void Apply_Knockback(const _float3& vAttackerPos, _float fHorizontalPower, _float fUpPower);
 
+    void Set_HoverMode(_bool bUse, _float fHeight = 0.f, _float fSearchDistance = 0.f);
+
 private:
     void Integrate_Forces(_float fTimeDelta, _vector& vVelocity);
     void Apply_Drag(_float fTimeDelta, _vector& vVelocity);
@@ -118,6 +120,8 @@ private:
     void Sync_BaseVelocityFields();
 
     void Update_CoyoteTimer(_float fDeltaTime);
+
+    _bool Apply_Hover(_float fTimeDelta);
 
 private:
     _float3 m_vVelocity = { 0.f, 0.f, 0.f };
@@ -128,6 +132,10 @@ private:
 
 private:
     _float m_fAccCoyoteTime{};
+
+    _bool m_bUseHover{};
+    _float m_fHoverHeight{};
+    _float m_fHoverSearchDistance{};
 
 public:
     static CMovement_Child* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
