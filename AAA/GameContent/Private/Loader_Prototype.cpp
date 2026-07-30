@@ -192,6 +192,10 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
         CShader::Create(pDevice, pContext, Shader_Fluid.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
         return E_FAIL;
 
+    if (FAILED(pProxy->Add_Prototype(Shader_SpecialEffect.iLevelID, Shader_SpecialEffect.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_SpecialEffect.szFileTag, VTXEFFECTMESH::Elements, VTXEFFECTMESH::iNumElements))))
+        return E_FAIL;
+
     if (FAILED(pProxy->Add_Prototype(Shader_MtrlTest.iLevelID, Shader_MtrlTest.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_MtrlTest.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
         return E_FAIL;

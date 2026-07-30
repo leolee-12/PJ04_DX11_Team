@@ -91,6 +91,9 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tGroundSmoke =
 		Make_MeshEmitterDesc(m_iPrototypeLevel, MODEL_GROUND_SMOKE_TAG, false, true);
 	tGroundSmoke.bUseTextureCom = true;
+	tGroundSmoke.bCustomShader = true;
+	tGroundSmoke.iShaderLevel = Shader_SpecialEffect.iLevelID;
+	tGroundSmoke.wstrShaderTag = Shader_SpecialEffect.szProtoTag;
 	tGroundSmoke.iTextureLevel = m_iPrototypeLevel;
 	tGroundSmoke.wstrTextureTag = TEXTURE_SLASH_TAG;
 	tGroundSmoke.bUseMaskCom = true;

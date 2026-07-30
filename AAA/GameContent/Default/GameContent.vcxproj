@@ -1182,6 +1182,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_SpecialEffect.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
