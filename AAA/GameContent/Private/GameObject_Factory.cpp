@@ -799,6 +799,23 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CHammerImpactGround::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerImpactGround),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::MODEL_RING_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Hammer/Common/Common_Ring01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::TEXTURE_WARP_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Hammer/Toy/indirectwarpring_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::TEXTURE_RING_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Hammer/Common/HammerImpactGround_Ring.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerImpactGround::TEXTURE_STAR_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Hammer/Common/common_star00.dds"), 1));
+        )
+    );
+
     Register(CWheelHammer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWheelHammer),
         LOADER
         (

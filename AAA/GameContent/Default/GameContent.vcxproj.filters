@@ -2208,6 +2208,9 @@
     <ClInclude Include="..\Public\HammerSwing.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HammerImpactGround.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\HitMark.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
     </ClInclude>
@@ -3813,6 +3816,9 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerImpactGround.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HitMark.cpp">

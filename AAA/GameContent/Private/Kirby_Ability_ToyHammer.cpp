@@ -598,6 +598,10 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_VelocityY(20.f);
+
+            _float3 vHammerImpactPosition{};
+            XMStoreFloat3(&vHammerImpactPosition, pKirby->Get_Transform()->Get_State(STATE::POSITION));
+            CEffect_Loader::GetInstance()->Spawn(L"HammerImpactGround", pKirby->Get_LevelIndex(), vHammerImpactPosition);
             break;
         }
         case TOY_HAMMER_STATE::TOY_HAMER_STATE_END:
