@@ -10,7 +10,7 @@ CGigatzoBullet::CGigatzoBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	m_fSpeed = 18.f;
 	m_fLifeTime = 4.5f;
 	m_fDamage = 1.f;
-	m_fHitRadius = 2.5f;
+	m_fHitRadius = 2.0f;
 }
 
 CGigatzoBullet::CGigatzoBullet(const CGigatzoBullet& Prototype)

@@ -18,9 +18,20 @@ public:
 
 private:
     _bool                           m_bArmed = { false };
-    _float m_fFireTimer = { 0.f };
+    _bool                           m_bPassLatched = { false };
+    _float                          m_fFireTimer = { 0.f };
+    _float3                         m_vPrevTargetPos = {};
+    _bool                           m_bHasPrevTarget = { false };
 
     static constexpr const _float   s_fFireInterval = { 1.93f };
+
+    static constexpr const _float   s_fAnimDelay = { 0.30f };
+    static constexpr const _float   s_fLeadBias = { 2.0f };
+    static constexpr const _float   s_fRearmDistance = { 5.f };
+
+    static constexpr const _float   s_fTeleportStep = { 20.f };
+
+    static constexpr const _float   s_fMinLeadSpeed = { 12.f };
 
 protected:
     virtual void                    Free() override;

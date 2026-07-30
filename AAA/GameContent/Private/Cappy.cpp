@@ -43,7 +43,7 @@ HRESULT CCappy::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
-	m_fCullDist = 95.f;
+	m_fCullDist = 175.f;
 
 	if (m_pTransformCom)
 		m_pTransformCom->Set_RotationPerSec(180.f);

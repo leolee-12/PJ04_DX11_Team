@@ -80,12 +80,13 @@ public:
 
 #pragma endregion
 
-#pragma region 사운드 키 
+#pragma region 사운드 키
     static constexpr const _tchar* SND_ATTACK1CHARGE1           = L"CharaMetaknight_Attack1Charge1.wav";
     static constexpr const _tchar* SND_BURSTTORNADOATTACK       = L"CharaMetaknight_BurstTornadoAttack.wav";
     static constexpr const _tchar* SND_HOVERDASH                = L"DemoBossMetaknight_Glide.wav";
     static constexpr const _tchar* SND_SWORDLOCKSTART           = L"DemoBossMetaknight_SwordLockStart.wav";
     static constexpr const _tchar* SND_SWORDLOCKING             = L"CharaMetaknight_SwordLocking.wav";
+    static constexpr const _tchar* SND_GIGAMOONSHOT_CHARGE      = L"CharaMetaknight_MoonShot1.wav";
 #pragma endregion
 
 private:

@@ -62,11 +62,11 @@ HRESULT CDropStar_Body::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantDiffuse", &m_vDiffuse, sizeof(_float4))))
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantDiffuse", &s_vDiffuse, sizeof(_float4))))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantMRA", &m_vMRA, sizeof(_float3))))
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantMRA", &s_vMRA, sizeof(_float3))))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &m_vEmissive, sizeof(_float4))))
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &s_vEmissive, sizeof(_float4))))
 			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID",	&m_iMaterialID, sizeof(_uint))))
 			return E_FAIL;

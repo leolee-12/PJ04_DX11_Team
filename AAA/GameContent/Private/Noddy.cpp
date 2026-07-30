@@ -43,7 +43,7 @@ HRESULT CNoddy::Initialize(void* pArg)
         return E_FAIL;
 
     m_eCopyAbility = COPY_ABILITY_TYPE::SLEEP;
-    m_fCullDist = 95.f;
+    m_fCullDist = 175.f;
 
     if (m_pMovement)
         m_pMovement->Set_Stats(2.f, 720.f, -20.f, 0.f);
