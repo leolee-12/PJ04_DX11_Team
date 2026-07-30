@@ -50,7 +50,7 @@ void CKirby_Ability_Crash::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_bReqEndAttackState = false;
 
-    m_bAttackActived = false;
+    m_bAttackActivated = false;
     m_bKeyUpAttackEnd = false;
 
     m_fAccFlameChargeTime = 0.f;
@@ -98,7 +98,7 @@ void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
     pMovement->Set_UseGroundFriction(true);
     pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
 
-    if(m_bAttackActived)
+    if(m_bAttackActivated)
     {
         pKirby->Set_AbilityPartsActive(COPY_ABILITY_TYPE::CRASH, false);
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::NORMAL);
@@ -202,12 +202,12 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
             if(pKirby->Has_MoveDir() && pKirby->Get_Movement()->Is_Grounded())
             {
                 pAnimator->Play("FlameChargeMove", true, false, 0.1f, 1.5f);
-                m_bPlayFrameChrageMoveAni = true;
+                m_bPlayFrameChargeMoveAni = true;
             }
             else
             {
                 pAnimator->Play("FlameCharge", true, false, 0.1f, 1.5f);
-                m_bPlayFrameChrageMoveAni = false;
+                m_bPlayFrameChargeMoveAni = false;
             }
 
             break;
@@ -405,21 +405,21 @@ void CKirby_Ability_Crash::Update_FlameChrageMoveAni(CKirby* pKirby)
 
     _bool bHasMoveDir = pKirby->Has_MoveDir();
 
-        if (bHasMoveDir && pKirby->Get_Movement()->Is_Grounded() && !m_bPlayFrameChrageMoveAni)
+        if (bHasMoveDir && pKirby->Get_Movement()->Is_Grounded() && !m_bPlayFrameChargeMoveAni)
         {
             pAnimator->Play("FlameChargeMove", true, false, 0.1f, 1.5f);
-            m_bPlayFrameChrageMoveAni = true;
+            m_bPlayFrameChargeMoveAni = true;
         }
-        else if(!bHasMoveDir && m_bPlayFrameChrageMoveAni)
+        else if(!bHasMoveDir && m_bPlayFrameChargeMoveAni)
         {
             pAnimator->Play("FlameCharge", true, false, 0.1f, 1.5f);
-            m_bPlayFrameChrageMoveAni = false;
+            m_bPlayFrameChargeMoveAni = false;
         }
 }
 
 void CKirby_Ability_Crash::Apply_CrashHit(CKirby* pKirby)
 {
-    m_bAttackActived = true;
+    m_bAttackActivated = true;
     
     if (m_pCrashHitBox == nullptr)
     {

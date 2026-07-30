@@ -70,7 +70,6 @@ private:
 
 	CCollider* m_pCrashHitBox{};
 	CSound_Handle m_hChargeSound{};
-
 public:
 	static CKirby_Ability_Crash* Create();
 private:
