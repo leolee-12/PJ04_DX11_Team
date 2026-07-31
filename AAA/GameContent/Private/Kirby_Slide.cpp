@@ -100,7 +100,7 @@ void CKirby_Slide::On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, C
                 tAttackDesc.eHitType = HIT_TYPE::SLIDE;
                 tAttackDesc.pAttacker = pKirby;
                 XMStoreFloat3(&tAttackDesc.vAttackerPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
-                tAttackDesc.fDamage = 10.f;
+                tAttackDesc.fDamage = 8.f;
                 tAttackDesc.fKnockback = 10.f;
                 pMonster->Damaged(tAttackDesc);
 
@@ -114,7 +114,7 @@ void CKirby_Slide::On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, C
                     tAttackDesc.eHitType = HIT_TYPE::SLIDE;
                     tAttackDesc.pAttacker = pKirby;
                     XMStoreFloat3(&tAttackDesc.vAttackerPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
-                    tAttackDesc.fDamage = 10.f;
+                    tAttackDesc.fDamage = 8.f;
                     tAttackDesc.fKnockback = 10.f;
                     pDamageable->Damaged(tAttackDesc);
                 }

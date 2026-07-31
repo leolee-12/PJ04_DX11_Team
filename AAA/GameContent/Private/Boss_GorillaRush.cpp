@@ -15,7 +15,7 @@ HRESULT CBoss_GorillaRush::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg))) return E_FAIL;
     m_strBossName = L"°í¸£¸£¹³¹Ù";        
-    m_fMaxHP = 650.f; 
+    m_fMaxHP = 1000.f; 
     m_fCurHP = m_fMaxHP;
 
     Get_BodyAnimator()->Play("Wait", true, false, 0.f, 1.5f);

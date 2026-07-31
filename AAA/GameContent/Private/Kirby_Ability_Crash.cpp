@@ -15,7 +15,7 @@ namespace
 {
     constexpr _float fMaxFlameChargeTime = 1.9f;
     constexpr _float fMaxFlameTime = 3.9f;
-    constexpr _float fMaxDamageTime = 3.5f;
+    constexpr _float fMaxDamageTime = 3.f;
 
     constexpr _float fMaxDamageHeight = 5.f;
     constexpr _uint iDamageRotCount = 4;
@@ -380,6 +380,7 @@ void CKirby_Ability_Crash::Enter_DamageState(CKirby* pKirby, CAnimator* pAnimato
 
     // Effect
     Effect_Stop(m_pCrashChargeEffect);
+    CEffect_Loader::GetInstance()->Spawn(L"CrashEffect", pKirby->Get_LevelIndex(), m_vDamageStartPos);
 
     // Sound
     if (m_hChargeSound.Is_Valid())
@@ -477,11 +478,9 @@ void CKirby_Ability_Crash::Apply_CrashHit(CKirby* pKirby)
     tAttackInfo.pAttacker = pKirby;
 
     if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
-        tAttackInfo.fDamage = 1000.f;
-    else if (m_fAccFlameTime < fMaxFlameTime)
-        tAttackInfo.fDamage = 1500.f;
+        tAttackInfo.fDamage = 450.f;
     else
-        tAttackInfo.fDamage = 2000.f;
+        tAttackInfo.fDamage = 700.f;
 
     tAttackInfo.fKnockback = 5.f;
     XMStoreFloat3(&tAttackInfo.vAttackerPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));

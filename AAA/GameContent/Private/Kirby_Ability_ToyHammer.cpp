@@ -278,49 +278,49 @@ _bool CKirby_Ability_ToyHammer::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_
             {
                 case HAMMER_ATTACK_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK);
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 20.8f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
                     break;
                 case HAMMER_ATTACK_FINAL_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK_FINAL);
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 41.6f;
                     tAttackInfo.fKnockback = 10.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_PRESS;
                     break;
                 case CHARGE_ATTACK_1_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_1);
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 52.f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
                     break;
                 case CHARGE_ATTACK_2_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_2);
-                    tAttackInfo.fDamage = 150.f;
+                    tAttackInfo.fDamage = 104.f;
                     tAttackInfo.fKnockback = 10.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
                     break;
                 case CHARGE_ATTACK_3_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_3);
-                    tAttackInfo.fDamage = 200.f;
+                    tAttackInfo.fDamage = 208.f;
                     tAttackInfo.fKnockback = 15.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
                     break;
                 case CHARGE_ATTACK_4_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_4);
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 10.4f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
                     break;
                 case WHEELHAMMER_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER);
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 20.8f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_NORMAL;
                     break;
                 case WHEELHAMMER_FALL_H:
                     pToyHammer->Change_HitBox(TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER_FALL);
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 20.8f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::HAMMER_PRESS;
                     break;
@@ -489,6 +489,8 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::ATTACK_END:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackHit1.wav", 0.25f);
+
             pAnimator->Play("HammerAttackHitToy", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("HammerAttackHit", false, true, 0.1f, 2.5f);
             break;

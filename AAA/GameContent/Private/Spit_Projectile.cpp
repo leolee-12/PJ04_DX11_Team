@@ -45,7 +45,12 @@ void CSpit_Projectile::Fire(IInhalable* const* ppPayloads, _uint iCount, const _
 		XMStoreFloat4x4(&m_Payloads[i].matRot, matW);
 	}
 
-	m_fDamage = s_fDamagePerStack * (_float)m_iPayloadCount;
+	if (m_iPayloadCount == 1)
+		m_fDamage = 80.f;
+	else if (m_iPayloadCount == 2)
+		m_fDamage = 120.f;
+	else
+		m_fDamage = 190.f;
 
 	XMStoreFloat3(&m_vSpinAxis, XMVector3Normalize(XMLoadFloat3(&vDir)));
 	m_fSpinDeg = 0.f;
