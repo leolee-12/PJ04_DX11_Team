@@ -1,6 +1,5 @@
 #include "CrashChargeEffect.h"
 
-#include "DistortionCommon.h"
 #include "GameContent_const.h"
 #include "MeshCommon.h"
 #include "MeshEmitterCommon.h"
@@ -22,25 +21,6 @@ namespace
 		tDesc.bUseNormalTexture = false;
 		tDesc.bUseMRATexture = false;
 		tDesc.bUseUnknownTexture = false;
-		tDesc.bUseTextureCom = true;
-		tDesc.iTextureLevel = iLevel;
-		tDesc.wstrTextureTag = szTextureTag;
-		tDesc.bUseMaskCom = true;
-		tDesc.iMaskLevel = iLevel;
-		tDesc.wstrMaskTag = szMaskTag;
-		tDesc.bCustomShader = false;
-		return tDesc;
-	}
-
-	CDistortionCommon::DISTORTION_COMMON_DESC Make_DistortionDesc(
-		_uint iLevel,
-		const _tchar* szModelTag,
-		const _tchar* szTextureTag,
-		const _tchar* szMaskTag)
-	{
-		CDistortionCommon::DISTORTION_COMMON_DESC tDesc{};
-		tDesc.iModelLevel = iLevel;
-		tDesc.wstrModelTag = szModelTag;
 		tDesc.bUseTextureCom = true;
 		tDesc.iTextureLevel = iLevel;
 		tDesc.wstrTextureTag = szTextureTag;
@@ -150,17 +130,6 @@ void CCrashChargeEffect::Late_Update(_float fTimeDelta)
 
 HRESULT CCrashChargeEffect::Ready_EffectPartObjects()
 {
-	CDistortionCommon::DISTORTION_COMMON_DESC tWarp = Make_DistortionDesc(
-		m_iPrototypeLevel, MODEL_RING_TAG, TEXTURE_WARP_CHARGE_TAG, TEXTURE_RING07_TAG);
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CDistortionCommon::PROTOTYPE_TAG, L"Warp", &tWarp)))
-		return E_FAIL;
-
-	CDistortionCommon::DISTORTION_COMMON_DESC tWarpInner = Make_DistortionDesc(
-		m_iPrototypeLevel, MODEL_RING_TAG, TEXTURE_WARP_CHARGE_TAG, TEXTURE_CIRCLE06_TAG);
-	if (FAILED(Add_Effect_PartObject(
-		m_iPrototypeLevel, CDistortionCommon::PROTOTYPE_TAG, L"WarpInnerDistortion", &tWarpInner)))
-		return E_FAIL;
-
 	CRectCommon::RECT_COMMON_DESC tCoreGlow = Make_RectDesc(m_iPrototypeLevel, TEXTURE_SHINE_CIRCLE_TAG);
 	tCoreGlow.bUseMaskCom = true;
 	tCoreGlow.iMaskLevel = m_iPrototypeLevel;
@@ -204,6 +173,18 @@ HRESULT CCrashChargeEffect::Ready_EffectPartObjects()
 		m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"GatherStar", &tGatherStar)))
 		return E_FAIL;
 
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tStoneGather{};
+	tStoneGather.iModelLevel = m_iPrototypeLevel;
+	tStoneGather.wstrModelTag = MODEL_BREAKABLE_ROCK_TAG;
+	tStoneGather.bUseDiffuseTexture = true;
+	tStoneGather.bUseNormalTexture = true;
+	tStoneGather.bCustomShader = true;
+	tStoneGather.iShaderLevel = Shader_EffectRock.iLevelID;
+	tStoneGather.wstrShaderTag = Shader_EffectRock.szProtoTag;
+	if (FAILED(Add_Effect_PartObject(
+		m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"StoneGather", &tStoneGather)))
+		return E_FAIL;
+
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tThunder = Make_MeshEmitterDesc(
 		m_iPrototypeLevel, MODEL_THUNDER_SPIRAL_TAG,
 		TEXTURE_THUNDER_STRAIGHT_TAG, TEXTURE_INDIRECT_NORMAL_TAG, true);
@@ -244,12 +225,6 @@ HRESULT CCrashChargeEffect::Ready_EffectPartObjects()
 		m_iPrototypeLevel, MODEL_CIRCLE_TAG, TEXTURE_CIRCLE01_TAG, TEXTURE_CIRCLE06_TAG);
 	if (FAILED(Add_Effect_PartObject(
 		m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"WarpAuraOuter", &tWarpAuraOuter)))
-		return E_FAIL;
-
-	CDistortionCommon::DISTORTION_COMMON_DESC tWarpAuraDistortion = Make_DistortionDesc(
-		m_iPrototypeLevel, MODEL_RING_TAG, TEXTURE_INDIRECT3_TAG, TEXTURE_RING07_TAG);
-	if (FAILED(Add_Effect_PartObject(
-		m_iPrototypeLevel, CDistortionCommon::PROTOTYPE_TAG, L"WarpAuraDistortion", &tWarpAuraDistortion)))
 		return E_FAIL;
 
 	return S_OK;
