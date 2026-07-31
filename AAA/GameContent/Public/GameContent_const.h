@@ -59,6 +59,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_World_Anim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Anim"), TEXT("../Bin/ShaderFiles/Shader_World_Anim.hlsl") };
 	inline constexpr SHADER_DESC Shader_World_Instance = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Instance"), TEXT("../Bin/ShaderFiles/Shader_World_Instance.hlsl") };
 	inline constexpr SHADER_DESC Shader_Fluid = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Fluid"), TEXT("../Bin/ShaderFiles/Shader_Fluid.hlsl") };
+	inline constexpr SHADER_DESC Shader_SpecialEffect = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SpecialEffect"), TEXT("../Bin/ShaderFiles/Shader_SpecialEffect.hlsl") };
 	inline constexpr SHADER_DESC Shader_SkySphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SkySphere"), TEXT("../Bin/ShaderFiles/Shader_SkySphere.hlsl") };
 	inline constexpr SHADER_DESC Shader_AttackDecal = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AttackDecal"), TEXT("../Bin/ShaderFiles/Shader_AttackDecal.hlsl") };
 

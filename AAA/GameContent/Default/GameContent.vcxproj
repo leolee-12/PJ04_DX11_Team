@@ -264,6 +264,7 @@
     <ClInclude Include="..\Public\SystemObject_Include.h" />
     <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\HammerSwing.h" />
+    <ClInclude Include="..\Public\HammerImpactGround.h" />
     <ClInclude Include="..\Public\WheelHammer.h" />
     <ClInclude Include="..\Public\HammerFire.h" />
     <ClInclude Include="..\Public\HammerFireSwing.h" />
@@ -281,6 +282,7 @@
     <ClInclude Include="..\Public\RectParticleCommon.h" />
     <ClInclude Include="..\Public\MeshParticleCommon.h" />
     <ClInclude Include="..\Public\RectEmitterCommon.h" />
+    <ClInclude Include="..\Public\Split_Cage.h" />
     <ClInclude Include="..\Public\Split_Coaster.h" />
     <ClInclude Include="..\Public\Split_Cylinder.h" />
     <ClInclude Include="..\Public\Tornado_BK.h" />
@@ -811,6 +813,7 @@
     <ClCompile Include="..\Private\DistortionCommon.cpp" />
     <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\HammerSwing.cpp" />
+    <ClCompile Include="..\Private\HammerImpactGround.cpp" />
     <ClCompile Include="..\Private\WheelHammer.cpp" />
     <ClCompile Include="..\Private\HammerFire.cpp" />
     <ClCompile Include="..\Private\HammerFireSwing.cpp" />
@@ -828,6 +831,7 @@
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
     <ClCompile Include="..\Private\MeshParticleCommon.cpp" />
     <ClCompile Include="..\Private\RectEmitterCommon.cpp" />
+    <ClCompile Include="..\Private\Split_Cage.cpp" />
     <ClCompile Include="..\Private\Split_Coaster.cpp" />
     <ClCompile Include="..\Private\Split_Cylinder.cpp" />
     <ClCompile Include="..\Private\Tornado_BK.cpp" />
@@ -1192,6 +1196,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_SpecialEffect.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

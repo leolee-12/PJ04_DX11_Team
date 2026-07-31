@@ -1,6 +1,7 @@
 #include "Stage1_Step3.h"
 
 #include "Level_Defines.h"
+#include "Mission_Manager.h"
 
 CStage1_Step3::CStage1_Step3(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -22,6 +23,9 @@ HRESULT CStage1_Step3::Initialize()
         return E_FAIL;
 
     m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_VolcanoGrassland.marker.wav", 3.f, 0.15f);
+
+    if (FAILED(Ready_Missions()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -59,6 +63,25 @@ HRESULT CStage1_Step3::Ready_Events()
 HRESULT CStage1_Step3::Ready_Lights()
 {
     CLevelLight_DB::Apply(m_pGameInstance_Proxy, LEVEL::STAGE1_STEP3);
+
+    return S_OK;
+}
+
+HRESULT CStage1_Step3::Ready_Missions()
+{
+    auto* pMission = CMissionManager::GetInstance();
+
+    pMission->Reset();
+
+    pMission->Bind_SubMission(0, L"»ï½Ã¼¼³¢ Àß Ã¬°Ü¸Ô±â");
+    pMission->Bind_SubMission(1, L"Áö°¢ÇÏ±â");
+    pMission->Bind_SubMission(2, L"¾Ç¼ºÄÚµå ¸¸µé±â");
+    pMission->Bind_SubMission(3, L"¹ã»õ±â");
+    pMission->Set_Succeeded(CMissionManager::MAIN, true);
+    pMission->Report_SubSuccess(0);
+    pMission->Report_SubSuccess(1);
+    pMission->Report_SubSuccess(2);
+    pMission->Report_SubSuccess(3);
 
     return S_OK;
 }

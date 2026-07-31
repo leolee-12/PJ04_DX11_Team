@@ -41,6 +41,9 @@ public:
 public:
 	CGameObject* Spawn_Object(const wstring& strProtoTag, const wstring& strLayerTag, const wstring& strName, void* pArg = nullptr);
 
+	HRESULT Save_CrashEffectPreview();
+	HRESULT Load_CrashEffectPreview();
+
 public:
 	// Layer
 	void Add_Layer(const wstring& strLayerTag);

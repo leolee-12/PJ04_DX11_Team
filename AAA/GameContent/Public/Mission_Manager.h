@@ -21,11 +21,29 @@ private:
     MISSION_SLOT m_Slots[COUNT];
 
 public:
-    void Reset(const _wstring& strMainName = L"스테이지 클리어")
+    static constexpr const _tchar* DEFAULT_MAIN = L"스테이지 클리어하기";
+    static constexpr const _tchar* DEFAULT_SUBS[SUB_COUNT] =
+    {
+        L"와들디를 모두 구출하기",
+        L"대미지를 받지 않고 클리어",
+        L"복사 능력으로 적 쓰러뜨리기",
+        L"숨겨진 길 찾아내기",
+    };
+
+    void Reset(const _wstring& strMainName = DEFAULT_MAIN)
     {
         for (_uint i = 0; i < COUNT; ++i) { m_Slots[i].strName.clear(); m_Slots[i].bSucceeded = false; }
         m_Slots[MAIN].strName = strMainName;
     }
+
+    // 메인 + 서브 4개를 기본 문구로 한번에 채움
+    void Reset_Default()
+    {
+        Reset(DEFAULT_MAIN);
+        for (_uint i = 0; i < SUB_COUNT; ++i)
+            Bind_SubMission(i, DEFAULT_SUBS[i]);
+    }
+
     void Bind_SubMission(_uint iSub, const _wstring& strName) { if (iSub < SUB_COUNT) m_Slots[1 + iSub].strName = strName; }
     void Set_Succeeded(_uint iSlot, _bool b) { if (iSlot < COUNT)    m_Slots[iSlot].bSucceeded = b; }
     void Report_SubSuccess(_uint iSub) { if (iSub < SUB_COUNT) m_Slots[1 + iSub].bSucceeded = true; }

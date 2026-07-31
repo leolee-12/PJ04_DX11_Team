@@ -10,7 +10,7 @@ class CLIENT_DLL CUI_MissionPanel final : public CUI_GenericContainer
 
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_UI_MissionPanel";
-    static constexpr const _tchar* PART_NAME = L"Name";     
+    static constexpr const _tchar* PART_NAME = L"Text";     
     static constexpr const _tchar* PART_STAMP = L"Stamp";   
     static constexpr const _tchar* PART_CAGE = L"IconCage";
     static constexpr const _tchar* PART_WADDLE = L"WaddleDee";

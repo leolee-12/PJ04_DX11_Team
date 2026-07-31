@@ -15,8 +15,10 @@
 #include "EffectPart_Enum.h"
 #include "GameContent_Events.h"
 #include "LD_LensFlare.h"
+#include "CrashEffect.h"
 
 #include "GameInstance.h"
+#include "DataExporter.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
 #include "UIContainerObject.h"
@@ -30,6 +32,9 @@
 
 namespace
 {
+	// ponytail: LensFlare-only path; expose Effect_Loader asset paths if more MapTool effects need saving.
+	constexpr const _tchar* LENS_FLARE_CONFIG_PATH = TEXT("../../Resources/Map/Effect/Proto_LensFlare_0.JSON");
+
 	const _char* TexTypeName(_uint t)
 	{
 		static const char* names[MTEX_TYPE_MAX] = {
@@ -91,6 +96,24 @@ namespace
 				continue;
 
 			return static_cast<_bool*>(pHolder->Get_PropertyPtr(Property.uOffset));
+		}
+
+		return nullptr;
+	}
+
+	_float3* FindFloat3Property(IReflectable* pHolder, const _wstring& strName, const _wstring& strCategory)
+	{
+		if (nullptr == pHolder)
+			return nullptr;
+
+		for (const Engine::FPROPERTY& Property : pHolder->Get_Properties())
+		{
+			if (Engine::PROP_TYPE::FLOAT3 != Property.eType)
+				continue;
+			if (Property.strName != strName || Property.strCategory != strCategory)
+				continue;
+
+			return static_cast<_float3*>(pHolder->Get_PropertyPtr(Property.uOffset));
 		}
 
 		return nullptr;
@@ -490,13 +513,100 @@ void CPanel_Inspector::Render()
 		{
 			ImGui::TextDisabled("LensFlare preview is not available.");
 		}
-		else if (ImGui::CollapsingHeader("LensFlare Preview", ImGuiTreeNodeFlags_DefaultOpen))
+		else
 		{
-			ImGui::PushID(pLensFlare);
+			const _bool bPreviousForceOpaque = pLDLensFlare->Get_EditorPreviewForceOpaque();
+			_bool bForceOpaque = bPreviousForceOpaque;
 
-			Draw_Properties(pLensFlare);
+			if (ImGui::IsKeyPressed(ImGuiKey_F3, false))
+				bForceOpaque = !bForceOpaque;
 
-			const auto& EffectParts = pLensFlare->Get_EffectPartObject();
+			ImGui::Checkbox("Force Preview Alpha 1 (F3)", &bForceOpaque);
+			ImGui::SameLine();
+			ImGui::TextDisabled("(MapTool preview only)");
+
+			if (bForceOpaque != bPreviousForceOpaque)
+				pLDLensFlare->Set_EditorPreviewForceOpaque(bForceOpaque);
+
+			if (ImGui::CollapsingHeader("LensFlare Preview", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::PushID(pLensFlare);
+
+				Draw_Properties(pLensFlare);
+
+				_bool bLensLayoutChanged = false;
+
+				const auto& EffectParts = pLensFlare->Get_EffectPartObject();
+				vector<pair<_wstring, Engine::CEffect_Part*>> SortedParts(EffectParts.begin(), EffectParts.end());
+
+				sort(SortedParts.begin(), SortedParts.end(),
+					[](const auto& Left, const auto& Right)
+					{
+						return Left.first < Right.first;
+					});
+
+				for (auto& [strTag, pPart] : SortedParts)
+				{
+					if (nullptr == pPart)
+						continue;
+
+					const string strLabel = "Part - " + WstrToStr(strTag);
+
+					if (ImGui::CollapsingHeader(strLabel.c_str()))
+					{
+						ImGui::PushID(pPart);
+
+						_float3* pLocalPosition = FindFloat3Property(pPart, L"Local Pos", L"Effect");
+						const _float3 vPreviousLocalPosition = nullptr != pLocalPosition ? *pLocalPosition : _float3{};
+
+						Draw_Properties(pPart);
+
+						if (nullptr != pLocalPosition
+							&& (pLocalPosition->x != vPreviousLocalPosition.x
+								|| pLocalPosition->y != vPreviousLocalPosition.y
+								|| pLocalPosition->z != vPreviousLocalPosition.z))
+						{
+							bLensLayoutChanged = true;
+						}
+
+						ImGui::PopID();
+					}
+				}
+
+				if (bLensLayoutChanged)
+				{
+					// ponytail: editor-only JSON round-trip; add a dedicated cache refresh API if dragging stalls.
+					pLensFlare->Deserialize(pLensFlare->Serialize());
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::Button("Save LensFlare JSON"))
+				{
+					json jLensFlare = pLensFlare->Serialize();
+					jLensFlare["Prototype_Tag"] = "Proto_LensFlare";
+					jLensFlare["Object_Tag"] = "Proto_LensFlare_0";
+					jLensFlare["Layer_Tag"] = "Layer_Effect";
+
+					if (FAILED(CDataExporter::Write_JsonFile(LENS_FLARE_CONFIG_PATH, jLensFlare)))
+						MSG_BOX("LENS FLARE JSON SAVE FAILED");
+				}
+
+				ImGui::SameLine();
+				ImGui::TextDisabled("(overwrites Resources/Map/Effect/Proto_LensFlare_0.JSON)");
+
+				ImGui::PopID();
+			}
+		}
+	}
+
+	if (auto* pCrashEffect = dynamic_cast<Client::CCrashEffect*>(pSelected))
+	{
+		ImGui::Separator();
+
+		if (ImGui::CollapsingHeader("CrashEffect Parts", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			const auto& EffectParts = pCrashEffect->Get_EffectPartObject();
 			vector<pair<_wstring, Engine::CEffect_Part*>> SortedParts(EffectParts.begin(), EffectParts.end());
 
 			sort(SortedParts.begin(), SortedParts.end(),
@@ -512,16 +622,65 @@ void CPanel_Inspector::Render()
 
 				const string strLabel = "Part - " + WstrToStr(strTag);
 
-				if (ImGui::CollapsingHeader(strLabel.c_str()))
-				{
-					ImGui::PushID(pPart);
-					Draw_Properties(pPart);
-					ImGui::PopID();
-				}
-			}
+				if (!ImGui::CollapsingHeader(strLabel.c_str()))
+					continue;
 
-			ImGui::PopID();
+				ImGui::PushID(pPart);
+
+				_float3* pLocalPosition = FindFloat3Property(pPart, L"Local Pos", L"Effect");
+				const _float3 vPreviousLocalPosition =
+					nullptr != pLocalPosition ? *pLocalPosition : _float3{};
+
+				Draw_Properties(pPart);
+
+				if (nullptr != pLocalPosition
+					&& (pLocalPosition->x != vPreviousLocalPosition.x
+						|| pLocalPosition->y != vPreviousLocalPosition.y
+						|| pLocalPosition->z != vPreviousLocalPosition.z))
+				{
+					pPart->Get_Transform()->Set_State(
+						STATE::POSITION,
+						XMVectorSet(
+							pLocalPosition->x,
+							pLocalPosition->y,
+							pLocalPosition->z,
+							1.f));
+				}
+
+				ImGui::PopID();
+			}
 		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Save Crash JSON"))
+		{
+			if (FAILED(pLevel->Save_CrashEffectPreview()))
+				MSG_BOX("CRASH EFFECT JSON SAVE FAILED");
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Reload Crash JSON"))
+		{
+			if (FAILED(pLevel->Load_CrashEffectPreview()))
+				MSG_BOX("CRASH EFFECT JSON LOAD FAILED");
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Restart Crash Preview"))
+		{
+			_float3 vSpawnPosition{};
+			XMStoreFloat3(
+				&vSpawnPosition,
+				pCrashEffect->Get_Transform()->Get_State(STATE::POSITION));
+
+			pCrashEffect->EffectContainer_Start(vSpawnPosition);
+		}
+
+		ImGui::TextDisabled(
+			"Resources/LevelData/Proto_CrashEffect_0.JSON");
 	}
 
 	for (auto& [tag, pComponent] : pSelected->Get_Components())

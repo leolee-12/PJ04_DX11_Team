@@ -2235,6 +2235,9 @@
     <ClInclude Include="..\Public\HammerFireSwing.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HammerImpactGround.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\HammerSwing.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
@@ -3123,6 +3126,9 @@
     <ClInclude Include="..\Public\Split_Bush.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Cage.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Split_Coaster.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClInclude>
@@ -3852,6 +3858,9 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerFireSwing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerImpactGround.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerSwing.cpp">
@@ -4673,6 +4682,9 @@
     <ClCompile Include="..\Private\Split_Bush.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Split_Cage.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Split_Coaster.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env\Split</Filter>
     </ClCompile>
@@ -4950,6 +4962,9 @@
     </None>
     <None Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_SpecialEffect.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_UI.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
