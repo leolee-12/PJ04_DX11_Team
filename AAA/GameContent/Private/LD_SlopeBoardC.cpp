@@ -72,6 +72,8 @@ HRESULT CLD_SlopeBoardC::Validate_Initialized()
 	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
+	m_iMaterialID = DYNAMIC_ACTOR_ID;
+
 	return S_OK;
 }
 
