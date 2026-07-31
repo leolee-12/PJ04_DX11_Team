@@ -1366,6 +1366,34 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CCrashChargeEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCrashChargeEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::MODEL_CIRCLE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/CrashCharge/Common_Circle01.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_WARP_CHARGE_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/indirectwarpcharge_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_CIRCLE01_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_circle01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_CIRCLE06_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_circle06.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_TWINKLE03_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_twinkle03.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_INDIRECT3_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/indirect3_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_RING07_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_ring07.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_SCROLL14_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_scroll14.dds"), 1));
+        )
+    );
+
 #pragma region 몬스터 이펙트
     
     // BladeKnight

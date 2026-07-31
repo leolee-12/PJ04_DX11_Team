@@ -51,6 +51,7 @@
     <ClInclude Include="..\public\Boss_Metaknight_Sword.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\public\Camera_Coaster.h" />
+    <ClInclude Include="..\Public\CrashChargeEffect.h" />
     <ClInclude Include="..\Public\CrashEffect.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
     <ClInclude Include="..\Public\Dekabu_Body.h" />
@@ -606,6 +607,7 @@
     <ClCompile Include="..\private\Boss_Metaknight_Sword.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\private\Camera_Coaster.cpp" />
+    <ClCompile Include="..\Private\CrashChargeEffect.cpp" />
     <ClCompile Include="..\Private\CrashEffect.cpp" />
     <ClCompile Include="..\Private\EnvInteract_BreakProp.cpp" />
     <ClCompile Include="..\Private\EnvInteract_KickProp.cpp" />

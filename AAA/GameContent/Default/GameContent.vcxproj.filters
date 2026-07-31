@@ -1974,6 +1974,9 @@
     <ClInclude Include="..\Public\CrashEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CrashChargeEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\CutsceneActor.h">
       <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClInclude>
@@ -3621,6 +3624,9 @@
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CrashEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CrashChargeEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CutsceneActor.cpp">
