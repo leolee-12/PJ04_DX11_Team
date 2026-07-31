@@ -20,7 +20,7 @@ namespace
     constexpr _float fMaxDamageHeight = 5.f;
     constexpr _uint iDamageRotCount = 4;
 
-    constexpr _float fMaxHoverHeight = 1.2f;
+    constexpr _float fMaxHoverHeight = 1.5f;
     constexpr _float fHoverSearchDistance = 1.3f;
 
     constexpr _float fCrashMaxHorizontalSpeed = 2.5f;
@@ -255,6 +255,13 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
             pAnimator->Play("FlameEnd", false, false, 0.1f, 1.5f);
             break;
         }
+        case CRASH_STATE::ABILITY_DUMP:
+        {
+            pKirby->Set_AbilityPartsActive(COPY_ABILITY_TYPE::CRASH, false);
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::ABILITY_DUMP);
+            break;
+        }
         case CRASH_STATE::CRASH_STATE_END:
         {
             m_bReqEndAttackState = true;
@@ -344,8 +351,13 @@ void CKirby_Ability_Crash::Update_CrashState(CKirby* pKirby, _float fTimeDelta)
         case CRASH_STATE::FLAME_END:
         {
             if (pAnimator->Is_Finished())
-                Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
+                Change_CrashState(pKirby, CRASH_STATE::ABILITY_DUMP);
             break;
+        }
+        case CRASH_STATE::ABILITY_DUMP:
+        {
+            if (pAnimator->Is_Finished())
+                Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
         }
     }
 }
@@ -363,6 +375,7 @@ void CKirby_Ability_Crash::Exit_CrashState(CKirby* pKirby, CRASH_STATE eState)
             Exit_DamageState(pKirby);
             break;
         case CRASH_STATE::FLAME_END:
+        case CRASH_STATE::ABILITY_DUMP:
         case CRASH_STATE::CRASH_STATE_END:
             break;
     }

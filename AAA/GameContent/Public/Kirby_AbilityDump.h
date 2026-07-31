@@ -41,6 +41,8 @@ private:
 
 	CBubble_Manager* m_pBubbleManager{};
 
+	_bool m_bEffectSpawned{};
+
 private:
 	void Update_AbilityDump(CKirby* pKirby, _float fRatio);
 
