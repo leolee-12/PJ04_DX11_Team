@@ -32,7 +32,7 @@
 
 namespace
 {
-	constexpr const _tchar* CRASH_EFFECT_CONFIG_PATH = L"../../Resources/LevelData/Proto_CrashEffect_0.JSON";
+	constexpr const _tchar* CRASH_EFFECT_CONFIG_PATH = L"../../Resources/Map/Effect/Proto_CrashEffect_0.JSON";
 	constexpr const _tchar* CRASH_EFFECT_LAYER_TAG = L"Layer_Effect";
 	constexpr const _tchar* CRASH_EFFECT_OBJECT_TAG = L"Proto_CrashEffect_0";
 
@@ -413,7 +413,7 @@ HRESULT CLevel_Edit::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Load_CrashEffectPreview()))
-		MapTool::Log_Warning("CrashEffect preview load skipped: Resources/LevelData/Proto_CrashEffect_0.JSON");
+		MapTool::Log_Warning("CrashEffect preview load skipped: Resources/Map/Effect/Proto_CrashEffect_0.JSON");
 
 	return S_OK;
 }

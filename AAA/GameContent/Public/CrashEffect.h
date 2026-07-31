@@ -45,9 +45,13 @@ protected:
 
 public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
+	virtual void Priority_Update(_float fTimeDelta);
+	virtual void Update(_float fTimeDelta);
+	virtual void Late_Update(_float fTimeDelta);
 
 private:
 	HRESULT Ready_EffectPartObjects();
+	_float Resolve_TimeDelta(_float fTimeDelta);
 
 public:
 	static CCrashEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

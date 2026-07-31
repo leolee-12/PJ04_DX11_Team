@@ -86,6 +86,24 @@ HRESULT CCrashEffect::Initialize(void* pArg)
 	return S_OK;
 }
 
+void CCrashEffect::Priority_Update(_float fTimeDelta)
+{
+	fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+	__super::Priority_Update(fTimeDelta);
+}
+
+void CCrashEffect::Update(_float fTimeDelta)
+{
+	fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+	__super::Update(fTimeDelta);
+}
+
+void CCrashEffect::Late_Update(_float fTimeDelta)
+{
+	fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+	__super::Late_Update(fTimeDelta);
+}
+
 HRESULT CCrashEffect::Ready_EffectPartObjects()
 {
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tGroundSmoke =
@@ -100,8 +118,18 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 	tGroundSmoke.iMaskLevel = m_iPrototypeLevel;
 	tGroundSmoke.wstrMaskTag = TEXTURE_WAVE_TAG;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"GroundSmoke", &tGroundSmoke)))
-		return E_FAIL;
+	for (_uint i = 0; i < 10; ++i)
+	{
+		_wstring strPartTag = L"GroundSmoke";
+		if (i != 0)
+		{
+			strPartTag += L"_";
+			strPartTag += std::to_wstring(i);
+		}
+
+		if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, strPartTag, &tGroundSmoke)))
+			return E_FAIL;
+	}
 
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tFlame =
 		Make_MeshEmitterDesc(m_iPrototypeLevel, MODEL_SPHERE_TAG, true, false);
@@ -121,13 +149,10 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"RingShock", &tRingShock)))
 		return E_FAIL;
 
-	CMeshCommon::MESH_COMMON_DESC tLine =
-		Make_MeshDesc(m_iPrototypeLevel, MODEL_CIRCLE_TAG, false, true);
-	tLine.bUseTextureCom = true;
-	tLine.iTextureLevel = m_iPrototypeLevel;
-	tLine.wstrTextureTag = TEXTURE_CIRCLE01_TAG;
+	CRectEmitterCommon::RECT_EMITTER_COMMON_DESC tLine =
+		Make_RectEmitterDesc(m_iPrototypeLevel, TEXTURE_CIRCLE01_TAG);
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Line", &tLine)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"Line", &tLine)))
 		return E_FAIL;
 
 	CRectEmitterCommon::RECT_EMITTER_COMMON_DESC tStars =
@@ -163,8 +188,8 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Shine", &tShine)))
 		return E_FAIL;
 
-	CMeshCommon::MESH_COMMON_DESC tShine2 =
-		Make_MeshDesc(m_iPrototypeLevel, MODEL_CIRCLE_TAG, false, true);
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tShine2 =
+		Make_MeshEmitterDesc(m_iPrototypeLevel, MODEL_CIRCLE_TAG, false, true);
 	tShine2.bUseTextureCom = true;
 	tShine2.iTextureLevel = m_iPrototypeLevel;
 	tShine2.wstrTextureTag = TEXTURE_CIRCLE06_TAG;
@@ -172,7 +197,7 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 	tShine2.iMaskLevel = m_iPrototypeLevel;
 	tShine2.wstrMaskTag = TEXTURE_CIRCLE_GLOW_TAG;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG, L"Shine2", &tShine2)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Shine2", &tShine2)))
 		return E_FAIL;
 
 	CDistortionCommon::DISTORTION_COMMON_DESC tWarp{};
@@ -229,6 +254,11 @@ HRESULT CCrashEffect::Ready_EffectPartObjects()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+_float CCrashEffect::Resolve_TimeDelta(_float fTimeDelta)
+{
+	return m_pGameInstance_Proxy->Get_RawTimeDelta(TEXT("Timer_60"));
 }
 
 CCrashEffect* CCrashEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
