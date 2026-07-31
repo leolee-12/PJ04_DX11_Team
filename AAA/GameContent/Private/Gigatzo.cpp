@@ -58,6 +58,9 @@ HRESULT CGigatzo::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+		m_fMaxHP = 48.f;
+		m_fCurHP = m_fMaxHP;
+
 	m_TraitFlags = MT_NONE;
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
 	m_fCullDist = 120.f;

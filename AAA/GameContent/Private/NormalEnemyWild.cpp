@@ -18,6 +18,9 @@ HRESULT CNormalEnemyWild::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+		m_fMaxHP = 24.f;
+		m_fCurHP = m_fMaxHP;
+
 	m_fCullDist = 175.f;
 
 	return S_OK;

@@ -44,7 +44,7 @@ void CEnemyBomb::On_Swallowed()
 HRESULT CEnemyBomb::Initialize(void* pArg)
 {
 	m_fSpeed = 25.f;
-	m_fDamage = 2.f;
+	m_fDamage = 18.f;
 	m_fKnockback = 4.f;
 	m_fHitRadius = 0.60f;
 
