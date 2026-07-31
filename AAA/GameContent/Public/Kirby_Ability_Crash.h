@@ -11,12 +11,20 @@ class CLIENT_DLL CKirby_Ability_Crash final : public CKirby_Ability
 private:
 	enum class CRASH_STATE
 	{
-		FLAME_CHARGE_START, FLAME_CHARGE,
-		FLAME_START, FLAME, DAMAGE, FLAME_END,
+		FLAME_CHARGE_START,
+		FLAME_CHARGE,
+		FLAME_START,
+		FLAME,
+		DAMAGE,
+		FLAME_END,
 		CRASH_STATE_END
 	};
 
-	enum class CRASH_DAMAGE_MODE { DEFAULT, JUMP };
+	enum class CRASH_DAMAGE_MODE
+	{
+		DEFAULT,
+		JUMP
+	};
 
 private:
 	CKirby_Ability_Crash();
@@ -44,12 +52,15 @@ public:
 	virtual _bool Ignore_TimeScale() override { return true; }
 
 private:
-	void Change_CrashState(CKirby* pKirby, CRASH_STATE eNext);
+	void Change_CrashState(CKirby* pKirby, CRASH_STATE eNextState);
 	void Enter_CrashState(CKirby* pKirby, CRASH_STATE eState);
 	void Update_CrashState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_CrashState(CKirby* pKirby, CRASH_STATE eState);
 
-	void Update_FlameChrageMoveAni(CKirby* pKirby);
+	void Enter_DamageState(CKirby* pKirby, CAnimator* pAnimator);
+	void Exit_DamageState(CKirby* pKirby);
+
+	void Update_FlameChargeMoveAni(CKirby* pKirby);
 
 	void Apply_CrashHit(CKirby* pKirby);
 
@@ -70,6 +81,8 @@ private:
 
 	CCollider* m_pCrashHitBox{};
 	CSound_Handle m_hChargeSound{};
+	CEffect_Container* m_pCrashChargeEffect{};
+
 public:
 	static CKirby_Ability_Crash* Create();
 private:

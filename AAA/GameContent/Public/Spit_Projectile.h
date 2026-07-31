@@ -45,8 +45,6 @@ private:
     };
 
     static constexpr _uint  s_iMaxPayload = 3;
-    static constexpr _float s_fDamagePerStack = 100.f;
-
     PAYLOAD  m_Payloads[s_iMaxPayload];
     _uint    m_iPayloadCount = { 0 };
 

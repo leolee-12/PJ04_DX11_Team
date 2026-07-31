@@ -362,14 +362,20 @@ HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, con
 
 void CEffect_Container::Compute_CombinedWorldMatrix()
 {
-    if(m_pParentMatrix != nullptr)
+    _matrix LocalMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+    if (m_pParentMatrix != nullptr)
     {
-        XMStoreFloat4x4(&m_CombinedWorldMatrix,
-            XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()) * XMLoadFloat4x4(m_pParentMatrix));
+        _matrix ParentMatrix = XMLoadFloat4x4(m_pParentMatrix);
+
+        if (m_bPositionOnlyFollow)
+            ParentMatrix = XMMatrixTranslationFromVector(ParentMatrix.r[3]);
+
+        XMStoreFloat4x4(&m_CombinedWorldMatrix, LocalMatrix * ParentMatrix);
     }
     else
     {
-        XMStoreFloat4x4(&m_CombinedWorldMatrix, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+        XMStoreFloat4x4(&m_CombinedWorldMatrix, LocalMatrix);
     }
 }
 
@@ -385,6 +391,7 @@ void CEffect_Container::Init_PropetyValue()
     m_fDuration = { 1.f };
     m_fAccTime = { 0.f };
     m_bContinerBillboard = { false };
+    m_bPositionOnlyFollow = { false };
 }
 
 void CEffect_Container::Free()

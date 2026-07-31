@@ -35,6 +35,10 @@ void CKirby_CarFirstBreakWall::Enter(CKirby* pKirby, _int iFlag)
     pAnimator->Play("DeformCarGetFirst", false, false, 0.1f, 1.5f);
 
     pModel->Stop_SoundHandle();
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Stop();
+    pMovement->Set_UseGravity(false);
 }
 
 void CKirby_CarFirstBreakWall::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -50,6 +54,10 @@ void CKirby_CarFirstBreakWall::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_CarFirstBreakWall::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_UseGravity(true);
+    pMovement->Sync_To_Controller();
 }
 
 _bool CKirby_CarFirstBreakWall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

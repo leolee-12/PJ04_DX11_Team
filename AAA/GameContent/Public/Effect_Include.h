@@ -32,6 +32,7 @@
 #include "ItemEffect.h"
 #include "VanishEffect.h"
 #include "CrashEffect.h"
+#include "CrashChargeEffect.h"
 #include "BombHitAim.h"
 #include "BombAimDot.h"
 #include "BreakWallEffect.h"

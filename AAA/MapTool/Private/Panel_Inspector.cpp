@@ -684,7 +684,7 @@ void CPanel_Inspector::Render()
 		}
 
 		ImGui::TextDisabled(
-			"Resources/LevelData/Proto_CrashEffect_0.JSON");
+			"Resources/YSE/Effect/Crash/Crash/CrashEffect.JSON");
 	}
 
 	for (auto& [tag, pComponent] : pSelected->Get_Components())
