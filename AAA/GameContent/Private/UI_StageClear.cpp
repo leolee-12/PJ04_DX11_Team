@@ -3,9 +3,6 @@
 #include "GameInstance.h"
 #include "GameContent_Events.h"
 
-//임시
-#include "Mission_Manager.h"
-//임시
 
 CUI_StageClear::CUI_StageClear(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUI_GenericContainer{ pDevice, pContext }
@@ -67,13 +64,6 @@ void CUI_StageClear::On_IntroFinished()
     Cam.eCam = ECutsceneCam::Cutscene;
     Cam.szTrack = L"Cut4_Camera";
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &Cam);
-
-    //임시
-    auto* pM = CMissionManager::GetInstance();
-    pM->Set_Succeeded(0, true);
-    pM->Set_Succeeded(1, true);
-    pM->Set_Succeeded(3, true);
-    //임시
     m_pGameInstance_Proxy->Publish(EventTag::StageClear_SequenceFinished, nullptr);
     __super::On_IntroFinished();
 }
