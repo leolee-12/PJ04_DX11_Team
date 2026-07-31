@@ -472,7 +472,8 @@ HRESULT CKirbyBomb::Ready_HitBox()
 			_uint iRenderGroup = pOther->Get_RegisteredGroup();
 
 			if (iRenderGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT) ||
-				iRenderGroup == ETOUI(COLLISION_LAYER::ENV_HURT))
+				iRenderGroup == ETOUI(COLLISION_LAYER::ENV_HURT) || 
+				iRenderGroup == ETOUI(COLLISION_LAYER::NPC_HURT))
 			{
 				if (m_bCarried)
 					return;	

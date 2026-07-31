@@ -333,6 +333,8 @@ void CProjectile_Bomb::Play_ExplodeFx()
 void CProjectile_Bomb::Reset_BombVisual()
 {
     m_fRollAngle = 0.f;
+    m_vRollAxis = { 1.f, 0.f, 0.f };
+    Apply_RollPose();
     m_vGlow = { 0.f, 0.f, 0.f };
 }
 
