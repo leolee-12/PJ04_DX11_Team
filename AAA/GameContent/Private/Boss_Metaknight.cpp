@@ -143,7 +143,7 @@ void CBoss_Metaknight::Play_Intro()
     if (s_bSkipIntro)
     {
         if (CAnimator* pAnim = Get_BodyAnimator())
-            pAnim->Play("Wait", true, true, 0.f, s_fDefaultAnimSpeed);
+            pAnim->Play("Wait", true, true, 0.f, 1.5f);
         return;
     }
 
@@ -151,7 +151,7 @@ void CBoss_Metaknight::Play_Intro()
     Sync.eType = KIRBY_POSITION_SYNC_CONTEXT::METAKNIGHT_INTRO;
     XMStoreFloat4x4(&Sync.AnchorWorld,
         Strip_Scale(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
-    Sync.fAnimSpeed = s_fDefaultAnimSpeed;
+    Sync.fAnimSpeed = 1.5f;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Sync);
 
     static constexpr const _char* INTRO_CUTS[] = {
@@ -162,8 +162,8 @@ void CBoss_Metaknight::Play_Intro()
     CAnimator* pMantAnim = (m_pMant && m_pMant->Is_Active()) ? m_pMant->Get_Animator() : nullptr;
     if (!pBodyAnim) return;
 
-    pBodyAnim->Play(INTRO_CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
-    if (pMantAnim) pMantAnim->Play(INTRO_CUTS[0], false, true, 0.f, s_fDefaultAnimSpeed);
+    pBodyAnim->Play(INTRO_CUTS[0], false, true, 0.f, 1.5f);
+    if (pMantAnim) pMantAnim->Play(INTRO_CUTS[0], false, true, 0.f, 1.5f);
 
     for (_uint i = 1; i < _countof(INTRO_CUTS); ++i)
     {
@@ -172,7 +172,7 @@ void CBoss_Metaknight::Play_Intro()
         tInfo.bLoop = false;
         tInfo.bRestart = true;
         tInfo.fBlend = 0.f;
-        tInfo.fSpeed = s_fDefaultAnimSpeed;
+        tInfo.fSpeed = 1.5f;
 
         pBodyAnim->Enqueue(tInfo);
         if (pMantAnim) pMantAnim->Enqueue(tInfo);

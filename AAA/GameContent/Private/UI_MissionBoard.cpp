@@ -4,6 +4,12 @@
 #include "UI_MissionPanel.h"
 #include "Mission_Manager.h"
 
+namespace
+{
+    const _tchar* s_SlotTags[CMissionManager::COUNT] =
+    { L"MainMission", L"SubMission1", L"SubMission2", L"SubMission3", L"SubMission4" };
+}
+
 CUI_MissionBoard::CUI_MissionBoard(ID3D11Device* d, ID3D11DeviceContext* c)
     : CUICoordinatorContainer{ d, c }
 {
@@ -52,6 +58,20 @@ void CUI_MissionBoard::Start_Intro()
     if (m_eBoard == EBOARD::INTRO || m_eBoard == EBOARD::SUCCESS)
         return;
 
+    auto* pMgr = CMissionManager::GetInstance();
+    for (_uint i = 0; i < CMissionManager::COUNT; ++i)
+    {
+        auto* pPanel = dynamic_cast<CUI_MissionPanel*>(Find_Child(s_SlotTags[i]));
+        if (nullptr == pPanel)
+            continue;
+
+        const _wstring& strName = pMgr->Get_Name(i);
+        if (strName.empty())
+            continue;   // 미바인딩 슬롯은 저작(json) 문구를 그대로 유지
+
+        pPanel->Set_Mission(CMissionManager::MAIN == i, pMgr->Is_Succeeded(i), strName);
+    }
+
     m_IntroOrder.clear();
     if (Find_Child(L"Deco"))
         m_IntroOrder.push_back(L"Deco");
@@ -78,9 +98,6 @@ void CUI_MissionBoard::Update(_float dt)
     if (!m_bActive) return;
 
     __super::Update(dt);   // 활성 자식 구동(슬라이드 애님 진행)
-
-    static const _tchar* s_SlotTags[CMissionManager::COUNT] =
-    { L"MainMission", L"SubMission1", L"SubMission2", L"SubMission3", L"SubMission4" };
 
     if (m_eBoard == EBOARD::INTRO)
     {
