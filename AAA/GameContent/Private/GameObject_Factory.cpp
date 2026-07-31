@@ -1389,6 +1389,8 @@ void CGameObject_Factory::Register_Effect()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::MODEL_CIRCLE_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/CrashCharge/Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::MODEL_RING_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::MODEL_THUNDER_SPIRAL_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/CrashCharge/ThunderSpiral.ysh"));
 

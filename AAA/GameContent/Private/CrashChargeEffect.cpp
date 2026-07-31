@@ -151,12 +151,12 @@ void CCrashChargeEffect::Late_Update(_float fTimeDelta)
 HRESULT CCrashChargeEffect::Ready_EffectPartObjects()
 {
 	CDistortionCommon::DISTORTION_COMMON_DESC tWarp = Make_DistortionDesc(
-		m_iPrototypeLevel, MODEL_CIRCLE_TAG, TEXTURE_WARP_CHARGE_TAG, TEXTURE_RING07_TAG);
+		m_iPrototypeLevel, MODEL_RING_TAG, TEXTURE_WARP_CHARGE_TAG, TEXTURE_RING07_TAG);
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CDistortionCommon::PROTOTYPE_TAG, L"Warp", &tWarp)))
 		return E_FAIL;
 
 	CDistortionCommon::DISTORTION_COMMON_DESC tWarpInner = Make_DistortionDesc(
-		m_iPrototypeLevel, MODEL_CIRCLE_TAG, TEXTURE_WARP_CHARGE_TAG, TEXTURE_CIRCLE06_TAG);
+		m_iPrototypeLevel, MODEL_RING_TAG, TEXTURE_WARP_CHARGE_TAG, TEXTURE_CIRCLE06_TAG);
 	if (FAILED(Add_Effect_PartObject(
 		m_iPrototypeLevel, CDistortionCommon::PROTOTYPE_TAG, L"WarpInnerDistortion", &tWarpInner)))
 		return E_FAIL;
@@ -247,7 +247,7 @@ HRESULT CCrashChargeEffect::Ready_EffectPartObjects()
 		return E_FAIL;
 
 	CDistortionCommon::DISTORTION_COMMON_DESC tWarpAuraDistortion = Make_DistortionDesc(
-		m_iPrototypeLevel, MODEL_CIRCLE_TAG, TEXTURE_INDIRECT3_TAG, TEXTURE_RING07_TAG);
+		m_iPrototypeLevel, MODEL_RING_TAG, TEXTURE_INDIRECT3_TAG, TEXTURE_RING07_TAG);
 	if (FAILED(Add_Effect_PartObject(
 		m_iPrototypeLevel, CDistortionCommon::PROTOTYPE_TAG, L"WarpAuraDistortion", &tWarpAuraDistortion)))
 		return E_FAIL;

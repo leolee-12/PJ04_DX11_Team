@@ -507,6 +507,7 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             m_bIsHit = false;
             m_bAttackFinalEndOverlayApplied = false;
             m_bAttackFinalAddVelocity = false;
+            m_bAttackFinalHitSFXPlayed = false;
             pAnimator->Play("HammerAttackFinalToy", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("HammerAttackFinal", false, true, 0.1f, 2.5f);
             break;
@@ -692,6 +693,13 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
             AniEndChangeState(TOY_HAMMER_STATE::TOY_HAMER_STATE_END);
 
             const _float fRatio = pAnimator->Get_Progress();
+
+            if (!m_bAttackFinalHitSFXPlayed && fRatio > 0.4f)
+            {
+                m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackFinalHit.wav", 0.25f);
+                m_bAttackFinalHitSFXPlayed = true;
+            }
+
             if (!m_bAttackFinalEndOverlayApplied && fRatio >= 0.9f)
             {
                 pAnimator->Set_Mask("HaveHammerWait", "R_ShoulderJ", true, 1.f, 0.1f, 0.0f);

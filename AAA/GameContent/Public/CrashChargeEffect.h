@@ -11,6 +11,7 @@ public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_CrashChargeEffect";
 
 	static constexpr const _tchar* MODEL_CIRCLE_TAG = L"Prototype_Component_Model_CrashCharge_Circle";
+	static constexpr const _tchar* MODEL_RING_TAG = L"Prototype_Component_Model_CrashCharge_Ring";
 	static constexpr const _tchar* MODEL_THUNDER_SPIRAL_TAG = L"Prototype_Component_Model_CrashCharge_ThunderSpiral";
 
 	static constexpr const _tchar* TEXTURE_WARP_CHARGE_TAG = L"Prototype_Component_Texture_CrashCharge_Warp";
