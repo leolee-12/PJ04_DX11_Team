@@ -15,6 +15,7 @@
 
 #include "Projectile_Manager.h"
 #include "GigatzoBullet.h"
+#include "GigatzoAttackEffect.h"
 
 namespace
 {
@@ -99,7 +100,7 @@ _bool CGigatzo::Is_InCameraFront() const
 
 _float CGigatzo::Get_FireDistance() const
 {
-    return 100.f;
+    return 170.f;
 }
 
 _bool CGigatzo::Get_MuzzleRay(_vector* pOutPos,
@@ -270,6 +271,29 @@ void CGigatzo::Fire_Bullet()
 		Get_PrototypeLevelIndex(), Get_LevelIndex(),
 		L"GigatzoBullet", CGigatzoBullet::PROTOTYPE_TAG, &pProj);
 	if (nullptr == pProj) return;
+
+	CEffect_Container* pFx = nullptr;
+	CEffect_Loader::GetInstance()->Spawn(
+		CGigatzoAttackEffect::FX_ID, Get_LevelIndex(), vP,
+		_float3{}, _float3{}, nullptr, &pFx);
+
+	if (nullptr != pFx)
+	{
+		CTransform* pTr = pFx->Get_Transform();
+
+		_vector vFxUp = vDir;
+		_vector vRef = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		if (fabsf(XMVectorGetX(XMVector3Dot(vFxUp, vRef))) > 0.99f)
+			vRef = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+
+		_vector vFxRight = XMVector3Normalize(XMVector3Cross(vRef, vFxUp));
+		_vector vFxLook = XMVector3Cross(vFxRight, vFxUp);
+
+		const _float3 vS = pTr->Get_Scaled();
+		pTr->Set_State(STATE::RIGHT, XMVectorSetW(vFxRight * vS.x, 0.f));
+		pTr->Set_State(STATE::UP, XMVectorSetW(vFxUp * vS.y, 0.f));
+		pTr->Set_State(STATE::LOOK, XMVectorSetW(vFxLook * vS.z, 0.f));
+	}
 
 	static_cast<CGigatzoBullet*>(pProj)->Configure(m_fBulletSpeed, m_fBulletDamage, m_fBulletLife);
 	pProj->Launch(vP, vD);

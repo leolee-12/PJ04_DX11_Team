@@ -35,6 +35,9 @@ public:
 	static constexpr const _char* MODEL_PATH = "../../Resources/Map/Gimmick/NonAnim/BattleBoundary/BattleBoundary.ysh";
 	static constexpr const _char* MODEL_PATH_CYLINDRICAL = "../../Resources/Map/Gimmick/NonAnim/BattleBoundary/BattleBoundaryCylindrical.ysh";
 
+	static constexpr const _tchar* SND_CREATEWALL = L"GimmickRoomGuarder_CreateWall.wav";
+	static constexpr const _tchar* SND_CLEARWALL = L"GimmickRoomGuarder_ClearWall.wav";
+
 private:
 	CLD_BattleBoundary(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CLD_BattleBoundary(const CLD_BattleBoundary& Prototype);

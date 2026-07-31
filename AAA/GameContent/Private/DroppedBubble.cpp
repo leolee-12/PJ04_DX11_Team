@@ -78,7 +78,7 @@ void CDroppedBubble::Activate(const _float3& vPos)
 	m_vVelocity = { 0.f, 0.f, 0.f };
 	m_bIsGrounded = false;
 	m_iBounceCount = 0;
-
+	m_fBobPhase = vPos.x * 0.7f + vPos.z * 1.3f;
 }
 
 void CDroppedBubble::Launch(const _float3& vDir)
@@ -193,6 +193,35 @@ void CDroppedBubble::Despawn()
 
 }
 
+void CDroppedBubble::SetUp_Collider_CallBack()
+{
+	if (nullptr == m_pCollider)
+		return;
+
+	m_pCollider->Set_OnStay([this](CCollider* pOther)
+	{
+		if (ETOUI(COLLISION_LAYER::PLAYER_HURT)
+			!= pOther->Get_RegisteredGroup())
+			return;
+		if (m_bCaptured || !m_bAvailable)
+			return;
+
+		_vector vFrom = pOther->Get_Owner()
+			->Get_Transform()->Get_State(STATE::POSITION);
+		_vector vTo =
+			m_pTransformCom->Get_State(STATE::POSITION);
+
+		_vector vDir = XMVectorSetY(vTo - vFrom, 0.f);
+		if (XMVectorGetX(XMVector3LengthSq(vDir)) < 1e-6f)
+			return;
+
+		_float3 d{};
+		XMStoreFloat3(&d, XMVector3Normalize(vDir));
+		m_vVelocity.x = d.x * s_fPushSpeed;
+		m_vVelocity.z = d.z * s_fPushSpeed;
+	});
+}
+
 HRESULT CDroppedBubble::Ready_Controller()
 {
 	CController::CONTROLLER_DESC cd{};
@@ -216,10 +245,15 @@ void CDroppedBubble::Update_Movement(_float fTimeDelta)
 {
 	if (nullptr == m_pController)
 		return;
-	if (m_bIsGrounded)
-		return;
 
 	m_vVelocity.y += s_fGravity * fTimeDelta;
+
+	m_fBobPhase += fTimeDelta;
+
+	_float fSwayT = m_fBobPhase * s_fSwayFreq;
+	_float fStep = s_fSwayAccel * fTimeDelta;
+	m_vVelocity.x += fStep * sinf(fSwayT);
+	m_vVelocity.z += fStep * cosf(fSwayT * 0.77f);
 
 	_float k = 1.f - s_fAirDrag * fTimeDelta;
 	if (k < 0.f)
@@ -230,32 +264,26 @@ void CDroppedBubble::Update_Movement(_float fTimeDelta)
 
 	_vector vDisp =
 		XMLoadFloat3(&m_vVelocity) * fTimeDelta;
+
 	_uint iFlags =
 		m_pController->Move(vDisp, 0.001f, fTimeDelta);
 
-	m_pTransformCom->Set_State(STATE::POSITION,	m_pController->Get_FootPosition() + XMVectorSet(0.f, s_fFootOffset, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::POSITION,
+		m_pController->Get_FootPosition()
+		+ XMVectorSet(0.f, s_fFootOffset, 0.f, 0.f));
 
-	_bool bDown = (iFlags &	physx::PxControllerCollisionFlag::eCOLLISION_DOWN) != 0;
+	using PXCF = physx::PxControllerCollisionFlag;
+
+	const _bool bDown = (iFlags & PXCF::eCOLLISION_DOWN) != 0;
 
 	if (bDown && m_vVelocity.y < 0.f)
 	{
-		_float fHit = -m_vVelocity.y;
-		++m_iBounceCount;
-
-		if (fHit < s_fRestSpeed
-			|| m_iBounceCount >= s_iMaxBounce)
+		if (!m_bIsGrounded)
 		{
-			m_vVelocity = { 0.f, 0.f, 0.f };
 			m_bIsGrounded = true;
 			On_Rest();
 		}
-		else
-		{
-			m_vVelocity.y = fHit * s_fRestitution;
-			m_vVelocity.x *= s_fHorizDamp;
-			m_vVelocity.z *= s_fHorizDamp;
-			On_Bounce(m_iBounceCount);
-		}
+		m_vVelocity.y = s_fHoverKick;
 	}
 }
 

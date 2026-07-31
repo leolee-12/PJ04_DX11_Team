@@ -130,6 +130,9 @@ namespace
         { TEXT("DropStarEffect"),         TEXT("../../Resources/EffectContainerJSON/CHJ/DropStarEffect.JSON") },
         { TEXT("MeteorExplosion"),        TEXT("../../Resources/CHJ/Effect/EffectContainers/MeteorExplosion.JSON")},
         { TEXT("FaintEffect"),            TEXT("../../Resources/CHJ/Effect/EffectContainers/FaintEffect.JSON")},
+        { TEXT("MeteorAura"),             TEXT("../../Resources/CHJ/Effect/EffectContainers/MeteorAura.JSON")},
+        { TEXT("GigatzoAttackEffect"), TEXT("../../Resources/CHJ/Effect/EffectContainers/GigatzoAttackEffect.JSON")},
+        { TEXT("GigatzoBreakEffect"), TEXT("../../Resources/CHJ/Effect/EffectContainers/GigatzoBreakEffect.JSON")},
 
 #pragma region Armadillo Effects
         { TEXT("RutA"),                   TEXT("../../Resources/EffectContainerJSON/YSH/RutA.JSON") },
@@ -198,6 +201,9 @@ namespace
         { TEXT("Meta_DemoUpperAtk11"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk11.JSON") },
         { TEXT("Meta_DemoUpperAtk12"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk12.JSON") },
         { TEXT("Meta_DemoUpperAtk13"),        TEXT("../../Resources/YSH/Effects/Metaknight/Meta_DemoUpperAtk13.JSON") },
+        { TEXT("GigantEdgeAppearEffect"),     TEXT("../../Resources/CHJ/Effect/EffectContainers/GigantEdgeAppearEffect.JSON") },
+        { TEXT("GigantEdgeSwordTrail"),       TEXT("../../Resources/CHJ/Effect/EffectContainers/GigantEdgeSwordTrail.JSON") },
+        { TEXT("GigantEdgeCrashEffect"),      TEXT("../../Resources/CHJ/Effect/EffectContainers/GigantEdgeCrashEffect.JSON") },
 #pragma endregion
     };
 }

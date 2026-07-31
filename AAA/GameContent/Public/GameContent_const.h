@@ -116,6 +116,9 @@ namespace ProtoDesc
 	// Sparkle
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle01"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle01.dds"), 1 };
 	inline constexpr TEXTURE_DESC Texture_CommonSparkle02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle02"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle02.dds"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GigatzoSpark = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GigatzoSpark"), TEXT("../../Resources/CHJ/Effect/Gigatzo/common_shinecircle01.dds"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GigatzoFire = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GigatzoFire"), TEXT("../../Resources/CHJ/Effect/Gigatzo/common_arrow01.dds"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GigatzoFireSmoke = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GigatzoFireSmoke"), TEXT("../../Resources/CHJ/Effect/Gigatzo/common_smoke06.dds"), 1 };
 
 	// EnvEffect
 	inline constexpr TEXTURE_DESC Texture_ItemCircle	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemCircle"), TEXT("../../Resources/Map/Effect/Textures/Item_Circle.png"), 1 };
@@ -159,6 +162,12 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_BK_CommonSlash = { ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_BK_CommonSlash"),  TEXT("../../Resources/CHJ/Effect/Monster/BladeKnight/common_slash.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Kabu_CommonLine = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Kabu_CommonLine"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/Common_Line.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Kabu_FlashCircle ={ ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_Kabu_FlashCircle"), TEXT("../../Resources/CHJ/Effect/Textures/circlegradation_a.png"), 1 }; 
+	inline constexpr TEXTURE_DESC Texture_GE_CircleQuarter = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GE_CircleQuarter"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/common_circle01.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GE_CircleGlow = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GE_CircleGlow"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/common_circle06.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GE_Radiation = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GE_Radiation"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/common_radiation1.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GE_RingRay = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GE_RingRay"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/common_ring02b.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GE_Leaf = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GE_Leaf"), TEXT("../../Resources/CHJ/Effect/AppearDisappear/Textures/leaf.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_GE_Slash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GE_Slash"), TEXT("../../Resources/CHJ/Effect/Monster/GigantEdge/common_slash.png"), 1 };
 }
 
 using namespace ProtoDesc;
