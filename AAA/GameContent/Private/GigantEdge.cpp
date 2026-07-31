@@ -28,6 +28,9 @@ HRESULT CGigantEdge::Initialize(void* pArg)
 
     m_strBossName = L"±â°£Æ® ¿§Áö";
 
+    m_fMaxHP = 650.f;
+    m_fCurHP = m_fMaxHP;
+
     m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
     m_pMovement->Set_MoveSpeed(4.f);
 
