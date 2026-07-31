@@ -8,7 +8,7 @@ namespace
 {
 	constexpr _float CULL_DISTANCE = 175.f;
 	constexpr _float DISTANCE_FADE_WIDTH = 10.f;
-	constexpr _uint CULLING_STABLE_EVALUATION_INTERVAL = 3u;
+	constexpr _uint CULLING_STABLE_EVALUATION_INTERVAL = 2u;
 
 	_uint Acquire_EvaluationPhase()
 	{

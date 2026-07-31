@@ -23,6 +23,7 @@
 #include "LD_LensFlare.h"
 #include "LD_WaterArea.h"
 #include "CrashEffect.h"
+#include "WaddleDee.h"
 
 #include "GameInstance.h"
 #include "DataExporter.h"
@@ -887,6 +888,20 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 
 		const _float4x4& CurrentWorld = *pLDObject->Get_Transform()->Get_WorldMatrixPtr();
 		Update_WorldMatrixEdit(CurrentWorld, Build_LevelDesignBaseWorldMatrix(pLDObject->Get_LevelDesignDesc()), &Edit);
+		return Track_EditedMapPreviewLevelDesignObject(pObject, Edit);
+	}
+
+	if (CWaddleDee* pWaddleDee = dynamic_cast<CWaddleDee*>(pObject))
+	{
+		if (m_pMapPreviewSession->Is_AddedObject(pObject))
+			return true;
+
+		EDIT_OBJECT_OVERRIDE_DESC Edit{};
+		Edit.eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
+		Try_GetMapPreviewLevelDesignEdit(pObject, &Edit);
+
+		const _float4x4& CurrentWorld = *pWaddleDee->Get_Transform()->Get_WorldMatrixPtr();
+		Update_WorldMatrixEdit(CurrentWorld, Build_LevelDesignBaseWorldMatrix(pWaddleDee->Get_LevelDesignDesc()), &Edit);
 		return Track_EditedMapPreviewLevelDesignObject(pObject, Edit);
 	}
 

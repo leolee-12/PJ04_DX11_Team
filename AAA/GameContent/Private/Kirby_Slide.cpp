@@ -106,7 +106,7 @@ void CKirby_Slide::On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, C
 
                 Change_SlideState(pKirby, SLIDE_STATE::BACK_JUMP);
             }
-            else if (iGroup == ETOUI(COLLISION_LAYER::ENV_HURT))
+            else if (iGroup == ETOUI(COLLISION_LAYER::ENV_HURT) || iGroup == ETOUI(COLLISION_LAYER::NPC_HURT))
             {
                 if (auto* pDamageable = dynamic_cast<IDamageable*>(pGameObject))
                 {
@@ -118,6 +118,9 @@ void CKirby_Slide::On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, C
                     tAttackDesc.fKnockback = 10.f;
                     pDamageable->Damaged(tAttackDesc);
                 }
+
+                if (iGroup == ETOUI(COLLISION_LAYER::NPC_HURT))
+                    Change_SlideState(pKirby, SLIDE_STATE::BACK_JUMP);
             }
             break;
         }

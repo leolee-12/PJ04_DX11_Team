@@ -464,6 +464,10 @@ void CPanel_Inspector::Render()
 #endif
 			}
 		}
+		else if (pLevel->Is_MapPreviewObject(pSelected))
+		{
+			pLevel->Commit_MapEditObjectFromCurrentState(pSelected);
+		}
 	}
 
 	ImGui::Separator();
