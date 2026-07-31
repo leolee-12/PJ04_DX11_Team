@@ -54,6 +54,7 @@
 #include "MoonShot.h"
 #include "HammerSwing.h"
 #include "HammerImpactGround.h"
+#include "HammerChargeGlow.h"
 #include "WheelHammer.h"
 #include "HammerFire.h"
 #include "HammerFireSwing.h"
