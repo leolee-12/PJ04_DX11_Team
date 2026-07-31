@@ -1331,50 +1331,97 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_GROUND_SMOKE_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Cylinder3.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/Crash/Common_Cylinder3.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_SPHERE_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Spere.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/Crash/Common_Spere.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_RING_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Ring01.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/Crash/Common_Ring01.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_CIRCLE_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Circle01.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/Crash/Common_Circle01.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_CRASH_SPHERE_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_CrashSphere.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/Crash/Common_CrashSphere.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_THUNDER_SPIRAL_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/ThunderSpiral.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/Crash/ThunderSpiral.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_BREAKABLE_ROCK_TAG,
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/BreakableRock.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/Crash/BreakableRock.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_SLASH_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/slash01.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/slash01.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WAVE_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirectcommon_scroll05_normal.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/indirectcommon_scroll05_normal.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_RING04_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_ring04.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_ring04.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE01_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle01.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_circle01.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_STAR00_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_star00.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_star00.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE02_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle02.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_circle02.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_SHINE_CIRCLE_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_shinecircle01.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_shinecircle01.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE06_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle06.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_circle06.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_RING03_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_ring03.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_ring03.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE07_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_circle07.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_circle07.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE_GLOW_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/circleglow2.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/circleglow2.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WARP_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirectwarpcirkle_normal.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/indirectwarpcirkle_normal.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_STAR03_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_star03.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/common_star03.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_INDIRECT_NORMAL_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirect_normal.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/indirect_normal.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_THUNDER_STRAIGHT_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/thunderstraight.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/Crash/thunderstraight.dds"), 1));
+        )
+    );
+
+    Register(CCrashChargeEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCrashChargeEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDistortionCommon::PROTOTYPE_TAG, CDistortionCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::MODEL_CIRCLE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/CrashCharge/Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::MODEL_RING_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::MODEL_THUNDER_SPIRAL_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Crash/CrashCharge/ThunderSpiral.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_WARP_CHARGE_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/indirectwarpcharge_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_CIRCLE01_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_circle01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_CIRCLE06_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_circle06.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_TWINKLE03_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_twinkle03.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_INDIRECT3_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/indirect3_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_RING07_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_ring07.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_SCROLL14_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_scroll14.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_SHINE_CIRCLE_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_shinecircle01.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_CIRCLE_GLOW_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/circleglow2.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_LINE03_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_line03.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_LINE04_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_line04.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_STAR03_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/common_star03.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_INDIRECT_NORMAL_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/indirect_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashChargeEffect::TEXTURE_THUNDER_STRAIGHT_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Crash/CrashCharge/thunderstraight.dds"), 1));
         )
     );
 

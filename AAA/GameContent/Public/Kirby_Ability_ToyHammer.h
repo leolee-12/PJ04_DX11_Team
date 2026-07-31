@@ -71,6 +71,8 @@ private:
     CEffect_Container* m_pHammerFire{};
     CEffect_Container* m_pHammerFireSwing{};
 
+    _bool m_bAttackFinalHitSFXPlayed{};
+
 private:
     void Change_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eNext);
     void Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_STATE eState);

@@ -24,7 +24,7 @@ CKirbyBomb::CKirbyBomb(const CKirbyBomb& Prototype)
 HRESULT CKirbyBomb::Initialize(void* pArg)
 {
 	m_fSpeed = 25.f;
-	m_fDamage = 50.f;
+	m_fDamage = 18.f;
 	m_fKnockback = 4.f;
 	m_fHitHeight = 0.01f;
 	m_fHitRadius = 0.60f;

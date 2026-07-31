@@ -15,7 +15,7 @@ namespace
 {
     constexpr _float fMaxFlameChargeTime = 1.9f;
     constexpr _float fMaxFlameTime = 3.9f;
-    constexpr _float fMaxDamageTime = 3.5f;
+    constexpr _float fMaxDamageTime = 3.f;
 
     constexpr _float fMaxDamageHeight = 5.f;
     constexpr _uint iDamageRotCount = 4;
@@ -48,6 +48,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Crash::Get_AbilityType()
 
 void CKirby_Ability_Crash::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
+    // Value
     m_bReqEndAttackState = false;
 
     m_bAttackActivated = false;
@@ -56,14 +57,17 @@ void CKirby_Ability_Crash::Enter_AttackState(CKirby* pKirby, _int iFlag)
     m_fAccFlameChargeTime = 0.f;
     m_fAccFlameTime = 0.f;
 
+    // Render
     pKirby->Set_UseRenderGroundAlign(false);
 
+    // Movement
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_GravityScale(0.7f);
     pMovement->Set_MaxHorizontalSpeed(fCrashMaxHorizontalSpeed);
     pMovement->Set_UseGroundFriction(false);
     pMovement->Set_LinearDrag(fCrashLinearDrag);
 
+    // State
     m_eCrashState = CRASH_STATE::CRASH_STATE_END;
     Change_CrashState(pKirby, CRASH_STATE::FLAME_CHARGE_START);
 }
@@ -75,22 +79,26 @@ void CKirby_Ability_Crash::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 
 void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
 {
-    if (m_eCrashState != CRASH_STATE::CRASH_STATE_END)
-        Exit_CrashState(pKirby, m_eCrashState);
+    Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
 
-    m_eCrashState = CRASH_STATE::CRASH_STATE_END;
+    // Value
     m_bReqEndAttackState = true;
 
     m_fAccFlameChargeTime = 0.f;
     m_fAccFlameTime = 0.f;
     m_fAccDamageTime = 0.f;
 
+    // Render
     pKirby->Set_UseRenderGroundAlign(true);
+
+    // Effect
+    Effect_Stop(m_pCrashChargeEffect);
 
     // Sound
     if (m_hChargeSound.Is_Valid())
         m_hChargeSound.Stop();
 
+    // Movement
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_HoverMode(false);
     pMovement->Set_GravityScale(1.f);
@@ -98,7 +106,8 @@ void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
     pMovement->Set_UseGroundFriction(true);
     pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
 
-    if(m_bAttackActivated)
+    // Ability
+    if (m_bAttackActivated)
     {
         pKirby->Set_AbilityPartsActive(COPY_ABILITY_TYPE::CRASH, false);
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::NORMAL);
@@ -172,14 +181,14 @@ void CKirby_Ability_Crash::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_IN
     __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
-void CKirby_Ability_Crash::Change_CrashState(CKirby* pKirby, CRASH_STATE eNext)
+void CKirby_Ability_Crash::Change_CrashState(CKirby* pKirby, CRASH_STATE eNextState)
 {
-    if (m_eCrashState == eNext)
+    if (m_eCrashState == eNextState)
         return;
 
     Exit_CrashState(pKirby, m_eCrashState);
 
-    m_eCrashState = eNext;
+    m_eCrashState = eNextState;
 
     Enter_CrashState(pKirby, m_eCrashState);
 }
@@ -191,15 +200,21 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
     switch (eState)
     {
         case CRASH_STATE::FLAME_CHARGE_START:
-            m_hChargeSound = m_pGameInstance_Proxy->Play_SFX(L"HeroCrashBasic_Charge1.wav", 0.6f);            
+        {
+            if (m_pCrashChargeEffect == nullptr)
+                CEffect_Loader::GetInstance()->Spawn(L"CrashChargeEffect", pKirby->Get_LevelIndex(),
+                    _float3{}, _float3{}, _float3{}, pKirby->Get_RenderWorldMatrixPtr(), &m_pCrashChargeEffect);
 
+            m_hChargeSound = m_pGameInstance_Proxy->Play_SFX(L"HeroCrashBasic_Charge1.wav", 0.6f);
             m_eCrashDamageMode = CRASH_DAMAGE_MODE::DEFAULT;
             pAnimator->Play("FlameChargeStart", false, false, 0.1f, 1.5f);
             break;
+        }
         case CRASH_STATE::FLAME_CHARGE:
+        {
             m_fAccFlameChargeTime = 0.f;
 
-            if(pKirby->Has_MoveDir() && pKirby->Get_Movement()->Is_Grounded())
+            if (pKirby->Has_MoveDir() && pKirby->Get_Movement()->Is_Grounded())
             {
                 pAnimator->Play("FlameChargeMove", true, false, 0.1f, 1.5f);
                 m_bPlayFrameChargeMoveAni = true;
@@ -209,66 +224,36 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
                 pAnimator->Play("FlameCharge", true, false, 0.1f, 1.5f);
                 m_bPlayFrameChargeMoveAni = false;
             }
-
             break;
-
+        }
         case CRASH_STATE::FLAME_START:
+        {
             pKirby->Get_Movement()->Set_HoverMode(true, fMaxHoverHeight, fHoverSearchDistance);
-
             m_eCrashDamageMode = CRASH_DAMAGE_MODE::JUMP;
             pAnimator->Play("FlameStart", false, false, 0.1f, 2.5f);
             break;
+        }
         case CRASH_STATE::FLAME:
+        {
             m_fAccFlameTime = 0.f;
             pAnimator->Play("Flame", true, false, 0.1f, 1.5f);
             break;
+        }
         case CRASH_STATE::DAMAGE:
-        {            
-            m_pGameInstance_Proxy->Set_TimeScale(0.f);
-
-            // Movement
-            CMovement_Child* pMovement = pKirby->Get_Movement();
-            pMovement->Stop();
-            pMovement->Set_UseGravity(false);
-            pMovement->Set_HoverMode(false);
-
-            // Value
-            XMStoreFloat3(&m_vDamageStartPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
-            m_iAccDamageRotCount = 0;
-            m_fAccDamageTime = 0.f;
-
-            // Sound
-            if (m_hChargeSound.Is_Valid())
-                m_hChargeSound.Stop();
-
-            if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
-                m_pGameInstance_Proxy->Play_SFX(L"HeroCrash_Flame1.wav", 0.6f);
-            else if (m_fAccFlameTime < fMaxFlameTime)
-                m_pGameInstance_Proxy->Play_SFX(L"HeroCrashTime_Attack.wav", 0.6f);
-            else
-                m_pGameInstance_Proxy->Play_SFX(L"HeroCrashTime_BigAttack.wav", 0.6f);
-
-            // Ani
-            if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
-            {
-                pAnimator->Play("FlameStart", false, false, 0.1f, 2.5f);
-                CAnimator::ANI_PLAY_INFO tInfo{};
-                tInfo.strAniName = "Flame";
-                tInfo.bLoop = true;
-                tInfo.bRestart = false;
-                tInfo.fBlend = 0.1f;
-                tInfo.fSpeed = 1.5f;
-                pAnimator->Enqueue(tInfo);
-            }
-
+        {
+            Enter_DamageState(pKirby, pAnimator);
             break;
         }
         case CRASH_STATE::FLAME_END:
+        {
             pAnimator->Play("FlameEnd", false, false, 0.1f, 1.5f);
             break;
+        }
         case CRASH_STATE::CRASH_STATE_END:
+        {
             m_bReqEndAttackState = true;
             break;
+        }
     }
 }
 
@@ -291,7 +276,7 @@ void CKirby_Ability_Crash::Update_CrashState(CKirby* pKirby, _float fTimeDelta)
         }
         case CRASH_STATE::FLAME_CHARGE:
         {
-            Update_FlameChrageMoveAni(pKirby);
+            Update_FlameChargeMoveAni(pKirby);
 
             if (m_bKeyUpAttackEnd)
                 Change_CrashState(pKirby, CRASH_STATE::DAMAGE);
@@ -364,57 +349,104 @@ void CKirby_Ability_Crash::Exit_CrashState(CKirby* pKirby, CRASH_STATE eState)
     switch (eState)
     {
         case CRASH_STATE::FLAME_CHARGE_START:
-            break;
         case CRASH_STATE::FLAME_CHARGE:
-            break;
         case CRASH_STATE::FLAME_START:
-            break;
         case CRASH_STATE::FLAME:
             break;
         case CRASH_STATE::DAMAGE:
-        {
-            m_pGameInstance_Proxy->Set_TimeScale(1.f);
-
-            CMovement_Child* pMovement = pKirby->Get_Movement();      
-            pKirby->Get_Transform()->Set_State(STATE::POSITION, XMLoadFloat3(&m_vDamageStartPos));
-            pMovement->Sync_To_Controller();
-
-            pMovement->Set_UseGravity(true);
-            pMovement->Set_GravityScale(1.f);
-            pMovement->Set_UseGroundFriction(true);
-            pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
-
-            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-            pAnimator->SetBoneRotation("RotL", 0.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
-
-            Apply_CrashHit(pKirby);
-
+            Exit_DamageState(pKirby);
             break;
-        }
         case CRASH_STATE::FLAME_END:
-        {
-
+        case CRASH_STATE::CRASH_STATE_END:
             break;
-        }
     }
 }
 
-void CKirby_Ability_Crash::Update_FlameChrageMoveAni(CKirby* pKirby)
+void CKirby_Ability_Crash::Enter_DamageState(CKirby* pKirby, CAnimator* pAnimator)
+{
+    // Time
+    m_pGameInstance_Proxy->Set_TimeScale(0.f);
+
+    // Movement
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Stop();
+    pMovement->Set_UseGravity(false);
+    pMovement->Set_HoverMode(false);
+
+    // Value
+    XMStoreFloat3(&m_vDamageStartPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
+    m_iAccDamageRotCount = 0;
+    m_fAccDamageTime = 0.f;
+
+    // Effect
+    Effect_Stop(m_pCrashChargeEffect);
+    CEffect_Loader::GetInstance()->Spawn(L"CrashEffect", pKirby->Get_LevelIndex(), m_vDamageStartPos);
+
+    // Sound
+    if (m_hChargeSound.Is_Valid())
+        m_hChargeSound.Stop();
+
+    if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
+        m_pGameInstance_Proxy->Play_SFX(L"HeroCrash_Flame1.wav", 0.6f);
+    else if (m_fAccFlameTime < fMaxFlameTime)
+        m_pGameInstance_Proxy->Play_SFX(L"HeroCrashTime_Attack.wav", 0.6f);
+    else
+        m_pGameInstance_Proxy->Play_SFX(L"HeroCrashTime_BigAttack.wav", 0.6f);
+
+    // Animation
+    if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
+    {
+        pAnimator->Play("FlameStart", false, false, 0.1f, 2.5f);
+        CAnimator::ANI_PLAY_INFO tInfo{};
+        tInfo.strAniName = "Flame";
+        tInfo.bLoop = true;
+        tInfo.bRestart = false;
+        tInfo.fBlend = 0.1f;
+        tInfo.fSpeed = 1.5f;
+        pAnimator->Enqueue(tInfo);
+    }
+}
+
+void CKirby_Ability_Crash::Exit_DamageState(CKirby* pKirby)
+{
+    // Time
+    m_pGameInstance_Proxy->Set_TimeScale(1.f);
+
+    // Transform
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pKirby->Get_Transform()->Set_State(STATE::POSITION, XMLoadFloat3(&m_vDamageStartPos));
+    pMovement->Sync_To_Controller();
+
+    // Movement
+    pMovement->Set_UseGravity(true);
+    pMovement->Set_GravityScale(1.f);
+    pMovement->Set_UseGroundFriction(true);
+    pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
+
+    // Animation
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    pAnimator->SetBoneRotation("RotL", 0.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+
+    // Attack
+    Apply_CrashHit(pKirby);
+}
+
+void CKirby_Ability_Crash::Update_FlameChargeMoveAni(CKirby* pKirby)
 {
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
     _bool bHasMoveDir = pKirby->Has_MoveDir();
 
-        if (bHasMoveDir && pKirby->Get_Movement()->Is_Grounded() && !m_bPlayFrameChargeMoveAni)
-        {
-            pAnimator->Play("FlameChargeMove", true, false, 0.1f, 1.5f);
-            m_bPlayFrameChargeMoveAni = true;
-        }
-        else if(!bHasMoveDir && m_bPlayFrameChargeMoveAni)
-        {
-            pAnimator->Play("FlameCharge", true, false, 0.1f, 1.5f);
-            m_bPlayFrameChargeMoveAni = false;
-        }
+    if (bHasMoveDir && pKirby->Get_Movement()->Is_Grounded() && !m_bPlayFrameChargeMoveAni)
+    {
+        pAnimator->Play("FlameChargeMove", true, false, 0.1f, 1.5f);
+        m_bPlayFrameChargeMoveAni = true;
+    }
+    else if (!bHasMoveDir && m_bPlayFrameChargeMoveAni)
+    {
+        pAnimator->Play("FlameCharge", true, false, 0.1f, 1.5f);
+        m_bPlayFrameChargeMoveAni = false;
+    }
 }
 
 void CKirby_Ability_Crash::Apply_CrashHit(CKirby* pKirby)
@@ -446,11 +478,9 @@ void CKirby_Ability_Crash::Apply_CrashHit(CKirby* pKirby)
     tAttackInfo.pAttacker = pKirby;
 
     if (m_eCrashDamageMode == CRASH_DAMAGE_MODE::DEFAULT)
-        tAttackInfo.fDamage = 1000.f;
-    else if (m_fAccFlameTime < fMaxFlameTime)
-        tAttackInfo.fDamage = 1500.f;
+        tAttackInfo.fDamage = 450.f;
     else
-        tAttackInfo.fDamage = 2000.f;
+        tAttackInfo.fDamage = 700.f;
 
     tAttackInfo.fKnockback = 5.f;
     XMStoreFloat3(&tAttackInfo.vAttackerPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));

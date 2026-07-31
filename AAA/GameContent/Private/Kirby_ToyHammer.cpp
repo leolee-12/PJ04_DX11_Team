@@ -172,50 +172,50 @@ void CKirby_ToyHammer::Change_HitBox(TOY_HAMMER_HITBOX_TYPE eHitBoxType)
     {
         case TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK:
             tDesc.vCenter = { -1.105f, -0.002f, -1.843f };
-            tDesc.fRadius = 1.11f;
+            tDesc.fRadius = 1.332f;
             tDesc.fHeight = 0.f;
             break;
 
         case TOY_HAMMER_HITBOX_TYPE::HAMMER_ATTACK_FINAL:
             tDesc.vCenter = { -1.183f, -0.004f, -1.761f };
-            tDesc.fRadius = 1.18f;
+            tDesc.fRadius = 1.416f;
             tDesc.fHeight = 0.f;
             break;
 
         case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_1:
             tDesc.vCenter = { -0.912f, -0.002f, -1.006f };
-            tDesc.fRadius = 0.63f;
-            tDesc.fHeight = 0.58f;
+            tDesc.fRadius = 0.756f;
+            tDesc.fHeight = 0.696f;
             break;
 
         case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_2:
             tDesc.vCenter = { -1.131f, -0.002f, -1.497f };
-            tDesc.fRadius = 0.79f;
-            tDesc.fHeight = 0.68f;
+            tDesc.fRadius = 0.948f;
+            tDesc.fHeight = 0.816f;
             break;
 
         case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_3:
             tDesc.vCenter = { -1.809f, -0.012f, -2.163f };
-            tDesc.fRadius = 1.26f;
-            tDesc.fHeight = 1.1f;
+            tDesc.fRadius = 1.512f;
+            tDesc.fHeight = 1.32f;
             break;
 
         case TOY_HAMMER_HITBOX_TYPE::CHARGE_ATTACK_4:
             tDesc.vCenter = { -0.68f, -0.001f, -0.5f };
-            tDesc.fRadius = 0.63f;
-            tDesc.fHeight = 0.1f;
+            tDesc.fRadius = 0.756f;
+            tDesc.fHeight = 0.12f;
             break;
 
         case TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER:
             tDesc.vCenter = { -1.315f, -0.004f, -1.682f };
-            tDesc.fRadius = 0.94f;
-            tDesc.fHeight = 0.87f;
+            tDesc.fRadius = 1.128f;
+            tDesc.fHeight = 1.044f;
             break;
 
         case TOY_HAMMER_HITBOX_TYPE::WHEELHAMMER_FALL:
             tDesc.vCenter = { -1.31f, -0.002f, -1.618f };
-            tDesc.fRadius = 0.91f;
-            tDesc.fHeight = 0.8f;
+            tDesc.fRadius = 1.092f;
+            tDesc.fHeight = 0.96f;
             break;
         default:
             return;
@@ -288,8 +288,8 @@ HRESULT CKirby_ToyHammer::Ready_HitBox()
     CCollider::COLLIDER_DESC desc{};
     desc.pOwner = this;
     desc.vCenter = { -1.81f, -0.01f, -2.f };
-    desc.fRadius = 1.1f;
-    desc.fHeight = 1.1f;
+    desc.fRadius = 1.32f;
+    desc.fHeight = 1.32f;
     desc.vRadians = { 0.f, 0.f, XMConvertToRadians(-90.f) };
 
     m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("HitBox_Com"), &desc);

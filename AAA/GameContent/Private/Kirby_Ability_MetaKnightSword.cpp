@@ -312,7 +312,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
             {
                 case COMMON_HIT_PARAM::SLIDE_H:
                 {
-                    tAttackInfo.fDamage = 10.f;
+                    tAttackInfo.fDamage = 12.16f;
                     tAttackInfo.fKnockback = 9.5f;
                     tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                     pMetaSword->Begin_Hit(tAttackInfo);
@@ -320,7 +320,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
                 }
                 case META_SWORD_HIT_PARAM::SLASH1_H:
                 {
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 13.68f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                     pMetaSword->Begin_Hit(tAttackInfo);
@@ -328,7 +328,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
                 }
                 case META_SWORD_HIT_PARAM::SLASH_2_H:
                 {
-                    tAttackInfo.fDamage = 25.f;
+                    tAttackInfo.fDamage = 18.24f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                     pMetaSword->Begin_Hit(tAttackInfo);
@@ -336,7 +336,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
                 }
                 case META_SWORD_HIT_PARAM::SLASH_3_H:
                 {
-                    tAttackInfo.fDamage = 200.f;
+                    tAttackInfo.fDamage = 54.72f;
                     tAttackInfo.fKnockback = 15.f;
                     tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                     pMetaSword->Begin_Hit(tAttackInfo);
@@ -344,7 +344,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
                 }
                 case META_SWORD_HIT_PARAM::JUMP_SLASH_H:
                 {
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 12.16f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                     pMetaSword->Begin_Hit(tAttackInfo);
@@ -352,7 +352,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
                 }
                 case META_SWORD_HIT_PARAM::SPIN_SLASH:
                 {
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 15.2f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
                     pMetaSword->Begin_Hit(tAttackInfo);
@@ -360,7 +360,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
                 }
                 case META_SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
                 {
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 27.36f;
                     tAttackInfo.fKnockback = 15.f;
                     tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
                     pMetaSword->Begin_Hit(tAttackInfo);
@@ -368,7 +368,7 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
                 }
                 case META_SWORD_HIT_PARAM::UPWARDSLASH:
                 {
-                    tAttackInfo.fDamage = 100.f;
+                    tAttackInfo.fDamage = 15.2f;
                     tAttackInfo.fKnockback = 5.f;
                     tAttackInfo.eHitType = HIT_TYPE::UPWARD_SLASH;
                     pMetaSword->Begin_Hit(tAttackInfo);
