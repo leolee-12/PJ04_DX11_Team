@@ -44,8 +44,11 @@ private:
 	struct LENS_ELEMENT
 	{
 		CEffect_Part* pPart = nullptr;
+		_float* pEmitterAlpha = nullptr;
+		_float fRuntimeEmitterAlpha = 1.f;
 		_float3 vAuthorLocalPosition{};
 		_float fAxisPosition = 0.f;
+		_float2 vScreenOffset{};
 	};
 
 	struct PENDING_LENS_POSITION
@@ -60,17 +63,26 @@ private:
 	_bool m_bAuthorPlacementRestored = false;
 	_bool m_bScreenVisible = false;
 
+	_bool m_bFadeInPending = true;
+	_float m_fFadeInAccTime = 0.f;
+	_float m_fFadeInAlpha = 0.f;
+
 private:
 	HRESULT Ready_EffectPartObjects();
 	void    Cache_LensElements();
-	_float  Resolve_DefaultAxisPosition(const _wstring& strTag) const;
+	_bool   Try_GetAuthorLocalPosition(const CEffect_Part* pPart, _float3* pOutLocalPosition) const;
+	_float* Find_EmitterAlpha(CEffect_Part* pPart) const;
 	_bool   Validate_LensProperties();
 	_bool   Project_SourceToNDC(_float2* pOutSourceNDC) const;
-	_float2 Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisPosition) const;
+	_float2 Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisPosition, const _float2& vScreenOffset) const;
 	_bool   Unproject_AtViewDepth(const _float2& vNDC, _float fViewDepth, _float3* pOutWorldPosition) const;
 	_bool   Update_ScreenVisibility(const _float2& vSourceNDC);
 	_bool   Update_LensFlarePlacement();
 	void    Restore_AuthorPlacement();
+	void    Queue_FadeIn();
+	void    Update_FadeIn(_float fTimeDelta);
+	void    Apply_FadeInAlpha();
+	void    Restore_EmitterAlpha();
 
 public:
 	static CLensFlare* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

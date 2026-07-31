@@ -19,6 +19,7 @@ public:
 private:
 	virtual HRESULT Ready_Events() override;
 	HRESULT Ready_Lights();
+	HRESULT Ready_Missions();
 
 public:
 	static CStage1_Step3* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

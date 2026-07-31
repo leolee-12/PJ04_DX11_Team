@@ -22,13 +22,20 @@
 #include "LevelDesign_Registry.h"
 #include "LD_LensFlare.h"
 #include "LD_WaterArea.h"
+#include "CrashEffect.h"
 
 #include "GameInstance.h"
+#include "DataExporter.h"
+#include "DataLoader.h"
 
 #include <cmath>
 
 namespace
 {
+	constexpr const _tchar* CRASH_EFFECT_CONFIG_PATH = L"../../Resources/Map/Effect/Proto_CrashEffect_0.JSON";
+	constexpr const _tchar* CRASH_EFFECT_LAYER_TAG = L"Layer_Effect";
+	constexpr const _tchar* CRASH_EFFECT_OBJECT_TAG = L"Proto_CrashEffect_0";
+
 	void Forward_GameContentLog(Client::GAMECONTENT_LOG_LEVEL eLevel, const char* pMessage)
 	{
 		const string strMessage = (nullptr != pMessage) ? pMessage : "";
@@ -405,6 +412,9 @@ HRESULT CLevel_Edit::Initialize()
 	if (nullptr == m_pMapPreviewSession)
 		return E_FAIL;
 
+	if (FAILED(Load_CrashEffectPreview()))
+		MapTool::Log_Warning("CrashEffect preview load skipped: Resources/Map/Effect/Proto_CrashEffect_0.JSON");
+
 	return S_OK;
 }
 
@@ -476,6 +486,85 @@ CGameObject* CLevel_Edit::Spawn_Object(const _wstring& strProtoTag, const _wstri
 	Mark_HierarchyDirty();
 
 	return pObj;
+}
+
+HRESULT CLevel_Edit::Save_CrashEffectPreview()
+{
+	CCrashEffect* pCrashEffect = dynamic_cast<CCrashEffect*>(m_pSelected);
+	if (nullptr == pCrashEffect)
+		return E_FAIL;
+
+	json jCrashEffect = pCrashEffect->Serialize();
+	jCrashEffect["Prototype_Tag"] = "Proto_CrashEffect";
+	jCrashEffect["Object_Tag"] = "Proto_CrashEffect_0";
+	jCrashEffect["Layer_Tag"] = "Layer_Effect";
+
+	return CDataExporter::Write_JsonFile(CRASH_EFFECT_CONFIG_PATH, jCrashEffect);
+}
+
+HRESULT CLevel_Edit::Load_CrashEffectPreview()
+{
+	string strContent;
+	if (FAILED(CDataLoader::Read_Json(CRASH_EFFECT_CONFIG_PATH, &strContent)))
+		return E_FAIL;
+
+	json jCrashEffect;
+
+	try
+	{
+		jCrashEffect = json::parse(strContent);
+	}
+	catch (const json::exception&)
+	{
+		return E_FAIL;
+	}
+
+	if (!jCrashEffect.is_object())
+		return E_FAIL;
+
+	const auto PrototypeIter = jCrashEffect.find("Prototype_Tag");
+	if (PrototypeIter == jCrashEffect.end()
+		|| !PrototypeIter->is_string()
+		|| PrototypeIter->get<string>() != "Proto_CrashEffect")
+	{
+		return E_FAIL;
+	}
+
+	CCrashEffect* pCrashEffect = dynamic_cast<CCrashEffect*>(m_pSelected);
+	const _bool bCreated = nullptr == pCrashEffect;
+
+	if (bCreated)
+	{
+		pCrashEffect = dynamic_cast<CCrashEffect*>(Spawn_Object(
+			CCrashEffect::PROTOTYPE_TAG,
+			CRASH_EFFECT_LAYER_TAG,
+			CRASH_EFFECT_OBJECT_TAG));
+
+		if (nullptr == pCrashEffect)
+			return E_FAIL;
+	}
+
+	try
+	{
+		pCrashEffect->Deserialize(jCrashEffect);
+	}
+	catch (const json::exception&)
+	{
+		if (bCreated)
+			Delete_Object(pCrashEffect);
+
+		return E_FAIL;
+	}
+
+	_float3 vSpawnPosition{};
+	XMStoreFloat3(
+		&vSpawnPosition,
+		pCrashEffect->Get_Transform()->Get_State(STATE::POSITION));
+
+	pCrashEffect->EffectContainer_Start(vSpawnPosition);
+	Set_Selected(pCrashEffect);
+
+	return S_OK;
 }
 
 void CLevel_Edit::Add_Layer(const wstring& strLayerTag)

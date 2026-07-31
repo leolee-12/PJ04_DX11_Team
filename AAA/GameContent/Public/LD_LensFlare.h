@@ -34,6 +34,8 @@ public:
 	virtual HRESULT On_EditTransformChanged() override;
 	CLIENT_DLL void Set_EditorPreviewActive(_bool bActive);
 	CLIENT_DLL Engine::CEffect_Container* Get_EditorPreviewEffect() const;
+	CLIENT_DLL void Set_EditorPreviewForceOpaque(_bool bForce);
+	CLIENT_DLL _bool Get_EditorPreviewForceOpaque() const;
 #pragma endregion
 
 private:
@@ -48,6 +50,10 @@ private:
 
 	_uint m_iActivatorCount = { 0u };
 	_bool m_bEditorPreviewActive = { false };
+	_bool m_bEditorPreviewForceOpaque = { false };
+
+	FX_HANDLE m_EditorPreviewAlphaHandle = {};
+	unordered_map<_wstring, _float> m_EditorPreviewOriginalAlphas;
 
 private:
 	HRESULT Ready_Components(const LD_PARSED_OBJECT& Desc);
@@ -65,6 +71,9 @@ private:
 	void Start_LensFlare();
 	void Stop_LensFlare();
 	void Release_LensFlare();
+
+	void Apply_EditorPreviewAlphaOverride();
+	void Restore_EditorPreviewAlphaOverride();
 
 public:
 	static void Register_LevelDesignSpecs();

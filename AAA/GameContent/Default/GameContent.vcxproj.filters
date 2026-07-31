@@ -4930,6 +4930,9 @@
     <None Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_SpecialEffect.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
     <None Include="..\ShaderFiles\Shader_UI.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
     </None>

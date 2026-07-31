@@ -1,6 +1,7 @@
 #include "Boss_Stage1.h"
 
 #include "Level_Defines.h"
+#include "Mission_Manager.h"
 
 CBoss_Stage1::CBoss_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -24,6 +25,9 @@ HRESULT CBoss_Stage1::Initialize()
     m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_PreBoss.marker.wav", 3.f, 0.15f);     // 1초 Fade IN 들어보며 튜닝
 
     m_pGameInstance_Proxy->Set_ShaderGlobal("g_fFogEnable", _float4(0.f, 0.f, 0.f, 0.f));
+
+    if (FAILED(Ready_Missions()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -69,6 +73,20 @@ HRESULT CBoss_Stage1::Ready_Events()
 HRESULT CBoss_Stage1::Ready_Lights()
 {
     CLevelLight_DB::Apply(m_pGameInstance_Proxy, LEVEL::BOSS_STAGE1);
+
+    return S_OK;
+}
+
+HRESULT CBoss_Stage1::Ready_Missions()
+{
+    auto* pMission = CMissionManager::GetInstance();
+
+    pMission->Reset();
+
+    pMission->Bind_SubMission(0, L"스워드로 클리어하기");
+    pMission->Bind_SubMission(1, L"1:30 이내에 클리어하기");
+    pMission->Set_Succeeded(CMissionManager::MAIN, true);
+    pMission->Report_SubSuccess(0);                      
 
     return S_OK;
 }
