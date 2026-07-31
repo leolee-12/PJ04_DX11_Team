@@ -82,7 +82,7 @@ VS_SHADOW_OUT VS_SHADOW(VS_IN In)
 
 PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_ShadowDitherIfNeeded(In.vPosition);
     Apply_ShadowAlphaCut(In.vTexcoord, In.vUnknownTexcoord);
     return Make_ShadowOutput(In.vProjPos);
 }

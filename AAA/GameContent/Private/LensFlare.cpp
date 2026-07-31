@@ -6,6 +6,13 @@
 
 #include "Math_Utils.h"
 
+namespace
+{
+	constexpr _float LENS_AUTHOR_AXIS_ORIGIN = 40.f;
+	constexpr _float LENS_AUTHOR_AXIS_UNIT = 35.f;
+	constexpr _float LENS_FADE_IN_DURATION = 1.5f;
+}
+
 CLensFlare::CLensFlare(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container(pDevice, pContext)
 	, m_bUseScreenAxis{ true }
@@ -59,7 +66,15 @@ void CLensFlare::Priority_Update(_float fTimeDelta)
 
 void CLensFlare::Update(_float fTimeDelta)
 {
+	if (m_bLensElementCacheReady == false)
+		Cache_LensElements();
+
+	Update_FadeIn(fTimeDelta);
+	Apply_FadeInAlpha();
+
 	__super::Update(fTimeDelta);
+
+	Restore_EmitterAlpha();
 }
 
 void CLensFlare::Late_Update(_float fTimeDelta)
@@ -76,7 +91,12 @@ void CLensFlare::Late_Update(_float fTimeDelta)
 		return;
 
 	if (Update_LensFlarePlacement() == false)
+	{
+		if (m_bUseScreenAxis == true && m_bFadeOutRequested == false)
+			Queue_FadeIn();
+
 		return;
+	}
 
 	__super::Late_Update(fTimeDelta);
 }
@@ -142,6 +162,8 @@ HRESULT CLensFlare::Ready_EffectPartObjects()
 	tMeshDesc.bUseMaskCom = true;
 	tMeshDesc.iMaskLevel = m_iPrototypeLevel;
 	tMeshDesc.bCustomShader = false;
+	tMeshDesc.iShaderLevel = Shader_SpecialEffect.iLevelID;
+	tMeshDesc.wstrShaderTag = Shader_SpecialEffect.szProtoTag;
 
 	tMeshDesc.wstrModelTag = TEXT("Prototype_Component_Model_LensFlare_Common_Circle01");
 	// circlegradation 은 알파가 전 픽셀 0 → 마스크 슬롯으로 옮겨 Red 채널을 알파원으로 사용
@@ -153,9 +175,11 @@ HRESULT CLensFlare::Ready_EffectPartObjects()
 	tMeshDesc.wstrModelTag = TEXT("Prototype_Component_Model_LensFlare_Common_Ring01");
 	tMeshDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_Common_Ring08");
 	tMeshDesc.wstrMaskTag = TEXT("Prototype_Component_Texture_LensFlare_Common_Circle11");
+	tMeshDesc.bCustomShader = true;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Ring1"), &tMeshDesc)))
 		return E_FAIL;
 
+	tMeshDesc.bCustomShader = false;
 	tMeshDesc.wstrModelTag = TEXT("Prototype_Component_Model_LensFlare_Common_Circle01");
 	tMeshDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_Common_Circle01");
 	tMeshDesc.bUseMaskCom = false;
@@ -175,9 +199,11 @@ HRESULT CLensFlare::Ready_EffectPartObjects()
 	tMeshDesc.wstrModelTag = TEXT("Prototype_Component_Model_LensFlare_Common_Ring01");
 	tMeshDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_Common_Ring08");
 	tMeshDesc.wstrMaskTag = TEXT("Prototype_Component_Texture_LensFlare_Common_Circle11");
+	tMeshDesc.bCustomShader = true;
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Ring2"), &tMeshDesc)))
 		return E_FAIL;
 
+	tMeshDesc.bCustomShader = false;
 	tMeshDesc.wstrModelTag = TEXT("Prototype_Component_Model_LensFlare_Common_Circle01");
 	tMeshDesc.wstrTextureTag = TEXT("Prototype_Component_Texture_LensFlare_Common_Circle04");
 	tMeshDesc.wstrMaskTag = TEXT("Prototype_Component_Texture_LensFlare_CircleGradation");
@@ -202,8 +228,7 @@ void CLensFlare::Cache_LensElements()
 			if (m_bLensElementCacheWarningLogged == false)
 			{
 				const char* pReason = pPart == nullptr ? "part is null" : "transform is null";
-				Client::Log_GameContentWarning("[LensFlare] Lens element cache failed: tag=" + WstrToStr(strTag) + ", reason=" +
-					pReason);
+				Client::Log_GameContentWarning("[LensFlare] Lens element cache failed: tag=" + WstrToStr(strTag) + ", reason=" + pReason);
 				m_bLensElementCacheWarningLogged = true;
 			}
 
@@ -212,8 +237,24 @@ void CLensFlare::Cache_LensElements()
 
 		LENS_ELEMENT Element{};
 		Element.pPart = pPart;
-		XMStoreFloat3(&Element.vAuthorLocalPosition, pTransform->Get_State(STATE::POSITION));
-		Element.fAxisPosition = Resolve_DefaultAxisPosition(strTag);
+		Element.pEmitterAlpha = Find_EmitterAlpha(pPart);
+
+		if (Try_GetAuthorLocalPosition(pPart, &Element.vAuthorLocalPosition) == false)
+		{
+			if (m_bLensElementCacheWarningLogged == false)
+			{
+				Client::Log_GameContentWarning("[LensFlare] Lens element cache failed: tag=" + WstrToStr(strTag) + ", reason=Local Pos is missing or invalid");
+				m_bLensElementCacheWarningLogged = true;
+			}
+
+			continue;
+		}
+
+		Element.fAxisPosition = (Element.vAuthorLocalPosition.z - LENS_AUTHOR_AXIS_ORIGIN) / LENS_AUTHOR_AXIS_UNIT;
+		Element.vScreenOffset = {
+				Element.vAuthorLocalPosition.x / LENS_AUTHOR_AXIS_UNIT,
+				Element.vAuthorLocalPosition.y / LENS_AUTHOR_AXIS_UNIT
+		};
 
 		m_LensElements.emplace(strTag, Element);
 	}
@@ -224,19 +265,42 @@ void CLensFlare::Cache_LensElements()
 		m_bLensElementCacheWarningLogged = false;
 }
 
-_float CLensFlare::Resolve_DefaultAxisPosition(const _wstring& strTag) const
+_bool CLensFlare::Try_GetAuthorLocalPosition(const CEffect_Part* pPart, _float3* pOutLocalPosition) const
 {
-	if (strTag == L"Line")			return 0.f;
-	else if (strTag == L"Circle1")	return 0.f;
-	else if (strTag == L"Hexagon1")	return 1.086f;
-	else if (strTag == L"Ring1")	return 1.143f;
-	else if (strTag == L"Circle2")	return 1.429f;
-	else if (strTag == L"Hexagon2")	return 1.629f;
-	else if (strTag == L"Hexagon3")	return 1.714f;
-	else if (strTag == L"Ring2")	return 1.771f;
-	else if (strTag == L"Circle3")	return 2.f;
+	if (nullptr == pPart || nullptr == pOutLocalPosition)
+		return false;
 
-	return 1.f;
+	for (const Engine::FPROPERTY& Property : pPart->Get_Properties())
+	{
+		if (Engine::PROP_TYPE::FLOAT3 != Property.eType || Property.strName != L"Local Pos" || Property.strCategory != L"Effect")
+			continue;
+
+		const _float3* pLocalPosition = static_cast<const _float3*>(pPart->Get_PropertyPtr(Property.uOffset));
+
+		if (nullptr == pLocalPosition || !MathUtils::Is_ValidFloat3(*pLocalPosition))
+			return false;
+
+		*pOutLocalPosition = *pLocalPosition;
+		return true;
+	}
+
+	return false;
+}
+
+_float* CLensFlare::Find_EmitterAlpha(CEffect_Part* pPart) const
+{
+	if (nullptr == pPart)
+		return nullptr;
+
+	for (const Engine::FPROPERTY& Property : pPart->Get_Properties())
+	{
+		if (Engine::PROP_TYPE::FLOAT != Property.eType || Property.strName != L"Alpha_E")
+			continue;
+
+		return static_cast<_float*>(pPart->Get_PropertyPtr(Property.uOffset));
+	}
+
+	return nullptr;
 }
 
 _bool CLensFlare::Validate_LensProperties()
@@ -290,20 +354,21 @@ _bool CLensFlare::Project_SourceToNDC(_float2* pOutSourceNDC) const
 		&& MathUtils::Is_FiniteFloat(pOutSourceNDC->y);
 }
 
-
-_float2 CLensFlare::Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisPosition) const
+_float2 CLensFlare::Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisPosition, const _float2& vScreenOffset) const
 {
 	const _float fFinalAxis = fAxisPosition * m_fAxisExtent;
-
-	/* 광원에서 화면 중심 쪽으로 향하는 오프셋. 회전은 이 오프셋에만 걸어야 축 위치 0인 코어가 광원에 붙어 있다. */
 	_float2 vOffset{ -vSourceNDC.x * fFinalAxis, -vSourceNDC.y * fFinalAxis };
+
+	const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+	const _bool bValidProjection = nullptr != pProj
+		&& MathUtils::Is_FiniteFloat(pProj->_11)
+		&& MathUtils::Is_FiniteFloat(pProj->_22)
+		&& fabsf(pProj->_11) > Helper::fEpsilon
+		&& fabsf(pProj->_22) > Helper::fEpsilon;
+	const _float fAspect = bValidProjection ? pProj->_22 / pProj->_11 : 1.f;
 
 	if (fabsf(m_fAxisRotationDegree) > Helper::fEpsilon)
 	{
-		/* NDC 는 종횡비가 빠진 공간이라, 화면 비율로 늘린 뒤 회전해야 눈에 보이는 각도와 일치한다. 종횡비는 투영행렬에서 _11). */
-		const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-		const _float fAspect = (pProj != nullptr && fabsf(pProj->_11) > Helper::fEpsilon) ? pProj->_22 / pProj->_11 : 1.f;
-
 		const _float fRadian = XMConvertToRadians(m_fAxisRotationDegree);
 		const _float fCos = cosf(fRadian), fSin = sinf(fRadian);
 		const _float fX = vOffset.x * fAspect, fY = vOffset.y;
@@ -311,6 +376,9 @@ _float2 CLensFlare::Calculate_GhostNDC(const _float2& vSourceNDC, _float fAxisPo
 		vOffset.x = (fX * fCos - fY * fSin) / fAspect;
 		vOffset.y = fX * fSin + fY * fCos;
 	}
+
+	vOffset.x += vScreenOffset.x / fAspect;
+	vOffset.y += vScreenOffset.y;
 
 	return { vSourceNDC.x + vOffset.x, vSourceNDC.y + vOffset.y };
 }
@@ -406,7 +474,7 @@ _bool CLensFlare::Update_LensFlarePlacement()
 		if (pPartTransform == nullptr)
 			return false;
 
-		const _float2 vGhostNDC = Calculate_GhostNDC(vSourceNDC, Element.fAxisPosition);
+		const _float2 vGhostNDC = Calculate_GhostNDC(vSourceNDC, Element.fAxisPosition, Element.vScreenOffset);
 
 		_float3 vGhostWorld{};
 
@@ -435,10 +503,69 @@ _bool CLensFlare::Update_LensFlarePlacement()
 	return true;
 }
 
+void CLensFlare::Queue_FadeIn()
+{
+	m_bFadeInPending = true;
+	m_fFadeInAccTime = 0.f;
+	m_fFadeInAlpha = 0.f;
+}
+
+void CLensFlare::Update_FadeIn(_float fTimeDelta)
+{
+	if (m_bIsPlay == false)
+		return;
+
+	if (m_bFadeOutRequested == true)
+	{
+		m_bFadeInPending = false;
+		return;
+	}
+
+	if (m_bFadeInPending == true)
+	{
+		if (m_bUseScreenAxis == true && m_bScreenVisible == false)
+			return;
+
+		m_bFadeInPending = false;
+	}
+
+	if (m_fFadeInAlpha >= 1.f)
+		return;
+
+	m_fFadeInAccTime += fTimeDelta;
+
+	_float fRatio = m_fFadeInAccTime / LENS_FADE_IN_DURATION;
+	Helper::FloatClamp(fRatio, 0.f, 1.f);
+
+	m_fFadeInAlpha = Helper::FloatSmoothStep(0.f, 1.f, fRatio);
+}
+
+void CLensFlare::Apply_FadeInAlpha()
+{
+	for (auto& [strTag, Element] : m_LensElements)
+	{
+		if (nullptr == Element.pEmitterAlpha)
+			continue;
+
+		Element.fRuntimeEmitterAlpha = *Element.pEmitterAlpha;
+		*Element.pEmitterAlpha *= m_fFadeInAlpha;
+	}
+}
+
+void CLensFlare::Restore_EmitterAlpha()
+{
+	for (auto& [strTag, Element] : m_LensElements)
+	{
+		if (nullptr != Element.pEmitterAlpha)
+			*Element.pEmitterAlpha = Element.fRuntimeEmitterAlpha;
+	}
+}
+
 void CLensFlare::Reset_LensRuntimeState()
 {
 	m_bScreenVisible = false;
 	m_bAuthorPlacementRestored = false;
+	Queue_FadeIn();
 
 	if (m_bLensElementCacheReady == true)
 		Restore_AuthorPlacement();

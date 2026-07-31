@@ -1338,11 +1338,17 @@ void CGameObject_Factory::Register_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Ring01.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_CIRCLE_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_CRASH_SPHERE_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/Common_CrashSphere.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_THUNDER_SPIRAL_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/ThunderSpiral.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::MODEL_BREAKABLE_ROCK_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Crash/BreakableRock.ysh"));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_SLASH_TAG,
                 CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/slash01.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WAVE_TAG,
-                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_wave01.dds"), 1));
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirectcommon_scroll05_normal.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_RING04_TAG,
                 CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_ring04.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_CIRCLE01_TAG,
@@ -1363,6 +1369,12 @@ void CGameObject_Factory::Register_Effect()
                 CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/circleglow2.dds"), 1));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_WARP_TAG,
                 CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirectwarpcirkle_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_STAR03_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/common_star03.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_INDIRECT_NORMAL_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/indirect_normal.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCrashEffect::TEXTURE_THUNDER_STRAIGHT_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/Crash/thunderstraight.dds"), 1));
         )
     );
 

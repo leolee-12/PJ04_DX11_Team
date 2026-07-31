@@ -113,6 +113,11 @@ static const float Bayer4x4[16] =
     15.0 / 16.0, 7.0 / 16.0, 13.0 / 16.0, 5.0 / 16.0
 };
 
+float Get_ShadowDitherNoise(float2 vPixel)
+{
+    return frac(52.9829189f * frac(dot(vPixel, float2(0.06711056f, 0.00583715f))));
+}
+
 void Apply_Dither(float4 vScreenPos, float fDissolve)
 {
       [branch]
@@ -122,6 +127,17 @@ void Apply_Dither(float4 vScreenPos, float fDissolve)
     float fVisibility = 1.f - saturate(fDissolve);
     int2 px = int2(vScreenPos.xy) & 3;
     if (fVisibility <= Bayer4x4[px.y * 4 + px.x])
+        discard;
+}
+
+void Apply_ShadowDither(float4 vScreenPos, float fDissolve)
+{
+        [branch]
+    if (fDissolve <= 0.0001f)
+        return;
+
+    float fVisibility = 1.f - saturate(fDissolve);
+    if (fVisibility <= Get_ShadowDitherNoise(vScreenPos.xy))
         discard;
 }
 
@@ -139,6 +155,13 @@ void Apply_DitherIfNeeded(float4 vScreenPos)
       [branch]
     if (0u != (g_iFlags & FLAG_DITHER))
         Apply_Dither(vScreenPos, g_fDissolve);
+}
+
+void Apply_ShadowDitherIfNeeded(float4 vScreenPos)
+{
+        [branch]
+    if (0u != (g_iFlags & FLAG_DITHER))
+        Apply_ShadowDither(vScreenPos, g_fDissolve);
 }
 
 void Apply_DitherFromPixelInput(PS_IN In)

@@ -121,7 +121,7 @@ namespace
         { TEXT("MoveSmoke"),              TEXT("../../Resources/EffectContainerJSON/CHJ/MoveSmoke.JSON") },
         { TEXT("MonsterLandingSmoke"),    TEXT("../../Resources/EffectContainerJSON/CHJ/MonsterLandingSmoke.JSON") },
         { TEXT("VanishEffect"),           TEXT("../../Resources/Map/Effect/Proto_VanishEffect_0.JSON") },
-        //{ TEXT("CrashEffect"),            TEXT("../../Resources/Map/Effect/Crash/CrashEffect.JSON") },
+        { TEXT("CrashEffect"),            TEXT("../../Resources/Map/Effect/Crash/CrashEffect.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/EffectContainerJSON/CHJ/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/EffectContainerJSON/CHJ/Tornado_BK.JSON") },

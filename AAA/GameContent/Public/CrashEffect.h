@@ -14,6 +14,9 @@ public:
 	static constexpr const _tchar* MODEL_SPHERE_TAG = L"Prototype_Component_Model_Crash_Sphere";
 	static constexpr const _tchar* MODEL_RING_TAG = L"Prototype_Component_Model_Crash_Ring";
 	static constexpr const _tchar* MODEL_CIRCLE_TAG = L"Prototype_Component_Model_Crash_Circle";
+	static constexpr const _tchar* MODEL_CRASH_SPHERE_TAG = L"Prototype_Component_Model_Crash_CrashSphere";
+	static constexpr const _tchar* MODEL_THUNDER_SPIRAL_TAG = L"Prototype_Component_Model_Crash_ThunderSpiral";
+	static constexpr const _tchar* MODEL_BREAKABLE_ROCK_TAG = L"Prototype_Component_Model_Crash_BreakableRock";
 
 	static constexpr const _tchar* TEXTURE_SLASH_TAG = L"Prototype_Component_Texture_Crash_Slash";
 	static constexpr const _tchar* TEXTURE_WAVE_TAG = L"Prototype_Component_Texture_Crash_Wave";
@@ -27,6 +30,9 @@ public:
 	static constexpr const _tchar* TEXTURE_CIRCLE07_TAG = L"Prototype_Component_Texture_Crash_Circle07";
 	static constexpr const _tchar* TEXTURE_CIRCLE_GLOW_TAG = L"Prototype_Component_Texture_Crash_CircleGlow";
 	static constexpr const _tchar* TEXTURE_WARP_TAG = L"Prototype_Component_Texture_Crash_Warp";
+	static constexpr const _tchar* TEXTURE_STAR03_TAG = L"Prototype_Component_Texture_Crash_Star03";
+	static constexpr const _tchar* TEXTURE_INDIRECT_NORMAL_TAG = L"Prototype_Component_Texture_Crash_IndirectNormal";
+	static constexpr const _tchar* TEXTURE_THUNDER_STRAIGHT_TAG = L"Prototype_Component_Texture_Crash_ThunderStraight";
 
 private:
 	CCrashEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -39,9 +45,13 @@ protected:
 
 public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
+	virtual void Priority_Update(_float fTimeDelta);
+	virtual void Update(_float fTimeDelta);
+	virtual void Late_Update(_float fTimeDelta);
 
 private:
 	HRESULT Ready_EffectPartObjects();
+	_float Resolve_TimeDelta(_float fTimeDelta);
 
 public:
 	static CCrashEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

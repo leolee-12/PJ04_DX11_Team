@@ -1,11 +1,31 @@
 #include "LD_LensFlare.h"
 #include "LensFlare.h"
+#include "Effect_Part.h"
 #include "LevelDesign_Registry.h"
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
 
 NS_BEGIN(Client)
+
+namespace
+{
+	_float* Find_EmitterAlphaProperty(Engine::CEffect_Part* pPart)
+	{
+		if (nullptr == pPart)
+			return nullptr;
+
+		for (const Engine::FPROPERTY& Property : pPart->Get_Properties())
+		{
+			if (Engine::PROP_TYPE::FLOAT != Property.eType || L"Alpha_E" != Property.strName)
+				continue;
+
+			return static_cast<_float*>(pPart->Get_PropertyPtr(Property.uOffset));
+		}
+
+		return nullptr;
+	}
+}
 
 CLD_LensFlare::CLD_LensFlare(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevelDesignObject(pDevice, pContext)
@@ -34,7 +54,11 @@ HRESULT CLD_LensFlare::Initialize(void* pArg)
 
 	m_tEffectAreaDesc = pParsedDesc->EffectArea;
 	m_LensFlareHandle.Clear();
+	m_EditorPreviewAlphaHandle.Clear();
+	m_EditorPreviewOriginalAlphas.clear();
 	m_iActivatorCount = 0u;
+	m_bEditorPreviewActive = false;
+	m_bEditorPreviewForceOpaque = false;
 
 	if (FAILED(Ready_Components(*pParsedDesc)))
 		return E_FAIL;
@@ -109,16 +133,25 @@ void CLD_LensFlare::Set_EditorPreviewActive(_bool bActive)
 
 	const _bool bWasRequested = Is_LensFlareRequested();
 
+	if (!bActive)
+	{
+		Restore_EditorPreviewAlphaOverride();
+		m_bEditorPreviewForceOpaque = false;
+	}
+
 	m_bEditorPreviewActive = bActive;
 
 	const _bool bIsRequested = Is_LensFlareRequested();
-	if (bWasRequested == bIsRequested)
-		return;
+	if (bWasRequested != bIsRequested)
+	{
+		if (bIsRequested)
+			Start_LensFlare();
+		else
+			Stop_LensFlare();
+	}
 
-	if (bIsRequested)
-		Start_LensFlare();
-	else
-		Stop_LensFlare();
+	if (m_bEditorPreviewActive && m_bEditorPreviewForceOpaque)
+		Apply_EditorPreviewAlphaOverride();
 }
 
 Engine::CEffect_Container* CLD_LensFlare::Get_EditorPreviewEffect() const
@@ -131,6 +164,84 @@ Engine::CEffect_Container* CLD_LensFlare::Get_EditorPreviewEffect() const
 	return pEffectLoader->Is_Current(m_LensFlareHandle)
 		? m_LensFlareHandle.p
 		: nullptr;
+}
+
+void CLD_LensFlare::Set_EditorPreviewForceOpaque(_bool bForce)
+{
+	if (m_bEditorPreviewForceOpaque == bForce)
+		return;
+
+	m_bEditorPreviewForceOpaque = bForce;
+
+	if (m_bEditorPreviewForceOpaque)
+		Apply_EditorPreviewAlphaOverride();
+	else
+		Restore_EditorPreviewAlphaOverride();
+}
+
+_bool CLD_LensFlare::Get_EditorPreviewForceOpaque() const
+{
+	return m_bEditorPreviewForceOpaque;
+}
+
+void CLD_LensFlare::Apply_EditorPreviewAlphaOverride()
+{
+	if (!m_bEditorPreviewActive || !m_bEditorPreviewForceOpaque)
+		return;
+
+	if (nullptr == m_pGameInstance_Proxy || !m_pGameInstance_Proxy->IsConnected())
+		return;
+
+	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
+	if (!pEffectLoader->Is_Current(m_LensFlareHandle))
+		return;
+
+	const _bool bSameHandle =
+		m_EditorPreviewAlphaHandle.p == m_LensFlareHandle.p
+		&& m_EditorPreviewAlphaHandle.iEpoch == m_LensFlareHandle.iEpoch;
+
+	if (nullptr != m_EditorPreviewAlphaHandle.p && !bSameHandle)
+		Restore_EditorPreviewAlphaOverride();
+
+	m_EditorPreviewAlphaHandle = m_LensFlareHandle;
+
+	const auto& EffectParts = m_LensFlareHandle.p->Get_EffectPartObject();
+	for (auto& [strTag, pPart] : EffectParts)
+	{
+		_float* pAlpha = Find_EmitterAlphaProperty(pPart);
+		if (nullptr == pAlpha)
+			continue;
+
+		m_EditorPreviewOriginalAlphas.try_emplace(strTag, *pAlpha);
+		*pAlpha = 1.f;
+	}
+}
+
+void CLD_LensFlare::Restore_EditorPreviewAlphaOverride()
+{
+	if (nullptr != m_pGameInstance_Proxy && m_pGameInstance_Proxy->IsConnected())
+	{
+		CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
+
+		if (pEffectLoader->Is_Current(m_EditorPreviewAlphaHandle))
+		{
+			const auto& EffectParts = m_EditorPreviewAlphaHandle.p->Get_EffectPartObject();
+
+			for (const auto& [strTag, fOriginalAlpha] : m_EditorPreviewOriginalAlphas)
+			{
+				auto PartIter = EffectParts.find(strTag);
+				if (PartIter == EffectParts.end())
+					continue;
+
+				_float* pAlpha = Find_EmitterAlphaProperty(PartIter->second);
+				if (nullptr != pAlpha)
+					*pAlpha = fOriginalAlpha;
+			}
+		}
+	}
+
+	m_EditorPreviewOriginalAlphas.clear();
+	m_EditorPreviewAlphaHandle.Clear();
 }
 #pragma endregion
 
@@ -347,9 +458,13 @@ void CLD_LensFlare::Release_LensFlare()
 {
 	if (nullptr == m_pGameInstance_Proxy || !m_pGameInstance_Proxy->IsConnected())
 	{
+		m_EditorPreviewOriginalAlphas.clear();
+		m_EditorPreviewAlphaHandle.Clear();
 		m_LensFlareHandle.Clear();
 		return;
 	}
+
+	Restore_EditorPreviewAlphaOverride();
 
 	CEffect_Loader* pEffectLoader = CEffect_Loader::GetInstance();
 

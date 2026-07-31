@@ -96,7 +96,7 @@ void CCulling_Manager::Update()
 	CULLING_VIEW_DESC ShadowViewDesc{};
 	ShadowViewDesc.pView = m_pProxy->Get_Shadow_Transform(D3DTS::VIEW);
 	ShadowViewDesc.pProj = m_pProxy->Get_Shadow_Transform(D3DTS::PROJ);
-	ShadowViewDesc.fCullMargin = 10.f;
+	ShadowViewDesc.fCullMargin = 30.f;
 	Update_View(CULLING_VIEW::SHADOW_DIR, ShadowViewDesc);
 }
 
