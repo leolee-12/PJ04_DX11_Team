@@ -218,6 +218,8 @@ void CKirby_Deform_RollerCoaster::On_Damaged_KirbyState(CKirby* pKirby, const AT
     pKirby->Add_HP(-tInfo.fDamage);
     pKirby->Start_DamageInvincibility();
 
+    m_pGameInstance_Proxy->Play_SFX(L"HeroVoice_Damage4.wav", 0.15f);
+
     //if (m_eRollerCoasterState == DEFORM_ROLLERCOASTER_STATE::RUNNING)
     //{
     //    m_fAccRailSpeed = fMinSpeed;

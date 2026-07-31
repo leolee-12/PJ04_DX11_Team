@@ -36,6 +36,10 @@ void CKirby_AbilityDump::Enter(CKirby* pKirby, _int iFlag)
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::ABILITY_DUMP);
 
+    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_Deforming.wav", 0.15f);
+
+    m_bEffectSpawned = false;
+
     m_bPartsOff = false;
 }
 
@@ -49,6 +53,14 @@ void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
     const _float fRatio = pAnimator->Get_Progress();
 
     Update_AbilityDump(pKirby, fRatio);
+
+    if (m_bEffectSpawned == false && fRatio >= 0.4f) {
+        _float3 vPos{};
+        XMStoreFloat3(&vPos, pKirby->Get_Transform()->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f));
+        CEffect_Loader::GetInstance()->Spawn(L"GetAbilityEffect", pKirby->Get_LevelIndex(), vPos);
+
+        m_bEffectSpawned = true;
+    }
 
     if(pAnimator->Is_Finished())
     {

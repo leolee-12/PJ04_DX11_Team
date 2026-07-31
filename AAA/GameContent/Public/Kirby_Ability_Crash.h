@@ -17,6 +17,7 @@ private:
 		FLAME,
 		DAMAGE,
 		FLAME_END,
+		ABILITY_DUMP,
 		CRASH_STATE_END
 	};
 

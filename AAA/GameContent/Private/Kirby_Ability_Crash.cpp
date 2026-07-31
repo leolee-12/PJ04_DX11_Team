@@ -20,7 +20,7 @@ namespace
     constexpr _float fMaxDamageHeight = 5.f;
     constexpr _uint iDamageRotCount = 4;
 
-    constexpr _float fMaxHoverHeight = 1.2f;
+    constexpr _float fMaxHoverHeight = 1.5f;
     constexpr _float fHoverSearchDistance = 1.3f;
 
     constexpr _float fCrashMaxHorizontalSpeed = 2.5f;
@@ -80,6 +80,9 @@ void CKirby_Ability_Crash::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
 {
     Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
+
+    _float fLevel = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
 
     // Value
     m_bReqEndAttackState = true;
@@ -205,6 +208,9 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
                 CEffect_Loader::GetInstance()->Spawn(L"CrashChargeEffect", pKirby->Get_LevelIndex(),
                     _float3{}, _float3{}, _float3{}, pKirby->Get_RenderWorldMatrixPtr(), &m_pCrashChargeEffect);
 
+            _float fLevel = 0.3f;
+            m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
+
             m_hChargeSound = m_pGameInstance_Proxy->Play_SFX(L"HeroCrashBasic_Charge1.wav", 0.6f);
             m_eCrashDamageMode = CRASH_DAMAGE_MODE::DEFAULT;
             pAnimator->Play("FlameChargeStart", false, false, 0.1f, 1.5f);
@@ -247,6 +253,13 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
         case CRASH_STATE::FLAME_END:
         {
             pAnimator->Play("FlameEnd", false, false, 0.1f, 1.5f);
+            break;
+        }
+        case CRASH_STATE::ABILITY_DUMP:
+        {
+            pKirby->Set_AbilityPartsActive(COPY_ABILITY_TYPE::CRASH, false);
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::ABILITY_DUMP);
             break;
         }
         case CRASH_STATE::CRASH_STATE_END:
@@ -338,8 +351,13 @@ void CKirby_Ability_Crash::Update_CrashState(CKirby* pKirby, _float fTimeDelta)
         case CRASH_STATE::FLAME_END:
         {
             if (pAnimator->Is_Finished())
-                Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
+                Change_CrashState(pKirby, CRASH_STATE::ABILITY_DUMP);
             break;
+        }
+        case CRASH_STATE::ABILITY_DUMP:
+        {
+            if (pAnimator->Is_Finished())
+                Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
         }
     }
 }
@@ -357,6 +375,7 @@ void CKirby_Ability_Crash::Exit_CrashState(CKirby* pKirby, CRASH_STATE eState)
             Exit_DamageState(pKirby);
             break;
         case CRASH_STATE::FLAME_END:
+        case CRASH_STATE::ABILITY_DUMP:
         case CRASH_STATE::CRASH_STATE_END:
             break;
     }
@@ -409,6 +428,9 @@ void CKirby_Ability_Crash::Enter_DamageState(CKirby* pKirby, CAnimator* pAnimato
 
 void CKirby_Ability_Crash::Exit_DamageState(CKirby* pKirby)
 {
+    _float fLevel = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
+
     // Time
     m_pGameInstance_Proxy->Set_TimeScale(1.f);
 

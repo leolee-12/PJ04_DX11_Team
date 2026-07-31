@@ -62,7 +62,7 @@ void CKirby_Emote::Enter(CKirby* pKirby, _int iFlag)
         CCollider::COLLIDER_DESC tBoxDesc{};
         tBoxDesc.pOwner = pKirby;
         tBoxDesc.vCenter = { 0.f, 1.f, 0.f };
-        tBoxDesc.vSize = { 3.f, 2.f, 3.f };
+        tBoxDesc.vSize = { 5.f, 2.f, 5.f };
 
         m_pQueryBox = static_cast<CCollider*>(m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::COMPONENT,
             Collider_AABB.iLevelID, Collider_AABB.szProtoTag, &tBoxDesc));
@@ -90,7 +90,7 @@ void CKirby_Emote::Update(CKirby* pKirby, const _float fTimeDelta)
         m_pQueryBox->Update(XMLoadFloat4x4(pKirby->Get_Transform()->Get_WorldMatrixPtr()));
 
         vector<CCollider*> Hits;
-        m_pGameInstance_Proxy->Query_Overlap(m_pQueryBox, ETOUI(COLLISION_LAYER::ENV_HURT), &Hits);
+        m_pGameInstance_Proxy->Query_Overlap(m_pQueryBox, ETOUI(COLLISION_LAYER::NPC_HURT), &Hits);
 
         for (CCollider* pCollider : Hits)
         {
