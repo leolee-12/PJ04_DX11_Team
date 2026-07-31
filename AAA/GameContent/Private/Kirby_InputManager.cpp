@@ -166,22 +166,22 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
     }
 
     // Emote
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_1))
+    if (m_pGameInstance_Proxy->Key_Down(DIK_1))
     {
         pCommand = new EmoteTop_Command(KEY_STATE_TYPE::DOWN);
         ProcessCommand(pCommand);
     }
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_2))
+    if (m_pGameInstance_Proxy->Key_Down(DIK_2))
     {
         pCommand = new EmoteDown_Command(KEY_STATE_TYPE::DOWN);
         ProcessCommand(pCommand);
     }
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_3))
+    if (m_pGameInstance_Proxy->Key_Down(DIK_3))
     {
         pCommand = new EmoteLeft_Command(KEY_STATE_TYPE::DOWN);
         ProcessCommand(pCommand);
     }
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_4))
+    if (m_pGameInstance_Proxy->Key_Down(DIK_4))
     {
         pCommand = new EmoteRight_Command(KEY_STATE_TYPE::DOWN);
         ProcessCommand(pCommand);

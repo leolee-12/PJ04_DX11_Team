@@ -11,15 +11,12 @@ public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_CrashChargeEffect";
 
 	static constexpr const _tchar* MODEL_CIRCLE_TAG = L"Prototype_Component_Model_CrashCharge_Circle";
-	static constexpr const _tchar* MODEL_RING_TAG = L"Prototype_Component_Model_CrashCharge_Ring";
 	static constexpr const _tchar* MODEL_THUNDER_SPIRAL_TAG = L"Prototype_Component_Model_CrashCharge_ThunderSpiral";
+	static constexpr const _tchar* MODEL_BREAKABLE_ROCK_TAG = L"Prototype_Component_Model_CrashCharge_BreakableRock";
 
-	static constexpr const _tchar* TEXTURE_WARP_CHARGE_TAG = L"Prototype_Component_Texture_CrashCharge_Warp";
 	static constexpr const _tchar* TEXTURE_CIRCLE01_TAG = L"Prototype_Component_Texture_CrashCharge_Circle01";
 	static constexpr const _tchar* TEXTURE_CIRCLE06_TAG = L"Prototype_Component_Texture_CrashCharge_Circle06";
 	static constexpr const _tchar* TEXTURE_TWINKLE03_TAG = L"Prototype_Component_Texture_CrashCharge_Twinkle03";
-	static constexpr const _tchar* TEXTURE_INDIRECT3_TAG = L"Prototype_Component_Texture_CrashCharge_Indirect3";
-	static constexpr const _tchar* TEXTURE_RING07_TAG = L"Prototype_Component_Texture_CrashCharge_Ring07";
 	static constexpr const _tchar* TEXTURE_SCROLL14_TAG = L"Prototype_Component_Texture_CrashCharge_Scroll14";
 	static constexpr const _tchar* TEXTURE_SHINE_CIRCLE_TAG = L"Prototype_Component_Texture_CrashCharge_ShineCircle";
 	static constexpr const _tchar* TEXTURE_CIRCLE_GLOW_TAG = L"Prototype_Component_Texture_CrashCharge_CircleGlow";
