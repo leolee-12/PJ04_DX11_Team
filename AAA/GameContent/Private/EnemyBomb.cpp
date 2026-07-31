@@ -1,6 +1,7 @@
 #include "EnemyBomb.h"
 #include "GameInstance.h"
 #include "GameContent_Events.h"
+#include "GameContent_const.h"
 
 CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CProjectile_Bomb{ pDevice , pContext }
@@ -83,6 +84,43 @@ m_iPrototypeLevel, MODEL_PROTO_TAG, TEXT("Com_Model"));
 	if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&ad)))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT CEnemyBomb::Ready_HitBox()
+{
+	CCollider::COLLIDER_DESC desc{};
+	desc.pOwner = this;
+	desc.fHeight = m_fHitHeight;
+	desc.fRadius = m_fHitRadius;
+	desc.vCenter = m_vCenterOffset;
+	desc.vRadians = m_vRadians;
+
+	m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
+		TEXT("Com_HitBox"), &desc);
+	if (nullptr == m_pHitBox)
+		return E_FAIL;
+
+	m_pHitBox->Set_OnEnter([this](CCollider* pOther) {
+		if (!m_bAlive) return;
+		// 플레이어 콜라이더, 무기 콜라이더, 플레이어 폭탄에 터지게 
+		if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup() &&
+			ETOUI(COLLISION_LAYER::PLAYER_HIT) != pOther->Get_RegisteredGroup() &&
+			ETOUI(COLLISION_LAYER::PLAYER_BOMB) != pOther->Get_RegisteredGroup())
+			return;
+		if (auto* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner()))
+		{
+			ATTACK_INFO atk{};
+			atk.fDamage = m_fDamage; atk.fKnockback = m_fKnockback;
+			XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+			atk.pAttacker = this;
+			pVictim->Damaged(atk);
+		}
+		On_Impact();
+		});
+
+	m_pHitBox->Set_Enabled(false);
+	m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
 	return S_OK;
 }
 

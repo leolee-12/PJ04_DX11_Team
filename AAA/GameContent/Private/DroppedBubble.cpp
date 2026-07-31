@@ -78,7 +78,7 @@ void CDroppedBubble::Activate(const _float3& vPos)
 	m_vVelocity = { 0.f, 0.f, 0.f };
 	m_bIsGrounded = false;
 	m_iBounceCount = 0;
-
+	m_fBobPhase = vPos.x * 0.7f + vPos.z * 1.3f;
 }
 
 void CDroppedBubble::Launch(const _float3& vDir)
@@ -246,23 +246,25 @@ void CDroppedBubble::Update_Movement(_float fTimeDelta)
 	if (nullptr == m_pController)
 		return;
 
-	const _bool bWasGrounded = m_bIsGrounded;
-
 	m_vVelocity.y += s_fGravity * fTimeDelta;
 
-	const _float fDamp = bWasGrounded
-		? s_fGroundFriction : s_fAirDrag;
-	_float k = 1.f - fDamp * fTimeDelta;
+	m_fBobPhase += fTimeDelta;
+
+	_float fSwayT = m_fBobPhase * s_fSwayFreq;
+	_float fStep = s_fSwayAccel * fTimeDelta;
+	m_vVelocity.x += fStep * sinf(fSwayT);
+	m_vVelocity.z += fStep * cosf(fSwayT * 0.77f);
+
+	_float k = 1.f - s_fAirDrag * fTimeDelta;
 	if (k < 0.f)
 		k = 0.f;
-
 	m_vVelocity.x *= k;
+	m_vVelocity.y *= k;
 	m_vVelocity.z *= k;
-	if (!bWasGrounded)
-		m_vVelocity.y *= k;
 
 	_vector vDisp =
 		XMLoadFloat3(&m_vVelocity) * fTimeDelta;
+
 	_uint iFlags =
 		m_pController->Move(vDisp, 0.001f, fTimeDelta);
 
@@ -270,37 +272,18 @@ void CDroppedBubble::Update_Movement(_float fTimeDelta)
 		m_pController->Get_FootPosition()
 		+ XMVectorSet(0.f, s_fFootOffset, 0.f, 0.f));
 
-	const _bool bDown = (iFlags &
-		physx::PxControllerCollisionFlag::eCOLLISION_DOWN) != 0;
+	using PXCF = physx::PxControllerCollisionFlag;
 
-	if (!bDown)
-	{
-		m_bIsGrounded = false;
-		return;
-	}
+	const _bool bDown = (iFlags & PXCF::eCOLLISION_DOWN) != 0;
 
-	if (bWasGrounded)
+	if (bDown && m_vVelocity.y < 0.f)
 	{
-		m_vVelocity.y = s_fStickDown;
-		return;
-	}
-
-	const _float fHit = -m_vVelocity.y;
-	++m_iBounceCount;
-
-	if (fHit < s_fRestSpeed
-		|| m_iBounceCount >= s_iMaxBounce)
-	{
-		m_vVelocity.y = s_fStickDown;
-		m_bIsGrounded = true;
-		On_Rest();
-	}
-	else
-	{
-		m_vVelocity.y = fHit * s_fRestitution;
-		m_vVelocity.x *= s_fHorizDamp;
-		m_vVelocity.z *= s_fHorizDamp;
-		On_Bounce(m_iBounceCount);
+		if (!m_bIsGrounded)
+		{
+			m_bIsGrounded = true;
+			On_Rest();
+		}
+		m_vVelocity.y = s_fHoverKick;
 	}
 }
 

@@ -65,6 +65,7 @@ private:
 	_bool						m_bCaptured = { false };
 	_float						m_fPullSpeed = { 0.f };
 	_float						m_fScaleRatio = { 1.f };
+	_float						m_fBobPhase = { 0.f };
 
 	static constexpr _float		s_fBlinkTime = { 6.f };				//	원본 (20초 기준) - 16 - 18초 -> 6초로 수정
 	static constexpr _float		s_fDeSpawnTime = { 10.f };			// 원본은 20초지만 너무 길어서 10초로 수정
@@ -72,19 +73,16 @@ private:
 	static constexpr _float		s_fMinScaleRatio = { 0.45f };		// 보면서 튜닝
 	static constexpr _float		s_fShrinkLerp = { 2.f };
 
-	static constexpr _float     s_fLaunchSpeed = { 4.f };
-	static constexpr _float     s_fPopUpSpeed = { 6.f };
-	static constexpr _float     s_fGravity = { -12.f };
-	static constexpr _float     s_fAirDrag = { 1.2f };
-	static constexpr _float     s_fRestitution = { 0.8f };
-	static constexpr _float     s_fHorizDamp = { 0.85f };
-	static constexpr _float     s_fRestSpeed = { 1.5f };
-	static constexpr _int       s_iMaxBounce = { 6 };
+	static constexpr _float     s_fLaunchSpeed = { 2.5f };
+	static constexpr _float     s_fPopUpSpeed = { 2.5f };
+	static constexpr _float     s_fGravity = { -3.5f };
+	static constexpr _float     s_fAirDrag = { 2.0f };
+	static constexpr _float     s_fHoverKick = { 1.45f };
+	static constexpr _float     s_fSwayAccel = { 0.6f };
+	static constexpr _float     s_fSwayFreq = { 0.9f };
 
 	static constexpr _float		s_fFootOffset = { 0.45f };
-	static constexpr _float		s_fPushSpeed = { 5.f };
-	static constexpr _float		s_fGroundFriction = { 3.f };
-	static constexpr _float		s_fStickDown = { -2.f };
+	static constexpr _float     s_fPushSpeed = { 3.f };
 
 public:
 	static CDroppedBubble*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

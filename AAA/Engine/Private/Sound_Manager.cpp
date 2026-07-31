@@ -1,5 +1,6 @@
 ﻿#include "Sound_Manager.h"
 #include "fmod/fmod.hpp"
+#include "fmod/fmod_dsp_effects.h"
 #include <io.h>
 
 CSound_Manager::CSound_Manager()
@@ -35,6 +36,15 @@ HRESULT CSound_Manager::Ready_Buses()
 		if (pMaster)
 			pMaster->addGroup(m_pBuses[i]);
 	}
+
+	if (pMaster && m_pSystem->createDSPByType(FMOD_DSP_TYPE_LIMITER, &m_pLimiter) == FMOD_OK)
+	{
+		m_pLimiter->setParameterFloat(FMOD_DSP_LIMITER_CEILING, -0.5f);
+		m_pLimiter->setParameterFloat(FMOD_DSP_LIMITER_MAXIMIZERGAIN, 0.f);
+		m_pLimiter->setParameterFloat(FMOD_DSP_LIMITER_RELEASETIME, 50.f);
+		pMaster->addDSP(FMOD_CHANNELCONTROL_DSP_HEAD, m_pLimiter);
+	}
+
 	return S_OK;
 }
 
@@ -73,11 +83,38 @@ _wstring CSound_Manager::Get_Current_BGM_Key() const
 	return L"";
 }
 
+_bool CSound_Manager::Gate_Sound(FMOD::Sound* pSound, _float& fVolume)
+{
+	const unsigned long long ullNow = GetTickCount64();
+	SOUND_GATE& Gate = m_mapSoundGate[pSound];
+
+	// 마지막 '허용' 재생에서 창을 넘겼으면 리셋
+	if (ullNow - Gate.ullLastMs > SOUND_GATE_WINDOW_MS)
+		Gate.iBurst = 0;
+
+	if (Gate.iBurst >= SOUND_GATE_MAX_STACK)
+		return false;   // 스킵 시 타임스탬프 갱신 안 함
+
+	Gate.ullLastMs = ullNow;
+	++Gate.iBurst;
+
+	for (_uint i = 1; i < Gate.iBurst; ++i)
+		fVolume *= SOUND_GATE_FALLOFF;
+
+	return true;
+}
+
 FMOD::Channel* CSound_Manager::PlayInternal(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus, bool bLoop)
 {
 	FMOD::Sound* pSound = Find_Sound(pSoundKey);
 	if (!pSound)
 		return nullptr;
+
+	if (!bLoop && ESoundBus::BGM != eBus)
+	{
+		if (!Gate_Sound(pSound, fVolume))
+			return nullptr;
+	}
 
 	FMOD::Channel* pChannel = nullptr;
 	// paused=true 로 시작 -> 세팅 후 재생(팝 방지). 채널 할당은 FMOD가 처리.
@@ -415,6 +452,11 @@ void CSound_Manager::Free()
 	__super::Free();
 
 	StopAll();
+	if (m_pLimiter)
+	{
+		m_pLimiter->release();
+		m_pLimiter = nullptr;
+	}
 
 	for (auto& pair : m_mapSound)
 	{

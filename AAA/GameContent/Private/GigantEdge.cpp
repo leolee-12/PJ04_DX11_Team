@@ -106,13 +106,27 @@ void CGigantEdge::On_Corpse_End()
     m_pGameInstance_Proxy->Publish(EventTag::Cage_Descend, nullptr);
 }
 
+const _float4x4* CGigantEdge::Get_FxParentMatrix(
+    const _wstring& strFx) const
+{
+    if (strFx == L"GigantEdgeSwordTrail")
+        return m_pSword->Get_CombinedWorldMatrixPtr();
+
+    return nullptr;
+}
+
 void CGigantEdge::On_FxRangeEnd(const _wstring& strFx)
 {
     auto it = m_Effects.find(strFx);
     if (it != m_Effects.end())
     {
         if (CEffect_Loader::GetInstance()->Is_Current(it->second))
-            it->second.p->Start_FadeOut(0.f);
+        {
+            if (strFx == L"GigantEdgeSwordTrail")
+                it->second.p->EffectContainer_StopAfterEmission();
+            else
+                it->second.p->Start_FadeOut(0.f);
+        }
         it->second.Clear();
     }
 }

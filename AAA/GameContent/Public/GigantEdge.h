@@ -64,6 +64,8 @@ protected:
 
     virtual void           On_Corpse_End() override;
     virtual void           On_FxRangeEnd(const _wstring& strFx) override;
+    virtual const _float4x4* Get_FxParentMatrix(
+        const _wstring& strFx) const override;
 
 private:
     CGigantEdge_Body*   m_pBody   = { nullptr };

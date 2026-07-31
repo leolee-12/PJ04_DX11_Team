@@ -411,7 +411,7 @@ void CMeteorRock::Launch(const _float3& vPos, const _float3& vDir)
 
 void CMeteorRock::Free()
 {
-    Release_AuraFx();
+    m_hAura = {};
 
     if (m_FallSound.Is_Valid())
         m_FallSound.Stop();
