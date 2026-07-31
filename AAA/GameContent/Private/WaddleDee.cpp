@@ -170,6 +170,7 @@ CWaddleDee::CWaddleDee(const CWaddleDee& Prototype)
 	, m_fWalkSpeed(Prototype.m_fWalkSpeed)
 	, m_strObjectName(Prototype.m_strObjectName)
 	, m_bUseMovement(Prototype.m_bUseMovement)
+	, m_tLevelDesignDesc(Prototype.m_tLevelDesignDesc)
 {
 }
 
@@ -183,6 +184,7 @@ HRESULT CWaddleDee::Initialize(void* pArg)
 	if (nullptr != pArg)
 	{
 		const LD_OBJECT_DESC* pDesc = static_cast<const LD_OBJECT_DESC*>(pArg);
+		m_tLevelDesignDesc = *pDesc;
 		m_strObjectName = pDesc->strObjectName;
 		m_bUseMovement = !JsonUtils::Equals_NoCase(m_strObjectName.c_str(), L"ArenaSpectator");
 
@@ -503,7 +505,7 @@ HRESULT CWaddleDee::Ready_HurtBox()
 			Damaged(AttackInfo);
 		});
 
-	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_HURT));
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::NPC_HURT));
 
 	return S_OK;
 }

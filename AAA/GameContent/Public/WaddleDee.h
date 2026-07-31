@@ -1,5 +1,6 @@
 #pragma once
 #include "Character.h"
+#include "LevelDesign_LoadTypes.h"
 
 NS_BEGIN(Engine)
 class CCollider;
@@ -51,6 +52,7 @@ public:
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 	virtual void Set_Active(_bool bActive) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
+	const LD_OBJECT_DESC& Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
 
 	void React_Emote(WADDLEDEE_EMOTE eEmote);
 
@@ -76,6 +78,8 @@ private:
 	_float3 m_vLookTarget = {};
 
 	CGameObject* m_pPlayer = { nullptr };
+
+	LD_OBJECT_DESC m_tLevelDesignDesc = {};
 
 private:
 	virtual void On_Deserialized() override;

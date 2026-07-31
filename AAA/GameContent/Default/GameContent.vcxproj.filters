@@ -328,15 +328,6 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\01. Kabu\WarpOut\Start">
       <UniqueIdentifier>{8eb1b2c9-635d-48d3-9cd7-f352e26bb283}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy">
-      <UniqueIdentifier>{ef83fc79-86ca-4d01-a53e-3135ff41ea5c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaCatch">
-      <UniqueIdentifier>{44c03455-7491-4b5e-b3a1-6de697292c0b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaUp">
-      <UniqueIdentifier>{e36ed791-3012-49fb-afa0-1a6ef8cd6ff9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\99. Shared">
       <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
     </Filter>
@@ -373,8 +364,32 @@
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode">
       <UniqueIdentifier>{6201b756-051b-4892-b43d-e3757bde2a32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorWarning">
+      <UniqueIdentifier>{b0c18de8-4098-441b-9ef4-28df1e9d57a9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\11. Faint">
       <UniqueIdentifier>{52951569-d865-4ff0-92b9-e5d169a4ccc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\12. Gigatzo">
+      <UniqueIdentifier>{5eb7e107-683b-4f6b-9607-790fe2ce6124}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\12. Gigatzo\GigatzoAttackEffect">
+      <UniqueIdentifier>{aa33c645-e316-4c8e-a380-92216856ce13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\12. Gigatzo\GigatzoBreakEffect">
+      <UniqueIdentifier>{3f9c8a71-52d4-4e6b-9a08-6c5b1d2e7f44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge">
+      <UniqueIdentifier>{aa05bcef-cd2b-4361-b58d-8f3ab0809381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeAppearEffect">
+      <UniqueIdentifier>{eb177baf-20db-4a4e-bc64-2dfddaa95b72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeCrashEffect">
+      <UniqueIdentifier>{3b6f21c4-9d5a-4e08-b7c2-5a1e6f4d8c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeSwordTrail">
+      <UniqueIdentifier>{f73c6870-813f-46aa-8a24-fda0f325e43e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
@@ -2178,6 +2193,15 @@
     <ClInclude Include="..\public\GigantEdge_Sword.h">
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge\Part\Sword</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\GigantEdgeAppearEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeAppearEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GigantEdgeCrashEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeCrashEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GigantEdgeSwordTrail.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeSwordTrail</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Gigatzo.h">
       <Filter>00. GameObject\06. Monster\15. Gigatzo</Filter>
     </ClInclude>
@@ -2189,6 +2213,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Gigatzo_State_Attack.h">
       <Filter>00. GameObject\06. Monster\15. Gigatzo\State\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GigatzoAttackEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\12. Gigatzo\GigatzoAttackEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GigatzoBreakEffect.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\12. Gigatzo\GigatzoBreakEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GigatzoBullet.h">
       <Filter>01. Projectile\00. PhysicsProjectile\03. Bullet\GigatzoBullet</Filter>
@@ -2249,12 +2279,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kabu_State_WarpOut.h">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\KasaCatchEffect.h">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaCatch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\KasaUpEffect.h">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaUp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>00. GameObject\05. Kirby</Filter>
@@ -2747,6 +2771,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\MetaSuperSpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeteorAura.h">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteoAura</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeteorExplosion.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>
@@ -3794,6 +3821,15 @@
     <ClCompile Include="..\private\GigantEdge_Sword.cpp">
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge\Part\Sword</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\GigantEdgeAppearEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeAppearEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GigantEdgeCrashEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeCrashEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GigantEdgeSwordTrail.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\13. GigantEdge\GigantEdgeSwordTrail</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Gigatzo.cpp">
       <Filter>00. GameObject\06. Monster\15. Gigatzo</Filter>
     </ClCompile>
@@ -3805,6 +3841,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gigatzo_State_Attack.cpp">
       <Filter>00. GameObject\06. Monster\15. Gigatzo\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GigatzoAttackEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\12. Gigatzo\GigatzoAttackEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GigatzoBreakEffect.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\12. Gigatzo\GigatzoBreakEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\GigatzoBullet.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\03. Bullet\GigatzoBullet</Filter>
@@ -3859,12 +3901,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\KasaCatchEffect.cpp">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaCatch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\KasaUpEffect.cpp">
-      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\06. MonsterEffect\02. Cappy\KasaUp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>00. GameObject\05. Kirby</Filter>
@@ -4321,6 +4357,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MetaSuperSpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\998. Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeteorAura.cpp">
+      <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteoAura</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeteorExplosion.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\10. Meteor\MeteorExplode</Filter>

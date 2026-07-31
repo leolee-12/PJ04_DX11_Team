@@ -1726,6 +1726,120 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CFaintEffect::SMOKE_MODEL_TAG,
                         CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Boss/SmokeLowPoly.ysh"));
         ));
+
+    Register(CMeteorAura::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CMeteorAura),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorAura::SHELL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Meteor_Spere/Meteor_Spere.ysh",
+                            XMMatrixRotationX(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorAura::FIRE01_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Meteor_Fire01/Meteor_Fire01.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeteorAura::FIRE02_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Meteor_Fire02/Meteor_Fire02.ysh"));
+        ));
+
+    Register(CGigatzoAttackEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGigatzoAttackEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoAttackEffect::SMOKE_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Gigatzo/SmokeSphere/SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, Texture_GigatzoSpark.iLevelID, Texture_GigatzoSpark.szProtoTag,
+                        CTexture::Create(pDevice, pContext, Texture_GigatzoSpark.szFileTag, Texture_GigatzoSpark.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_GigatzoFire.iLevelID, Texture_GigatzoFire.szProtoTag,
+                        CTexture::Create(pDevice, pContext, Texture_GigatzoFire.szFileTag, Texture_GigatzoFire.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_GigatzoFireSmoke.iLevelID, Texture_GigatzoFireSmoke.szProtoTag,
+                        CTexture::Create(pDevice, pContext, Texture_GigatzoFireSmoke.szFileTag, Texture_GigatzoFireSmoke.iNumTex));
+        ));
+
+    Register(CGigatzoBreakEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGigatzoBreakEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBreakEffect::PIECE_SMALL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceSmall.ysh",
+                            XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBreakEffect::PIECE_COOL_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Gimmick/VolcanoRock/Piece/VolcanoRock_Piece_PieceCool.ysh",
+                            XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBreakEffect::SPHERE_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Meteor/Common_Spere.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigatzoBreakEffect::SMOKE_MODEL_TAG,
+                        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
+        ));
+
+    Register(
+        CGigantEdgeAppearEffect::PROTOTYPE_TAG,
+        TEXT("Effect_Container"),
+        CREATOR(CGigantEdgeAppearEffect),
+        LOADER(
+            TRY_ADD_PROTO(
+                pProxy, iLevelIndex,
+                CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(
+                pProxy, iLevelIndex,
+                CRectParticleCommon::PROTOTYPE_TAG,
+                CRectParticleCommon::Create(
+                    pDevice, pContext));
+            TRY_ADD_PROTO(
+                pProxy,
+                Texture_GE_CircleQuarter.iLevelID,
+                Texture_GE_CircleQuarter.szProtoTag,
+                CTexture::Create(
+                    pDevice, pContext,
+                    Texture_GE_CircleQuarter.szFileTag,
+                    Texture_GE_CircleQuarter.iNumTex));
+            TRY_ADD_PROTO(
+                pProxy,
+                Texture_GE_CircleGlow.iLevelID,
+                Texture_GE_CircleGlow.szProtoTag,
+                CTexture::Create(
+                    pDevice, pContext,
+                    Texture_GE_CircleGlow.szFileTag,
+                    Texture_GE_CircleGlow.iNumTex));
+            TRY_ADD_PROTO(
+                pProxy,
+                Texture_GE_Radiation.iLevelID,
+                Texture_GE_Radiation.szProtoTag,
+                CTexture::Create(
+                    pDevice, pContext,
+                    Texture_GE_Radiation.szFileTag,
+                    Texture_GE_Radiation.iNumTex));
+            TRY_ADD_PROTO(
+                pProxy,
+                Texture_GE_RingRay.iLevelID,
+                Texture_GE_RingRay.szProtoTag,
+                CTexture::Create(
+                    pDevice, pContext,
+                    Texture_GE_RingRay.szFileTag,
+                    Texture_GE_RingRay.iNumTex));
+            TRY_ADD_PROTO(
+                pProxy,
+                Texture_GE_Leaf.iLevelID,
+                Texture_GE_Leaf.szProtoTag,
+                CTexture::Create(
+                    pDevice, pContext,
+                    Texture_GE_Leaf.szFileTag,
+                    Texture_GE_Leaf.iNumTex));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_BossEffect()
@@ -2507,6 +2621,62 @@ void CGameObject_Factory::Metaknight_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeta_Rock::MODEL_PROTO_TAG_ROCK,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Metaknight/Effect/Rock/BurstTornadoDebrisB.ysh"));
+        )
+    );
+
+    Register(
+        CGigantEdgeSwordTrail::PROTOTYPE_TAG,
+        TEXT("Effect_Container"),
+        CREATOR(CGigantEdgeSwordTrail),
+        LOADER(
+            TRY_ADD_PROTO(
+                pProxy, iLevelIndex,
+                CTrailCommon::PROTOTYPE_TAG,
+                CTrailCommon::Create(
+                    pDevice, pContext));
+            TRY_ADD_PROTO(
+                pProxy,
+                Texture_GE_Slash.iLevelID,
+                Texture_GE_Slash.szProtoTag,
+                CTexture::Create(
+                    pDevice, pContext,
+                    Texture_GE_Slash.szFileTag,
+                    Texture_GE_Slash.iNumTex));
+        )
+    );
+
+    Register(
+        CGigantEdgeCrashEffect::PROTOTYPE_TAG,
+        TEXT("Effect_Container"),
+        CREATOR(CGigantEdgeCrashEffect),
+        LOADER(
+            TRY_ADD_PROTO(
+                pProxy, iLevelIndex,
+                CMeshParticleCommon::PROTOTYPE_TAG,
+                CMeshParticleCommon::Create(
+                    pDevice, pContext));
+            TRY_ADD_PROTO(
+                pProxy, iLevelIndex,
+                CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(
+                pProxy, iLevelIndex,
+                CGigantEdgeCrashEffect::FLOOR_MODEL_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/Monster/GigantEdge/Floor/GroundRockEffectModel_TopL.ysh"));
+            TRY_ADD_PROTO(
+                pProxy, iLevelIndex,
+                CGigantEdgeCrashEffect::SMOKE_MODEL_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/SmokeMesh/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(
+                pProxy,
+                Texture_GE_CircleGlow.iLevelID,
+                Texture_GE_CircleGlow.szProtoTag,
+                CTexture::Create(
+                    pDevice, pContext,
+                    Texture_GE_CircleGlow.szFileTag,
+                    Texture_GE_CircleGlow.iNumTex));
         )
     );
 }

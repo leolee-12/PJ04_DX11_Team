@@ -117,7 +117,6 @@ void CBoss_Cage::Update(_float fTimeDelta)
                 Desc.fBlendDuration = 0.f;
                 Desc.eAnim = STAGECLEAR_ANIM::DANCE;
                 m_pGameInstance_Proxy->Publish(EventTag::Cutscene_StageClear, &Desc);
-                m_pGameInstance_Proxy->Fade_BGM_Out(2.f);
                 m_pGameInstance_Proxy->Play_SFX(L"K15_KirbyDanceLong.marker.dspadpcm.wav", 0.45f, ESoundBus::SFX);
 
                 m_eState = CAGE_STATE::BROKEN;
@@ -341,7 +340,7 @@ void CBoss_Cage::Break()
 
     _bool bShow = false;
     m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
-
+    m_pGameInstance_Proxy->Fade_BGM_Out(1.f);
     m_pGameInstance_Proxy->Play_SFX(L"DemoStageClear_CatchedCageL.wav", 0.5f);
 }
 
@@ -354,7 +353,6 @@ void CBoss_Cage::On_Deserialized()
             Start_Descend_InPlace();
         else
             Set_Active(false);
-
 }
 
 void CBoss_Cage::Attach_To_Bone(const _float4x4* pBoneMatrix, const _float4x4* pOwnerWorld, _fmatrix OffsetMatrix)

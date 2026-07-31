@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 #include "Effect_Loader.h"
+#include "GigatzoBreakEffect.h"
 
 CGigatzoBullet::CGigatzoBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CProjectile{ pDevice, pContext }
@@ -20,9 +21,15 @@ CGigatzoBullet::CGigatzoBullet(const CGigatzoBullet& Prototype)
 
 void CGigatzoBullet::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);   
+    __super::Update(fTimeDelta);
     if (!m_bAlive)
         return;
+
+    const _vector vAxis = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
+    const _matrix matSpin = XMMatrixRotationAxis(vAxis, XMConvertToRadians(SPIN_DEG) * fTimeDelta);
+
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVector3TransformNormal(m_pTransformCom->Get_State(STATE::RIGHT), matSpin));
+    m_pTransformCom->Set_State(STATE::LOOK,  XMVector3TransformNormal(m_pTransformCom->Get_State(STATE::LOOK), matSpin));
 
     if (m_pAnimatorCom)
     {
@@ -85,7 +92,7 @@ HRESULT CGigatzoBullet::Render_Shadow()
 
 void CGigatzoBullet::Launch(const _float3& vPos, const _float3& vDir)
 {
-    __super::Launch(vPos, vDir);   
+    __super::Launch(vPos, vDir);
 
     _vector vUp = XMVector3Normalize(XMLoadFloat3(&vDir));
 
@@ -138,8 +145,12 @@ void CGigatzoBullet::On_Activated()
 
 void CGigatzoBullet::On_Impact()
 {
-    // Effect Ãß°¡
+    m_pGameInstance_Proxy->Play_SFX(SND_BULLETBREAK, 0.5f);
 
+    _float3 vPos{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    CEffect_Loader::GetInstance()->Spawn(
+        CGigatzoBreakEffect::FX_ID, Get_LevelIndex(), vPos);
 
     Kill();
 }

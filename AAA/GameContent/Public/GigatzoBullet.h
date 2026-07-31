@@ -16,6 +16,7 @@ class CGigatzoBullet final : public CProjectile
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_GigatzoBullet";
     static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_GigatzoBullet";
+    static constexpr const _tchar* SND_BULLETBREAK = L"CharaGigatzo_BulletBreak.wav";
 
 private:
     CGigatzoBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -48,6 +49,8 @@ private:
     CModel*                 m_pModelCom = { nullptr };
     CAnimator*              m_pAnimatorCom = { nullptr };
     _bool                   m_bIntro = { false };
+
+    static constexpr const _float SPIN_DEG = 720.f;
 
 public:
     static CGigatzoBullet*  Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

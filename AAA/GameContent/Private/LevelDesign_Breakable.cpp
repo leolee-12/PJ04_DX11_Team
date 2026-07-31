@@ -42,11 +42,11 @@ namespace
 	static const LD_BREAKABLE_CATALOG g_BreakableCatalog[] =
 	{
 			{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh",
-			MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false, L"CommonHit", WOOD_BOX_BREAK_SOUNDKEY, 0.25f, BREAK_MASK_LV1 },
+			MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false, L"CommonHit", WOOD_BOX_BREAK_SOUNDKEY, 0.35f, BREAK_MASK_LV1 },
 			{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh",
-			MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, L"CommonHit", PLASTIC_BOX_BREAK_SOUNDKEY, 0.25f, BREAK_MASK_LV1 },
+			MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, L"CommonHit", PLASTIC_BOX_BREAK_SOUNDKEY, 0.35f, BREAK_MASK_LV1 },
 			{ L"BoxIron", CLevelDesign_Breakable::BOXIRON_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxIron/BoxIron2.ysh",
-			MODEL::ANIM, 0u, "Model__BoxIronC", false, L"CommonHit", BOX_IRON_BREAK_SOUNDKEY, 0.25f, BREAK_MASK_LV2 },
+			MODEL::ANIM, 0u, "Model__BoxIronC", false, L"CommonHit", BOX_IRON_BREAK_SOUNDKEY, 0.35f, BREAK_MASK_LV2 },
 			{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh",
 			MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f, BREAK_MASK_LV2 },
 			{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh",

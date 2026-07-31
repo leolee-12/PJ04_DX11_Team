@@ -68,6 +68,9 @@
 #include "MetaSuperSpinSlash.h"
 #include "MeteorExplosion.h"
 #include "FaintEffect.h"
+#include "MeteorAura.h"
+#include "GigatzoAttackEffect.h"
+#include "GigatzoBreakEffect.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -105,3 +108,6 @@
 #include "TrailCommon.h"
 #include "DistortionCommon.h"
 #include "EssenceCrown.h"
+#include "GigantEdgeAppearEffect.h"
+#include "GigantEdgeSwordTrail.h"
+#include "GigantEdgeCrashEffect.h"

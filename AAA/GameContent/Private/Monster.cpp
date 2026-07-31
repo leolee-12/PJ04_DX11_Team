@@ -694,13 +694,6 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	auto pLoader = CEffect_Loader::GetInstance();
 
 	if (ePhase == ANIM_EVENT_PHASE::POINT)
-	{   
-		pLoader->Spawn(strFx, Get_LevelIndex(),
-			vPos, vLook, vRotDeg, vAncorMat);
-		return true;
-	}
-
-	if (ePhase == ANIM_EVENT_PHASE::POINT)
 	{
 		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
 			vPos, vLook, vRotDeg, vAncorMat, nullptr);
@@ -718,13 +711,7 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	}
 	else if (ePhase == ANIM_EVENT_PHASE::END)
 	{
-		auto it = m_Effects.find(strFx);
-		if (it != m_Effects.end())
-		{
-			if (pLoader->Is_Current(it->second))
-				it->second.p->Start_FadeOut(0.4f);
-			it->second.Clear();
-		}
+		On_FxRangeEnd(strFx);
 	}
 	return true;
 }
@@ -891,6 +878,17 @@ void CMonster::Stop_AllFx(_bool bImmediate)
 				h.p->Start_FadeOut(0.4f);
 		}
 		h.Clear();
+	}
+}
+
+void CMonster::On_FxRangeEnd(const _wstring& strFx)
+{
+	auto it = m_Effects.find(strFx);
+	if (it != m_Effects.end())
+	{
+		if (CEffect_Loader::GetInstance()->Is_Current(it->second))
+			it->second.p->Start_FadeOut(0.4f);
+		it->second.Clear();
 	}
 }
 

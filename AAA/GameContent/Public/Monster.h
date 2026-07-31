@@ -237,6 +237,7 @@ protected:
 	{
 		return m_pTransformCom->Get_WorldMatrixPtr();
 	}
+	virtual void				On_FxRangeEnd(const _wstring& strFx);
 
 	void						Play_DeathFX();
 	void						Compute_SpatPivot();
