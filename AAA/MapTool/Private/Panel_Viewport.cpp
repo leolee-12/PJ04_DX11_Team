@@ -261,6 +261,12 @@ void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos
 #endif
 			}
 		}
+		else
+		{
+			CLevel_Edit* pLevel = CEditInstance::GetInstance()->Get_Level();
+			if (nullptr != pLevel && pLevel->Is_MapPreviewObject(pSelected))
+				pLevel->Commit_MapEditObjectFromCurrentState(pSelected);
+		}
 	}
 }
 

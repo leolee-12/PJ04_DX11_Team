@@ -3,6 +3,7 @@
 #include "EnvObject.h"
 #include "LevelDesignObject.h"
 #include "Monster.h"
+#include "WaddleDee.h"
 
 NS_BEGIN(Client)
 
@@ -172,6 +173,10 @@ void CMap_EditSession::Register_PreviewObject(const _wstring& strLayerTag, const
 		CMonster* pMonster = dynamic_cast<CMonster*>(pObject);
 		if (nullptr != pMonster && LD_CATEGORY::ENEMY == pMonster->Get_LevelDesignDesc().eCategory)
 			pLevelDesignDesc = &pMonster->Get_LevelDesignDesc();
+
+		CWaddleDee* pWaddleDee = dynamic_cast<CWaddleDee*>(pObject);
+		if (nullptr != pWaddleDee && LD_CATEGORY::META == pWaddleDee->Get_LevelDesignDesc().eCategory)
+			pLevelDesignDesc = &pWaddleDee->Get_LevelDesignDesc();
 	}
 
 	if (nullptr == pLevelDesignDesc)
