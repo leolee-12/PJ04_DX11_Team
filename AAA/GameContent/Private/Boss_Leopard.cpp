@@ -34,7 +34,7 @@ HRESULT CBoss_Leopard::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg))) return E_FAIL;
 
     m_strBossName = L"캐롤라인";
-    m_fMaxHP = 100.f;
+    m_fMaxHP = 650.f;
     m_fCurHP = m_fMaxHP;
 
     m_pBody->Get_Animator()->Play("Wait", true, false, 0.f, 1.5f);

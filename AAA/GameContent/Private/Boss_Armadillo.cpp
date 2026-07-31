@@ -31,7 +31,7 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
 
     m_strBossName = L"아르마파라파";
     //m_fMaxHP = 1000.f;
-    m_fMaxHP = 100.f;
+    m_fMaxHP = 650.f;
     m_fCurHP = m_fMaxHP;
 
     m_pMovement->Set_MoveSpeed(4.f);
