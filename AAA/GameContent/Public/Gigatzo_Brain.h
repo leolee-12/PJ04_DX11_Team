@@ -23,6 +23,11 @@ private:
     _float3                         m_vPrevTargetPos = {};
     _bool                           m_bHasPrevTarget = { false };
 
+    _float                          m_fPrevTargetSpeed = { 0.f };
+    _float                          m_fTargetAccel = { 0.f };
+    _float                          m_fObservedMaxSpeed = { 0.f };
+    _bool                           m_bHasPrevSpeed = { false };
+
     static constexpr const _float   s_fFireInterval = { 1.93f };
 
     static constexpr const _float   s_fAnimDelay = { 0.30f };
@@ -32,6 +37,9 @@ private:
     static constexpr const _float   s_fTeleportStep = { 20.f };
 
     static constexpr const _float   s_fMinLeadSpeed = { 12.f };
+
+    static constexpr const _float   s_fMaxTargetAccel = { 150.f };
+    static constexpr const _float   s_fAccelSmoothRate = { 10.f };
 
 protected:
     virtual void                    Free() override;
