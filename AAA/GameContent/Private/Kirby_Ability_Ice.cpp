@@ -18,6 +18,18 @@ HRESULT CKirby_Ability_Ice::Initialize()
 
     m_wstrAttackModeName = L"æ∆¿ÃΩ∫";
 
+    //Set_FullBodyAni(ABILITY_ANI::RUN, "IceRun", true, false, 0.1f, 1.5f);
+
+    //Set_FullBodyAni(ABILITY_ANI::FALL, "Fall", false, false, 0.1f, 2.f);
+
+    //Set_FullBodyAni(ABILITY_ANI::JUMP_L, "JumpL", false, false, 0.1f, 5.f);
+    //Set_FullBodyAni(ABILITY_ANI::JUMP_R, "JumpR", false, false, 0.1f, 5.f);
+
+    //Set_FullBodyAni(ABILITY_ANI::JUMP_END_L, "JumpEndL", false, false, 0.1f, 2.f);
+    //Set_FullBodyAni(ABILITY_ANI::JUMP_END_R, "JumpEndR", false, false, 0.1f, 2.f);
+
+    //Set_FullBodyAni(ABILITY_ANI::LANDING, "IceLanding", false, false, 0.05f, 1.f);
+
     return S_OK;
 }
 

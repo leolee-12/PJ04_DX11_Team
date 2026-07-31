@@ -266,6 +266,7 @@
     <ClInclude Include="..\Public\TestContainer.h" />
     <ClInclude Include="..\Public\HammerSwing.h" />
     <ClInclude Include="..\Public\HammerImpactGround.h" />
+    <ClInclude Include="..\Public\HammerChargeGlow.h" />
     <ClInclude Include="..\Public\WheelHammer.h" />
     <ClInclude Include="..\Public\HammerFire.h" />
     <ClInclude Include="..\Public\HammerFireSwing.h" />
@@ -816,6 +817,7 @@
     <ClCompile Include="..\Private\TestContainer.cpp" />
     <ClCompile Include="..\Private\HammerSwing.cpp" />
     <ClCompile Include="..\Private\HammerImpactGround.cpp" />
+    <ClCompile Include="..\Private\HammerChargeGlow.cpp" />
     <ClCompile Include="..\Private\WheelHammer.cpp" />
     <ClCompile Include="..\Private\HammerFire.cpp" />
     <ClCompile Include="..\Private\HammerFireSwing.cpp" />

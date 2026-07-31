@@ -527,6 +527,9 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge1.wav", 0.25f);
             pAnimator->Play("OnigorosiHammerCharge", true, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("OnigorosiHammerCharge", true, true, 0.1f, 2.5f);
+
+            CEffect_Loader::GetInstance()->Spawn(L"HammerChargeGlow", pKirby->Get_LevelIndex(),
+                _float3{}, _float3{}, _float3{}, pToyHammer->Get_HammerHeadWorldMatrixPtr());
             break;
         }
         case TOY_HAMMER_STATE::CHARGE_ATTACK_1:
@@ -789,20 +792,26 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
 
             m_fChargeTime += fTimeDelta;
 
+            CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
             if (m_eChargeLevel == CHARGE_LEVEL::LV1 && m_fChargeTime >= fChargeLevel2Time)
             {
                 m_eChargeLevel = CHARGE_LEVEL::LV2;
                 m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge2.wav", 0.25f);
+
+                CEffect_Loader::GetInstance()->Spawn(L"HammerChargeGlow", pKirby->Get_LevelIndex(),
+                    _float3{}, _float3{}, _float3{}, pToyHammer->Get_HammerHeadWorldMatrixPtr());
             }
             else if (m_eChargeLevel == CHARGE_LEVEL::LV2 && m_fChargeTime >= fChargeLevel3Time)
             {
                 m_eChargeLevel = CHARGE_LEVEL::LV3;
                 m_pGameInstance_Proxy->Play_SFX(L"HeroHammerBasic_Charge3.wav", 0.25f);
 
-                CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
                 CEffect_Loader::GetInstance()->Spawn(L"HammerFire", pKirby->Get_LevelIndex(),
                     _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
                     pToyHammer->Get_HammerHeadWorldMatrixPtr(), &m_pHammerFire);
+
+                CEffect_Loader::GetInstance()->Spawn(L"HammerChargeGlow", pKirby->Get_LevelIndex(),
+                    _float3{}, _float3{}, _float3{}, pToyHammer->Get_HammerHeadWorldMatrixPtr());
             }
             else if (m_eChargeLevel == CHARGE_LEVEL::LV3 && m_fChargeTime >= fChargeLevel4Time)
             {
@@ -811,7 +820,6 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
 
                 Effect_FadeOut(m_pHammerFire, 0.1f);
 
-                CKirby_ToyHammer* pToyHammer = static_cast<CKirby_ToyHammer*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::TOY_HAMMER));
                 CEffect_Loader::GetInstance()->Spawn(L"HammerBurnSmoke", pKirby->Get_LevelIndex(),
                     _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
                     pToyHammer->Get_HammerHeadWorldMatrixPtr(), &m_pHammerFire);
