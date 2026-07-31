@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Collider.h"
-#include "Effect_Loader.h"
+#include "Effect_Container.h"
 
 CMeteorRock::CMeteorRock(
     ID3D11Device* pDevice,
@@ -63,8 +63,13 @@ void CMeteorRock::Configure(_float fSpeed, _float fLifeSec, _bool bBreakOnLand, 
 
 void CMeteorRock::On_Activated()
 {
+    Release_AuraFx();
+
     m_eState = METEOR_STATE::FALLING;
     m_fLingerTimer = 0.f;
+
+    m_FallSound.Stop();   // 풀 재사용 대비
+    m_FallSound = m_pGameInstance_Proxy->Play_SFX3D_Loop(SND_FALLING, XMLoadFloat3(&m_vTargetPos), FALL_SOUND_VOLUME);
 }
 
 HRESULT CMeteorRock::Initialize_Prototype()
@@ -110,6 +115,20 @@ void CMeteorRock::Update(_float fTimeDelta)
 
         _float3 vNow{};
         XMStoreFloat3(&vNow, m_pTransformCom->Get_State(STATE::POSITION));
+
+        if (m_FallSound.Is_Valid())
+        {
+            const _float4* pCam =  m_pGameInstance_Proxy->Get_CamPosition();
+            if (nullptr != pCam)
+            {
+                const _float fSoundDist = XMVectorGetX(XMVector3Length(XMLoadFloat3(&vNow) - XMLoadFloat4(pCam)));
+
+                _float fAtten = 1.f - (fSoundDist / SOUND_FALLOFF_RANGE);
+                Helper::FloatClamp(fAtten, 0.f, 1.f);
+
+                m_FallSound.Set_Volume(FALL_SOUND_VOLUME * fAtten);
+            }
+        }
 
         const _vector vStart = XMLoadFloat3(&vPrev);
         const _vector vTarget = XMLoadFloat3(&m_vTargetPos);
@@ -175,6 +194,14 @@ HRESULT CMeteorRock::Ready_HitBox()
     return S_OK;
 }
 
+void CMeteorRock::Kill()
+{
+    Release_AuraFx();
+    m_FallSound.Stop();
+
+    __super::Kill();
+}
+
 void CMeteorRock::Enter_Landed()
 {
     m_eState = METEOR_STATE::LANDED;
@@ -212,8 +239,42 @@ void CMeteorRock::Spawn_ExplosionFx()
     }
 }
 
+void CMeteorRock::Spawn_AuraFx()
+{
+    Release_AuraFx();
+
+    FX_HANDLE hAura{};
+
+    const HRESULT hr = CEffect_Loader::GetInstance()->Spawn(
+        FX_AURA, Get_LevelIndex(),
+        _float3{}, _float3{}, _float3{},
+        m_pTransformCom->Get_WorldMatrixPtr(),
+        nullptr, &hAura);
+
+    if (FAILED(hr) || nullptr == hAura.p)
+        return;
+
+    m_hAura = hAura;
+}
+
+void CMeteorRock::Release_AuraFx()
+{
+    if (nullptr == m_hAura.p)
+        return;
+
+    if (CEffect_Loader::GetInstance()->Is_Current(m_hAura))
+        m_hAura.p->EffectContainer_Stop();
+
+    m_hAura = {};
+}
+
 void CMeteorRock::On_Land()
 {
+    m_FallSound.Stop();
+
+    if (m_bBreakOnLand)
+        m_pGameInstance_Proxy->Play_SFX3D(Get_BreakSoundKey(), m_pTransformCom->Get_State(STATE::POSITION), BREAK_SOUND_VOLUME);
+
     m_fLingerTimer = LINGER_SEC;
     m_fVibrationElapsed = 0.f;
 
@@ -313,9 +374,47 @@ void CMeteorRock::Launch(const _float3& vPos, const _float3& vDir)
 {
     __super::Launch(vPos, vDir);
     m_vDir = vDir;
+
+    const _vector vInput = XMLoadFloat3(&vDir);
+
+    if (XMVectorGetX(XMVector3LengthSq(vInput)) > FX_DIRECTION_EPSILON_SQ)
+    {
+        const _vector vFlight = XMVector3Normalize(vInput);
+        const _vector vUp = -vFlight;
+
+        _vector vReference = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+        if (fabsf(XMVectorGetX(XMVector3Dot(vUp, vReference)))
+            > FX_REFERENCE_DOT_LIMIT)
+        {
+            vReference = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+        }
+
+        const _vector vRight = XMVector3Normalize(
+            XMVector3Cross(vUp, vReference));
+        const _vector vLook = XMVector3Normalize(
+            XMVector3Cross(vRight, vUp));
+
+        const _float3 vScale = m_pTransformCom->Get_Scaled();
+
+        m_pTransformCom->Set_State(STATE::RIGHT,
+            XMVectorSetW(vRight * vScale.x, 0.f));
+        m_pTransformCom->Set_State(STATE::UP,
+            XMVectorSetW(vUp * vScale.y, 0.f));
+        m_pTransformCom->Set_State(STATE::LOOK,
+            XMVectorSetW(vLook * vScale.z, 0.f));
+
+        XMStoreFloat3(&m_vDir, vFlight);
+    }
+
+    Spawn_AuraFx();
 }
 
 void CMeteorRock::Free()
 {
+    m_hAura = {};
+
+    if (m_FallSound.Is_Valid())
+        m_FallSound.Stop();
+
     __super::Free();
 }

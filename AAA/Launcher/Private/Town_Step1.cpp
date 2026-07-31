@@ -31,8 +31,8 @@ void CTown_Step1::Update(_float fTimeDelta)
 #ifdef  _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
         m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
-    if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
-        m_pGameInstance_Proxy->Publish(TEXT("GigantEdge_Appear"), nullptr);
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
+    //    m_pGameInstance_Proxy->Publish(TEXT("GigantEdge_Appear"), nullptr);
     if (m_pGameInstance_Proxy->Key_Down(DIK_F5))
         m_pGameInstance_Proxy->Publish(EventTag::StageClear_UIStarted, nullptr);
 #endif //  _DEBUG

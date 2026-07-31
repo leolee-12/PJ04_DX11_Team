@@ -53,6 +53,7 @@ protected:
 	virtual void				Update(_float fTimeDelta) override;
 	virtual HRESULT				Ready_Visual() override;
 	virtual HRESULT				Ready_AnimEvents() override;
+	virtual HRESULT				Ready_HitBox() override;
 
 	// 활성화/발사/바운드 
 	virtual void				On_Activated() override;

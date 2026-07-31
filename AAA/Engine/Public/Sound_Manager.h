@@ -9,6 +9,7 @@ namespace FMOD
     class Channel;
     class ChannelGroup;
     class System;
+    class DSP;
 }
 
 NS_BEGIN(Engine)
@@ -18,6 +19,13 @@ class CSound_Manager : public CBase
 private:
     CSound_Manager();
     virtual ~CSound_Manager() = default;
+
+private:
+    struct SOUND_GATE
+    {
+        unsigned long long  ullLastMs = { 0 };
+        unsigned int        iBurst = 0;
+    };
 
 public:
     void Update();
@@ -56,15 +64,24 @@ private:
     FMOD::Channel* PlayInternal(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus, bool bLoop);
     FMOD::Sound* Find_Sound(const TCHAR* pSoundKey) const;
 
+    _bool Gate_Sound(FMOD::Sound* pSound, _float& fVolume);
+
 private:
-    std::map<std::wstring, FMOD::Sound*> m_mapSound;
+    std::map<std::wstring, FMOD::Sound*>    m_mapSound;
+    std::map<FMOD::Sound*, SOUND_GATE>      m_mapSoundGate;
+
     FMOD::System* m_pSystem = nullptr;
+    FMOD::DSP*  m_pLimiter = { nullptr };
 
     FMOD::ChannelGroup* m_pBuses[ETOUI(ESoundBus::END)] = {};
     FMOD::Channel* m_pBGMChannel = nullptr;   // BGM 소유 핸들
 
     _float3 m_vListenerPos = {};
     static constexpr _float m_fMaxDistance = 50.f;
+
+    static constexpr unsigned long long     SOUND_GATE_WINDOW_MS = 60;
+    static constexpr _uint                  SOUND_GATE_MAX_STACK = 3;
+    static constexpr _float                 SOUND_GATE_FALLOFF = 0.6f;
 
 private:
     HRESULT Initialize();

@@ -129,8 +129,17 @@ HRESULT CLD_BattleBoundary::Ready_Events()
 		return E_FAIL;
 
 	// 미니보스/보스 공통. Boss_HP_Appeared는 인트로 종료 시점에 발행된다(BossBase.cpp:94).
-	Subscribe_Event(EventTag::Boss_HP_Appeared, [this](void*) { m_fTargetActivationRatio = 1.f; });
-	Subscribe_Event(EventTag::Boss_Died, [this](void*) { m_fTargetActivationRatio = 0.f; });
+	Subscribe_Event(EventTag::Boss_HP_Appeared, [this](void*) {
+		if (m_fTargetActivationRatio < 1.f)
+			m_pGameInstance_Proxy->Play_SFX(SND_CREATEWALL, 0.3f);
+		m_fTargetActivationRatio = 1.f; 
+		});
+
+	Subscribe_Event(EventTag::Boss_Died, [this](void*) {
+		if (m_fTargetActivationRatio > 0.f)
+			m_pGameInstance_Proxy->Play_SFX(SND_CLEARWALL, 0.3f);
+		m_fTargetActivationRatio = 0.f; 
+		});
 
 	return S_OK;
 }
@@ -142,7 +151,7 @@ void CLD_BattleBoundary::Update(_float fTimeDelta)
 		m_fActivationRatio = 1.f;
 		return;
 	}
-
+	
 	if (m_fActivationRatio == m_fTargetActivationRatio)
 		return;
 
