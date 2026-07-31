@@ -1986,10 +1986,10 @@
     <ClInclude Include="..\Public\CommonHit.h">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\CrashEffect.h">
+    <ClInclude Include="..\Public\CrashChargeEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\CrashChargeEffect.h">
+    <ClInclude Include="..\Public\CrashEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CutsceneActor.h">
@@ -2232,6 +2232,9 @@
     <ClInclude Include="..\public\GorillaNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HammerChargeGlow.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\HammerFire.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
@@ -2239,9 +2242,6 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HammerImpactGround.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\HammerChargeGlow.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HammerSwing.h">
@@ -3653,10 +3653,10 @@
     <ClCompile Include="..\Private\CommonHit.cpp">
       <Filter>00. GameObject\03. Effect\02. CHJ_Effect\Container\01. CommonHit</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\CrashEffect.cpp">
+    <ClCompile Include="..\Private\CrashChargeEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\CrashChargeEffect.cpp">
+    <ClCompile Include="..\Private\CrashEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CutsceneActor.cpp">
@@ -3863,6 +3863,9 @@
     <ClCompile Include="..\private\GorillaNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\HammerChargeGlow.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\HammerFire.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
@@ -3870,9 +3873,6 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerImpactGround.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\HammerChargeGlow.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerSwing.cpp">
