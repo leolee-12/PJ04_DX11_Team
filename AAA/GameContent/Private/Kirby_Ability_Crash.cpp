@@ -81,6 +81,9 @@ void CKirby_Ability_Crash::Exit_AttackState(CKirby* pKirby)
 {
     Change_CrashState(pKirby, CRASH_STATE::CRASH_STATE_END);
 
+    _float fLevel = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
+
     // Value
     m_bReqEndAttackState = true;
 
@@ -204,6 +207,9 @@ void CKirby_Ability_Crash::Enter_CrashState(CKirby* pKirby, CRASH_STATE eState)
             if (m_pCrashChargeEffect == nullptr)
                 CEffect_Loader::GetInstance()->Spawn(L"CrashChargeEffect", pKirby->Get_LevelIndex(),
                     _float3{}, _float3{}, _float3{}, pKirby->Get_RenderWorldMatrixPtr(), &m_pCrashChargeEffect);
+
+            _float fLevel = 0.3f;
+            m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
 
             m_hChargeSound = m_pGameInstance_Proxy->Play_SFX(L"HeroCrashBasic_Charge1.wav", 0.6f);
             m_eCrashDamageMode = CRASH_DAMAGE_MODE::DEFAULT;
@@ -409,6 +415,9 @@ void CKirby_Ability_Crash::Enter_DamageState(CKirby* pKirby, CAnimator* pAnimato
 
 void CKirby_Ability_Crash::Exit_DamageState(CKirby* pKirby)
 {
+    _float fLevel = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &fLevel);
+
     // Time
     m_pGameInstance_Proxy->Set_TimeScale(1.f);
 
