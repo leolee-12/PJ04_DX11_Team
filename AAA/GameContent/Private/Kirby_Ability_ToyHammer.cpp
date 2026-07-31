@@ -489,7 +489,8 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::ATTACK_END:
         {
-            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackHit1.wav", 0.25f);
+            CAMERA_SHAKE_DESC Shake{ 0.5f, 0.15625f };
+            m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);            m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackHit1.wav", 0.25f);
 
             pAnimator->Play("HammerAttackHitToy", false, true, 0.1f, 2.5f);
             pToyHammerAnimator->Play("HammerAttackHit", false, true, 0.1f, 2.5f);
@@ -588,6 +589,8 @@ void CKirby_Ability_ToyHammer::Enter_ToyHammerState(CKirby* pKirby, TOY_HAMMER_S
         }
         case TOY_HAMMER_STATE::REBOUND:
         {
+            CAMERA_SHAKE_DESC Shake{ 0.5f, 0.15625f };
+            m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);
             m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackHit1.wav", 0.25f);
 
             pAnimator->Play("JumpEnd", false, true, 0.03f, 2.f);
@@ -696,6 +699,8 @@ void CKirby_Ability_ToyHammer::Update_ToyHammerState(CKirby* pKirby, _float fTim
 
             if (!m_bAttackFinalHitSFXPlayed && fRatio > 0.4f)
             {
+                CAMERA_SHAKE_DESC Shake{ 0.5f, 0.15625f };
+                m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);
                 m_pGameInstance_Proxy->Play_SFX(L"HeroHammerToy_AttackFinalHit.wav", 0.25f);
                 m_bAttackFinalHitSFXPlayed = true;
             }
