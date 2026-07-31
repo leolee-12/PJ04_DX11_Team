@@ -18,6 +18,8 @@ namespace
 {
     constexpr _float fMinSpeed = 14.f;
     constexpr _float fMaxSpeed = 80.f;
+    constexpr _float fSlopeAcceleration = 100.f;
+    constexpr _float fArrivalDeceleration = 30.f;
 }
 
 CKirby_Deform_RollerCoaster::CKirby_Deform_RollerCoaster()
@@ -42,12 +44,12 @@ DEFORM_TYPE CKirby_Deform_RollerCoaster::Get_DeformType()
 void CKirby_Deform_RollerCoaster::Enter_Deform(CKirby* pKirby)
 {
     constexpr _float fRadius = 0.5f;
-    constexpr _float fHeight = 0.1f;
+    constexpr _float fHeight = 3.1f;
 
     // Hurt Box
     CCollider::COLLIDER_DESC tHurtDesc{};
     tHurtDesc.pOwner = pKirby;
-    tHurtDesc.vCenter = _float3(0.f, 3.7f, 0.f);
+    tHurtDesc.vCenter = _float3(0.f, 0.7f, 0.f);
     tHurtDesc.fRadius = fRadius + CKirby::s_fHurtBoxRadiusPadding;
     tHurtDesc.fHeight = fHeight;
     pKirby->Set_ColliderDesc(CKirby::HURT_BOX, tHurtDesc);
@@ -95,6 +97,7 @@ void CKirby_Deform_RollerCoaster::Enter_AttackState(CKirby* pKirby, _int iFlag)
 
     m_bReqEndAttackState = false;
     m_fAccRailSpeed = { 10.f };
+    m_bNearDestination = false;
 
     m_fRailLength = m_pRailTrack->Get_Length();
     m_fCurRailDist = 0.f;
@@ -161,6 +164,24 @@ _bool CKirby_Deform_RollerCoaster::Handle_Command(CKirby* pKirby, CKirby_Command
 
                 pKirby->Req_AbilityDumpCoolDecrease();
             }
+
+            return true;
+        }
+        case KIRBY_COMMAND_TYPE::EMOTE_TOP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            m_pGameInstance_Proxy->Play_SFX(L"HeroVoice_Scream1.wav", 0.2f);
+
+            return true;
+        }
+        case KIRBY_COMMAND_TYPE::EMOTE_DOWN:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            m_pGameInstance_Proxy->Play_SFX(L"HeroVoice_Scream2.wav", 0.2f);
 
             return true;
         }
@@ -315,8 +336,16 @@ _bool CKirby_Deform_RollerCoaster::Update_OnRail(CKirby* pKirby, _float fTimeDel
     if (m_fCurRailDist >= m_fRailLength)
         return false;
 
-    constexpr _float fSlopeAcceleration = 100.f;
-    m_fAccRailSpeed += m_fSlopeRatio * fSlopeAcceleration * fTimeDelta;
+    // 거의 도착 트리거
+    if (m_bNearDestination == false && pKirby->Get_DeformEndTrigger())
+        m_bNearDestination = true;
+
+
+    if (m_bNearDestination)
+        m_fAccRailSpeed -= fArrivalDeceleration * fTimeDelta;
+    else
+        m_fAccRailSpeed += m_fSlopeRatio * fSlopeAcceleration * fTimeDelta;
+
 
     Helper::FloatClamp(m_fAccRailSpeed, fMinSpeed, fMaxSpeed);
 

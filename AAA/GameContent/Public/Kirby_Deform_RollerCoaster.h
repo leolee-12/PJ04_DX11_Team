@@ -87,6 +87,8 @@ private:
 
 	FX_HANDLE hCoasterWind{};
 
+	_bool m_bNearDestination{};
+
 private:
 	_float m_fLeftRightDegree{};
 	_int m_iLeftRight{};
