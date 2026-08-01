@@ -62,6 +62,12 @@ CAnimator* CGigantEdge::Get_BodyAnimator() const
     return m_pBody ? m_pBody->Get_Animator() : nullptr;
 }
 
+void CGigantEdge::Enable_SwordHit(_bool bOn)
+{
+    if (m_pSword)
+        m_pSword->Set_HitBox(bOn);
+}
+
 void CGigantEdge::Play_Intro()
 {
     CAnimator* pAni = m_pBody->Get_Animator();
@@ -152,8 +158,7 @@ _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
 
 void CGigantEdge::On_Death_Reaction(const ATTACK_INFO& tInfo)
 {
-    if (m_pSword)
-        m_pSword->Set_HitBox(false);
+    Enable_SwordHit(false);
 }
 
 #ifdef _DEBUG
@@ -255,6 +260,7 @@ HRESULT CGigantEdge::Ready_AnimEvents()
                             {
                                 case 0:
                                     m_pSword->Set_Drawn(true);
+                                    m_pSword->Set_HitBox(false);
                                     break;
                                 case 1:
                                 {
