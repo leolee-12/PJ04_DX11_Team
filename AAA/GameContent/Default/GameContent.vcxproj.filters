@@ -2232,6 +2232,9 @@
     <ClInclude Include="..\public\GorillaNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HammerChargeGlow.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\HammerFire.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClInclude>
@@ -3859,6 +3862,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GorillaNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HammerChargeGlow.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HammerFire.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\999. Hammer</Filter>

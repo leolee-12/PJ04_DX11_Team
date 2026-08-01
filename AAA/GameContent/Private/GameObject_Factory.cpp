@@ -816,6 +816,17 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CHammerChargeGlow::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CHammerChargeGlow),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerChargeGlow::TEXTURE_FLASH_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/YSE/Effect/Hammer/Common/common_flash02.dds"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHammerChargeGlow::TEXTURE_RING_TAG,
+                CTexture::Create(pDevice, pContext, TEXT("../../Resources/CHJ/Effect/Common/common_ring01.dds"), 1));
+        )
+    );
+
     Register(CWheelHammer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWheelHammer),
         LOADER
         (

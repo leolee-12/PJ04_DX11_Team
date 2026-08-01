@@ -92,14 +92,15 @@ void CKirby_Ability_Normal::Update_AttackState(CKirby* pKirby, _float fTimeDelta
     if (m_pGameInstance_Proxy->Key_Down(DIK_7))
     {
         //pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::TOY_HAMMER);
-        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::BOMB);
+        //pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::BOMB);
+        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::ICE);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         Off_InhaleEffect();
     }
     if (m_pGameInstance_Proxy->Key_Down(DIK_8))
     {
-        //pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::SLEEP);
-        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::CRASH);
+        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::TOY_HAMMER);
+        //pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::CRASH);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         Off_InhaleEffect();
     }
