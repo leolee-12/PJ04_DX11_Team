@@ -1,6 +1,7 @@
 #include "GigantEdge_Brain.h"
 #include "GigantEdge.h"
 #include "GigantEdge_Body.h"
+#include "GigantEdge_Shield.h"
 #include "GameInstance.h"
 #include "Animator.h"
 #include "Transform.h"
@@ -56,14 +57,25 @@ HRESULT CGigantEdge_Brain::Initialize(CMonster* pOwner)
             return CBTPlayClip::Create(Anim, { clip, true, fHold, fSpeed });
         };
 
+    auto SwordHit = [this](_bool bOn) -> CBTNode*
+        {
+            return CBTAction::Create(
+                [this, bOn](CBlackboard*, _float) {
+                    Owner()->Enable_SwordHit(bOn);
+                    return BT_STATUS::SUCCESS;
+                },
+                [this]() { Owner()->Enable_SwordHit(false); });
+        };
+
     auto MakeChargeAttack = [&]() -> CBTNode*     
         {
             return CBTSequence::Create({
                 OneShot("SwordAppearStart", 2.f),
                 OneShot("SwordAppear", 2.f),
-                //OneShot("AttackAChargeStart", 2.f),
                 HoldLoop("AttackAChargeWait", fChargeTime),
+                SwordHit(true),
                 OneShot("AttackAStart", 2.f),
+                SwordHit(false),
                 OneShot("AttackAWait", 2.f),
                 OneShot("AttackAEnd", 2.f),
                 });
@@ -74,9 +86,10 @@ HRESULT CGigantEdge_Brain::Initialize(CMonster* pOwner)
             return CBTSequence::Create({
                 OneShot("SwordAppearStart", 2.f),
                 OneShot("SideSwordAppear", 2.f),
-                //OneShot("SideAttackAChargeStart", 2.f),
                 HoldLoop("SideAttackAChargeWait", fChargeTime),
+                SwordHit(true),
                 OneShot("SideAttackAStart", 2.f),
+                SwordHit(false),
                 OneShot("SideAttackAWait", 2.f),
                 OneShot("SideAttackAEnd", 2.f),
                 });
@@ -114,7 +127,9 @@ HRESULT CGigantEdge_Brain::Initialize(CMonster* pOwner)
             OneShot("PreThrustStart", 2.f),
             HoldLoop("PreThrustStartWait", fThrustCharge),
             OneShot("ThrustStart", 2.f),
-            pLunge,                          // ← 기존 OneShot("ThrustMove") 대체
+            SwordHit(true),
+            pLunge,
+            SwordHit(false),
             OneShot("ThrustEnd", 2.f),
             OneShot("ThrustEndWait", 2.f),
             OneShot("ThrustEndWaitEnd", 2.f),
@@ -167,7 +182,12 @@ HRESULT CGigantEdge_Brain::Initialize(CMonster* pOwner)
             if (*fGuardT >= fGuardTime) { *fGuardT = 0.f; Owner()->Set_Guarding(false); return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
-        [this, fGuardT]() { *fGuardT = 0.f; Owner()->Set_Guarding(false); });
+        [this, fGuardT]() {
+            *fGuardT = 0.f;
+            Owner()->Set_Guarding(false);
+            if (auto* pShield = Owner()->Get_Shield())
+                pShield->Set_Drawn(false);
+        });
 
     CBTNode* pGuard = CBTSequence::Create({
         OneShot("ShieldAppear", 2.f),
