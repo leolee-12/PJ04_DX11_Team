@@ -48,6 +48,9 @@ HRESULT CNormalEnemy::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+		m_fMaxHP = 12.f;
+		m_fCurHP = m_fMaxHP;
+
 	m_eCopyAbility	= COPY_ABILITY_TYPE::NONE;
 	m_fCullDist		= 175.f;
 

@@ -1082,7 +1082,7 @@ void CBoss_Metaknight::Tick_DeathSequence(_float fTimeDelta)
                 pAnim->Pause();
                 m_fDeathTimer = DEATH_PAUSE_SEC;
 
-                Play_OneShotSFX(TEXT("CharaBasic_DeadBigEnemy.wav"));
+                Play_OneShotSFX(TEXT("CharaBasic_DeadBigEnemy.wav"), 0.45f);
 
                 CAMERA_SHAKE_DESC shake{ 0.8f, DEATH_SHAKE_SEC };
                 m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);

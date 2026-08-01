@@ -23,6 +23,7 @@ void CGigatzo_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard,  _float fTimeD
         m_bArmed = false;
         m_bPassLatched = false;
         m_bHasPrevTarget = false;
+        m_bHasPrevSpeed = false;
         return;
     }
 
@@ -51,6 +52,23 @@ void CGigatzo_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard,  _float fTimeD
 
     XMStoreFloat3(&m_vPrevTargetPos, vTargetPos);
     m_bHasPrevTarget = true;
+
+    // target acceleration estimate (slope accel / arrival decel both covered)
+    _float fRawAccel = 0.f;
+    if (m_bHasPrevSpeed && bVelValid && fTimeDelta > 0.f)
+        fRawAccel = (fTargetSpeed - m_fPrevTargetSpeed) / fTimeDelta;
+
+    Helper::FloatClamp(fRawAccel, -s_fMaxTargetAccel, s_fMaxTargetAccel);
+
+    const _float fAccelBlend = min(1.f, fTimeDelta * s_fAccelSmoothRate);
+    m_fTargetAccel += (fRawAccel - m_fTargetAccel) * fAccelBlend;
+
+    if (bVelValid)
+    {
+        m_fPrevTargetSpeed = fTargetSpeed;
+        m_bHasPrevSpeed = true;
+        m_fObservedMaxSpeed = max(m_fObservedMaxSpeed, fTargetSpeed);
+    }
 
     CGigatzo* pGig = static_cast<CGigatzo*>(m_pOwner);
 
@@ -90,18 +108,28 @@ void CGigatzo_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard,  _float fTimeD
 
     m_bArmed = false;
 
-    CTransform* pGigTransform = pGig->Get_Transform();
-    if (nullptr == pGigTransform)
+    // muzzle ray: exact for Vertical / Tilt / Horizontal pitch
+    _vector vMuzzlePos{}, vMuzzleDir{};
+    if (!pGig->Get_MuzzleRay(&vMuzzlePos, &vMuzzleDir))
         return;
 
-    // 커비 속도 정규화
     const _vector vForward = XMVector3Normalize(vTargetVel);
 
-    // 커비와 대포의 직선 거리
-    const _vector vRelative = pGigTransform->Get_State(STATE::POSITION) - vTargetPos;
+    // closest approach between target path L1(t) = vTargetPos + t*vForward
+    // and muzzle ray      L2(s) = vMuzzlePos + s*vMuzzleDir
+    // t = distance target must travel, s = bullet flight distance
+    const _vector vR = vTargetPos - vMuzzlePos;
 
-    // 커비가 대포 기준으로 어디에 있는지 판단 하는 기준 
-    const _float fForward = XMVectorGetX(XMVector3Dot(vRelative, vForward));
+    const _float fB = XMVectorGetX(XMVector3Dot(vForward, vMuzzleDir));
+    const _float fD = XMVectorGetX(XMVector3Dot(vForward, vR));
+    const _float fE = XMVectorGetX(XMVector3Dot(vMuzzleDir, vR));
+
+    const _float fDenom = 1.f - fB * fB;      // always >= 0 (unit vectors)
+    if (fDenom < Helper::fEpsilon)
+        return;                               // barrel parallel to path
+
+    const _float fForward    = (fB * fE - fD) / fDenom;
+    const _float fFlightDist = (fE - fB * fD) / fDenom;
 
     if (fForward < -s_fRearmDistance)
         m_bPassLatched = false;
@@ -109,17 +137,28 @@ void CGigatzo_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard,  _float fTimeD
     if (m_bPassLatched || fForward <= 0.f)
         return;
 
-    const _vector vLateral = vRelative - vForward * fForward;
-    const _float fLateral = XMVectorGetX(XMVector3Length(vLateral));
+    if (fFlightDist <= 0.f)
+        return;                               // intercept is behind the muzzle
 
     const _float fBulletSpeed = pGig->Get_BulletSpeed();
     if (fBulletSpeed <= Helper::fEpsilon)
         return;
 
-    _float fLead = fTargetSpeed *
-        (s_fAnimDelay + fLateral / fBulletSpeed) + s_fLeadBias;
+    const _float fT = s_fAnimDelay + fFlightDist / fBulletSpeed;
 
-    fLead = min(fLead, pGig->Get_FireDistance());
+    // no constant-velocity assumption. upper bound is the observed max,
+    // never an external constant owned by another system.
+    _float fEndSpeed = fTargetSpeed + m_fTargetAccel * fT;
+
+    if (m_fObservedMaxSpeed > 0.f)
+        fEndSpeed = min(fEndSpeed, m_fObservedMaxSpeed);
+
+    fEndSpeed = max(fEndSpeed, 0.f);
+
+    const _float fLead = 0.5f * (fTargetSpeed + fEndSpeed) * fT + s_fLeadBias;
+
+    if (fLead > pGig->Get_FireDistance())
+        return;                               // out of range: skip, do not clamp
 
     if (fForward > fLead)
         return;

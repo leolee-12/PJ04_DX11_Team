@@ -36,7 +36,7 @@ HRESULT CBladeKnight_Sword::Initialize(void* pArg)
     CapsuleDesc.fRadius = 0.25f;        
     CapsuleDesc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f };
 
-    if (FAILED(Ready_HitBox(CapsuleDesc, 5.f, 8.f)))
+    if (FAILED(Ready_HitBox(CapsuleDesc, 15.f, 8.f)))
         return E_FAIL;
 
     m_pAnimatorCom->Play("Thrust", false, false);

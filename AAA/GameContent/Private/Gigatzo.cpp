@@ -58,16 +58,19 @@ HRESULT CGigatzo::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+		m_fMaxHP = 48.f;
+		m_fCurHP = m_fMaxHP;
+
 	m_TraitFlags = MT_NONE;
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
-	m_fCullDist = 120.f;
+	m_fCullDist = 220.f;
 
 	return S_OK;
 }
 
 _float CGigatzo::Get_InteractRadius() const
 {
-    return 100.f;
+    return 180.f;
 }
 
 CAnimator* CGigatzo::Get_BodyAnimator() const
