@@ -18,7 +18,7 @@ namespace
 {
     constexpr _float fMinSpeed = 14.f;
     constexpr _float fMaxSpeed = 80.f;
-    constexpr _float fSlopeAcceleration = 100.f;
+    constexpr _float fSlopeAcceleration = 45.f;
     constexpr _float fArrivalDeceleration = 30.f;
 }
 

@@ -491,7 +491,8 @@ HRESULT CKirbyBomb::Ready_HitBox()
 					On_Impact();
 				}
 			}
-			else if (iRenderGroup == ETOUI(COLLISION_LAYER::PLAYER_BOMB))
+			else if (iRenderGroup == ETOUI(COLLISION_LAYER::PLAYER_BOMB) ||
+				iRenderGroup == ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE))
 			{
 				On_Impact();
 			}

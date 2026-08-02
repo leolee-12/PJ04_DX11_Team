@@ -38,6 +38,8 @@ public:
     CGigantEdge_Shield* Get_Shield() const { return m_pShield; }
     virtual CAnimator* Get_BodyAnimator() const override;
 
+    void Enable_SwordHit(_bool bOn);
+
     void  Set_Guarding(_bool b) { m_bGuarding = b; }
     _bool Is_Guarding() const { return m_bGuarding; }
     _bool Is_GroggyRequested() const { return m_bGroggyRequested; }

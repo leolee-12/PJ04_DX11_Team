@@ -145,7 +145,7 @@ void CGigatzoBullet::On_Activated()
 
 void CGigatzoBullet::On_Impact()
 {
-    m_pGameInstance_Proxy->Play_SFX(SND_BULLETBREAK, 0.5f);
+    m_pGameInstance_Proxy->Play_SFX(SND_BULLETBREAK, 0.75f);
 
     _float3 vPos{};
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));

@@ -83,7 +83,7 @@ void CUI_KirbyStatus::Late_Update(_float fTimeDelta)
     if (!m_bActive)
         return;
 
-    //__super::Late_Update(fTimeDelta);
+    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CUI_KirbyStatus::Ready_Events()

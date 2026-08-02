@@ -32,9 +32,9 @@ namespace
 
 	const AUDIO_AREA_SOUND_BINDING g_AudioAreaSoundBindings[] =
 	{
-		{ L"AreaBgmRequestor",		nullptr,				1u,					L"K15_Grassland1.marker.wav",			AUDIO_AREA_PLAY_TYPE::BGM_FADE,		0.25f,	0.f		},
-		{ L"AreaSeJungle",			L"Jungle",				kAnySoundId,		L"EnvJungle_Jungle1.wav",				AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.10f,	50.f	},
-		{ L"AreaSeSeaWave",			L"SeaWave",				kAnySoundId,		L"EnvWaterWave_SeaWave1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.18f,	40.f	},
+		{ L"AreaBgmRequestor",		nullptr,				1u,					L"K15_Grassland1.marker.wav",			AUDIO_AREA_PLAY_TYPE::BGM_FADE,		0.20f,	0.f		},
+		{ L"AreaSeJungle",			L"Jungle",				kAnySoundId,		L"EnvJungle_Jungle1.wav",				AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.08f,	50.f	},
+		{ L"AreaSeSeaWave",			L"SeaWave",				kAnySoundId,		L"EnvWaterWave_SeaWave1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.16f,	40.f	},
 		{ L"AreaSeWaterPipe",		L"WaterPipe",			kAnySoundId,		L"GimmickWaterPipe_FallingWater.wav",	AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.15f,	30.f	},
 		{ L"AreaSeLavaWaterFall",	L"LavaWaterFall",		kAnySoundId,		L"EnvLavaWaterFall_Lava1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.18f,	25.f	},
 		{ L"AreaSeSandWaterFall",	L"SandWaterFall",		kAnySoundId,		L"EnvSandWaterFall_SandFall1.wav",		AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.05f,	15.f	},
