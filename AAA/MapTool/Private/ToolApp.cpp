@@ -46,9 +46,6 @@ HRESULT CToolApp::Initialize()
 void CToolApp::Update(_float fTimeDelta, _float fRawTimeDelta)
 {
 	m_pGI_Proxy->Update_Engine(fTimeDelta, fRawTimeDelta);
-
-	if (!m_pEditInstance->Is_Loading())
-		m_pEditInstance->Update_Panels(fTimeDelta);
 }
 
 HRESULT CToolApp::Render()

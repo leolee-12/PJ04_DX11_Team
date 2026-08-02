@@ -1,6 +1,5 @@
 ﻿#include "EditInstance.h"
 #include "ImGui_Manager.h"
-#include "Level_Edit.h"
 #include "Panel_Manager.h"
 
 IMPLEMENT_SINGLETON(CEditInstance)
@@ -52,25 +51,12 @@ void CEditInstance::ImGui_Render()
 	m_pImGui_Manager->Render();
 }
 
-void CEditInstance::Update_Panels(_float fTimeDelta)
-{
-	if (nullptr == m_pPanelManager)
-		return;
-
-	m_pPanelManager->Update(fTimeDelta);
-}
-
 void CEditInstance::Render_Panels()
 {
 	if (nullptr == m_pPanelManager)
 		return;
 
 	m_pPanelManager->Render();
-}
-
-CGameObject* CEditInstance::Get_Selected() const
-{
-	return m_pLevel ? m_pLevel->Get_Selected() : nullptr;
 }
 
 void CEditInstance::Free()

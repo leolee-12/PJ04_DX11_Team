@@ -10,12 +10,6 @@ CPanel::CPanel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CPanel::Initialize(CPanel_Manager* pPanelManager)
-{
-	m_pPanel_Manager = pPanelManager;
-	return S_OK;
-}
-
 _bool CPanel::Begin_Panel()
 {
 	return ImGui::Begin(m_szName, &m_bOpen, m_iWindowFlags);

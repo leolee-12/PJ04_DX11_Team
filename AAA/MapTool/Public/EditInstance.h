@@ -10,10 +10,6 @@
 	- 보관 포인터(레벨/SRV)는 소유권이 다른 곳(엔진/App)에 있으므로 약참조(AddRef 안 함).
      CEditInstance 수명 ⊂ 소유자 수명. */
 
-NS_BEGIN(Engine)
-class CGameObject;
-NS_END
-
 NS_BEGIN(MapTool)
 class CLevel_Edit;
 class CImGui_Manager;
@@ -32,13 +28,10 @@ public:
 	void			ImGui_BeginFrame();
 	void			Render_UI();
 	void			ImGui_Render();
-	void			Update_Panels(_float fTimeDelta);
-	void			Render_Panels();
 
 	// 현재 편집 레벨 (약참조)
 	void			Set_Level(CLevel_Edit* pLevel) { m_pLevel = pLevel; }
 	CLevel_Edit*	Get_Level() const { return m_pLevel; }
-	CGameObject*	Get_Selected() const;
 
 	// 오프스크린 씬 텍스처 (App 소유, 약참조)
 	void			Set_SceneSRV(ID3D11ShaderResourceView* pSRV) { m_pSceneSRV = pSRV; }
@@ -46,7 +39,6 @@ public:
 
 	// 로딩 진행률 (Loader 갱신 -> ImGui 매니저 오버레이가 표시)
 	void			Set_Loading(_bool bLoading) { m_bLoading = bLoading; }
-	_bool			Is_Loading() const { return m_bLoading; }
 	void			Set_LoadProgress(_float fProgress) { m_fLoadProgress = fProgress; }
 
 private:
@@ -58,6 +50,9 @@ private:
 
 	_bool						m_bLoading = { true };
 	_float						m_fLoadProgress = { 0.f };
+
+private:
+	void	Render_Panels();
 
 private:
 	virtual void Free() override;

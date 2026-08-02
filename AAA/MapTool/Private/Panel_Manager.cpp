@@ -40,21 +40,8 @@ HRESULT CPanel_Manager::Add_Panel(const _wstring& strPanelTag, CPanel* pPanel)
 		return E_FAIL;
 	}
 
-	if (FAILED(pPanel->Initialize(this)))
-	{
-		Safe_Release(pPanel);
-		return E_FAIL;
-	}
-
 	m_Panels.emplace(strPanelTag, pPanel);
 	return S_OK;
-}
-
-void CPanel_Manager::Update(_float fTimeDelta)
-{
-	for (auto& [tag, pPanel] : m_Panels)
-		if (pPanel->Is_Open())
-			pPanel->Update(fTimeDelta);
 }
 
 void CPanel_Manager::Render()

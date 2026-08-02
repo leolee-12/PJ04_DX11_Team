@@ -13,7 +13,6 @@ private:
 
 public:
 	HRESULT						Initialize();
-	void						Update(_float fTimeDelta);
 	void						Render();
 
 	HRESULT						Add_Panel(const _wstring& strPanelTag, CPanel* pPanel);

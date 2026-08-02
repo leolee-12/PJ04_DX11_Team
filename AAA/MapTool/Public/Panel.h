@@ -9,10 +9,6 @@ class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(MapTool)
-
-class CPanel_Manager;
-class CEditInstance;
-
 class CPanel abstract : public CBase
 {
 protected:
@@ -20,8 +16,6 @@ protected:
 	virtual ~CPanel() = default;
 
 public:
-	virtual HRESULT			Initialize(CPanel_Manager* pPanelManager);
-	virtual void			Update(_float fTimeDelta) {}
 	virtual void			Render() PURE;
 
 	_bool					Is_Open() const { return m_bOpen; }
@@ -37,7 +31,6 @@ protected:
 	ID3D11Device*			m_pDevice = { nullptr };
 	ID3D11DeviceContext*	m_pContext = { nullptr };
 	CGameInstance_Proxy*	m_pGI_Proxy = { nullptr };
-	CPanel_Manager*			m_pPanel_Manager = { nullptr };
 
 	_char					m_szName[MAX_PATH] = {};
 	ImGuiWindowFlags		m_iWindowFlags = { 0 };
