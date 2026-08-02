@@ -89,6 +89,8 @@ private:
 	CEffect_Container* m_pMetaSwordJumpSpinTrail1{};
 	CEffect_Container* m_pMetaSwordJumpSpinTrail2{};
 
+	CEffect_Container* m_pUpwardSlash{};
+
 private:
 	void Change_SwordState(CKirby* pKirby, META_SWORD_STATE eNext);
 	void Enter_SwordState(CKirby* pKirby, META_SWORD_STATE eState);

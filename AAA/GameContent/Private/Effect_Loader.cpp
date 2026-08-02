@@ -52,6 +52,7 @@ namespace
         { TEXT("MetaSwordJumpSpin"),          TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpin.JSON") },
         { TEXT("MetaSwordJumpSpinTrail1"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpinTrail1.JSON") },
         { TEXT("MetaSwordJumpSpinTrail2"),  TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaSwordJumpSpinTrail2.JSON") },
+        { TEXT("MetaUpwardsSlash"),        TEXT("../../Resources/YSE/EffectContainer/MetaKnightSword/MetaUpwardsSlash.JSON") },
         {TEXT("UpwardsSlash"),            TEXT("../../Resources/EffectContainerJSON/YSE/UpwardsSlash.JSON")},
         { TEXT("RockFloor"),              TEXT("../../Resources/EffectContainerJSON/YSH/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/EffectContainerJSON/YSE/BoostGas.json") },
@@ -122,8 +123,8 @@ namespace
         { TEXT("MoveSmoke"),              TEXT("../../Resources/EffectContainerJSON/CHJ/MoveSmoke.JSON") },
         { TEXT("MonsterLandingSmoke"),    TEXT("../../Resources/EffectContainerJSON/CHJ/MonsterLandingSmoke.JSON") },
         { TEXT("VanishEffect"),           TEXT("../../Resources/Map/Effect/Proto_VanishEffect_0.JSON") },
-        { TEXT("CrashChargeEffect"),       TEXT("../../Resources/YSE/EffectContainer/CrashChargeEffect.JSON") },
-        { TEXT("CrashEffect"),            TEXT("../../Resources/YSE/Effect/Crash/Crash/CrashEffect.JSON") },
+        { TEXT("CrashChargeEffect"),      TEXT("../../Resources/YSE/EffectContainer/CrashChargeEffect.JSON") },
+        { TEXT("CrashEffect"),            TEXT("../../Resources/YSE/EffectContainer/CrashEffect.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/EffectContainerJSON/CHJ/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/EffectContainerJSON/CHJ/Tornado_BK.JSON") },

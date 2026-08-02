@@ -397,6 +397,40 @@ _bool CKirby_Ability_MetaKnightSword::Handle_BodyAnimEvent(CKirby* pKirby, const
         return false;
     }
 
+    if (static_cast<EANIM_EVENT>(e.iEventType) == EANIM_EVENT::AbilityFx)
+    {
+        if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+        {
+            switch (e.iIntParam)
+            {
+            case 0:
+            {
+                if (m_pUpwardSlash != nullptr)
+                    return true;
+
+                CEffect_Loader::GetInstance()->Spawn(L"MetaUpwardsSlash", pKirby->Get_LevelIndex(),
+                    _float3{ 0.f, 0.f, 0.f }, _float3{ 0.f, 0.f, 0.f }, _float3{ 0.f, 0.f, 0.f },
+                    pMetaSword->Get_CombinedWorldMatrixPtr(), &m_pUpwardSlash);
+                return true;
+            }
+            }
+        }
+        else if (ePhase == ANIM_EVENT_PHASE::END)
+        {
+            switch (e.iIntParam)
+            {
+            case 0:
+            {
+                if (m_pUpwardSlash == nullptr)
+                    return true;
+
+                m_pUpwardSlash->EffectContainer_StopAfterEmission();
+                m_pUpwardSlash = nullptr;
+            }
+            }
+        }
+    }
+
     return false;
 }
 
