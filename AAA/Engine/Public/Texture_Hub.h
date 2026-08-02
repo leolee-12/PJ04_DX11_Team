@@ -12,7 +12,6 @@ private:
 	virtual ~CTexture_Hub() = default;
 
 public:
-	static _string Normalize_TextureName(const _string& strRaw);
 	static _wstring Normalize_TextureName(const _wstring& strRaw);
 
 	HRESULT LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut);
@@ -20,7 +19,6 @@ public:
 	HRESULT Register_TextureName(TEXTURE_HANDLE Handle, const _tchar* pTextureName);
 	HRESULT Bind_ShaderResource(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle) const;
 	HRESULT Bind_DefaultShaderResource(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind) const;
-	_bool	Is_Valid(TEXTURE_HANDLE Handle) const;
 	TEXTURE_HUB_STATS Get_Stats() const;
 
 private:

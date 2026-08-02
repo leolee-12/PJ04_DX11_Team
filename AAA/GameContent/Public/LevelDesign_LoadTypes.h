@@ -223,14 +223,6 @@ struct LD_EFFECT_AREA_DESC
 	_bool bHasEffectRot = false;
 };
 
-struct LD_STEP_LINK_INFO
-{
-	_bool bIgnoreWarningAtOneWay = false;
-	_bool bRoundTrip = false;
-	_int iMoveStepValue = 0;
-	json jRaw;
-};
-
 struct LD_PARSED_OBJECT : public LD_OBJECT_DESC
 {
 	LD_PORTAL_DESC Portal;
@@ -289,7 +281,6 @@ struct LD_PACKAGE
 {
 	_wstring wstrSourcePath;
 	vector<LD_OBJECT_ENTRY> ObjectDescs;
-	vector<LD_STEP_LINK_INFO> StepLinks;
 };
 
 using LD_OBJECT_CREATED_CALLBACK = void(*)(void* pContext, CGameObject* pObject,

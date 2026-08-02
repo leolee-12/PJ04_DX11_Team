@@ -214,37 +214,25 @@ void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CULLING_CHANNEL_QUE
 	if (!Query.bUseFrustum)
 		return;
 
-	if (Query.bUseFrustumFade)
-	{
-		const _uint iPlaneMask = (CHANNEL::SHADOW == eChannel)
-			 ? ((1u << ETOUI(CCulling_Manager::CULLING_PLANE::COUNT)) - 1u)
-			 : CCulling_Manager::CULLING_PLANE_MASK_MAIN_SIDE;
+	const _uint iPlaneMask = (CHANNEL::SHADOW == eChannel)
+		? ((1u << ETOUI(CCulling_Manager::CULLING_PLANE::COUNT)) - 1u)
+		: CCulling_Manager::CULLING_PLANE_MASK_MAIN_SIDE;
 
-		const CULLING_FADE_RESULT FrustumResult =
-			m_pGameInstance_Proxy->Evaluate_FrustumFadeAABB(
-				Query.eView,
-				m_WorldBounds,
-				iPlaneMask);
+	const CULLING_FADE_RESULT FrustumResult =
+		m_pGameInstance_Proxy->Evaluate_FrustumFadeAABB(
+			Query.eView,
+			m_WorldBounds,
+			iPlaneMask);
 
-		Result.fDissolve = max(Result.fDissolve, FrustumResult.fDissolve);
+	Result.fDissolve = max(Result.fDissolve, FrustumResult.fDissolve);
 
-		if (FrustumResult.bCulled || FrustumResult.fDissolve > 0.f)
-			Result.iCauseFlags |= CAUSE_FRUSTUM;
+	if (FrustumResult.bCulled || FrustumResult.fDissolve > 0.f)
+		Result.iCauseFlags |= CAUSE_FRUSTUM;
 
-		if (FrustumResult.bCulled)
-		{
-			Result.bCulled = true;
-			Result.fDissolve = 1.f;
-		}
-
-		return;
-	}
-
-	if (m_pGameInstance_Proxy->Should_CullAABB(Query.eView, m_WorldBounds))
+	if (FrustumResult.bCulled)
 	{
 		Result.bCulled = true;
 		Result.fDissolve = 1.f;
-		Result.iCauseFlags |= CAUSE_FRUSTUM;
 	}
 }
 

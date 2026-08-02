@@ -637,14 +637,6 @@ _bool CGameInstance::Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_D
     return m_pCulling_Manager->Update_View(eView, Desc);
 }
 
-_bool CGameInstance::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
-{
-    if (nullptr == m_pCulling_Manager)
-        return false;
-
-    return m_pCulling_Manager->Should_CullAABB(eView, WorldBounds);
-}
-
 CULLING_FADE_RESULT CGameInstance::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const
 {
     if (nullptr == m_pCulling_Manager)

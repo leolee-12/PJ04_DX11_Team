@@ -234,7 +234,6 @@ namespace
 		if (Common.iPolicyMask & EDIT_CAP_SHADOW)
 		{
 			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Policy.bUseShadow;
-			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow;
 		}
 
 		if (Common.bHasWorldMatrix)
@@ -301,12 +300,6 @@ namespace
 			pOutDesc->tRender.bUseNearDistAlpha = pEnvOverride->bUseNearDistAlpha;
 	}
 
-	void Apply_ClassOverrideToMapSectionDesc(MAP_SECTION_DESC* pOutDesc, const EDIT_CLASS_OVERRIDE& ClassOverride)
-	{
-		UNREFERENCED_PARAMETER(pOutDesc);
-		UNREFERENCED_PARAMETER(ClassOverride);
-	}
-
 	void Apply_ClassOverrideToLDEntry(LD_OBJECT_ENTRY* pOutEntry, const EDIT_CLASS_OVERRIDE& ClassOverride)
 	{
 		if (nullptr == pOutEntry)
@@ -344,7 +337,6 @@ namespace
 			return;
 
 		Apply_CommonOverrideToMapSectionDesc(pOutDesc, Edit.Common);
-		Apply_ClassOverrideToMapSectionDesc(pOutDesc, Edit.ClassOverride);
 	}
 
 	void Apply_EditObjectOverrideToLDEntry(LD_OBJECT_ENTRY* pOutEntry, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
@@ -724,12 +716,10 @@ namespace
 		return S_OK;
 	}
 
-	const char* Get_ClassOverrideName(const EDIT_CLASS_OVERRIDE& ClassOverride)
+	const _char* Get_ClassOverrideName(const EDIT_CLASS_OVERRIDE& ClassOverride)
 	{
-		if (holds_alternative<EDIT_ENVOBJECT_OVERRIDE>(ClassOverride))          return "EnvObject";
-		if (holds_alternative<EDIT_MAPSECTION_OVERRIDE>(ClassOverride))         return "MapSection";
-		if (holds_alternative<EDIT_LEVELDESIGN_OVERRIDE>(ClassOverride))        return "LevelDesignObject";
-		if (holds_alternative<EDIT_LD_WATER_OVERRIDE>(ClassOverride))           return "Water";
+		if (holds_alternative<EDIT_ENVOBJECT_OVERRIDE>(ClassOverride))  return "EnvObject";
+		if (holds_alternative<EDIT_LD_WATER_OVERRIDE>(ClassOverride))   return "Water";
 
 		return "";
 	}
@@ -909,17 +899,8 @@ namespace
 			return S_OK;
 		}
 
-		if ("MapSection" == strClassName)
-		{
-			*pOutClassOverride = EDIT_MAPSECTION_OVERRIDE{};
+		if ("MapSection" == strClassName || "LevelDesignObject" == strClassName)
 			return S_OK;
-		}
-
-		if ("LevelDesignObject" == strClassName)
-		{
-			*pOutClassOverride = EDIT_LEVELDESIGN_OVERRIDE{};
-			return S_OK;
-		}
 
 		return E_FAIL;
 	}

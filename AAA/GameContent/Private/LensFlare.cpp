@@ -59,11 +59,6 @@ void CLensFlare::On_Deserialized()
 	Cache_LensElements();
 }
 
-void CLensFlare::Priority_Update(_float fTimeDelta)
-{
-	__super::Priority_Update(fTimeDelta);
-}
-
 void CLensFlare::Update(_float fTimeDelta)
 {
 	if (m_bLensElementCacheReady == false)
@@ -99,11 +94,6 @@ void CLensFlare::Late_Update(_float fTimeDelta)
 	}
 
 	__super::Late_Update(fTimeDelta);
-}
-
-HRESULT CLensFlare::Render()
-{
-	return __super::Render();
 }
 
 json CLensFlare::Serialize() const

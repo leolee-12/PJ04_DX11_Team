@@ -36,11 +36,6 @@ namespace
 		Collision.bCookCollMesh = false;
 		Collision.bUseCollMesh = false;
 
-		Collision.bCatalogCollisionChecked = false;
-		Collision.bHasDecorCollisionApxbin = false;
-		Collision.strDecorCollisionApxbinName.clear();
-		Collision.strDecorCollisionBfresPath.clear();
-
 		if (pDesc->eKind == ENV_OBJECT_KIND::EFFECT)
 			return;
 
@@ -48,18 +43,11 @@ namespace
 		// DecorCollisionCatalog의 objectName 존재 여부로 판단한다.
 		if (pDesc->eSourceType == ENV_SOURCE_TYPE::DECOR_DECOR)
 		{
-			Collision.bCatalogCollisionChecked = true;
-
-			ENV_COLLISION_CATALOG_RECORD Record{};
-			if (CEnv_CollisionCatalog::Try_Find(pDesc->wstrObjectName, &Record))
+			if (CEnv_CollisionCatalog::Try_Find(pDesc->wstrObjectName))
 			{
 				Collision.bHasCollMesh = true;
 				Collision.bCookCollMesh = true;
 				Collision.bUseCollMesh = false;
-
-				Collision.bHasDecorCollisionApxbin = true;
-				Collision.strDecorCollisionApxbinName = Record.strApxbinName;
-				Collision.strDecorCollisionBfresPath = Record.strBfresPath;
 				Collision.eColliderKind = ENV_COLLIDER_KIND::MODEL_MESH;
 			}
 			else
@@ -742,7 +730,6 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsShadowMappingCaster", &pDesc->tRender.bHasShadow);
 	// Source capability defaults to active shadow usage. Map edit override may disable it later.
 	pDesc->tRender.bUseShadow = pDesc->tRender.bHasShadow;
-	pDesc->tRender.bShadowMappingCaster = pDesc->tRender.bUseShadow; // Legacy transitional.
 
 	if (!JsonUtils::Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseCullDistance))
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseLodCulling", &pDesc->tRender.bUseCullDistance);

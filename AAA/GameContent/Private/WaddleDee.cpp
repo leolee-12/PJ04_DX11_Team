@@ -375,7 +375,7 @@ void CWaddleDee::On_Deserialized()
 
 HRESULT CWaddleDee::Ready_PartObjects()
 {
-	CWaddleDee_Body::WADDLEDEE_BODY_DESC BodyDesc{};
+	CPartObject::PARTOBJECT_DESC BodyDesc{};
 	BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
 	if (FAILED(Add_PartObject(m_iPrototypeLevel, CWaddleDee_Body::PROTOTYPE_TAG, CWaddleDee_Body::PART_TAG, &BodyDesc)))

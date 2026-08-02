@@ -58,10 +58,6 @@ namespace
 		}
 	}
 
-	using namespace std::filesystem;
-
-	constexpr _tchar kMapModelRoot[] = L"../../Resources/Map";
-
 	ENV_OBJECT_DESC Make_DefaultEnvRuntimeDesc(const wstring& strPrototypeTag, const wstring& strObjectName, const _float3& vPosition)
 	{
 		ENV_OBJECT_DESC Desc{};
@@ -99,11 +95,6 @@ namespace
 			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::SPOT_LIGHT;
 
 		return Desc;
-	}
-
-	_bool Equals_NoCase(const wstring& strLeft, const wstring& strRight)
-	{
-		return 0 == _wcsicmp(strLeft.c_str(), strRight.c_str());
 	}
 
 	_bool IsNearlyEqualFloat4x4(const _float4x4& A, const _float4x4& B, _float fEpsilon = 0.0001f)
@@ -290,90 +281,6 @@ namespace
 			pInOutEdit->Common.bHasWorldMatrix = false;
 			pInOutEdit->Common.matWorld = {};
 		}
-	}
-
-	void Add_UniqueCandidate(const wstring& strCandidate, vector<wstring>* pOutCandidates)
-	{
-		if (nullptr == pOutCandidates || strCandidate.empty())
-			return;
-
-		auto Iter = find_if(
-			pOutCandidates->begin(),
-			pOutCandidates->end(),
-			[&](const wstring& strExisting) { return Equals_NoCase(strExisting, strCandidate); });
-		if (Iter == pOutCandidates->end())
-			pOutCandidates->push_back(strCandidate);
-	}
-
-	void Build_MapSectionModelCandidates(const wstring& strSectionName, vector<wstring>* pOutCandidates)
-	{
-		if (nullptr == pOutCandidates)
-			return;
-
-		pOutCandidates->clear();
-		Add_UniqueCandidate(strSectionName + L".ysh", pOutCandidates);
-
-		if (0 == strSectionName.rfind(L"Land_", 0))
-			Add_UniqueCandidate(strSectionName.substr(5) + L".ysh", pOutCandidates);
-	}
-
-	_bool Try_ResolveMapSectionModelPath(const wstring& strSectionName, wstring* pOutPath)
-	{
-		if (nullptr == pOutPath)
-			return false;
-
-		error_code ErrorCode;
-		const path Root = weakly_canonical(path(kMapModelRoot), ErrorCode);
-		if (ErrorCode || !exists(Root))
-			return false;
-
-		vector<wstring> Candidates;
-		Build_MapSectionModelCandidates(strSectionName, &Candidates);
-		if (Candidates.empty())
-			return false;
-
-		for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode), End;
-			Iter != End;
-			Iter.increment(ErrorCode))
-		{
-			if (ErrorCode)
-				break;
-
-			if (!Iter->is_regular_file())
-				continue;
-
-			const wstring strFilename = Iter->path().filename().wstring();
-			auto CandidateIter = find_if(
-				Candidates.begin(),
-				Candidates.end(),
-				[&](const wstring& strCandidate) { return Equals_NoCase(strFilename, strCandidate); });
-			if (CandidateIter == Candidates.end())
-				continue;
-
-			*pOutPath = Iter->path().wstring();
-			return true;
-		}
-
-		return false;
-	}
-
-	_wstring Make_MapSectionModelProtoTag(const wstring& strSectionName)
-	{
-		return L"Prototype_Component_Model_MapSection_" + strSectionName;
-	}
-
-	_bool Try_GetLegacyMapSectionModelPath(const wstring& strSectionName, wstring* pOutPath)
-	{
-		if (nullptr == pOutPath)
-			return false;
-
-		const wstring strLegacyPath = L"../../ResourcesTest/Stage1-0/" + strSectionName + L".ysh";
-		error_code ErrorCode;
-		if (!exists(path(strLegacyPath), ErrorCode) || ErrorCode)
-			return false;
-
-		*pOutPath = strLegacyPath;
-		return true;
 	}
 
 	wstring Build_EnvPreviewCountText(const MAP_LOAD_RESULT& Report, _bool bUseCreatedLabel = false)
@@ -575,21 +482,6 @@ void CLevel_Edit::Add_Layer(const wstring& strLayerTag)
 		m_Layers[strLayerTag] = {};
 		Mark_HierarchyDirty();
 	}
-}
-
-HRESULT CLevel_Edit::Remove_Layer(const wstring& strLayerTag)
-{
-	auto iter = m_Layers.find(strLayerTag);
-	if (iter == m_Layers.end()) return E_FAIL;
-
-	if (!iter->second.empty()) {
-		MSG_BOX("The layer contains objects");
-		return E_FAIL;
-	}
-
-	m_Layers.erase(iter);
-	Mark_HierarchyDirty();
-	return S_OK;
 }
 
 void CLevel_Edit::Change_ObjectLayer(CGameObject* pObject, const wstring& strNewLayer)
@@ -1602,26 +1494,6 @@ void CLevel_Edit::Set_CameraActive(_bool b)
 		m_pCamera->Set_Active(b);
 }
 
-void CLevel_Edit::Preview_Camera(CGameObject* pCam)
-{
-	if (!pCam) return;
-
-	Set_CameraActive(false);
-
-	// 카메라 레이어 전부 Off
-	auto it = m_Layers.find(L"Layer_Camera");
-	if (it != m_Layers.end())
-	{
-		for (auto& handle : it->second)
-		{
-			if (handle.pObject)
-				handle.pObject->Set_Active(false);
-		}
-	}
-
-	pCam->Set_Active(true);
-}
-
 void CLevel_Edit::Back_To_Edit()
 {
 	auto it = m_Layers.find(L"Layer_Camera");
@@ -1662,12 +1534,6 @@ void CLevel_Edit::Teleport_EditCamera(const _float3& vPosition)
 
 	Back_To_Edit();
 	m_pCamera->Get_Transform()->Set_State(STATE::POSITION, XMVectorSet(vPosition.x, vPosition.y, vPosition.z, 1.f));
-}
-
-const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() const
-{
-	auto it = m_Layers.find(L"Layer_Camera");
-	return (it != m_Layers.end()) ? &it->second : nullptr;
 }
 
 HRESULT CLevel_Edit::Ready_EditLights()

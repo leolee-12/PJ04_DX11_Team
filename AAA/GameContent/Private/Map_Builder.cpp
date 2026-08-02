@@ -215,23 +215,16 @@ HRESULT CMap_Builder::Build_EnvDescs(const MAP_MANIFEST_DESC& Manifest, vector<E
 			Desc.tCollision.bCookCollMesh = Desc.tCollision.bHasCollMesh;
 			Desc.tCollision.bUseCollMesh = false;
 
-			Desc.tCollision.bSourceInvalidCollision = Desc.tCollision.bInvalidCollision;
-			Desc.tCollision.bSourceHasDecorCollisionApxbin = Desc.tCollision.bHasCollMesh;
-			Desc.tCollision.bHasDecorCollisionApxbin = Desc.tCollision.bHasCollMesh; // Legacy transitional.
-
 			Desc.tRender.bUseShadow = Desc.tRender.bHasShadow;
-			Desc.tRender.bShadowMappingCaster = Desc.tRender.bUseShadow; // Legacy transitional.
 
 			if (Desc.tRender.bIsDecal)
 			{
 				Desc.tRender.bUseShadow = false;
-				Desc.tRender.bShadowMappingCaster = false;
 
 				Desc.tCollision.eColliderKind = ENV_COLLIDER_KIND::NONE;
 				Desc.tCollision.bHasCollMesh = false;
 				Desc.tCollision.bCookCollMesh = false;
 				Desc.tCollision.bUseCollMesh = false;
-				Desc.tCollision.bHasDecorCollisionApxbin = false;
 			}
 
 			pOutEnvDescs->push_back(std::move(Desc));

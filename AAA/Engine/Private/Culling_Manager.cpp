@@ -159,41 +159,6 @@ void CCulling_Manager::Invalidate_All()
 		Reset_ViewState(&m_ViewStates[i]);
 }
 
-_bool CCulling_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
-{
-	if (!Is_ValidViewIndex(eView))
-	{
-		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW, 1);
-		return false;
-	}
-
-	const FRUSTUM_VIEW_STATE& State = m_ViewStates[ETOUI(eView)];
-	if (!State.bValid)
-	{
-		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW, 1);
-		return false;
-	}
-
-	if (!GeometryUtils::Is_ValidAABB(WorldBounds))
-	{
-		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS, 1);
-		return false;
-	}
-
-	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_TESTED, 1);
-
-	BoundingBox ExpandedBounds = WorldBounds;
-	if (State.fCullMargin > 0.f)
-		GeometryUtils::Expand_AABB(&ExpandedBounds, State.fCullMargin);
-
-	const _bool bVisible = State.WorldFrustum.Intersects(ExpandedBounds);
-	const _bool bCull = !bVisible;
-
-	PROFILE_COUNTER_ADD(bVisible ? EPROFILE_COUNTER::FRUSTUM_VISIBLE : EPROFILE_COUNTER::FRUSTUM_CULLED, 1);
-
-	return bCull;
-}
-
 _float CCulling_Manager::Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const
 {
 	if (nullptr == m_pProxy)

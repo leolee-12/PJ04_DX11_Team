@@ -44,8 +44,6 @@ private:
 
 private:
     vector<BLEND_SUBMIT_DATA> m_Submitted;
-
-    _bool m_bRegisteredThisFrame = { false };
     _int64 m_iLastSubmitFrame = { 0 };
 
 public:

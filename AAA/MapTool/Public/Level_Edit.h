@@ -47,7 +47,6 @@ public:
 public:
 	// Layer
 	void Add_Layer(const wstring& strLayerTag);
-	HRESULT Remove_Layer(const wstring& strLayerTag);
 	void Change_ObjectLayer(CGameObject* pObject, const wstring& strNewLayer);
 	void Delete_Object(CGameObject* pObject);
 
@@ -102,12 +101,10 @@ public:
 	const unordered_map<wstring, vector<EDITOR_OBJECT_HANDLE>>& Get_Layers() { return m_Layers; }
 	CGameObject* Get_Selected() { return m_pSelected; }
 	const wstring& Get_PendingProto() const { return m_strPendingProto; }
-	const vector<EDITOR_OBJECT_HANDLE>* Get_CameraLayer() const;
 
 	void Set_Selected(CGameObject* pSelected);
 	void Set_CameraActive(_bool b);
 
-	void Preview_Camera(CGameObject* pCam);
 	void Back_To_Edit();
 	void Reset_EditCameraRotation();
 	void Jump_EditCamera(_float fForwardDistance, _float fRightDistance);

@@ -90,21 +90,12 @@ struct ENV_COLLISION_DESC
 	_bool   bHasCollMesh = { false };
 	_bool   bCookCollMesh = { false };
 	_bool   bUseCollMesh = { false };
-
-	// Legacy transitional metadata. Do not use these for new collision policy decisions.
-	_bool   bCatalogCollisionChecked = { false };
-	_bool   bHasDecorCollisionApxbin = { false };
-	_bool   bSourceInvalidCollision = { false };
-	_bool   bSourceHasDecorCollisionApxbin = { false };
-	wstring strDecorCollisionApxbinName;
-	wstring strDecorCollisionBfresPath;
 };
 
 struct ENV_RENDER_DESC
 {
 	_bool   bHasShadow = { false };
 	_bool   bUseShadow = { false };
-	_bool   bShadowMappingCaster = { false }; // Legacy transitional.
 
 	_bool   bUseCullDistance = { false };
 	_bool	bUseCullFrustum = { true };

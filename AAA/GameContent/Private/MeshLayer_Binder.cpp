@@ -11,6 +11,12 @@ NS_BEGIN(Client)
 
 namespace
 {
+	struct MESH_LAYER_BIND_RESULT
+	{
+		_uint iPass = { 0u };
+		_bool bSkipMesh = { false };
+	};
+
 	HRESULT Bind_Map(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
 	HRESULT Bind_World(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
 	HRESULT Bind_WorldMainTextures(const MESH_LAYER_BIND_CONTEXT& Ctx);
@@ -28,7 +34,7 @@ namespace
 	HRESULT Bind_MapLayerExTextureSafe(const MESH_LAYER_BIND_CONTEXT& Ctx, const _char* pName, const MESH_LAYER_TEX_BIND_EX& Bind, DEFAULT_TEXTURE eDefault);
 }
 
-HRESULT MeshLayerBinder::Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
+static HRESULT Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
 {
 	if (nullptr == pOutResult)
 		return E_FAIL;
@@ -50,6 +56,48 @@ HRESULT MeshLayerBinder::Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIN
 
 	default:
 		return E_FAIL;
+	}
+}
+
+static HRESULT Bind_TextureSafe(CShader* pShader, CModel* pModel, CGameInstance_Proxy* pGI_Proxy,
+	_uint iMesh, const _char* pConstantName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefaultKind)
+{
+	if (nullptr == pShader || nullptr == pModel || nullptr == pGI_Proxy || nullptr == pConstantName)
+		return E_FAIL;
+
+	const _uint iTextureCount = pModel->Get_MeshTextureCount(iMesh, eType);
+
+	if (iTextureCount > 0u)
+	{
+		const _uint iSafeSlot = (iSlot < iTextureCount) ? iSlot : (iTextureCount - 1u);
+
+		if (SUCCEEDED(pModel->Bind_Material(pShader, pConstantName, iMesh, eType, iSafeSlot)))
+			return S_OK;
+	}
+
+	return pGI_Proxy->Bind_DefaultTextureFromHub(pShader, pConstantName, eDefaultKind);
+}
+
+static _uint Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_RENDER_KIND eKind, const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
+{
+	if (MESH_LAYER_RENDER_KIND::MAIN != eKind && MESH_LAYER_RENDER_KIND::MAIN_BLEND != eKind)
+		return iFallbackPass;
+
+	switch (eProfile)
+	{
+	case MESH_LAYER_PROFILE::MAP:
+		return Is_ValidMapPassValue(Layer.iPass) ? static_cast<_uint>(Layer.iPass) : iFallbackPass;
+
+	case MESH_LAYER_PROFILE::WORLD_NONANIM:
+	case MESH_LAYER_PROFILE::WORLD_ANIM:
+	case MESH_LAYER_PROFILE::WORLD_INSTANCE:
+	{
+		const WORLD_PASS ePass = static_cast<WORLD_PASS>(Layer.iPass);
+		return WORLD_PASS::DEFAULT != ePass && Is_ValidWorldPassValue(Layer.iPass) ? static_cast<_uint>(ePass) : iFallbackPass;
+	}
+
+	default:
+		return iFallbackPass;
 	}
 }
 
@@ -87,48 +135,6 @@ HRESULT MeshLayerBinder::Bind_WorldViewProj(CShader* pShader, CTransform* pTrans
 	return S_OK;
 }
 
-HRESULT MeshLayerBinder::Bind_TextureSafe(CShader* pShader, CModel* pModel, CGameInstance_Proxy* pGI_Proxy,
-	_uint iMesh, const _char* pConstantName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefaultKind)
-{
-	if (nullptr == pShader || nullptr == pModel || nullptr == pGI_Proxy || nullptr == pConstantName)
-		return E_FAIL;
-
-	const _uint iTextureCount = pModel->Get_MeshTextureCount(iMesh, eType);
-
-	if (iTextureCount > 0u)
-	{
-		const _uint iSafeSlot = (iSlot < iTextureCount) ? iSlot : (iTextureCount - 1u);
-
-		if (SUCCEEDED(pModel->Bind_Material(pShader, pConstantName, iMesh, eType, iSafeSlot)))
-			return S_OK;
-	}
-
-	return pGI_Proxy->Bind_DefaultTextureFromHub(pShader, pConstantName, eDefaultKind);
-}
-
-_uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_RENDER_KIND eKind, const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
-{
-	if (MESH_LAYER_RENDER_KIND::MAIN != eKind && MESH_LAYER_RENDER_KIND::MAIN_BLEND != eKind)
-		return iFallbackPass;
-
-	switch (eProfile)
-	{
-	case MESH_LAYER_PROFILE::MAP:
-		return Is_ValidMapPassValue(Layer.iPass) ? static_cast<_uint>(Layer.iPass) : iFallbackPass;
-
-	case MESH_LAYER_PROFILE::WORLD_NONANIM:
-	case MESH_LAYER_PROFILE::WORLD_ANIM:
-	case MESH_LAYER_PROFILE::WORLD_INSTANCE:
-	{
-		const WORLD_PASS ePass = static_cast<WORLD_PASS>(Layer.iPass);
-		return WORLD_PASS::DEFAULT != ePass && Is_ValidWorldPassValue(Layer.iPass) ? static_cast<_uint>(ePass) : iFallbackPass;
-	}
-
-	default:
-		return iFallbackPass;
-	}
-}
-
 namespace
 {
 	HRESULT Bind_Map(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
@@ -145,7 +151,7 @@ namespace
 			return E_FAIL;
 
 		const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOI(MAP_DEFAULT_PASS);
-		pOutResult->iPass = MeshLayerBinder::Resolve_Pass(Ctx.eProfile, Ctx.eKind, Layer, iFallbackPass);
+		pOutResult->iPass = Resolve_Pass(Ctx.eProfile, Ctx.eKind, Layer, iFallbackPass);
 
 		return S_OK;
 	}
@@ -196,7 +202,7 @@ namespace
 			}
 
 			const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DMN);
-			pOutResult->iPass = MeshLayerBinder::Resolve_Pass(Ctx.eProfile, Ctx.eKind, Layer, iFallbackPass);
+			pOutResult->iPass = Resolve_Pass(Ctx.eProfile, Ctx.eKind, Layer, iFallbackPass);
 			return S_OK;
 		}
 
@@ -215,16 +221,16 @@ namespace
 	{
 		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
 
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
 			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
 			return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture", MTEX_TYPE::NORMALS,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture", MTEX_TYPE::NORMALS,
 			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)], DEFAULT_TEXTURE::FLAT_NORMAL)))
 			return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture", MTEX_TYPE::METALNESS,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture", MTEX_TYPE::METALNESS,
 			Layer.idx[ETOUI(MTEX_TYPE::METALNESS)], DEFAULT_TEXTURE::MRA)))
 			return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
 			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 
@@ -238,7 +244,7 @@ namespace
 			return E_FAIL;
 
 		if (Uses_WorldEmissiveSlot(Layer.iPass) &&
-			FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_EmissiveTexture",
+			FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_EmissiveTexture",
 				MTEX_TYPE::EMISSIVE, Layer.idx[ETOUI(MTEX_TYPE::EMISSIVE)], DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 
@@ -348,10 +354,10 @@ namespace
 	{
 		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
 
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
 			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
 			return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
 			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 		if (FAILED(Bind_WorldCommonParams(Ctx)))
@@ -369,16 +375,16 @@ namespace
 	{
 		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
 
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture",
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture",
 			MTEX_TYPE::DIFFUSE, Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
 			return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture",
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture",
 			MTEX_TYPE::NORMALS, Layer.idx[ETOUI(MTEX_TYPE::NORMALS)], DEFAULT_TEXTURE::FLAT_NORMAL)))
 			return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture",
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture",
 			MTEX_TYPE::METALNESS, Layer.idx[ETOUI(MTEX_TYPE::METALNESS)], DEFAULT_TEXTURE::MRA)))
 			return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture",
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture",
 			MTEX_TYPE::UNKNOWN, Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
 			return E_FAIL;
 		if (FAILED(Bind_WorldCommonParams(Ctx)))
@@ -478,13 +484,13 @@ namespace
 	{
 		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
 
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
 			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA))) return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture", MTEX_TYPE::NORMALS,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture", MTEX_TYPE::NORMALS,
 			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)], DEFAULT_TEXTURE::FLAT_NORMAL))) return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture", MTEX_TYPE::METALNESS,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture", MTEX_TYPE::METALNESS,
 			Layer.idx[ETOUI(MTEX_TYPE::METALNESS)], DEFAULT_TEXTURE::MRA))) return E_FAIL;
-		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
+		if (FAILED(Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
 			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK))) return E_FAIL;
 
 		if (FAILED(Bind_MapExtraSlotSafe(Ctx, "g_ExtraRTexture", Layer.iExtraBind[0], static_cast<MTEX_TYPE>(Layer.iExtraTexType[0]),

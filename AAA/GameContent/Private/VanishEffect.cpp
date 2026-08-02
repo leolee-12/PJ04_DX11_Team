@@ -30,25 +30,10 @@ HRESULT CVanishEffect::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CVanishEffect::Priority_Update(_float fTimeDelta)
-{
-	__super::Priority_Update(fTimeDelta);
-}
-
 void CVanishEffect::Update(_float fTimeDelta)
 {
 	Update_Move(fTimeDelta);
 	__super::Update(fTimeDelta);
-}
-
-void CVanishEffect::Late_Update(_float fTimeDelta)
-{
-	__super::Late_Update(fTimeDelta);
-}
-
-HRESULT CVanishEffect::Render()
-{
-	return __super::Render();
 }
 
 HRESULT CVanishEffect::Ready_EffectPartObjects()

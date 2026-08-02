@@ -101,15 +101,6 @@ namespace GeometryUtils
 		return BoundingBox(_float3(0.f, 0.f, 0.f), _float3(fHalfExtent, fHalfExtent, fHalfExtent));
 	}
 
-	inline _bool XM_CALLCONV Transform_AABB(const BoundingBox& LocalBounds, _fmatrix WorldMatrix, BoundingBox* pOutWorldBounds)
-	{
-		if (nullptr == pOutWorldBounds)
-			return false;
-
-		LocalBounds.Transform(*pOutWorldBounds, WorldMatrix);
-		return true;
-	}
-
 	inline BoundingBox Merge_AABB(const BoundingBox& A, const BoundingBox& B)
 	{
 		BoundingBox Merged{};

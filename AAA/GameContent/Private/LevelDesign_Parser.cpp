@@ -144,10 +144,7 @@ HRESULT CLevelDesign_Parser::Parse_Root(const json& jRoot, const _wstring& wstrS
 		const json& jSection = Iter.value();
 
 		if (JsonUtils::Equals_NoCase(strSection.c_str(), L"StepLinkInfo"))
-		{
-			Parse_StepLinkInfo(jSection, &pOutPackage->StepLinks);
 			continue;
-		}
 
 		if (jSection.is_object())
 		{
@@ -216,33 +213,6 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 		Fill_SpecialFields(Iter.value(), &Desc);
 
 		pOutDescs->emplace_back(std::move(Desc));
-	}
-}
-
-void CLevelDesign_Parser::Parse_StepLinkInfo(
-	const json& jArray,
-	vector<LD_STEP_LINK_INFO>* pOutStepLinks)
-{
-	if (nullptr == pOutStepLinks || !jArray.is_array())
-		return;
-
-	pOutStepLinks->clear();
-	pOutStepLinks->reserve(jArray.size());
-
-	for (const json& jEntry : jArray)
-	{
-		if (!jEntry.is_object())
-			continue;
-
-		LD_STEP_LINK_INFO Info{};
-		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IgnoreWarningAtOneWay", &Info.bIgnoreWarningAtOneWay);
-		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "RoundTrip", &Info.bRoundTrip);
-
-		if (!JsonUtils::Try_ReadInt(jEntry, "MoveStepValue", &Info.iMoveStepValue))
-			JsonUtils::Try_ReadInt(jEntry, "MoveStep", &Info.iMoveStepValue);
-
-		Info.jRaw = jEntry;
-		pOutStepLinks->push_back(Info);
 	}
 }
 

@@ -31,8 +31,6 @@ public:
 
 	_bool	Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc);
 
-	_bool	Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
-
 	CULLING_FADE_RESULT Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const;
 	CULLING_FADE_RESULT Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const;
 

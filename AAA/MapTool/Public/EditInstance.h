@@ -18,7 +18,6 @@ NS_BEGIN(MapTool)
 class CLevel_Edit;
 class CImGui_Manager;
 class CPanel_Manager;
-class CPanel;
 
 class CEditInstance final : public CBase
 {
@@ -35,7 +34,6 @@ public:
 	void			ImGui_Render();
 	void			Update_Panels(_float fTimeDelta);
 	void			Render_Panels();
-	CPanel*			Get_Panel(const _wstring& strPanelTag);
 
 	// 현재 편집 레벨 (약참조)
 	void			Set_Level(CLevel_Edit* pLevel) { m_pLevel = pLevel; }

@@ -68,11 +68,6 @@ void CEditInstance::Render_Panels()
 	m_pPanelManager->Render();
 }
 
-CPanel* CEditInstance::Get_Panel(const _wstring& strPanelTag)
-{
-	return m_pPanelManager ? m_pPanelManager->Get_Panel(strPanelTag) : nullptr;
-}
-
 CGameObject* CEditInstance::Get_Selected() const
 {
 	return m_pLevel ? m_pLevel->Get_Selected() : nullptr;

@@ -352,8 +352,7 @@ HRESULT CLevelDesign_Rail::Ready_VisualCullBounds()
 		const _matrix InstanceLocalMatrix = XMLoadFloat4x4(&InstanceData.matWorld) * InverseRailWorldMatrix;
 
 		BoundingBox InstanceBounds{};
-		if (!GeometryUtils::Transform_AABB(ModelBounds, InstanceLocalMatrix, &InstanceBounds))
-			return E_FAIL;
+		ModelBounds.Transform(InstanceBounds, InstanceLocalMatrix);
 
 		if (!GeometryUtils::Is_ValidAABB(InstanceBounds))
 			return E_FAIL;

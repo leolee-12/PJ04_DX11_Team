@@ -58,29 +58,6 @@ CTexture_Hub::CTexture_Hub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	Safe_AddRef(m_pContext);
 }
 
-_string CTexture_Hub::Normalize_TextureName(const _string& strRaw)
-{
-	if (strRaw.empty())
-		return {};
-
-	_string strKey = strRaw;
-
-	if (const size_t iSlash = strKey.find_last_of("/\\"); iSlash != _string::npos)
-		strKey = strKey.substr(iSlash + 1);
-
-	transform(strKey.begin(), strKey.end(), strKey.begin(),
-		[](_char ch) { return static_cast<_char>(tolower(static_cast<unsigned char>(ch))); });
-
-	if (const size_t iDot = strKey.rfind('.'); iDot != _string::npos)
-	{
-		const _string strExt = strKey.substr(iDot);
-		if (".dds" == strExt || ".png" == strExt)
-			strKey.erase(iDot);
-	}
-
-	return strKey;
-}
-
 _wstring CTexture_Hub::Normalize_TextureName(const _wstring& strRaw)
 {
 	if (strRaw.empty())
@@ -253,12 +230,6 @@ HRESULT CTexture_Hub::Bind_DefaultShaderResource(CShader* pShader, const _char* 
 		return E_FAIL;
 
 	return pShader->Bind_SRV(pConstantName, pSRV);
-}
-
-_bool CTexture_Hub::Is_Valid(TEXTURE_HANDLE Handle) const
-{
-	shared_lock<shared_mutex> Lock(m_Mutex);
-	return Handle < m_SRVs.size() && nullptr != m_SRVs[Handle];
 }
 
 TEXTURE_HUB_STATS CTexture_Hub::Get_Stats() const

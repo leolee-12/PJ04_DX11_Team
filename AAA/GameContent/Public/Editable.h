@@ -69,10 +69,6 @@ struct EDIT_OBJECT_COMMON_OVERRIDE
 	_wstring strReceiveEventTag;
 };
 
-struct EDIT_MAPSECTION_OVERRIDE
-{
-};
-
 struct EDIT_ENVOBJECT_OVERRIDE
 {
 	_bool bHasNearDistAlpha = { false };
@@ -82,10 +78,6 @@ struct EDIT_ENVOBJECT_OVERRIDE
 	_float fDecalAlpha = { 1.f };
 };
 
-struct EDIT_LEVELDESIGN_OVERRIDE
-{
-};
-
 struct EDIT_LD_WATER_OVERRIDE
 {
 	WATER_RENDER_DESC RenderDesc = {};
@@ -93,9 +85,7 @@ struct EDIT_LD_WATER_OVERRIDE
 
 using EDIT_CLASS_OVERRIDE = variant<
 	monostate,
-	EDIT_MAPSECTION_OVERRIDE,
 	EDIT_ENVOBJECT_OVERRIDE,
-	EDIT_LEVELDESIGN_OVERRIDE,
 	EDIT_LD_WATER_OVERRIDE>;
 
 struct EDIT_OBJECT_OVERRIDE_DESC

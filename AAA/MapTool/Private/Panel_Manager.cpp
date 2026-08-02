@@ -50,12 +50,6 @@ HRESULT CPanel_Manager::Add_Panel(const _wstring& strPanelTag, CPanel* pPanel)
 	return S_OK;
 }
 
-CPanel* CPanel_Manager::Get_Panel(const _wstring& strPanelTag)
-{
-	auto it = m_Panels.find(strPanelTag);
-	return (it == m_Panels.end()) ? nullptr : it->second;
-}
-
 void CPanel_Manager::Update(_float fTimeDelta)
 {
 	for (auto& [tag, pPanel] : m_Panels)

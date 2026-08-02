@@ -17,7 +17,6 @@ public:
 	void						Render();
 
 	HRESULT						Add_Panel(const _wstring& strPanelTag, CPanel* pPanel);
-	CPanel*						Get_Panel(const _wstring& strPanelTag);
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };

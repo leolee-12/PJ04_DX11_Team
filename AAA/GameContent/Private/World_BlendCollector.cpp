@@ -53,11 +53,8 @@ void CWorld_BlendCollector::Submit(IBlendRenderable* pOwner, CGameObject* pRefOw
 	Safe_AddRef(Data.pRefOwner);
 	m_Submitted.push_back(Data);
 
-	if (!m_bRegisteredThisFrame)
-	{
-		m_bRegisteredThisFrame = true;
+	if (1 == m_Submitted.size())
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND_HDR, this);
-	}
 }
 
 HRESULT CWorld_BlendCollector::Render()
@@ -83,7 +80,6 @@ HRESULT CWorld_BlendCollector::Render()
 	}
 
 	Clear_Submissions();
-	m_bRegisteredThisFrame = false;
 
 	return hr;
 }
@@ -110,7 +106,6 @@ void CWorld_BlendCollector::BeginFrame_IfNeeded(_int64 iCurrentFrame)
 		return;
 
 	Clear_Submissions();
-	m_bRegisteredThisFrame = false;
 	m_iLastSubmitFrame = iCurrentFrame;
 }
 

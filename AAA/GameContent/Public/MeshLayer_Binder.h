@@ -53,25 +53,12 @@ struct MESH_LAYER_BIND_CONTEXT
 	_bool bUseLayerEx = { true };
 };
 
-struct MESH_LAYER_BIND_RESULT
-{
-	_uint iPass = { 0u };
-	_bool bSkipMesh = { false };
-};
-
 namespace MeshLayerBinder
 {
-	HRESULT Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
-
 	// S_OK: *pOutPass 유효 / S_FALSE: 메시 스킵 / 실패: 바인딩 실패
 	HRESULT Bind_OrSkip(const MESH_LAYER_BIND_CONTEXT& Ctx, _uint* pOutPass);
 
 	HRESULT Bind_WorldViewProj(CShader* pShader, CTransform* pTransform, CGameInstance_Proxy* pGI_Proxy, PROJ_TYPE eProjType);
-
-	HRESULT Bind_TextureSafe(CShader* pShader, CModel* pModel, CGameInstance_Proxy* pGI_Proxy,
-		_uint iMesh, const _char* pConstantName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefaultKind);
-
-	_uint Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_RENDER_KIND eKind, const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
 }
 
 NS_END

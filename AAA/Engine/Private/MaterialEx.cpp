@@ -84,9 +84,6 @@ CMaterialEx* CMaterialEx::Create(const MATERIAL_DATA& data)
 
 void CMaterialEx::Free()
 {
-	for (auto& Handles : m_MaterialHandles)
-		Handles.clear();
-
 	Safe_Release(m_pProxy);
 
 	__super::Free();

@@ -488,14 +488,6 @@ _bool CGameInstance_Proxy::Update_CullingView(CULLING_VIEW eView, const CULLING_
 	return m_pOwner->Update_CullingView(eView, Desc);
 }
 
-_bool CGameInstance_Proxy::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
-{
-	if (!IsConnected())
-		return false;
-
-	return m_pOwner->Should_CullAABB(eView, WorldBounds);
-}
-
 CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const
 {
 	if (!IsConnected())

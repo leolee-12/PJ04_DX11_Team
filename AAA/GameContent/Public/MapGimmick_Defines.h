@@ -34,18 +34,18 @@ struct MAP_GIMMICK_SECTION_ENTRY
 	COLLISION_LAYER eTriggerLayer;
 	_float			fTriggerPadding;
 
-	// CEffect_Loader에 사전 등록된 ID만 사용한다.
-	const _tchar* pBreakEffectID;
-	_float			fEffectHeightRatio;
-	_float			fEffectFrontRatio;
-
-	const _tchar* pBreakSFX;
-	_float			fBreakSFXVolume;
-	_float			fShakeTrauma;
-
-	MAP_GIMMICK_SCATTER			Scatter;
-	const MAP_GIMMICK_FRAGMENT* pFragments;
+	const MAP_GIMMICK_FRAGMENT*	pFragments;
 	_uint						iNumFragments;
+
+	const _tchar*	pBreakEffectID = L"Split_Stone_Ultra";
+	_float			fEffectHeightRatio = { 1.f };
+	_float			fEffectFrontRatio = { -0.5f };
+
+	const _tchar*	pBreakSFX = L"GimmickWallStake_Strike.wav";
+	_float			fBreakSFXVolume = { 0.6f };
+	_float			fShakeTrauma = { 1.f };
+
+	MAP_GIMMICK_SCATTER	Scatter;
 };
 
 struct MAP_GIMMICK_BREAK_EVENT
@@ -208,15 +208,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
 		0.5f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage1Step2_Fragments,
 		static_cast<_uint>(_countof(g_Stage1Step2_Fragments)),
 	},
@@ -231,15 +222,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::ENV_PROJECTILE,
 		1.0f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step1_GsAllBuilding7_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step1_GsAllBuilding7_Fragments)),
 	},
@@ -254,15 +236,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::ENV_PROJECTILE,
 		1.0f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step1_GsAllBuilding8_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step1_GsAllBuilding8_Fragments)),
 	},
@@ -277,15 +250,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::ENV_PROJECTILE,
 		1.0f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step1_GsAllBuilding9_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step1_GsAllBuilding9_Fragments)),
 	},
@@ -300,15 +264,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::ENV_PROJECTILE,
 		1.5f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step1_GsAllBuilding10_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step1_GsAllBuilding10_Fragments)),
 	},
@@ -323,15 +278,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
 		2.f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step2_GsAllBuilding9_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step2_GsAllBuilding9_Fragments)),
 	},
@@ -346,15 +292,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
 		2.f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step2_GsAllBuilding10_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step2_GsAllBuilding10_Fragments)),
 	},
@@ -369,15 +306,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
 		2.f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step2_GsAllBuilding11_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step2_GsAllBuilding11_Fragments)),
 	},
@@ -392,15 +320,6 @@ inline constexpr MAP_GIMMICK_SECTION_ENTRY g_MapGimmickSections[] =
 		COLLISION_LAYER::PLAYER_BREAKERABLE,
 		2.f,
 
-		L"Split_Stone_Ultra",
-		1.f,
-		-0.5f,
-
-		L"GimmickWallStake_Strike.wav",
-		0.6f,
-		1.f,
-
-		{},
 		g_Stage3Step2_GsAllBuilding12_Fragments,
 		static_cast<_uint>(_countof(g_Stage3Step2_GsAllBuilding12_Fragments)),
 	},

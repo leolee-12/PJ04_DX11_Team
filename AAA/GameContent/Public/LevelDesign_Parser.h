@@ -14,8 +14,6 @@ private:
 	static void Parse_ObjectSection(const _wstring& wstrSourcePath, const _wstring& strSourceFile,
 		const _wstring& strSection, const json& jSection, vector<LD_OBJECT_ENTRY>* pOutDescs);
 
-	static void Parse_StepLinkInfo(const json& jArray, vector<LD_STEP_LINK_INFO>* pOutStepLinks);
-
 	static LD_OBJECT_DESC Make_BaseDesc(const _wstring& wstrSourcePath, const _wstring& strSourceFile,
 		const _wstring& strSection, const _wstring& strEntryKey);
 

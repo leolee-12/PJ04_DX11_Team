@@ -16,10 +16,6 @@ class CWaddleDee_Body final : public CPartObject
 	GENERATED_BODY(CWaddleDee_Body)
 
 public:
-	struct WADDLEDEE_BODY_DESC : public CPartObject::PARTOBJECT_DESC
-	{
-	};
-
 	static constexpr const _tchar*	PROTOTYPE_TAG		= L"Proto_WaddleDee_Body";
 	static constexpr const _tchar*	PART_TAG			= L"Body";
 	static constexpr const _tchar*	EYE_TEX_PROTO		= L"Prototype_Component_Texture_WaddleDee_Eye";
