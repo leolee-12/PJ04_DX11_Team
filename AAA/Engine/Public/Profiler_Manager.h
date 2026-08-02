@@ -51,7 +51,6 @@ private:
 
 	PROFILER_FRAME_SNAPSHOT m_WorkingSnapshot = {};
 	PROFILER_FRAME_SNAPSHOT m_Snapshot = {};
-	TEXTURE_HUB_STATS m_PrevTextureHubStats = {};
 
 private:
 	virtual void Free() override;

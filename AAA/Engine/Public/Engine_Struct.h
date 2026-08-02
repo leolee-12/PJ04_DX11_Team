@@ -146,9 +146,9 @@ namespace Engine
 
 	struct TEXTURE_HUB_STATS
 	{
+		unsigned int iMaterialRequestCount = {};
 		unsigned int iCachedSRVCount = {};
 		unsigned int iCacheReuseCount = {};
-		unsigned int iFirstLoadRequestCount = {};
 		unsigned int iLoadFailCount = {};
 	};
 

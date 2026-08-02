@@ -130,25 +130,10 @@ void CProfiler_Manager::AddCounter(EPROFILE_COUNTER eCounter, _uint iValue)
 
 void CProfiler_Manager::Set_TextureHubStats(const TEXTURE_HUB_STATS& Stats)
 {
-	const auto Delta = [](_uint iCurrent, _uint iPrevious) -> _uint
-		{
-			return iCurrent >= iPrevious ? iCurrent - iPrevious : iCurrent;
-		};
-
-	const _uint iDeduped = Delta(Stats.iCacheReuseCount, m_PrevTextureHubStats.iCacheReuseCount);
-	const _uint iFirstLoad = Delta(Stats.iFirstLoadRequestCount, m_PrevTextureHubStats.iFirstLoadRequestCount);
-	const _uint iFailed = Delta(Stats.iLoadFailCount, m_PrevTextureHubStats.iLoadFailCount);
-
-	m_PrevTextureHubStats = Stats;
-
 	if (!m_bFrameOpen)
 		return;
 
-	m_WorkingSnapshot.iTextureHubCached = Stats.iCachedSRVCount;
-	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_REQUEST, iDeduped + iFirstLoad);
-	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_DEDUPED, iDeduped);
-	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_FIRST_LOAD_REQUEST, iFirstLoad);
-	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_FAILED, iFailed);
+	m_WorkingSnapshot.TextureHub = Stats;
 }
 
 const PROFILER_FRAME_SNAPSHOT& CProfiler_Manager::Get_Snapshot() const

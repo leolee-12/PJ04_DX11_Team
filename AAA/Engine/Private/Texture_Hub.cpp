@@ -101,15 +101,9 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 		const auto iter = m_HandleByNormalizedPath.find(strNormalizedPath);
 		if (iter != m_HandleByNormalizedPath.end())
 		{
-			if constexpr (0 != PROFILE_ENABLE)
-				++m_iDedupedLoadRequestCount;
-
 			*pOut = iter->second;
 			return S_OK;
 		}
-
-		if constexpr (0 != PROFILE_ENABLE)
-			++m_iFirstLoadRequestCount;
 	}
 
 	// 파일 I/O는 락 바깥에서 수행
@@ -155,22 +149,19 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 
 HRESULT CTexture_Hub::Get(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) const
 {
-	if (nullptr == pOut)
+	if (FAILED(Find_Handle(pTextureName, pOut)))
 		return E_FAIL;
 
-	*pOut = INVALID_TEXTURE_HANDLE;
+	if constexpr (0 != PROFILE_ENABLE)
+	{
+		unique_lock<shared_mutex> Lock(m_Mutex);
 
-	const _wstring strKey = To_NormalizedTextureName(pTextureName);
-	if (strKey.empty())
-		return E_FAIL;
+		++m_iMaterialRequestCount;
 
-	shared_lock<shared_mutex> Lock(m_Mutex);
+		if (!m_ReferencedTextureHandles.emplace(*pOut).second)
+			++m_iCacheReuseCount;
+	}
 
-	const auto iter = m_HandleByTextureName.find(strKey);
-	if (iter == m_HandleByTextureName.end())
-		return E_FAIL;
-
-	*pOut = iter->second;
 	return S_OK;
 }
 
@@ -222,7 +213,7 @@ HRESULT CTexture_Hub::Bind_DefaultShaderResource(CShader* pShader, const _char* 
 	}
 
 	TEXTURE_HANDLE Handle = INVALID_TEXTURE_HANDLE;
-	if (FAILED(Get(pTextureName, &Handle)))
+	if (FAILED(Find_Handle(pTextureName, &Handle)))
 		return E_FAIL;
 
 	ID3D11ShaderResourceView* pSRV = Get_SRV(Handle);
@@ -237,11 +228,32 @@ TEXTURE_HUB_STATS CTexture_Hub::Get_Stats() const
 	shared_lock<shared_mutex> Lock(m_Mutex);
 
 	TEXTURE_HUB_STATS Stats{};
+	Stats.iMaterialRequestCount = m_iMaterialRequestCount;
 	Stats.iCachedSRVCount = static_cast<_uint>(m_SRVs.size());
-	Stats.iCacheReuseCount = m_iDedupedLoadRequestCount;
-	Stats.iFirstLoadRequestCount = m_iFirstLoadRequestCount;
+	Stats.iCacheReuseCount = m_iCacheReuseCount;
 	Stats.iLoadFailCount = m_iLoadFailureCount;
 	return Stats;
+}
+
+HRESULT CTexture_Hub::Find_Handle(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) const
+{
+	if (nullptr == pOut)
+		return E_FAIL;
+
+	*pOut = INVALID_TEXTURE_HANDLE;
+
+	const _wstring strKey = To_NormalizedTextureName(pTextureName);
+	if (strKey.empty())
+		return E_FAIL;
+
+	shared_lock<shared_mutex> Lock(m_Mutex);
+
+	const auto iter = m_HandleByTextureName.find(strKey);
+	if (iter == m_HandleByTextureName.end())
+		return E_FAIL;
+
+	*pOut = iter->second;
+	return S_OK;
 }
 
 ID3D11ShaderResourceView* CTexture_Hub::Get_SRV(TEXTURE_HANDLE Handle) const
@@ -273,6 +285,7 @@ void CTexture_Hub::Free()
 
 	m_HandleByNormalizedPath.clear();
 	m_HandleByTextureName.clear();
+	m_ReferencedTextureHandles.clear();
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);

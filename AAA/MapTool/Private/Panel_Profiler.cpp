@@ -56,8 +56,20 @@ void CPanel_Profiler::Render()
 			Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_BLEND),
 			Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_UI));
 
+		const _uint iSubmittedNamed =
+			Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_PRIORITY)
+			+ Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_SHADOW)
+			+ Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_NONBLEND)
+			+ Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_DECAL)
+			+ Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_NONLIGHT)
+			+ Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_BLEND)
+			+ Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_UI);
+		const _uint iSubmittedTotal = Counter(Engine::EPROFILE_COUNTER::RENDER_SUBMITTED_TOTAL);
+		ImGui::Text("  others(sky/blend_hdr/occlusion/distortion) %u",
+			iSubmittedTotal >= iSubmittedNamed ? iSubmittedTotal - iSubmittedNamed : 0u);
+
 		ImGui::Separator();
-		ImGui::Text("Engine Frustum:");
+		ImGui::Text("Engine Frustum Queries (only when evaluation runs):");
 		ImGui::Text("  tested %u / visible %u / culled %u",
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_TESTED),
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_VISIBLE),
@@ -68,7 +80,7 @@ void CPanel_Profiler::Render()
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS));
 
 		ImGui::Separator();
-		ImGui::Text("Engine Distance:");
+		ImGui::Text("Engine Distance Queries (only when evaluation runs):");
 		ImGui::Text("  tested %u / visible %u / culled %u",
 			Counter(Engine::EPROFILE_COUNTER::DISTANCE_TESTED),
 			Counter(Engine::EPROFILE_COUNTER::DISTANCE_VISIBLE),
@@ -79,7 +91,7 @@ void CPanel_Profiler::Render()
 			Counter(Engine::EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_DISTANCE));
 
 		ImGui::Separator();
-		ImGui::Text("Engine Env Visible:");
+		ImGui::Text("Engine Env Visible (every frame, cached result included):");
 		ImGui::Text("  culling %.3f ms", CpuMs(Engine::EPROFILE_CPU_SECTION::ENV_CULLING));
 		ImGui::Text("  main %u / shadow %u",
 			Counter(Engine::EPROFILE_COUNTER::ENV_VISIBLE_MAIN),
@@ -94,28 +106,25 @@ void CPanel_Profiler::Render()
 			Counter(Engine::EPROFILE_COUNTER::ENV_INSTANCE_RENDERED),
 			Counter(Engine::EPROFILE_COUNTER::ENV_INSTANCE_FALLBACK));
 
-		const _uint iTextureRequests = Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_REQUEST);
-		const _uint iTextureDeduped = Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_DEDUPED);
-		const _uint iTextureFirstLoad = Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_FIRST_LOAD_REQUEST);
+		const Engine::TEXTURE_HUB_STATS& TextureHub = Snapshot.TextureHub;
+		const _uint iUniqueSRVCount = TextureHub.iMaterialRequestCount >= TextureHub.iCacheReuseCount
+			? TextureHub.iMaterialRequestCount - TextureHub.iCacheReuseCount
+			: 0u;
 
 		ImGui::Separator();
-		ImGui::Text("Engine TextureHub LoadOrGet (Frame):");
-		ImGui::Text("  cached SRV %u", Snapshot.iTextureHubCached);
-		ImGui::Text("  requests %u / deduped %u / first-load %u / failed %u",
-			iTextureRequests,
-			iTextureDeduped,
-			iTextureFirstLoad,
-			Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_FAILED));
+		ImGui::Text("Engine TextureHub MaterialEx (Session):");
+		ImGui::Text("  requests %u / unique SRVs %u", TextureHub.iMaterialRequestCount, iUniqueSRVCount);
+		ImGui::Text("  hub cached SRVs %u", TextureHub.iCachedSRVCount);
+		ImGui::Text("  duplicate loads prevented %u", TextureHub.iCacheReuseCount);
 
-		if (0 == iTextureRequests)
-		{
-			ImGui::Text("  dedup rate N/A");
-		}
+		if (0 == TextureHub.iMaterialRequestCount)
+			ImGui::Text("  prevention rate N/A");
 		else
-		{
-			const _float fDedupRate = static_cast<_float>(iTextureDeduped) / static_cast<_float>(iTextureRequests) * 100.f;
-			ImGui::Text("  dedup rate %.1f%%", fDedupRate);
-		}
+			ImGui::Text("  prevention rate %.1f%%",
+				static_cast<_float>(TextureHub.iCacheReuseCount) /
+				static_cast<_float>(TextureHub.iMaterialRequestCount) * 100.f);
+
+		ImGui::Text("  SRV load failures %u", TextureHub.iLoadFailCount);
 	}
 
 	End_Panel();

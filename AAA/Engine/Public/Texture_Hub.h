@@ -31,11 +31,13 @@ private:
 	unordered_map<_wstring, TEXTURE_HANDLE> m_HandleByTextureName;
 
 	mutable shared_mutex m_Mutex;
-	_uint m_iDedupedLoadRequestCount = {};
-	_uint m_iFirstLoadRequestCount = {};
+	mutable unordered_set<TEXTURE_HANDLE> m_ReferencedTextureHandles;
+	mutable _uint m_iMaterialRequestCount = {};
+	mutable _uint m_iCacheReuseCount = {};
 	_uint m_iLoadFailureCount = {};
 
 private:
+	HRESULT Find_Handle(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) const;
 	ID3D11ShaderResourceView* Get_SRV(TEXTURE_HANDLE Handle) const;
 
 public:
