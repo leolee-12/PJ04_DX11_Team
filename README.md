@@ -19,12 +19,10 @@
 원작의 3D 액션 플랫포머 구조를 그대로 재현하는 것을 목표로 했습니다.
 
 - **마을 - 스테이지 - 보스전 - 엔딩**으로 이어지는 완결된 플레이 흐름
-- 커비의 **흡입 / 능력 복사**(소드, 토이해머 등)와 **입 크게 변신(Deform)** 시스템
+- 커비의 **흡입 / 능력 복사**(소드, 토이해머 등)와 **머금기 변형(Deform)** 시스템
 - **보스 4종** (메타나이트, 고릴라, 기간트엣지, 아르마딜로)과 잡몹 AI
 - 컷씬 시퀀스, 대화 연출, 화면 전환, 클리어 연출 등 게임 외적 연출까지 포함
 - 레벨 배치 / 애니메이션 이벤트 / 카메라 연출을 위한 **자체 툴 4종** 병행 개발
-
-레벨 구성: `Town(3단계)` → `Stage0(2단계)` → `Stage1(3단계)` → `Boss_Stage1` → `Arena(보스 러쉬)` → `Ending`
 
 ---
 
@@ -165,7 +163,7 @@ Priority → Sky → Shadow → ShadowBlur → NonBlend → Decals → SSAO
 | 렌더링 / 보스 / UI / 카메라 / 엔진 코어 | [@Marb1e0817](https://github.com/Marb1e0817) | 디퍼드 파이프라인 확장, 셰이더, 리플렉션, EventBus, BT, PhysX 연동, 보스 AI, 컷씬 시퀀스 |
 | 플레이어 / 이펙트 툴 | [@yoonseungeon](https://github.com/yoonseungeon) | 커비 상태 머신, 능력 복사 시스템, 변신(Deform), 이펙트 로더 |
 | 레벨 / 맵 툴 | [@leolee-12](https://github.com/leolee-12) | MapTool, 맵 로더 / 스포너, 환경 오브젝트, 레벨 디자인 요소, 컬링 / 프로파일러 |
-| 몬스터 / 애니메이션 / 애니매이션,UI툴 | [@ddoichaboom](https://github.com/ddoichaboom) | 잡몹 AI, 애니메이터 시스템, AnimUITool |
+| 몬스터 / 애니메이션 / 애니매이션,UI툴 | [@ddoichaboom](https://github.com/ddoichaboom) | 몬스터 AI, 애니메이터 시스템, AnimUITool |
 
 > 담당은 주 작성 영역 기준이며, 대부분의 기능은 공용 모듈 위에서 서로 맞물려 있습니다.
 
