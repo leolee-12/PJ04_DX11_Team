@@ -35,7 +35,7 @@
 | 사운드 | FMOD |
 | 에디터 UI | Dear ImGui, ImGuizmo |
 | 데이터 | nlohmann/json (레벨, 이펙트, 애님 이벤트, 카메라 데이터) |
-| 텍스처 / 모델 | DirectXTK, DirectXTex, Assimp 기반 자체 포맷(`.ysh` / `.yse`) |
+| 텍스처 / 모델 | DirectXTK, DirectXTex, Assimp 기반 자체 모델 포맷(`.ysh`) |
 | 툴체인 | Visual Studio 2022 (v143), Python (프로젝트 파일 정렬 훅) |
 
 ---
