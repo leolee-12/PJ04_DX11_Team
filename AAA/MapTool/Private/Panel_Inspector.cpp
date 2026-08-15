@@ -15,7 +15,6 @@
 #include "EffectPart_Enum.h"
 #include "GameContent_Events.h"
 #include "LD_LensFlare.h"
-#include "CrashEffect.h"
 
 #include "GameInstance.h"
 #include "DataExporter.h"
@@ -602,89 +601,6 @@ void CPanel_Inspector::Render()
 				ImGui::PopID();
 			}
 		}
-	}
-
-	if (auto* pCrashEffect = dynamic_cast<Client::CCrashEffect*>(pSelected))
-	{
-		ImGui::Separator();
-
-		if (ImGui::CollapsingHeader("CrashEffect Parts", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			const auto& EffectParts = pCrashEffect->Get_EffectPartObject();
-			vector<pair<_wstring, Engine::CEffect_Part*>> SortedParts(EffectParts.begin(), EffectParts.end());
-
-			sort(SortedParts.begin(), SortedParts.end(),
-				[](const auto& Left, const auto& Right)
-				{
-					return Left.first < Right.first;
-				});
-
-			for (auto& [strTag, pPart] : SortedParts)
-			{
-				if (nullptr == pPart)
-					continue;
-
-				const string strLabel = "Part - " + WstrToStr(strTag);
-
-				if (!ImGui::CollapsingHeader(strLabel.c_str()))
-					continue;
-
-				ImGui::PushID(pPart);
-
-				_float3* pLocalPosition = FindFloat3Property(pPart, L"Local Pos", L"Effect");
-				const _float3 vPreviousLocalPosition =
-					nullptr != pLocalPosition ? *pLocalPosition : _float3{};
-
-				Draw_Properties(pPart);
-
-				if (nullptr != pLocalPosition
-					&& (pLocalPosition->x != vPreviousLocalPosition.x
-						|| pLocalPosition->y != vPreviousLocalPosition.y
-						|| pLocalPosition->z != vPreviousLocalPosition.z))
-				{
-					pPart->Get_Transform()->Set_State(
-						STATE::POSITION,
-						XMVectorSet(
-							pLocalPosition->x,
-							pLocalPosition->y,
-							pLocalPosition->z,
-							1.f));
-				}
-
-				ImGui::PopID();
-			}
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("Save Crash JSON"))
-		{
-			if (FAILED(pLevel->Save_CrashEffectPreview()))
-				MSG_BOX("CRASH EFFECT JSON SAVE FAILED");
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Reload Crash JSON"))
-		{
-			if (FAILED(pLevel->Load_CrashEffectPreview()))
-				MSG_BOX("CRASH EFFECT JSON LOAD FAILED");
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Restart Crash Preview"))
-		{
-			_float3 vSpawnPosition{};
-			XMStoreFloat3(
-				&vSpawnPosition,
-				pCrashEffect->Get_Transform()->Get_State(STATE::POSITION));
-
-			pCrashEffect->EffectContainer_Start(vSpawnPosition);
-		}
-
-		ImGui::TextDisabled(
-			"Resources/YSE/Effect/Crash/Crash/CrashEffect.JSON");
 	}
 
 	for (auto& [tag, pComponent] : pSelected->Get_Components())

@@ -31,6 +31,52 @@ void CPanel_Profiler::Render()
 		const auto CpuMs = [&Snapshot](Engine::EPROFILE_CPU_SECTION eSection) -> double { return Snapshot.CpuMs[ETOUI(eSection)]; };
 		const auto Counter = [&Snapshot](Engine::EPROFILE_COUNTER eCounter) -> _uint { return Snapshot.Counters[ETOUI(eCounter)]; };
 
+		struct CULLING_QUERY_DISPLAY
+		{
+			_float fTested = {};
+			_float fVisible = {};
+			_float fCulled = {};
+		};
+
+		static Engine::PROFILER_FRAME_SNAPSHOT s_PreviousSnapshot = {};
+		static _bool s_bHasPreviousSnapshot = false;
+		static CULLING_QUERY_DISPLAY s_FrustumDisplay = {};
+		static CULLING_QUERY_DISPLAY s_DistanceDisplay = {};
+
+		if (!s_bHasPreviousSnapshot || s_PreviousSnapshot.iFrameIndex != Snapshot.iFrameIndex)
+		{
+			const _bool bConsecutiveFrame =
+				s_bHasPreviousSnapshot &&
+				Snapshot.iFrameIndex == s_PreviousSnapshot.iFrameIndex + 1u;
+
+			const auto AverageCounter = [&](Engine::EPROFILE_COUNTER eCounter) -> _float
+				{
+					const _uint iCurrent = Counter(eCounter);
+					if (!bConsecutiveFrame)
+						return static_cast<_float>(iCurrent);
+
+					return (static_cast<_float>(s_PreviousSnapshot.Counters[ETOUI(eCounter)])
+						+ static_cast<_float>(iCurrent)) * 0.5f;
+				};
+
+			s_FrustumDisplay =
+			{
+					AverageCounter(Engine::EPROFILE_COUNTER::FRUSTUM_TESTED),
+					AverageCounter(Engine::EPROFILE_COUNTER::FRUSTUM_VISIBLE),
+					AverageCounter(Engine::EPROFILE_COUNTER::FRUSTUM_CULLED)
+			};
+
+			s_DistanceDisplay =
+			{
+					AverageCounter(Engine::EPROFILE_COUNTER::DISTANCE_TESTED),
+					AverageCounter(Engine::EPROFILE_COUNTER::DISTANCE_VISIBLE),
+					AverageCounter(Engine::EPROFILE_COUNTER::DISTANCE_CULLED)
+			};
+
+			s_PreviousSnapshot = Snapshot;
+			s_bHasPreviousSnapshot = 0u != Snapshot.iFrameIndex;
+		}
+
 		ImGui::Text("Engine Frame: %llu", static_cast<unsigned long long>(Snapshot.iFrameIndex));
 		ImGui::Text("FPS avg %.1f / now %.1f", Snapshot.fAvgFPS, Snapshot.fFPS);
 		ImGui::Text("Frame %.2f ms / dt %.2f ms", Snapshot.fFrameMs, Snapshot.fDeltaTime * 1000.f);
@@ -69,22 +115,23 @@ void CPanel_Profiler::Render()
 			iSubmittedTotal >= iSubmittedNamed ? iSubmittedTotal - iSubmittedNamed : 0u);
 
 		ImGui::Separator();
-		ImGui::Text("Engine Frustum Queries (only when evaluation runs):");
-		ImGui::Text("  tested %u / visible %u / culled %u",
-			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_TESTED),
-			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_VISIBLE),
-			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_CULLED));
+		ImGui::Text("Engine Frustum Queries (2-frame avg):");
+		ImGui::Text("  tested %.1f / visible %.1f / culled %.1f",
+			s_FrustumDisplay.fTested,
+			s_FrustumDisplay.fVisible,
+			s_FrustumDisplay.fCulled);
 
 		ImGui::Text("  fail-open view %u / bounds %u",
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW),
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS));
 
 		ImGui::Separator();
-		ImGui::Text("Engine Distance Queries (only when evaluation runs):");
-		ImGui::Text("  tested %u / visible %u / culled %u",
-			Counter(Engine::EPROFILE_COUNTER::DISTANCE_TESTED),
-			Counter(Engine::EPROFILE_COUNTER::DISTANCE_VISIBLE),
-			Counter(Engine::EPROFILE_COUNTER::DISTANCE_CULLED));
+		ImGui::Text("Engine Distance Queries (2-frame avg):");
+		ImGui::Text("  tested %.1f / visible %.1f / culled %.1f",
+			s_DistanceDisplay.fTested,
+			s_DistanceDisplay.fVisible,
+			s_DistanceDisplay.fCulled);
+
 		ImGui::Text("  fail-open camera %u / bounds %u / distance %u",
 			Counter(Engine::EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_CAMERA),
 			Counter(Engine::EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_BOUNDS),
