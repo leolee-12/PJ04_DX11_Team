@@ -7,6 +7,7 @@
 
 namespace
 {
+	static constexpr _bool ENABLE_INSTANCING = true;	// 성능 측정용 Switch
 	static constexpr _uint INSTANCE_MIN_COUNT = 2;
 	static constexpr _uint INSTANCE_MIN_SAVED_DRAWS = 2;
 }
@@ -225,6 +226,9 @@ void CEnv_InstanceBatch::BeginFrame_IfNeeded(_uint64 iCurrentFrame)
 
 _bool CEnv_InstanceBatch::Should_Instance() const
 {
+	if (!ENABLE_INSTANCING)
+		return false;
+
 	const _uint iInstanceCount = static_cast<_uint>(m_Submitted.size());
 	if (iInstanceCount < INSTANCE_MIN_COUNT)
 		return false;

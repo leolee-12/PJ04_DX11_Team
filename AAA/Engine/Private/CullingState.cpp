@@ -6,6 +6,7 @@
 
 namespace
 {
+	constexpr _bool ENABLE_CULLING = false;	// 성능 측정용 Switch
 	constexpr _float CULL_DISTANCE = 175.f;
 	constexpr _float DISTANCE_FADE_WIDTH = 10.f;
 	constexpr _uint CULLING_STABLE_EVALUATION_INTERVAL = 2u;
@@ -128,6 +129,12 @@ void CCullingState::Refresh_WorldBounds(const _float4x4& WorldMatrix)
 
 void CCullingState::Evaluate(const CULLING_EVALUATION_INPUT& Desc)
 {
+	if (!ENABLE_CULLING)
+	{
+		Reset_AllResults();
+		return;
+	}
+
 	const _uint64 iFrameIndex = static_cast<_uint64>(m_pGameInstance_Proxy->Get_FrameIndex());
 	if (!m_bForceEvaluation
 		&& 0u != ((iFrameIndex + m_iEvaluationPhase) % CULLING_STABLE_EVALUATION_INTERVAL))
